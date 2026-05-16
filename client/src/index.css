@@ -1,0 +1,173 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  * {
+    @apply border-line;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-bg text-ink font-sans antialiased;
+    background-image: theme('backgroundImage.radial-fade');
+    background-repeat: no-repeat;
+  }
+
+  /* Light theme overrides (toggleable) */
+  html.light body {
+    @apply bg-white text-slate-800;
+    background-image: radial-gradient(
+      ellipse 80% 60% at 50% -10%,
+      rgba(0, 191, 163, 0.1),
+      transparent 60%
+    );
+  }
+  html.light {
+    color-scheme: light;
+  }
+
+  ::selection {
+    @apply bg-neon/30 text-white;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-bg-soft;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-line rounded-full;
+    border: 2px solid theme('colors.bg.soft');
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-neon-dim;
+  }
+}
+
+@layer components {
+  .container-x {
+    @apply mx-auto w-full max-w-6xl px-5 sm:px-8;
+  }
+
+  .glass {
+    @apply rounded-2xl border border-line bg-bg-card/70 backdrop-blur-xl shadow-card;
+  }
+
+  .glass-hover {
+    @apply transition-all duration-300 hover:border-neon/40 hover:shadow-neon hover:-translate-y-1;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5
+           text-sm font-semibold transition-all duration-200 disabled:opacity-50
+           disabled:pointer-events-none focus:outline-none focus:ring-2
+           focus:ring-neon/50 focus:ring-offset-2 focus:ring-offset-bg;
+  }
+  .btn-primary {
+    @apply btn bg-neon text-bg hover:bg-white hover:shadow-neon;
+  }
+  .btn-outline {
+    @apply btn border border-line text-ink hover:border-neon/60 hover:text-neon;
+  }
+  .btn-ghost {
+    @apply btn text-ink-soft hover:text-neon hover:bg-bg-elevated;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-line
+           bg-bg-elevated px-3 py-1 text-xs font-medium text-ink-soft;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-line bg-bg-soft px-4 py-2.5 text-sm
+           text-ink placeholder:text-ink-dim transition-colors
+           focus:border-neon/60 focus:outline-none focus:ring-1 focus:ring-neon/40;
+  }
+  .label {
+    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wider text-ink-soft;
+  }
+
+  .section-title {
+    @apply text-3xl font-extrabold tracking-tight sm:text-4xl;
+  }
+
+  .gradient-text {
+    @apply bg-neon-gradient bg-clip-text text-transparent;
+  }
+
+  .link-underline {
+    @apply relative after:absolute after:-bottom-0.5 after:left-0 after:h-px
+           after:w-0 after:bg-neon after:transition-all hover:after:w-full;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Markdown article styling for blog & project case-studies */
+.prose-neon {
+  @apply text-ink-soft leading-relaxed;
+}
+.prose-neon h1,
+.prose-neon h2,
+.prose-neon h3 {
+  @apply mt-8 mb-3 font-bold text-ink;
+}
+.prose-neon h1 {
+  @apply text-2xl;
+}
+.prose-neon h2 {
+  @apply text-xl;
+}
+.prose-neon h3 {
+  @apply text-lg;
+}
+.prose-neon p {
+  @apply my-4;
+}
+.prose-neon a {
+  @apply text-neon underline underline-offset-2 hover:text-white;
+}
+.prose-neon ul {
+  @apply my-4 list-disc space-y-1.5 pl-6;
+}
+.prose-neon ol {
+  @apply my-4 list-decimal space-y-1.5 pl-6;
+}
+.prose-neon code {
+  @apply rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-sm text-neon;
+}
+.prose-neon pre {
+  @apply my-5 overflow-x-auto rounded-xl border border-line bg-bg-soft p-4 text-sm;
+}
+.prose-neon pre code {
+  @apply bg-transparent p-0 text-ink;
+}
+.prose-neon blockquote {
+  @apply my-5 border-l-2 border-neon/60 pl-4 italic text-ink-soft;
+}
+.prose-neon img {
+  @apply my-5 rounded-xl border border-line;
+}
