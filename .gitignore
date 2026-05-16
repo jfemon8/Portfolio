@@ -45,6 +45,9 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 
+# ===== Local docs (not tracked) =====
+docs/
+
 # ===== Misc =====
 *.local
 tmp/
