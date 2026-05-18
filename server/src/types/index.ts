@@ -6,15 +6,56 @@ import type { Types } from 'mongoose';
 
 export type ID = Types.ObjectId;
 
-export type UserRole = 'admin';
+export type UserRole = 'superAdmin' | 'admin' | 'visitor';
+export type UserStatus = 'active' | 'disabled';
 
 export interface IUser {
   name: string;
   email: string;
   password: string;
   role: UserRole;
+  status: UserStatus;
+  /** true for the hardcoded super admins — role/status/deletion locked */
+  isImmutableSuperAdmin: boolean;
   avatar: string;
   lastLogin?: Date;
+}
+
+/** Persisted, hashed refresh token (rotation + reuse detection). */
+export interface IRefreshToken {
+  user: ID;
+  tokenHash: string;
+  /** rotation family — a reused token revokes the whole family */
+  family: string;
+  expiresAt: Date;
+  revokedAt?: Date;
+  replacedByHash?: string;
+  ip: string;
+  userAgent: string;
+}
+
+export type AuditAction =
+  | 'auth.login'
+  | 'auth.login_failed'
+  | 'auth.refresh'
+  | 'auth.refresh_reuse_detected'
+  | 'auth.logout'
+  | 'auth.password_changed'
+  | 'user.created'
+  | 'user.updated'
+  | 'user.deleted'
+  | 'rbac.denied';
+
+export interface IAuditLog {
+  actor?: ID;
+  actorEmail: string;
+  role: UserRole | 'anonymous';
+  action: AuditAction;
+  entity?: string;
+  entityId?: string;
+  meta?: Record<string, unknown>;
+  ip: string;
+  userAgent: string;
 }
 
 export interface Social {
@@ -50,6 +91,18 @@ export interface IProfile {
   stats: Stat[];
   languages: LanguageProficiency[];
   available: boolean;
+  codeforcesHandle: string;
+}
+
+/** Cached competitive-programming snapshot (Codeforces). */
+export interface ICpStats {
+  handle: string;
+  rating: number | null;
+  maxRating: number | null;
+  rank: string;
+  maxRank: string;
+  contests: number;
+  fetchedAt: Date;
 }
 
 export type EmploymentType =
@@ -87,11 +140,26 @@ export interface GalleryImage {
   caption: string;
 }
 
+/** Structured case study (all optional Markdown). Empty → page falls back
+ *  to `description` for backward compatibility. */
+export interface CaseStudy {
+  problem: string;
+  process: string;
+  architecture: string;
+  database: string;
+  api: string;
+  challenges: string;
+  solutions: string;
+  optimization: string;
+  learnings: string;
+}
+
 export interface IProject {
   title: string;
   slug: string;
   tagline: string;
   description: string;
+  caseStudy: CaseStudy;
   summary: string;
   techStack: string[];
   highlights: string[];
@@ -138,7 +206,10 @@ export interface IEducation {
   order: number;
 }
 
-export type CredentialCategory = 'certification' | 'publication' | 'achievement';
+export type CredentialCategory =
+  | 'certification'
+  | 'publication'
+  | 'achievement';
 
 export interface ICertification {
   title: string;
@@ -160,7 +231,7 @@ export interface IPublication {
   order: number;
 }
 
-export type BlogStatus = 'draft' | 'published';
+export type BlogStatus = 'draft' | 'scheduled' | 'published';
 
 export interface IBlogPost {
   title: string;
@@ -176,6 +247,8 @@ export interface IBlogPost {
   featured: boolean;
   views: number;
   publishedAt?: Date;
+  /** when status === 'scheduled', the post becomes public at this time */
+  scheduledFor?: Date;
 }
 
 export interface IMessage {
@@ -217,4 +290,7 @@ export interface ApiSuccess<T = unknown> {
 export interface JwtPayload {
   id: string;
   role: UserRole;
+  email: string;
+  /** distinguishes access vs (future) typed tokens */
+  type: 'access';
 }

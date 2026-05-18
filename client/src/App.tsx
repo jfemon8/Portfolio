@@ -2,6 +2,7 @@ import { Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import PublicLayout from '@/components/layout/PublicLayout';
 import ProtectedRoute from '@/components/admin/ProtectedRoute';
+import RequireRole from '@/components/admin/RequireRole';
 import { Spinner } from '@/components/ui/States';
 import Home from '@/pages/Home';
 
@@ -28,6 +29,8 @@ const BlogEditor = lazy(() => import('@/pages/admin/BlogEditor'));
 const MessagesManager = lazy(() => import('@/pages/admin/MessagesManager'));
 const AnalyticsManager = lazy(() => import('@/pages/admin/AnalyticsManager'));
 const SettingsManager = lazy(() => import('@/pages/admin/SettingsManager'));
+const UsersManager = lazy(() => import('@/pages/admin/UsersManager'));
+const AuditLogViewer = lazy(() => import('@/pages/admin/AuditLogViewer'));
 
 const Fallback = (
   <div className="grid min-h-screen place-items-center">
@@ -69,6 +72,22 @@ export default function App() {
           <Route path="blog/:id/edit" element={<BlogEditor />} />
           <Route path="messages" element={<MessagesManager />} />
           <Route path="analytics" element={<AnalyticsManager />} />
+          <Route
+            path="users"
+            element={
+              <RequireRole roles={['superAdmin']}>
+                <UsersManager />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="audit"
+            element={
+              <RequireRole roles={['superAdmin']}>
+                <AuditLogViewer />
+              </RequireRole>
+            }
+          />
           <Route path="settings" element={<SettingsManager />} />
         </Route>
       </Routes>

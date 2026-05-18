@@ -2,7 +2,7 @@
   "name": "portfolio-monorepo",
   "version": "1.0.0",
   "private": true,
-  "description": "Dynamic MERN portfolio — runs the Express API (server/) and React app (client/) together",
+  "description": "Premium MERN portfolio ecosystem — Express API (server/) + React app (client/)",
   "scripts": {
     "dev": "concurrently -k -n server,client -c cyan,magenta \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
     "dev:server": "npm --prefix server run dev",
@@ -11,14 +11,33 @@
     "build": "npm --prefix client run build",
     "lint": "npm --prefix client run lint",
     "typecheck": "npm --prefix server run typecheck && npm --prefix client run typecheck",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\" --ignore-path .prettierignore",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css}\" --ignore-path .prettierignore",
     "seed": "npm --prefix server run seed",
     "seed:fresh": "npm --prefix server run seed:fresh",
     "create:admin": "npm --prefix server run create:admin",
     "install:all": "npm install && npm --prefix server install && npm --prefix client install",
-    "setup": "npm run install:all && npm run seed"
+    "setup": "npm run install:all && npm run seed",
+    "prepare": "husky || true"
+  },
+  "lint-staged": {
+    "client/**/*.{ts,tsx}": [
+      "prettier --write"
+    ],
+    "server/**/*.ts": [
+      "prettier --write"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
   },
   "devDependencies": {
-    "concurrently": "^9.1.0"
+    "@commitlint/cli": "^19.6.1",
+    "@commitlint/config-conventional": "^19.6.0",
+    "concurrently": "^9.1.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.3.0",
+    "prettier": "^3.4.2"
   },
   "engines": {
     "node": ">=18.0.0"

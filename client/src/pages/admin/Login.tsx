@@ -1,9 +1,13 @@
 import { useState } from 'react';
 import { useNavigate, useLocation, Navigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { motion } from 'motion/react';
 import toast from 'react-hot-toast';
 import { Terminal, Loader2, Lock } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import PremiumBackground from '@/components/layout/PremiumBackground';
+import GlassCard from '@/components/shared/GlassCard';
+import { Button } from '@/components/ui/button';
 import Seo from '@/components/ui/Seo';
 import type { ApiError } from '@/types';
 
@@ -44,9 +48,15 @@ export default function Login() {
 
   return (
     <>
-      <Seo title="Admin Login" />
-      <div className="grid min-h-screen place-items-center bg-bg px-5">
-        <div className="w-full max-w-sm">
+      <Seo title="Admin Login" noindex />
+      <div className="relative grid min-h-screen place-items-center bg-background px-5">
+        <PremiumBackground />
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="relative z-10 w-full max-w-sm"
+        >
           <Link
             to="/"
             className="mb-8 flex items-center justify-center gap-2 font-mono text-xl font-bold"
@@ -56,14 +66,14 @@ export default function Login() {
             <span className="animate-blink text-neon">_</span>
           </Link>
 
-          <div className="glass p-7">
+          <GlassCard className="p-7">
             <div className="mb-6 flex items-center gap-3">
-              <span className="grid h-10 w-10 place-items-center rounded-xl border border-neon/30 bg-bg-elevated text-neon">
+              <span className="grid h-10 w-10 place-items-center rounded-xl border border-primary/30 bg-card/60 text-neon">
                 <Lock className="h-5 w-5" />
               </span>
               <div>
-                <h1 className="font-bold">Admin Panel</h1>
-                <p className="text-xs text-ink-dim">
+                <h1 className="font-bold text-foreground">Admin Panel</h1>
+                <p className="text-xs text-muted-foreground/70">
                   Sign in to manage your portfolio
                 </p>
               </div>
@@ -80,7 +90,7 @@ export default function Login() {
                   {...register('email', { required: 'Email required' })}
                 />
                 {errors.email && (
-                  <p className="mt-1 text-xs text-neon-pink">
+                  <p className="mt-1 text-xs text-destructive">
                     {errors.email.message}
                   </p>
                 )}
@@ -95,14 +105,15 @@ export default function Login() {
                   {...register('password', { required: 'Password required' })}
                 />
                 {errors.password && (
-                  <p className="mt-1 text-xs text-neon-pink">
+                  <p className="mt-1 text-xs text-destructive">
                     {errors.password.message}
                   </p>
                 )}
               </div>
-              <button
+              <Button
                 disabled={submitting}
-                className="btn-primary w-full"
+                className="w-full"
+                size="lg"
                 type="submit"
               >
                 {submitting ? (
@@ -112,13 +123,13 @@ export default function Login() {
                 ) : (
                   'Sign in'
                 )}
-              </button>
+              </Button>
             </form>
-          </div>
-          <p className="mt-5 text-center text-xs text-ink-dim">
-            Credentials are created by the seed script — see docs/07.
+          </GlassCard>
+          <p className="mt-5 text-center text-xs text-muted-foreground/60">
+            Protected area · authorized access only
           </p>
-        </div>
+        </motion.div>
       </div>
     </>
   );

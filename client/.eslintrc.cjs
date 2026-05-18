@@ -32,6 +32,12 @@ module.exports = {
       files: ['vite.config.ts', '*.cjs', 'postcss.config.js', 'tailwind.config.js'],
       env: { node: true, browser: false },
     },
+    {
+      // ShadCN/UI vendored primitives intentionally co-export `*Variants`
+      // (cva) with the component — standard ShadCN convention.
+      files: ['src/components/ui/**/*.{ts,tsx}'],
+      rules: { 'react-refresh/only-export-components': 'off' },
+    },
   ],
   ignorePatterns: [
     'dist',

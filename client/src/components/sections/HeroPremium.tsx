@@ -1,0 +1,245 @@
+import { motion, useReducedMotion } from 'motion/react';
+import {
+  ArrowRight,
+  Download,
+  Github,
+  Linkedin,
+  Mail,
+  Code2,
+  MapPin,
+  ChevronDown,
+  type LucideIcon,
+} from 'lucide-react';
+import { useTypewriter } from '@/hooks/useTypewriter';
+import { track } from '@/lib/api';
+import { duration, ease } from '@/config/animation';
+import Spotlight from '@/components/motion/Spotlight';
+import Particles from '@/components/motion/Particles';
+import Magnetic from '@/components/motion/Magnetic';
+import GlassCard from '@/components/shared/GlassCard';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/cn';
+import type { ProfileDoc } from '@/types';
+
+const iconMap: Record<string, LucideIcon> = {
+  github: Github,
+  linkedin: Linkedin,
+  mail: Mail,
+  code: Code2,
+};
+
+interface HeroPremiumProps {
+  profile?: ProfileDoc;
+  onContact: () => void;
+  onProjects: () => void;
+}
+
+export default function HeroPremium({
+  profile,
+  onContact,
+  onProjects,
+}: HeroPremiumProps) {
+  const reduce = useReducedMotion();
+  const roles = profile?.roles?.length
+    ? profile.roles
+    : ['Front-End Developer', 'MERN Stack Developer'];
+  const typed = useTypewriter(roles);
+
+  const rise = (delay: number) => ({
+    initial: reduce ? false : { opacity: 0, y: 22 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: duration.slow, ease: ease.out, delay },
+  });
+
+  return (
+    <section id="hero" className="relative overflow-hidden">
+      <Spotlight className="flex min-h-screen items-center">
+        <Particles count={28} />
+
+        <div className="container-x relative z-10 grid items-center gap-14 py-28 lg:grid-cols-[1.15fr_0.85fr]">
+          {/* Left — identity */}
+          <div>
+            <motion.span
+              {...rise(0)}
+              className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/50 px-3.5 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-neon opacity-70" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-neon" />
+              </span>
+              {profile?.available
+                ? 'Available for opportunities'
+                : 'Currently building'}
+            </motion.span>
+
+            <motion.h1
+              {...rise(0.06)}
+              className="mt-6 text-balance text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl"
+            >
+              Hi, I'm{' '}
+              <span className="gradient-text">
+                {profile?.name || 'Md Jannatul Ferdhous Emon'}
+              </span>
+            </motion.h1>
+
+            <motion.div
+              {...rise(0.12)}
+              className="mt-5 flex items-center gap-2 font-mono text-lg text-muted-foreground sm:text-2xl"
+            >
+              <span className="text-neon">&gt;</span>
+              <span className="text-foreground">{typed}</span>
+              <span className="inline-block h-6 w-[3px] animate-blink bg-neon" />
+            </motion.div>
+
+            <motion.p
+              {...rise(0.18)}
+              className="mt-7 max-w-xl text-balance text-base leading-relaxed text-muted-foreground sm:text-lg"
+            >
+              {profile?.tagline ||
+                'I build responsive, dynamic & scalable web apps with the MERN stack.'}
+            </motion.p>
+
+            {profile?.location && (
+              <motion.p
+                {...rise(0.22)}
+                className="mt-4 flex items-center gap-1.5 text-sm text-muted-foreground/80"
+              >
+                <MapPin className="h-4 w-4" /> {profile.location}
+              </motion.p>
+            )}
+
+            <motion.div
+              {...rise(0.28)}
+              className="mt-9 flex flex-wrap items-center gap-3"
+            >
+              <Magnetic strength={0.4}>
+                <Button size="lg" onClick={onProjects}>
+                  View Projects <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Magnetic>
+              {profile?.resumeUrl && (
+                <Magnetic strength={0.4}>
+                  <a
+                    href={profile.resumeUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => track('resume_download', '/', 'hero')}
+                  >
+                    <Button size="lg" variant="outline">
+                      <Download className="h-4 w-4" /> Resume
+                    </Button>
+                  </a>
+                </Magnetic>
+              )}
+              <Button size="lg" variant="ghost" onClick={onContact}>
+                Contact me
+              </Button>
+            </motion.div>
+
+            <motion.div
+              {...rise(0.34)}
+              className="mt-9 flex items-center gap-3"
+            >
+              {(profile?.socials ?? []).map((s) => {
+                const Icon = iconMap[s.icon] ?? Code2;
+                return (
+                  <Magnetic key={s.label} strength={0.5}>
+                    <a
+                      href={s.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={s.label}
+                      onClick={() => track('social_click', '/', s.label)}
+                      className="grid h-11 w-11 place-items-center rounded-xl border border-border/70 bg-card/50 text-muted-foreground backdrop-blur transition-colors hover:border-primary/50 hover:text-primary"
+                    >
+                      <Icon className="h-5 w-5" />
+                    </a>
+                  </Magnetic>
+                );
+              })}
+            </motion.div>
+          </div>
+
+          {/* Right — terminal glass card */}
+          <motion.div
+            initial={reduce ? false : { opacity: 0, scale: 0.94, y: 28 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ delay: 0.24, duration: 0.7, ease: ease.out }}
+          >
+            <GlassCard className="overflow-hidden">
+              <div className="flex items-center gap-2 border-b border-border/70 bg-background/40 px-4 py-3">
+                <span className="h-3 w-3 rounded-full bg-[#ff5f56]" />
+                <span className="h-3 w-3 rounded-full bg-[#ffbd2e]" />
+                <span className="h-3 w-3 rounded-full bg-[#27c93f]" />
+                <span className="ml-2 font-mono text-xs text-muted-foreground">
+                  emon@portfolio: ~
+                </span>
+              </div>
+              <pre className="overflow-x-auto p-5 font-mono text-[13px] leading-relaxed text-muted-foreground">
+                <code>
+                  <span className="text-neon">$</span> whoami{'\n'}
+                  <span className="text-foreground">
+                    {profile?.name || 'Md Jannatul Ferdhous Emon'}
+                  </span>
+                  {'\n\n'}
+                  <span className="text-neon">$</span> cat stack.json{'\n'}
+                  {'{'}
+                  {'\n'} <span className="text-neon-violet">"frontend"</span>:{' '}
+                  <span className="text-neon-blue">
+                    "React, Next.js, Tailwind"
+                  </span>
+                  ,{'\n'} <span className="text-neon-violet">"backend"</span>:{' '}
+                  <span className="text-neon-blue">"Node, Express, .NET"</span>,
+                  {'\n'} <span className="text-neon-violet">"database"</span>:{' '}
+                  <span className="text-neon-blue">"MongoDB, SQL Server"</span>
+                  {'\n'}
+                  {'}'}
+                  {'\n\n'}
+                  <span className="text-neon">$</span> echo $GOALS{'\n'}
+                  <span className="text-foreground">
+                    Become a well-rounded software engineer 🚀
+                  </span>
+                  {'\n'}
+                  <span className="text-neon">$</span>{' '}
+                  <span className="inline-block h-4 w-2 animate-blink bg-neon align-middle" />
+                </code>
+              </pre>
+              {profile?.stats && profile.stats.length > 0 && (
+                <div className="grid grid-cols-2 gap-px border-t border-border/70 bg-border/40 sm:grid-cols-4">
+                  {profile.stats.map((s) => (
+                    <div
+                      key={s.label}
+                      className="bg-card/60 px-3 py-4 text-center"
+                    >
+                      <div className="text-lg font-bold text-neon">
+                        {s.value}
+                      </div>
+                      <div className="mt-0.5 text-[11px] uppercase tracking-wide text-muted-foreground/70">
+                        {s.label}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </GlassCard>
+          </motion.div>
+        </div>
+
+        <motion.button
+          type="button"
+          onClick={onContact}
+          aria-label="Scroll down"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1 }}
+          className={cn(
+            'absolute bottom-24 left-1/2 -translate-x-1/2 text-muted-foreground/60',
+            'hidden sm:block'
+          )}
+        >
+          <ChevronDown className="h-6 w-6 animate-bounce" />
+        </motion.button>
+      </Spotlight>
+    </section>
+  );
+}

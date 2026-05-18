@@ -6,20 +6,35 @@ import { BlogPost } from '../models/BlogPost.js';
 import type { IBlogPost } from '../types/index.js';
 import { destroyAsset } from '../config/cloudinary.js';
 
-/** Public — published posts only, paginated, with ?tag & ?q search. */
+/**
+ * A post is publicly visible if it's published, OR scheduled with its time
+ * already due (the model also auto-promotes scheduled→published on next save;
+ * this query keeps it correct without a cron — Vercel serverless has none).
+ */
+export const publicVisibility = (): RootFilterQuery<IBlogPost> => ({
+  $or: [
+    { status: 'published' },
+    { status: 'scheduled', scheduledFor: { $lte: new Date() } },
+  ],
+});
+
+/** Public — visible posts only, paginated, with ?tag & ?q search. */
 export const listPublished = asyncHandler(
   async (req: Request, res: Response) => {
     const page = Math.max(1, parseInt(String(req.query.page)) || 1);
     const limit = Math.min(50, parseInt(String(req.query.limit)) || 9);
-    const filter: RootFilterQuery<IBlogPost> = { status: 'published' };
-    if (req.query.tag) filter.tags = String(req.query.tag);
+    const and: RootFilterQuery<IBlogPost>[] = [publicVisibility()];
     if (req.query.q) {
       const q = String(req.query.q);
-      filter.$or = [
-        { title: { $regex: q, $options: 'i' } },
-        { excerpt: { $regex: q, $options: 'i' } },
-      ];
+      and.push({
+        $or: [
+          { title: { $regex: q, $options: 'i' } },
+          { excerpt: { $regex: q, $options: 'i' } },
+        ],
+      });
     }
+    const filter: RootFilterQuery<IBlogPost> = { $and: and };
+    if (req.query.tag) filter.tags = String(req.query.tag);
 
     const [posts, total] = await Promise.all([
       BlogPost.find(filter)
@@ -42,13 +57,13 @@ export const listPublished = asyncHandler(
 export const getPublishedBySlug = asyncHandler(
   async (req: Request, res: Response) => {
     const post = await BlogPost.findOneAndUpdate(
-      { slug: req.params.slug, status: 'published' },
+      { slug: req.params.slug, ...publicVisibility() },
       { $inc: { views: 1 } },
       { new: true }
     );
     if (!post) throw ApiError.notFound('Post not found');
     const related = await BlogPost.find({
-      status: 'published',
+      $and: [publicVisibility()],
       _id: { $ne: post._id },
       tags: { $in: post.tags },
     })

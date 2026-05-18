@@ -1,45 +1,62 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { Section, SectionHeading } from '@/components/ui/Section';
-import Reveal from '@/components/ui/Reveal';
-import ProjectCard from '@/components/ui/ProjectCard';
+import { Section, SectionHeading } from '@/components/shared/Section';
+import Reveal from '@/components/motion/Reveal';
+import ProjectCard from '@/components/shared/ProjectCard';
+import { Button } from '@/components/ui/button';
 import { Spinner, ErrorState, EmptyState } from '@/components/ui/States';
 import { useProjects } from '@/hooks/usePortfolio';
+import { cn } from '@/lib/cn';
 
+/**
+ * Featured projects — premium bento: the first featured project gets the
+ * hero slot, the rest tile around it.
+ */
 export default function FeaturedProjects() {
   const { data, isLoading, isError, refetch } = useProjects('?featured=true');
   const projects = data?.data ?? [];
 
   return (
     <Section id="projects">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <SectionHeading
-          index="03."
-          title="Featured projects"
-          subtitle="A selection of things I've built and shipped."
-        />
-        <Link to="/projects" className="btn-outline mb-12 hidden sm:inline-flex">
-          All projects <ArrowRight className="h-4 w-4" />
-        </Link>
-      </div>
+      <SectionHeading
+        index="03."
+        title="Featured work"
+        subtitle="A selection of products I've designed, built and shipped."
+        action={
+          <Link to="/projects" className="hidden sm:block">
+            <Button variant="outline">
+              All projects <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
+        }
+      />
 
       {isLoading && <Spinner />}
-      {isError && <ErrorState onRetry={refetch} />}
+      {isError && <ErrorState onRetry={() => void refetch()} />}
       {!isLoading && !isError && projects.length === 0 && (
         <EmptyState message="Projects coming soon." />
       )}
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {projects.map((p, i) => (
-          <Reveal key={p._id} delay={i * 0.06}>
-            <ProjectCard project={p} />
-          </Reveal>
-        ))}
+      <div className="grid auto-rows-[1fr] gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {projects.map((p, i) => {
+          const big = i === 0;
+          return (
+            <Reveal
+              key={p._id}
+              delay={i * 0.07}
+              className={cn(big && 'sm:col-span-2 lg:row-span-2')}
+            >
+              <ProjectCard project={p} featured={big} />
+            </Reveal>
+          );
+        })}
       </div>
 
       <div className="mt-10 text-center sm:hidden">
-        <Link to="/projects" className="btn-outline">
-          View all projects <ArrowRight className="h-4 w-4" />
+        <Link to="/projects">
+          <Button variant="outline">
+            View all projects <ArrowRight className="h-4 w-4" />
+          </Button>
         </Link>
       </div>
     </Section>

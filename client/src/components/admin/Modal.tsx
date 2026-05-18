@@ -1,6 +1,8 @@
 import { useEffect, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { X } from 'lucide-react';
+import { cn } from '@/lib/cn';
 
 interface ModalProps {
   open: boolean;
@@ -10,6 +12,7 @@ interface ModalProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
+/** Shared premium modal (project rule #3) — glass, animated, reduced-motion safe. */
 export default function Modal({
   open,
   title,
@@ -17,6 +20,8 @@ export default function Modal({
   children,
   size = 'md',
 }: ModalProps) {
+  const reduce = useReducedMotion();
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -31,28 +36,44 @@ export default function Modal({
     };
   }, [open, onClose]);
 
-  if (!open) return null;
   const max =
     size === 'lg' ? 'max-w-3xl' : size === 'sm' ? 'max-w-md' : 'max-w-xl';
 
   return createPortal(
-    <div className="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm">
-      <div
-        className={`glass my-8 w-full ${max} animate-fade-up`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between border-b border-line px-6 py-4">
-          <h2 className="font-bold text-ink">{title}</h2>
-          <button
-            onClick={onClose}
-            className="rounded-lg p-1.5 text-ink-dim hover:bg-bg-elevated hover:text-neon-pink"
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+        >
+          <motion.div
+            initial={reduce ? false : { opacity: 0, y: -20, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={reduce ? undefined : { opacity: 0, y: -10, scale: 0.98 }}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            onClick={(e) => e.stopPropagation()}
+            className={cn(
+              'my-8 w-full rounded-2xl border border-border/70 bg-card/80 shadow-glow backdrop-blur-2xl',
+              max
+            )}
           >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        <div className="max-h-[70vh] overflow-y-auto p-6">{children}</div>
-      </div>
-    </div>,
+            <div className="flex items-center justify-between border-b border-border/60 px-6 py-4">
+              <h2 className="font-bold text-foreground">{title}</h2>
+              <button
+                onClick={onClose}
+                className="rounded-lg p-1.5 text-muted-foreground/70 transition-colors hover:bg-card hover:text-destructive"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="max-h-[70vh] overflow-y-auto p-6">{children}</div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>,
     document.body
   );
 }

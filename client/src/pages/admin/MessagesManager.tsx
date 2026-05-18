@@ -4,7 +4,10 @@ import toast from 'react-hot-toast';
 import { Mail, MailOpen, Star, Trash2, Archive, Reply } from 'lucide-react';
 import { api } from '@/lib/api';
 import PageHeader from '@/components/admin/PageHeader';
+import GlassCard from '@/components/shared/GlassCard';
+import { Button } from '@/components/ui/button';
 import { Spinner, EmptyState } from '@/components/ui/States';
+import { cn } from '@/lib/cn';
 import type { ListResponse, MessageDoc } from '@/types';
 
 type FilterKey = 'all' | 'unread' | 'starred' | 'archived';
@@ -54,6 +57,9 @@ export default function MessagesManager() {
     if (!m.read) patch.mutate({ id: m._id, body: { read: true } });
   };
 
+  const iconBtn =
+    'rounded-lg border border-border/70 p-2 text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon';
+
   return (
     <div>
       <PageHeader title="Messages" subtitle={`${data?.unread ?? 0} unread`} />
@@ -63,11 +69,12 @@ export default function MessagesManager() {
           <button
             key={ff.k}
             onClick={() => setFilter(ff.k)}
-            className={`rounded-full border px-4 py-1.5 text-sm transition-colors ${
+            className={cn(
+              'rounded-full border px-4 py-1.5 text-sm transition-all',
               filter === ff.k
-                ? 'border-neon/50 bg-neon/10 text-neon'
-                : 'border-line text-ink-soft hover:text-ink'
-            }`}
+                ? 'border-primary/50 bg-primary/10 text-primary shadow-glow'
+                : 'border-border/70 text-muted-foreground hover:text-foreground'
+            )}
           >
             {ff.l}
           </button>
@@ -85,40 +92,51 @@ export default function MessagesManager() {
             <button
               key={m._id}
               onClick={() => open(m)}
-              className={`glass w-full p-4 text-left transition-colors ${
-                active?._id === m._id ? 'border-neon/50' : ''
-              } ${!m.read ? 'border-l-2 border-l-neon' : ''}`}
+              className="block w-full text-left"
             >
-              <div className="flex items-center justify-between gap-2">
-                <span className="truncate font-semibold text-ink">
-                  {m.name}
-                </span>
-                <span className="shrink-0 text-[11px] text-ink-dim">
-                  {new Date(m.createdAt).toLocaleDateString()}
-                </span>
-              </div>
-              <p className="truncate text-xs text-ink-dim">{m.email}</p>
-              <p className="mt-1 truncate text-sm text-ink-soft">
-                {m.subject || m.message}
-              </p>
+              <GlassCard
+                className={cn(
+                  'p-4 transition-colors',
+                  active?._id === m._id && 'border-primary/50',
+                  !m.read && 'border-l-2 border-l-neon'
+                )}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="truncate font-semibold text-foreground">
+                    {m.name}
+                  </span>
+                  <span className="shrink-0 text-[11px] text-muted-foreground/60">
+                    {new Date(m.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+                <p className="truncate text-xs text-muted-foreground/70">
+                  {m.email}
+                </p>
+                <p className="mt-1 truncate text-sm text-muted-foreground">
+                  {m.subject || m.message}
+                </p>
+              </GlassCard>
             </button>
           ))}
         </div>
 
         {active ? (
-          <div className="glass h-fit p-6">
-            <div className="flex flex-wrap items-start justify-between gap-3 border-b border-line pb-4">
+          <GlassCard className="h-fit p-6">
+            <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border/60 pb-4">
               <div>
-                <h2 className="text-lg font-bold text-ink">
+                <h2 className="text-lg font-bold text-foreground">
                   {active.subject || '(no subject)'}
                 </h2>
-                <p className="mt-1 text-sm text-ink-soft">
+                <p className="mt-1 text-sm text-muted-foreground">
                   {active.name} ·{' '}
-                  <a href={`mailto:${active.email}`} className="text-neon">
+                  <a
+                    href={`mailto:${active.email}`}
+                    className="text-neon hover:underline"
+                  >
                     {active.email}
                   </a>
                 </p>
-                <p className="text-xs text-ink-dim">
+                <p className="text-xs text-muted-foreground/60">
                   {new Date(active.createdAt).toLocaleString()}
                 </p>
               </div>
@@ -130,13 +148,14 @@ export default function MessagesManager() {
                       body: { starred: !active.starred },
                     })
                   }
-                  className="rounded-lg border border-line p-2 text-ink-soft hover:text-neon"
+                  className={iconBtn}
                   title="Star"
                 >
                   <Star
-                    className={`h-4 w-4 ${
-                      active.starred ? 'fill-neon text-neon' : ''
-                    }`}
+                    className={cn(
+                      'h-4 w-4',
+                      active.starred && 'fill-neon text-neon'
+                    )}
                   />
                 </button>
                 <button
@@ -146,7 +165,7 @@ export default function MessagesManager() {
                       body: { read: !active.read },
                     })
                   }
-                  className="rounded-lg border border-line p-2 text-ink-soft hover:text-neon"
+                  className={iconBtn}
                   title="Toggle read"
                 >
                   {active.read ? (
@@ -162,7 +181,7 @@ export default function MessagesManager() {
                       body: { archived: !active.archived },
                     })
                   }
-                  className="rounded-lg border border-line p-2 text-ink-soft hover:text-neon"
+                  className={iconBtn}
                   title="Archive"
                 >
                   <Archive className="h-4 w-4" />
@@ -172,28 +191,30 @@ export default function MessagesManager() {
                     window.confirm('Delete this message?') &&
                     del.mutate(active._id)
                   }
-                  className="rounded-lg border border-line p-2 text-ink-soft hover:text-neon-pink"
+                  className="rounded-lg border border-border/70 p-2 text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
+                  title="Delete"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
             </div>
-            <p className="whitespace-pre-wrap py-5 text-sm leading-relaxed text-ink-soft">
+            <p className="whitespace-pre-wrap py-5 text-sm leading-relaxed text-muted-foreground">
               {active.message}
             </p>
             <a
               href={`mailto:${active.email}?subject=Re: ${encodeURIComponent(
                 active.subject || ''
               )}`}
-              className="btn-primary"
             >
-              <Reply className="h-4 w-4" /> Reply by email
+              <Button>
+                <Reply className="h-4 w-4" /> Reply by email
+              </Button>
             </a>
-          </div>
+          </GlassCard>
         ) : (
-          <div className="glass hidden place-items-center p-10 text-ink-dim lg:grid">
+          <GlassCard className="hidden place-items-center p-10 text-muted-foreground/60 lg:grid">
             Select a message to read
-          </div>
+          </GlassCard>
         )}
       </div>
     </div>

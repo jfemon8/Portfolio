@@ -22,10 +22,19 @@ import {
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import PageHeader from '@/components/admin/PageHeader';
+import GlassCard from '@/components/shared/GlassCard';
 import { Spinner } from '@/components/ui/States';
 import type { AnalyticsSummary, ItemResponse, VisitType } from '@/types';
 
 const COLORS = ['#00ffd1', '#a855f7', '#38bdf8', '#ec4899', '#0bbfa3'];
+
+const axisStroke = 'hsl(var(--muted-foreground))';
+const tooltipStyle = {
+  background: 'hsl(var(--card))',
+  border: '1px solid hsl(var(--border))',
+  borderRadius: 12,
+  color: 'hsl(var(--foreground))',
+} as const;
 
 const typeIcon: Record<string, LucideIcon> = {
   pageview: Eye,
@@ -81,17 +90,19 @@ export default function AnalyticsManager() {
 
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((c) => (
-          <div key={c.label} className="glass p-5">
+          <GlassCard key={c.label} className="p-5">
             <c.icon className="mb-3 h-5 w-5 text-neon" />
-            <p className="text-2xl font-bold text-ink">{c.value}</p>
-            <p className="text-xs text-ink-dim">{c.label}</p>
-          </div>
+            <p className="text-2xl font-bold text-foreground">{c.value}</p>
+            <p className="text-xs text-muted-foreground">{c.label}</p>
+          </GlassCard>
         ))}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <div className="glass p-6 lg:col-span-2">
-          <h3 className="mb-4 font-semibold text-ink">Page views over time</h3>
+        <GlassCard className="p-6 lg:col-span-2">
+          <h3 className="mb-4 font-semibold text-foreground">
+            Page views over time
+          </h3>
           <ResponsiveContainer width="100%" height={280}>
             <AreaChart data={a.byDay}>
               <defs>
@@ -100,16 +111,9 @@ export default function AnalyticsManager() {
                   <stop offset="95%" stopColor="#00ffd1" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <XAxis dataKey="date" stroke="#6b6b7d" fontSize={11} />
-              <YAxis stroke="#6b6b7d" fontSize={11} allowDecimals={false} />
-              <Tooltip
-                contentStyle={{
-                  background: '#13131d',
-                  border: '1px solid #23232f',
-                  borderRadius: 12,
-                  color: '#e7e7ee',
-                }}
-              />
+              <XAxis dataKey="date" stroke={axisStroke} fontSize={11} />
+              <YAxis stroke={axisStroke} fontSize={11} allowDecimals={false} />
+              <Tooltip contentStyle={tooltipStyle} />
               <Area
                 type="monotone"
                 dataKey="views"
@@ -119,10 +123,10 @@ export default function AnalyticsManager() {
               />
             </AreaChart>
           </ResponsiveContainer>
-        </div>
+        </GlassCard>
 
-        <div className="glass p-6">
-          <h3 className="mb-4 font-semibold text-ink">By device</h3>
+        <GlassCard className="p-6">
+          <h3 className="mb-4 font-semibold text-foreground">By device</h3>
           <ResponsiveContainer width="100%" height={240}>
             <PieChart>
               <Pie
@@ -137,20 +141,14 @@ export default function AnalyticsManager() {
                   <Cell key={i} fill={COLORS[i % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip
-                contentStyle={{
-                  background: '#13131d',
-                  border: '1px solid #23232f',
-                  borderRadius: 12,
-                }}
-              />
+              <Tooltip contentStyle={tooltipStyle} />
             </PieChart>
           </ResponsiveContainer>
           <div className="mt-2 flex flex-wrap justify-center gap-3 text-xs">
             {a.byDevice.map((d, i) => (
               <span
                 key={d._id}
-                className="flex items-center gap-1.5 text-ink-soft"
+                className="flex items-center gap-1.5 text-muted-foreground"
               >
                 <span
                   className="h-2.5 w-2.5 rounded-full"
@@ -160,10 +158,10 @@ export default function AnalyticsManager() {
               </span>
             ))}
           </div>
-        </div>
+        </GlassCard>
 
-        <div className="glass p-6">
-          <h3 className="mb-4 font-semibold text-ink">Events</h3>
+        <GlassCard className="p-6">
+          <h3 className="mb-4 font-semibold text-foreground">Events</h3>
           <div className="space-y-3">
             {a.byType.map((t) => {
               const Icon = typeIcon[t._id as VisitType] ?? Eye;
@@ -172,41 +170,37 @@ export default function AnalyticsManager() {
                   key={t._id}
                   className="flex items-center justify-between text-sm"
                 >
-                  <span className="flex items-center gap-2 text-ink-soft">
+                  <span className="flex items-center gap-2 text-muted-foreground">
                     <Icon className="h-4 w-4 text-neon" />
                     {t._id.replace('_', ' ')}
                   </span>
-                  <span className="font-mono text-ink">{t.count}</span>
+                  <span className="font-mono text-foreground">{t.count}</span>
                 </div>
               );
             })}
           </div>
-        </div>
+        </GlassCard>
 
-        <div className="glass p-6 lg:col-span-2">
-          <h3 className="mb-4 font-semibold text-ink">Top projects</h3>
+        <GlassCard className="p-6 lg:col-span-2">
+          <h3 className="mb-4 font-semibold text-foreground">Top projects</h3>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={a.topProjects} layout="vertical">
-              <XAxis type="number" stroke="#6b6b7d" fontSize={11} />
+              <XAxis type="number" stroke={axisStroke} fontSize={11} />
               <YAxis
                 type="category"
                 dataKey="title"
-                stroke="#6b6b7d"
+                stroke={axisStroke}
                 fontSize={11}
                 width={110}
               />
               <Tooltip
-                contentStyle={{
-                  background: '#13131d',
-                  border: '1px solid #23232f',
-                  borderRadius: 12,
-                }}
-                cursor={{ fill: '#1a1a24' }}
+                contentStyle={tooltipStyle}
+                cursor={{ fill: 'hsl(var(--muted))' }}
               />
               <Bar dataKey="views" fill="#a855f7" radius={[0, 6, 6, 0]} />
             </BarChart>
           </ResponsiveContainer>
-        </div>
+        </GlassCard>
       </div>
     </div>
   );

@@ -91,10 +91,10 @@ export default function CredentialsManager() {
           <button
             key={t.k}
             onClick={() => setTab(t.k)}
-            className={`rounded-full border px-4 py-1.5 text-sm transition-colors ${
+            className={`rounded-full border px-4 py-1.5 text-sm transition-all ${
               tab === t.k
-                ? 'border-neon/50 bg-neon/10 text-neon'
-                : 'border-line text-ink-soft hover:text-ink'
+                ? 'border-primary/50 bg-primary/10 text-primary shadow-glow'
+                : 'border-border/70 text-muted-foreground hover:text-foreground'
             }`}
           >
             {t.l}

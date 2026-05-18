@@ -2,12 +2,28 @@ import mongoose, { type Model } from 'mongoose';
 import slugify from 'slugify';
 import type { IProject } from '../types/index.js';
 
+const caseStudySchema = new mongoose.Schema(
+  {
+    problem: { type: String, default: '' },
+    process: { type: String, default: '' },
+    architecture: { type: String, default: '' },
+    database: { type: String, default: '' },
+    api: { type: String, default: '' },
+    challenges: { type: String, default: '' },
+    solutions: { type: String, default: '' },
+    optimization: { type: String, default: '' },
+    learnings: { type: String, default: '' },
+  },
+  { _id: false }
+);
+
 const projectSchema = new mongoose.Schema<IProject>(
   {
     title: { type: String, required: true, trim: true },
     slug: { type: String, unique: true, index: true },
     tagline: { type: String, default: '' },
     description: { type: String, default: '' },
+    caseStudy: { type: caseStudySchema, default: () => ({}) },
     summary: { type: String, default: '' },
     techStack: { type: [String], default: [] },
     highlights: { type: [String], default: [] },

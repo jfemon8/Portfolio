@@ -13,10 +13,15 @@ const blogSchema = new mongoose.Schema<IBlogPost>(
     tags: { type: [String], default: [] },
     category: { type: String, default: 'General' },
     readingTime: { type: Number, default: 1 },
-    status: { type: String, enum: ['draft', 'published'], default: 'draft' },
+    status: {
+      type: String,
+      enum: ['draft', 'scheduled', 'published'],
+      default: 'draft',
+    },
     featured: { type: Boolean, default: false },
     views: { type: Number, default: 0 },
     publishedAt: { type: Date },
+    scheduledFor: { type: Date },
   },
   { timestamps: true }
 );
@@ -29,8 +34,16 @@ blogSchema.pre('validate', function prep(next) {
     const words = (this.content || '').trim().split(/\s+/).length;
     this.readingTime = Math.max(1, Math.round(words / 200));
   }
+  // A scheduled post whose time has arrived becomes published.
+  if (
+    this.status === 'scheduled' &&
+    this.scheduledFor &&
+    this.scheduledFor.getTime() <= Date.now()
+  ) {
+    this.status = 'published';
+  }
   if (this.status === 'published' && !this.publishedAt) {
-    this.publishedAt = new Date();
+    this.publishedAt = this.scheduledFor ?? new Date();
   }
   next();
 });

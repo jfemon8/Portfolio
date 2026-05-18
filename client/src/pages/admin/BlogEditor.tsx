@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { Save, ArrowLeft, Eye, Loader2 } from 'lucide-react';
+import { Save, ArrowLeft, Loader2 } from 'lucide-react';
 import { api } from '@/lib/api';
 import ImageUpload from '@/components/admin/ImageUpload';
+import MarkdownEditor from '@/components/admin/MarkdownEditor';
 import Toggle from '@/components/ui/Toggle';
-import Markdown from '@/components/ui/Markdown';
+import GlassCard from '@/components/shared/GlassCard';
+import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/States';
 import type { ApiError, BlogPostDoc, ItemResponse } from '@/types';
 
@@ -29,7 +31,6 @@ export default function BlogEditor() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [f, setF] = useState<BlogForm>(empty);
-  const [preview, setPreview] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ['blog', 'admin', id],
@@ -62,83 +63,58 @@ export default function BlogEditor() {
 
   return (
     <div>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-6">
         <button
           onClick={() => navigate('/admin/blog')}
-          className="inline-flex items-center gap-2 text-sm text-ink-soft hover:text-neon"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-neon"
         >
           <ArrowLeft className="h-4 w-4" /> Back to posts
         </button>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setPreview((p) => !p)}
-            className="btn-outline"
-          >
-            <Eye className="h-4 w-4" /> {preview ? 'Edit' : 'Preview'}
-          </button>
-          <button
-            onClick={() => save.mutate(f)}
-            disabled={save.isPending || !f.title}
-            className="btn-primary"
-          >
-            {save.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Save className="h-4 w-4" />
-            )}
-            Save
-          </button>
-        </div>
+        <Button
+          onClick={() => save.mutate(f)}
+          disabled={save.isPending || !f.title}
+        >
+          {save.isPending ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Save className="h-4 w-4" />
+          )}
+          Save
+        </Button>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-        <div className="glass space-y-4 p-6">
-          {preview ? (
-            <article>
-              <h1 className="text-3xl font-extrabold">
-                {f.title || 'Untitled'}
-              </h1>
-              <p className="mt-2 text-ink-soft">{f.excerpt}</p>
-              <hr className="my-6 border-line" />
-              <Markdown>{f.content}</Markdown>
-            </article>
-          ) : (
-            <>
-              <div>
-                <label className="label">Title</label>
-                <input
-                  className="input text-lg"
-                  value={f.title ?? ''}
-                  onChange={(e) => set('title', e.target.value)}
-                  placeholder="An awesome post title"
-                />
-              </div>
-              <div>
-                <label className="label">Excerpt</label>
-                <textarea
-                  rows={2}
-                  className="input resize-none"
-                  value={f.excerpt ?? ''}
-                  onChange={(e) => set('excerpt', e.target.value)}
-                  placeholder="Short summary shown on cards"
-                />
-              </div>
-              <div>
-                <label className="label">Content (Markdown)</label>
-                <textarea
-                  rows={20}
-                  className="input resize-y font-mono text-sm"
-                  value={f.content ?? ''}
-                  onChange={(e) => set('content', e.target.value)}
-                  placeholder={'# Heading\n\nWrite your article in **Markdown**…'}
-                />
-              </div>
-            </>
-          )}
-        </div>
+        <GlassCard className="space-y-4 p-6">
+          <div>
+            <label className="label">Title</label>
+            <input
+              className="input text-lg"
+              value={f.title ?? ''}
+              onChange={(e) => set('title', e.target.value)}
+              placeholder="An awesome post title"
+            />
+          </div>
+          <div>
+            <label className="label">Excerpt</label>
+            <textarea
+              rows={2}
+              className="input resize-none"
+              value={f.excerpt ?? ''}
+              onChange={(e) => set('excerpt', e.target.value)}
+              placeholder="Short summary shown on cards"
+            />
+          </div>
+          <div>
+            <label className="label">Content</label>
+            <MarkdownEditor
+              value={f.content ?? ''}
+              onChange={(v) => set('content', v)}
+            />
+          </div>
+        </GlassCard>
 
         <div className="space-y-6">
-          <div className="glass space-y-4 p-6">
+          <GlassCard className="space-y-4 p-6">
             <h3 className="font-semibold text-neon">Settings</h3>
             <div>
               <label className="label">Status</label>
@@ -150,9 +126,35 @@ export default function BlogEditor() {
                 }
               >
                 <option value="draft">Draft</option>
+                <option value="scheduled">Scheduled</option>
                 <option value="published">Published</option>
               </select>
             </div>
+            {f.status === 'scheduled' && (
+              <div>
+                <label className="label">Publish at</label>
+                <input
+                  type="datetime-local"
+                  className="input"
+                  value={
+                    f.scheduledFor
+                      ? new Date(f.scheduledFor).toISOString().slice(0, 16)
+                      : ''
+                  }
+                  onChange={(e) =>
+                    set(
+                      'scheduledFor',
+                      e.target.value
+                        ? new Date(e.target.value).toISOString()
+                        : undefined
+                    )
+                  }
+                />
+                <p className="mt-1 text-[11px] text-muted-foreground/70">
+                  Goes public automatically at this time.
+                </p>
+              </div>
+            )}
             <div>
               <label className="label">Category</label>
               <input
@@ -182,11 +184,13 @@ export default function BlogEditor() {
                 checked={Boolean(f.featured)}
                 onChange={(v) => set('featured', v)}
               />
-              <span className="text-sm text-ink-soft">Featured post</span>
+              <span className="text-sm text-muted-foreground">
+                Featured post
+              </span>
             </div>
-          </div>
+          </GlassCard>
 
-          <div className="glass p-6">
+          <GlassCard className="p-6">
             <ImageUpload
               label="Cover image"
               value={f.coverImage}
@@ -197,7 +201,7 @@ export default function BlogEditor() {
                 set('coverPublicId', publicId);
               }}
             />
-          </div>
+          </GlassCard>
         </div>
       </div>
     </div>

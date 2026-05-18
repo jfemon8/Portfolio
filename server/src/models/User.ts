@@ -1,6 +1,7 @@
 import mongoose, { type Model, type HydratedDocument } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import type { IUser } from '../types/index.js';
+import { isImmutableSuperAdminEmail } from '../config/superAdmins.js';
 
 export interface IUserMethods {
   comparePassword(candidate: string): Promise<boolean>;
@@ -20,12 +21,36 @@ const userSchema = new mongoose.Schema<IUser, UserModel, IUserMethods>(
       trim: true,
     },
     password: { type: String, required: true, minlength: 8, select: false },
-    role: { type: String, enum: ['admin'], default: 'admin' },
+    role: {
+      type: String,
+      enum: ['superAdmin', 'admin', 'visitor'],
+      default: 'admin',
+    },
+    status: {
+      type: String,
+      enum: ['active', 'disabled'],
+      default: 'active',
+    },
+    isImmutableSuperAdmin: { type: Boolean, default: false },
     avatar: { type: String, default: '' },
     lastLogin: { type: Date },
   },
   { timestamps: true }
 );
+
+/**
+ * Immutability guard — runs on EVERY save. The hardcoded super admins are
+ * always re-asserted to a locked state regardless of what any
+ * code/admin/API attempted, so they can never be demoted/disabled.
+ */
+userSchema.pre('save', function enforceImmutableSuperAdmin(next) {
+  if (isImmutableSuperAdminEmail(this.email)) {
+    this.role = 'superAdmin';
+    this.status = 'active';
+    this.isImmutableSuperAdmin = true;
+  }
+  next();
+});
 
 userSchema.pre('save', async function hashPassword(next) {
   if (!this.isModified('password')) return next();

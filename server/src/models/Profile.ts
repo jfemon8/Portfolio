@@ -30,6 +30,7 @@ const profileSchema = new mongoose.Schema<IProfile>(
       default: [],
     },
     available: { type: Boolean, default: true },
+    codeforcesHandle: { type: String, default: '' },
   },
   { timestamps: true }
 );

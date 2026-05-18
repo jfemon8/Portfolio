@@ -13,6 +13,9 @@ import {
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
+import GlassCard from '@/components/shared/GlassCard';
+import Counter from '@/components/shared/Counter';
+import Reveal from '@/components/motion/Reveal';
 import { Spinner } from '@/components/ui/States';
 import type { AnalyticsSummary, ItemResponse } from '@/types';
 
@@ -73,75 +76,95 @@ export default function Dashboard() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-ink">
-          Welcome back,{' '}
-          <span className="gradient-text">{user?.name?.split(' ')[0]}</span> 👋
-        </h1>
-        <p className="mt-1 text-sm text-ink-soft">
-          Here's what's happening with your portfolio.
-        </p>
-      </div>
+      <Reveal>
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-foreground">
+            Welcome back,{' '}
+            <span className="gradient-text">{user?.name?.split(' ')[0]}</span>{' '}
+            👋
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Here's what's happening with your portfolio.
+          </p>
+        </div>
+      </Reveal>
 
       {isLoading ? (
         <Spinner />
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {stats.map((s) => (
-              <Link
-                key={s.label}
-                to={s.to}
-                className={`glass glass-hover p-5 ${
-                  s.highlight ? 'border-neon/40' : ''
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <s.icon className="h-5 w-5 text-neon" />
-                  <ArrowRight className="h-4 w-4 text-ink-dim" />
-                </div>
-                <p className="mt-3 text-3xl font-bold text-ink">{s.value}</p>
-                <p className="text-xs text-ink-dim">{s.label}</p>
-              </Link>
+            {stats.map((s, i) => (
+              <Reveal key={s.label} delay={i * 0.05}>
+                <Link to={s.to}>
+                  <GlassCard
+                    interactive
+                    className={`p-5 ${s.highlight ? 'border-primary/40' : ''}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <s.icon className="h-5 w-5 text-neon" />
+                      <ArrowRight className="h-4 w-4 text-muted-foreground/60" />
+                    </div>
+                    <p className="mt-3 text-3xl font-bold text-foreground">
+                      <Counter value={String(s.value)} />
+                    </p>
+                    <p className="text-xs text-muted-foreground/70">
+                      {s.label}
+                    </p>
+                  </GlassCard>
+                </Link>
+              </Reveal>
             ))}
           </div>
 
           <div className="mt-8 grid gap-6 lg:grid-cols-2">
-            <div className="glass p-6">
-              <h2 className="mb-4 font-semibold text-ink">Quick actions</h2>
-              <div className="grid grid-cols-2 gap-3">
-                {quick.map((q) => (
-                  <Link
-                    key={q.label}
-                    to={q.to}
-                    className="flex items-center gap-3 rounded-xl border border-line bg-bg-soft px-4 py-3 text-sm text-ink-soft transition-colors hover:border-neon/40 hover:text-neon"
-                  >
-                    <q.icon className="h-4 w-4" />
-                    {q.label}
-                  </Link>
-                ))}
-              </div>
-            </div>
+            <Reveal delay={0.1}>
+              <GlassCard className="p-6">
+                <h2 className="mb-4 font-semibold text-foreground">
+                  Quick actions
+                </h2>
+                <div className="grid grid-cols-2 gap-3">
+                  {quick.map((q) => (
+                    <Link
+                      key={q.label}
+                      to={q.to}
+                      className="flex items-center gap-3 rounded-xl border border-border/70 bg-card/50 px-4 py-3 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary"
+                    >
+                      <q.icon className="h-4 w-4" />
+                      {q.label}
+                    </Link>
+                  ))}
+                </div>
+              </GlassCard>
+            </Reveal>
 
-            <div className="glass p-6">
-              <h2 className="mb-4 font-semibold text-ink">Top content</h2>
-              <div className="space-y-2 text-sm">
-                {(a?.topProjects ?? []).slice(0, 4).map((p) => (
-                  <div
-                    key={p._id}
-                    className="flex items-center justify-between border-b border-line/60 pb-2 last:border-0"
-                  >
-                    <span className="truncate text-ink-soft">{p.title}</span>
-                    <span className="flex items-center gap-1.5 text-xs text-ink-dim">
-                      <Eye className="h-3.5 w-3.5" /> {p.views}
-                    </span>
-                  </div>
-                ))}
-                {!a?.topProjects?.length && (
-                  <p className="text-xs text-ink-dim">No data yet.</p>
-                )}
-              </div>
-            </div>
+            <Reveal delay={0.15}>
+              <GlassCard className="p-6">
+                <h2 className="mb-4 font-semibold text-foreground">
+                  Top content
+                </h2>
+                <div className="space-y-2 text-sm">
+                  {(a?.topProjects ?? []).slice(0, 4).map((p) => (
+                    <div
+                      key={p._id}
+                      className="flex items-center justify-between border-b border-border/50 pb-2 last:border-0"
+                    >
+                      <span className="truncate text-muted-foreground">
+                        {p.title}
+                      </span>
+                      <span className="flex items-center gap-1.5 text-xs text-muted-foreground/70">
+                        <Eye className="h-3.5 w-3.5" /> {p.views}
+                      </span>
+                    </div>
+                  ))}
+                  {!a?.topProjects?.length && (
+                    <p className="text-xs text-muted-foreground/70">
+                      No data yet.
+                    </p>
+                  )}
+                </div>
+              </GlassCard>
+            </Reveal>
           </div>
         </>
       )}

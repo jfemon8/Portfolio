@@ -53,6 +53,17 @@ export interface Profile {
   stats: Stat[];
   languages: LanguageProficiency[];
   available: boolean;
+  codeforcesHandle: string;
+}
+
+export interface CpStats {
+  handle: string;
+  rating: number | null;
+  maxRating: number | null;
+  rank: string;
+  maxRank: string;
+  contests: number;
+  fetchedAt: string;
 }
 
 export type EmploymentType =
@@ -83,11 +94,24 @@ export type ProjectCategory =
   | 'other';
 export type ProjectStatus = 'completed' | 'in-progress' | 'archived';
 
+export interface CaseStudy {
+  problem: string;
+  process: string;
+  architecture: string;
+  database: string;
+  api: string;
+  challenges: string;
+  solutions: string;
+  optimization: string;
+  learnings: string;
+}
+
 export interface Project {
   title: string;
   slug: string;
   tagline: string;
   description: string;
+  caseStudy: CaseStudy;
   summary: string;
   techStack: string[];
   highlights: string[];
@@ -159,7 +183,7 @@ export interface Publication {
   order: number;
 }
 
-export type BlogStatus = 'draft' | 'published';
+export type BlogStatus = 'draft' | 'scheduled' | 'published';
 
 export interface BlogPost {
   title: string;
@@ -175,6 +199,7 @@ export interface BlogPost {
   featured: boolean;
   views: number;
   publishedAt?: string;
+  scheduledFor?: string;
 }
 
 export interface Message {
@@ -206,13 +231,55 @@ export type CertificationDoc = Entity<Certification>;
 export type PublicationDoc = Entity<Publication>;
 export type BlogPostDoc = Entity<BlogPost>;
 export type MessageDoc = Entity<Message>;
+export type CpStatsDoc = Entity<CpStats>;
 
 /* ---- auth ---- */
+export type UserRole = 'superAdmin' | 'admin' | 'visitor';
+export type UserStatus = 'active' | 'disabled';
+
+export interface User {
+  name: string;
+  email: string;
+  role: UserRole;
+  status: UserStatus;
+  isImmutableSuperAdmin: boolean;
+  avatar: string;
+  lastLogin?: string;
+}
+export type UserDoc = Entity<User>;
+
+export type AuditAction =
+  | 'auth.login'
+  | 'auth.login_failed'
+  | 'auth.refresh'
+  | 'auth.refresh_reuse_detected'
+  | 'auth.logout'
+  | 'auth.password_changed'
+  | 'user.created'
+  | 'user.updated'
+  | 'user.deleted'
+  | 'rbac.denied';
+
+export interface AuditLog {
+  actor?: string;
+  actorEmail: string;
+  role: UserRole | 'anonymous';
+  action: AuditAction;
+  entity?: string;
+  entityId?: string;
+  meta?: Record<string, unknown>;
+  ip: string;
+  userAgent: string;
+}
+export type AuditLogDoc = Entity<AuditLog>;
+
 export interface AuthUser {
   id: string;
   name: string;
   email: string;
-  role: 'admin';
+  role: UserRole;
+  status?: UserStatus;
+  isImmutableSuperAdmin?: boolean;
   avatar: string;
   lastLogin?: string;
 }
@@ -244,7 +311,13 @@ export interface BlogDetailResponse {
   data: BlogPostDoc;
   related: Pick<
     BlogPostDoc,
-    '_id' | 'title' | 'slug' | 'excerpt' | 'coverImage' | 'readingTime' | 'publishedAt'
+    | '_id'
+    | 'title'
+    | 'slug'
+    | 'excerpt'
+    | 'coverImage'
+    | 'readingTime'
+    | 'publishedAt'
   >[];
 }
 export interface AuthResponse {
@@ -264,8 +337,8 @@ export interface AnalyticsSummary {
   byDay: { date: string; views: number }[];
   byType: { _id: VisitType; count: number }[];
   byDevice: { _id: string; count: number }[];
-  topProjects: (Pick<ProjectDoc, '_id' | 'title' | 'slug' | 'views'>)[];
-  topPosts: (Pick<BlogPostDoc, '_id' | 'title' | 'slug' | 'views'>)[];
+  topProjects: Pick<ProjectDoc, '_id' | 'title' | 'slug' | 'views'>[];
+  topPosts: Pick<BlogPostDoc, '_id' | 'title' | 'slug' | 'views'>[];
   counts: {
     projects: number;
     posts: number;

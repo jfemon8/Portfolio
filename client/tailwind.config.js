@@ -1,3 +1,5 @@
+import animate from 'tailwindcss-animate';
+
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: 'class',
@@ -5,7 +7,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Dark Developer / Neon palette
+        // ---- Dark Developer / Neon palette (existing — unchanged) ----
         bg: {
           DEFAULT: '#0a0a0f',
           soft: '#0f0f17',
@@ -14,7 +16,7 @@ export default {
         },
         line: '#23232f',
         neon: {
-          DEFAULT: '#00ffd1', // primary cyan
+          DEFAULT: '#00ffd1',
           dim: '#0bbfa3',
           violet: '#a855f7',
           pink: '#ec4899',
@@ -25,6 +27,46 @@ export default {
           soft: '#a1a1b5',
           dim: '#6b6b7d',
         },
+        // ---- ShadCN/UI semantic tokens (CSS-variable driven, theme presets) ----
+        border: 'hsl(var(--border) / <alpha-value>)',
+        input: 'hsl(var(--input) / <alpha-value>)',
+        ring: 'hsl(var(--ring) / <alpha-value>)',
+        background: 'hsl(var(--background) / <alpha-value>)',
+        foreground: 'hsl(var(--foreground) / <alpha-value>)',
+        primary: {
+          DEFAULT: 'hsl(var(--primary) / <alpha-value>)',
+          foreground: 'hsl(var(--primary-foreground) / <alpha-value>)',
+        },
+        secondary: {
+          DEFAULT: 'hsl(var(--secondary) / <alpha-value>)',
+          foreground: 'hsl(var(--secondary-foreground) / <alpha-value>)',
+        },
+        destructive: {
+          DEFAULT: 'hsl(var(--destructive) / <alpha-value>)',
+          foreground: 'hsl(var(--destructive-foreground) / <alpha-value>)',
+        },
+        muted: {
+          DEFAULT: 'hsl(var(--muted) / <alpha-value>)',
+          foreground: 'hsl(var(--muted-foreground) / <alpha-value>)',
+        },
+        accent: {
+          DEFAULT: 'hsl(var(--accent) / <alpha-value>)',
+          foreground: 'hsl(var(--accent-foreground) / <alpha-value>)',
+        },
+        popover: {
+          DEFAULT: 'hsl(var(--popover) / <alpha-value>)',
+          foreground: 'hsl(var(--popover-foreground) / <alpha-value>)',
+        },
+        card: {
+          DEFAULT: 'hsl(var(--card) / <alpha-value>)',
+          foreground: 'hsl(var(--card-foreground) / <alpha-value>)',
+        },
+      },
+      borderRadius: {
+        xl: 'calc(var(--radius) + 4px)',
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'Segoe UI', 'sans-serif'],
@@ -32,13 +74,17 @@ export default {
       },
       boxShadow: {
         neon: '0 0 0 1px rgba(0,255,209,.15), 0 8px 40px -8px rgba(0,255,209,.35)',
-        'neon-violet': '0 0 0 1px rgba(168,85,247,.18), 0 8px 40px -8px rgba(168,85,247,.4)',
+        'neon-violet':
+          '0 0 0 1px rgba(168,85,247,.18), 0 8px 40px -8px rgba(168,85,247,.4)',
         card: '0 1px 0 0 rgba(255,255,255,.04) inset, 0 12px 40px -16px rgba(0,0,0,.8)',
+        glow: '0 0 60px -12px hsl(var(--ring) / 0.55)',
       },
       backgroundImage: {
         grid: 'linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px)',
-        'neon-gradient': 'linear-gradient(135deg,#00ffd1 0%,#38bdf8 45%,#a855f7 100%)',
-        'radial-fade': 'radial-gradient(ellipse 80% 60% at 50% -10%,rgba(0,255,209,.12),transparent 60%)',
+        'neon-gradient':
+          'linear-gradient(135deg,#00ffd1 0%,#38bdf8 45%,#a855f7 100%)',
+        'radial-fade':
+          'radial-gradient(ellipse 80% 60% at 50% -10%,rgba(0,255,209,.12),transparent 60%)',
       },
       backgroundSize: { grid: '40px 40px' },
       keyframes: {
@@ -63,6 +109,14 @@ export default {
           '0%,100%': { 'background-position': '0% 50%' },
           '50%': { 'background-position': '100% 50%' },
         },
+        'accordion-down': {
+          from: { height: '0' },
+          to: { height: 'var(--radix-accordion-content-height)' },
+        },
+        'accordion-up': {
+          from: { height: 'var(--radix-accordion-content-height)' },
+          to: { height: '0' },
+        },
       },
       animation: {
         'fade-up': 'fade-up .6s ease-out both',
@@ -71,8 +125,10 @@ export default {
         blink: 'blink 1s step-end infinite',
         marquee: 'marquee 30s linear infinite',
         'gradient-x': 'gradient-x 6s ease infinite',
+        'accordion-down': 'accordion-down 0.2s ease-out',
+        'accordion-up': 'accordion-up 0.2s ease-out',
       },
     },
   },
-  plugins: [],
+  plugins: [animate],
 };

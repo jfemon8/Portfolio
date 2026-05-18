@@ -5,6 +5,8 @@ import { KeyRound, User, Loader2 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import PageHeader from '@/components/admin/PageHeader';
+import GlassCard from '@/components/shared/GlassCard';
+import { Button } from '@/components/ui/button';
 import type { ApiError, MeResponse } from '@/types';
 
 interface PasswordForm {
@@ -60,7 +62,7 @@ export default function SettingsManager() {
       <PageHeader title="Settings" subtitle="Manage your admin account." />
 
       <div className="grid max-w-3xl gap-6">
-        <div className="glass p-6">
+        <GlassCard className="p-6">
           <h3 className="mb-5 flex items-center gap-2 font-semibold text-neon">
             <User className="h-4 w-4" /> Account
           </h3>
@@ -82,75 +84,69 @@ export default function SettingsManager() {
               />
             </div>
           </div>
-          <button
-            onClick={saveName}
-            disabled={savingName}
-            className="btn-primary mt-4"
-          >
+          <Button onClick={saveName} disabled={savingName} className="mt-4">
             {savingName && <Loader2 className="h-4 w-4 animate-spin" />}
             Save account
-          </button>
-        </div>
+          </Button>
+        </GlassCard>
 
-        <form onSubmit={handleSubmit(changePassword)} className="glass p-6">
-          <h3 className="mb-5 flex items-center gap-2 font-semibold text-neon">
-            <KeyRound className="h-4 w-4" /> Change password
-          </h3>
-          <div className="grid gap-4">
-            <div>
-              <label className="label">Current password</label>
-              <input
-                type="password"
-                className="input"
-                {...register('currentPassword', { required: 'Required' })}
-              />
-              {errors.currentPassword && (
-                <p className="mt-1 text-xs text-neon-pink">
-                  {errors.currentPassword.message}
-                </p>
-              )}
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
+        <GlassCard className="p-6">
+          <form onSubmit={handleSubmit(changePassword)}>
+            <h3 className="mb-5 flex items-center gap-2 font-semibold text-neon">
+              <KeyRound className="h-4 w-4" /> Change password
+            </h3>
+            <div className="grid gap-4">
               <div>
-                <label className="label">New password</label>
+                <label className="label">Current password</label>
                 <input
                   type="password"
                   className="input"
-                  {...register('newPassword', {
-                    required: 'Required',
-                    minLength: { value: 8, message: 'Min 8 characters' },
-                  })}
+                  {...register('currentPassword', { required: 'Required' })}
                 />
-                {errors.newPassword && (
-                  <p className="mt-1 text-xs text-neon-pink">
-                    {errors.newPassword.message}
+                {errors.currentPassword && (
+                  <p className="mt-1 text-xs text-destructive">
+                    {errors.currentPassword.message}
                   </p>
                 )}
               </div>
-              <div>
-                <label className="label">Confirm new password</label>
-                <input
-                  type="password"
-                  className="input"
-                  {...register('confirm', { required: 'Required' })}
-                />
-                {errors.confirm && (
-                  <p className="mt-1 text-xs text-neon-pink">
-                    {errors.confirm.message}
-                  </p>
-                )}
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="label">New password</label>
+                  <input
+                    type="password"
+                    className="input"
+                    {...register('newPassword', {
+                      required: 'Required',
+                      minLength: { value: 8, message: 'Min 8 characters' },
+                    })}
+                  />
+                  {errors.newPassword && (
+                    <p className="mt-1 text-xs text-destructive">
+                      {errors.newPassword.message}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label className="label">Confirm new password</label>
+                  <input
+                    type="password"
+                    className="input"
+                    {...register('confirm', { required: 'Required' })}
+                  />
+                  {errors.confirm && (
+                    <p className="mt-1 text-xs text-destructive">
+                      {errors.confirm.message}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-          <button
-            disabled={isSubmitting}
-            className="btn-primary mt-5"
-            type="submit"
-          >
-            {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
-            Update password
-          </button>
-        </form>
+            <Button disabled={isSubmitting} className="mt-5" type="submit">
+              {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+              Update password
+            </Button>
+          </form>
+        </GlassCard>
       </div>
     </div>
   );

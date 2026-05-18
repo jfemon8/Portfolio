@@ -6,6 +6,8 @@ import { api } from '@/lib/api';
 import PageHeader from '@/components/admin/PageHeader';
 import ImageUpload from '@/components/admin/ImageUpload';
 import Toggle from '@/components/ui/Toggle';
+import GlassCard from '@/components/shared/GlassCard';
+import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/States';
 import type { ApiError, ItemResponse, ProfileDoc } from '@/types';
 
@@ -38,10 +40,8 @@ export default function ProfileManager() {
 
   if (isLoading || !f) return <Spinner />;
 
-  const set = <K extends keyof ProfileForm>(
-    k: K,
-    v: ProfileForm[K]
-  ): void => setF((p) => (p ? { ...p, [k]: v } : p));
+  const set = <K extends keyof ProfileForm>(k: K, v: ProfileForm[K]): void =>
+    setF((p) => (p ? { ...p, [k]: v } : p));
 
   const setArr = (
     key: ArrayKey,
@@ -51,23 +51,17 @@ export default function ProfileManager() {
   ): void =>
     setF((p) => {
       if (!p) return p;
-      const arr = [
-        ...(p[key] as unknown as Record<string, string>[]),
-      ];
+      const arr = [...(p[key] as unknown as Record<string, string>[])];
       arr[idx] = { ...arr[idx], [field]: val };
       return { ...p, [key]: arr };
     });
 
   const addArr = (key: ArrayKey, obj: Record<string, string>): void =>
-    setF((p) =>
-      p ? { ...p, [key]: [...(p[key] as unknown[]), obj] } : p
-    );
+    setF((p) => (p ? { ...p, [key]: [...(p[key] as unknown[]), obj] } : p));
 
   const delArr = (key: ArrayKey, idx: number): void =>
     setF((p) =>
-      p
-        ? { ...p, [key]: (p[key] as unknown[]).filter((_, i) => i !== idx) }
-        : p
+      p ? { ...p, [key]: (p[key] as unknown[]).filter((_, i) => i !== idx) } : p
     );
 
   const uploadResume = async (file?: File): Promise<void> => {
@@ -103,6 +97,7 @@ export default function ProfileManager() {
     ['location', 'Location'],
     ['email', 'Email'],
     ['phone', 'Phone'],
+    ['codeforcesHandle', 'Codeforces handle'],
   ];
 
   return (
@@ -111,19 +106,19 @@ export default function ProfileManager() {
         title="Profile"
         subtitle="The identity shown in the hero, about and contact sections."
         action={
-          <button className="btn-primary" disabled={save.isPending}>
+          <Button type="submit" disabled={save.isPending}>
             {save.isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <Save className="h-4 w-4" />
             )}
             Save changes
-          </button>
+          </Button>
         }
       />
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="glass space-y-4 p-6">
+        <GlassCard className="space-y-4 p-6">
           <h3 className="font-semibold text-neon">Basics</h3>
           {basics.map(([k, label]) => (
             <div key={k}>
@@ -168,14 +163,14 @@ export default function ProfileManager() {
               checked={f.available}
               onChange={(v) => set('available', v)}
             />
-            <span className="text-sm text-ink-soft">
+            <span className="text-sm text-muted-foreground">
               Available for opportunities
             </span>
           </div>
-        </div>
+        </GlassCard>
 
         <div className="space-y-6">
-          <div className="glass space-y-4 p-6">
+          <GlassCard className="space-y-4 p-6">
             <h3 className="font-semibold text-neon">Avatar & Resume</h3>
             <ImageUpload
               label="Avatar"
@@ -194,12 +189,12 @@ export default function ProfileManager() {
                   href={f.resumeUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="mb-2 block truncate text-xs text-neon"
+                  className="mb-2 block truncate text-xs text-neon hover:underline"
                 >
                   {f.resumeUrl}
                 </a>
               )}
-              <label className="btn-outline cursor-pointer">
+              <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-border/70 px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:border-primary/50 hover:text-primary">
                 {resumeBusy ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
@@ -214,7 +209,7 @@ export default function ProfileManager() {
                 />
               </label>
             </div>
-          </div>
+          </GlassCard>
 
           <ArrayEditor
             title="Social links"
@@ -225,7 +220,9 @@ export default function ProfileManager() {
               ['icon', 'Icon (github/linkedin/mail/code)'],
             ]}
             onChange={(i, k, v) => setArr('socials', i, k, v)}
-            onAdd={() => addArr('socials', { label: '', url: '', icon: 'code' })}
+            onAdd={() =>
+              addArr('socials', { label: '', url: '', icon: 'code' })
+            }
             onDelete={(i) => delArr('socials', i)}
           />
           <ArrayEditor
@@ -274,16 +271,18 @@ function ArrayEditor({
   onDelete,
 }: ArrayEditorProps) {
   return (
-    <div className="glass p-6">
+    <GlassCard className="p-6">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-semibold text-neon">{title}</h3>
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="sm"
           onClick={onAdd}
-          className="btn-ghost px-2 py-1 text-xs"
+          className="text-xs"
         >
           <Plus className="h-4 w-4" /> Add
-        </button>
+        </Button>
       </div>
       <div className="space-y-3">
         {items.map((it, i) => (
@@ -301,16 +300,16 @@ function ArrayEditor({
             <button
               type="button"
               onClick={() => onDelete(i)}
-              className="mb-0.5 rounded-lg border border-line p-2.5 text-ink-dim hover:text-neon-pink"
+              className="mb-0.5 rounded-lg border border-border/70 p-2.5 text-muted-foreground/70 transition-colors hover:border-destructive/40 hover:text-destructive"
             >
               <Trash2 className="h-4 w-4" />
             </button>
           </div>
         ))}
         {items.length === 0 && (
-          <p className="text-xs text-ink-dim">None yet.</p>
+          <p className="text-xs text-muted-foreground/70">None yet.</p>
         )}
       </div>
-    </div>
+    </GlassCard>
   );
 }

@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import Seo from '@/components/ui/Seo';
-import Reveal from '@/components/ui/Reveal';
-import ProjectCard from '@/components/ui/ProjectCard';
+import { breadcrumbSchema } from '@/lib/structuredData';
+import { Section, SectionHeading } from '@/components/shared/Section';
+import Reveal from '@/components/motion/Reveal';
+import ProjectCard from '@/components/shared/ProjectCard';
 import { Spinner, ErrorState, EmptyState } from '@/components/ui/States';
 import { useProjects } from '@/hooks/usePortfolio';
+import { cn } from '@/lib/cn';
 import type { ProjectCategory } from '@/types';
 
 type Filter = 'all' | ProjectCategory;
@@ -24,50 +27,53 @@ export default function Projects() {
 
   return (
     <>
-      <Seo title="Projects" path="/projects" />
-      <section className="container-x py-16 sm:py-20">
-        <Reveal>
-          <span className="font-mono text-sm text-neon">~/projects</span>
-          <h1 className="section-title mt-2">
-            Things I've built <span className="text-neon">.</span>
-          </h1>
-          <p className="mt-3 max-w-xl text-ink-soft">
-            Full-stack apps, front-ends and experiments — from MERN platforms to
-            .NET e-commerce.
-          </p>
-        </Reveal>
+      <Seo
+        title="Projects"
+        path="/projects"
+        description="Full-stack platforms, front-ends and experiments — from MERN products to .NET e-commerce."
+        jsonLd={breadcrumbSchema([
+          { name: 'Home', path: '/' },
+          { name: 'Projects', path: '/projects' },
+        ])}
+      />
+      <Section id="projects-page" className="pt-32">
+        <SectionHeading
+          index="~/projects"
+          title="Things I've built"
+          subtitle="Full-stack platforms, front-ends and experiments — from MERN products to .NET e-commerce."
+        />
 
-        <div className="mt-8 flex flex-wrap gap-2">
+        <div className="mb-12 flex flex-wrap gap-2">
           {filters.map((f) => (
             <button
               key={f.key}
               onClick={() => setFilter(f.key)}
-              className={`rounded-full border px-4 py-1.5 text-sm transition-colors ${
+              className={cn(
+                'rounded-full border px-4 py-1.5 text-sm transition-all duration-200',
                 filter === f.key
-                  ? 'border-neon/50 bg-neon/10 text-neon'
-                  : 'border-line text-ink-soft hover:border-neon/30 hover:text-ink'
-              }`}
+                  ? 'border-primary/50 bg-primary/10 text-primary shadow-glow'
+                  : 'border-border/70 text-muted-foreground hover:border-primary/30 hover:text-foreground'
+              )}
             >
               {f.label}
             </button>
           ))}
         </div>
 
-        <div className="mt-10">
-          {isLoading && <Spinner />}
-          {isError && <ErrorState onRetry={() => void refetch()} />}
-          {!isLoading && !isError && projects.length === 0 && (
-            <EmptyState message="No projects in this category yet." />
-          )}
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {projects.map((p, i) => (
-              <Reveal key={p._id} delay={i * 0.05}>
-                <ProjectCard project={p} />
-              </Reveal>
-            ))}
-          </div>
+        {isLoading && <Spinner />}
+        {isError && <ErrorState onRetry={() => void refetch()} />}
+        {!isLoading && !isError && projects.length === 0 && (
+          <EmptyState message="No projects in this category yet." />
+        )}
+
+        <div className="grid auto-rows-[1fr] gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {projects.map((p, i) => (
+            <Reveal key={p._id} delay={i * 0.05}>
+              <ProjectCard project={p} />
+            </Reveal>
+          ))}
         </div>
-      </section>
+      </Section>
     </>
   );
 }

@@ -2,6 +2,56 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ShadCN/UI semantic tokens — drive the design system & theme presets.
+   Dark is the default (app is dark-first, <html class="dark">); `html.light`
+   holds the light overrides, consistent with the existing theme mechanism. */
+@layer base {
+  :root {
+    --background: 240 24% 4%;
+    --foreground: 240 20% 92%;
+    --card: 240 24% 9%;
+    --card-foreground: 240 20% 92%;
+    --popover: 240 24% 7%;
+    --popover-foreground: 240 20% 92%;
+    --primary: 168 100% 50%;
+    --primary-foreground: 240 24% 4%;
+    --secondary: 240 16% 14%;
+    --secondary-foreground: 240 20% 92%;
+    --muted: 240 14% 14%;
+    --muted-foreground: 240 10% 64%;
+    --accent: 270 91% 65%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 330 81% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 18% 16%;
+    --input: 240 18% 16%;
+    --ring: 168 100% 50%;
+    --radius: 0.85rem;
+  }
+
+  html.light {
+    --background: 0 0% 100%;
+    --foreground: 240 24% 8%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 24% 8%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 24% 8%;
+    --primary: 174 90% 36%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 14% 95%;
+    --secondary-foreground: 240 24% 12%;
+    --muted: 240 14% 95%;
+    --muted-foreground: 240 8% 42%;
+    --accent: 270 80% 56%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 330 81% 56%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 12% 88%;
+    --input: 240 12% 88%;
+    --ring: 174 90% 36%;
+  }
+}
+
 @layer base {
   :root {
     color-scheme: dark;
@@ -53,6 +103,34 @@
   }
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-neon-dim;
+  }
+
+  /* A11y: one consistent keyboard-focus ring app-wide (matches the Button
+     primitive). Components with their own focus styles win via the cascade
+     layer order; this is the safety net for every other interactive element.
+     :focus-visible keeps mouse clicks ring-free. */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [tabindex]:not([tabindex='-1']):focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* A11y: honour prefers-reduced-motion. JS motion already guards via
+     useReducedMotion; this neutralises CSS keyframe/transition motion
+     (float, pulse, blink, ping, marquee, gradient-x, smooth scroll) that
+     isn't individually gated. No Tailwind utility can express this. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
@@ -126,48 +204,61 @@
   }
 }
 
-/* Markdown article styling for blog & project case-studies */
+/* Premium long-form typography for blog & project case-studies.
+   Code blocks/inline code are owned by <Markdown/> (syntax highlighter),
+   so no `code`/`pre` rules here. Tailwind @apply only (project rule #1). */
 .prose-neon {
-  @apply text-ink-soft leading-relaxed;
+  @apply text-[15px] leading-[1.85] text-muted-foreground;
 }
 .prose-neon h1,
 .prose-neon h2,
-.prose-neon h3 {
-  @apply mt-8 mb-3 font-bold text-ink;
+.prose-neon h3,
+.prose-neon h4 {
+  @apply mb-4 mt-10 scroll-mt-28 font-bold tracking-tight text-foreground;
 }
 .prose-neon h1 {
-  @apply text-2xl;
+  @apply text-3xl;
 }
 .prose-neon h2 {
-  @apply text-xl;
+  @apply text-2xl;
+}
+.prose-neon h2::before {
+  @apply mr-2 font-mono text-base text-neon content-['#'];
 }
 .prose-neon h3 {
-  @apply text-lg;
+  @apply text-xl;
 }
 .prose-neon p {
-  @apply my-4;
+  @apply my-5;
+}
+.prose-neon strong {
+  @apply font-semibold text-foreground;
 }
 .prose-neon a {
-  @apply text-neon underline underline-offset-2 hover:text-white;
+  @apply font-medium text-neon underline decoration-neon/40 underline-offset-4 transition-colors hover:decoration-neon;
 }
 .prose-neon ul {
-  @apply my-4 list-disc space-y-1.5 pl-6;
+  @apply my-5 list-disc space-y-2 pl-6 marker:text-neon;
 }
 .prose-neon ol {
-  @apply my-4 list-decimal space-y-1.5 pl-6;
-}
-.prose-neon code {
-  @apply rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-sm text-neon;
-}
-.prose-neon pre {
-  @apply my-5 overflow-x-auto rounded-xl border border-line bg-bg-soft p-4 text-sm;
-}
-.prose-neon pre code {
-  @apply bg-transparent p-0 text-ink;
+  @apply my-5 list-decimal space-y-2 pl-6 marker:text-muted-foreground;
 }
 .prose-neon blockquote {
-  @apply my-5 border-l-2 border-neon/60 pl-4 italic text-ink-soft;
+  @apply my-6 rounded-r-lg border-l-2 border-neon/60 bg-card/40 py-2 pl-5 pr-4 italic text-muted-foreground;
 }
 .prose-neon img {
-  @apply my-5 rounded-xl border border-line;
+  @apply my-6 w-full rounded-xl border border-border/70;
+}
+.prose-neon hr {
+  @apply my-10 border-border/60;
+}
+.prose-neon table {
+  @apply my-6 w-full border-collapse overflow-hidden rounded-lg text-sm;
+}
+.prose-neon th,
+.prose-neon td {
+  @apply border border-border/60 px-3 py-2 text-left;
+}
+.prose-neon th {
+  @apply bg-card/60 font-semibold text-foreground;
 }

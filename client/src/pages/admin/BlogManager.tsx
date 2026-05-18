@@ -4,7 +4,10 @@ import toast from 'react-hot-toast';
 import { Plus, Pencil, Trash2, Eye, Globe, FileEdit } from 'lucide-react';
 import { api } from '@/lib/api';
 import PageHeader from '@/components/admin/PageHeader';
+import GlassCard from '@/components/shared/GlassCard';
+import { Button } from '@/components/ui/button';
 import { Spinner, ErrorState, EmptyState } from '@/components/ui/States';
+import { cn } from '@/lib/cn';
 import type { BlogPostDoc, BlogStatus, ListResponse } from '@/types';
 
 export default function BlogManager() {
@@ -33,14 +36,19 @@ export default function BlogManager() {
     },
   });
 
+  const iconBtn =
+    'rounded-lg border border-border/70 p-2 text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon';
+
   return (
     <div>
       <PageHeader
         title="Blog"
         subtitle="Write and manage articles."
         action={
-          <Link to="/admin/blog/new" className="btn-primary">
-            <Plus className="h-4 w-4" /> New post
+          <Link to="/admin/blog/new">
+            <Button>
+              <Plus className="h-4 w-4" /> New post
+            </Button>
           </Link>
         }
       />
@@ -53,22 +61,28 @@ export default function BlogManager() {
 
       <div className="space-y-3">
         {posts.map((p) => (
-          <div
+          <GlassCard
             key={p._id}
-            className="glass flex flex-wrap items-center justify-between gap-4 p-4"
+            interactive
+            className="flex flex-wrap items-center justify-between gap-4 p-4"
           >
             <div className="min-w-0">
-              <p className="font-semibold text-ink">
+              <p className="font-semibold text-foreground">
                 {p.title}
                 <span
-                  className={`ml-2 align-middle text-[11px] ${
-                    p.status === 'published' ? 'text-neon' : 'text-ink-dim'
-                  }`}
+                  className={cn(
+                    'ml-2 align-middle text-[11px] capitalize',
+                    p.status === 'published'
+                      ? 'text-neon'
+                      : p.status === 'scheduled'
+                        ? 'text-neon-blue'
+                        : 'text-muted-foreground/60'
+                  )}
                 >
                   ● {p.status}
                 </span>
               </p>
-              <p className="text-xs text-ink-dim">
+              <p className="text-xs text-muted-foreground/70">
                 {p.readingTime} min · {p.views} views · /{p.slug}
               </p>
             </div>
@@ -81,7 +95,7 @@ export default function BlogManager() {
                   })
                 }
                 title={p.status === 'published' ? 'Unpublish' : 'Publish'}
-                className="rounded-lg border border-line p-2 text-ink-soft hover:border-neon/40 hover:text-neon"
+                className={iconBtn}
               >
                 {p.status === 'published' ? (
                   <FileEdit className="h-4 w-4" />
@@ -94,14 +108,16 @@ export default function BlogManager() {
                   href={`/blog/${p.slug}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="rounded-lg border border-line p-2 text-ink-soft hover:border-neon/40 hover:text-neon"
+                  className={iconBtn}
+                  title="View"
                 >
                   <Eye className="h-4 w-4" />
                 </a>
               )}
               <Link
                 to={`/admin/blog/${p._id}/edit`}
-                className="rounded-lg border border-line p-2 text-ink-soft hover:border-neon/40 hover:text-neon"
+                className={iconBtn}
+                title="Edit"
               >
                 <Pencil className="h-4 w-4" />
               </Link>
@@ -109,12 +125,13 @@ export default function BlogManager() {
                 onClick={() =>
                   window.confirm(`Delete "${p.title}"?`) && del.mutate(p._id)
                 }
-                className="rounded-lg border border-line p-2 text-ink-soft hover:border-neon-pink/40 hover:text-neon-pink"
+                title="Delete"
+                className="rounded-lg border border-border/70 p-2 text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
               >
                 <Trash2 className="h-4 w-4" />
               </button>
             </div>
-          </div>
+          </GlassCard>
         ))}
       </div>
     </div>

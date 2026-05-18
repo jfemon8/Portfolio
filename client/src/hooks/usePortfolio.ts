@@ -3,6 +3,7 @@ import { api } from '@/lib/api';
 import type {
   BlogDetailResponse,
   BlogPostDoc,
+  CpStatsDoc,
   CertificationDoc,
   EducationDoc,
   ExperienceDoc,
@@ -15,8 +16,7 @@ import type {
   SkillDoc,
 } from '@/types';
 
-const get = async <T>(url: string): Promise<T> =>
-  (await api.get<T>(url)).data;
+const get = async <T>(url: string): Promise<T> => (await api.get<T>(url)).data;
 
 export const useProfile = () =>
   useQuery({
@@ -78,4 +78,11 @@ export const useBlogPost = (slug?: string) =>
     queryKey: ['blog', 'post', slug],
     queryFn: () => get<BlogDetailResponse>(`/blog/slug/${slug}`),
     enabled: !!slug,
+  });
+
+export const useCpStats = () =>
+  useQuery({
+    queryKey: ['cp'],
+    queryFn: () => get<ItemResponse<CpStatsDoc>>('/cp'),
+    retry: false,
   });

@@ -1,88 +1,103 @@
-import { Section, SectionHeading } from '@/components/ui/Section';
-import Reveal from '@/components/ui/Reveal';
+import {
+  Award,
+  Trophy,
+  FileText,
+  ExternalLink,
+  type LucideIcon,
+} from 'lucide-react';
+import { Section, SectionHeading } from '@/components/shared/Section';
+import Reveal from '@/components/motion/Reveal';
+import GlassCard from '@/components/shared/GlassCard';
 import { useCertifications, usePublications } from '@/hooks/usePortfolio';
-import { Award, Trophy, FileText, ExternalLink } from 'lucide-react';
+
+interface ColumnItem {
+  id: string;
+  title: string;
+  meta?: string;
+  url?: string;
+}
+
+function Column({
+  icon: Icon,
+  title,
+  items,
+  delay,
+}: {
+  icon: LucideIcon;
+  title: string;
+  items: ColumnItem[];
+  delay: number;
+}) {
+  return (
+    <Reveal delay={delay}>
+      <GlassCard interactive className="h-full p-6">
+        <h3 className="mb-5 flex items-center gap-2 font-mono text-sm font-semibold uppercase tracking-wider text-neon">
+          <Icon className="h-4 w-4" /> {title}
+        </h3>
+        <ul className="space-y-4">
+          {items.map((it) => (
+            <li key={it.id} className="border-l-2 border-border/70 pl-3">
+              <p className="text-sm font-medium text-foreground">{it.title}</p>
+              {it.meta && (
+                <p className="text-xs text-muted-foreground/70">{it.meta}</p>
+              )}
+              {it.url && (
+                <a
+                  href={it.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-1 inline-flex items-center gap-1 text-xs text-neon hover:underline"
+                >
+                  Read <ExternalLink className="h-3 w-3" />
+                </a>
+              )}
+            </li>
+          ))}
+        </ul>
+      </GlassCard>
+    </Reveal>
+  );
+}
 
 export default function Credentials() {
   const { data: certData } = useCertifications();
   const { data: pubData } = usePublications();
   const all = certData?.data ?? [];
-  const certs = all.filter((c) => c.category === 'certification');
-  const achievements = all.filter((c) => c.category === 'achievement');
-  const publications = pubData?.data ?? [];
+
+  const certs: ColumnItem[] = all
+    .filter((c) => c.category === 'certification')
+    .map((c) => ({ id: c._id, title: c.title, meta: c.issuer }));
+  const achievements: ColumnItem[] = all
+    .filter((c) => c.category === 'achievement')
+    .map((c) => ({ id: c._id, title: c.title, meta: c.issuer }));
+  const publications: ColumnItem[] = (pubData?.data ?? []).map((p) => ({
+    id: p._id,
+    title: p.title,
+    meta: p.venue,
+    url: p.url,
+  }));
 
   return (
-    <Section id="credentials" className="bg-bg-soft/40">
+    <Section id="credentials">
       <SectionHeading
         index="06."
         title="Credentials"
         subtitle="Certifications, achievements & research."
       />
-
       <div className="grid gap-6 lg:grid-cols-3">
-        <Reveal>
-          <div className="glass h-full p-6">
-            <h3 className="mb-5 flex items-center gap-2 font-mono text-sm font-semibold uppercase tracking-wider text-neon">
-              <Award className="h-4 w-4" /> Certifications
-            </h3>
-            <ul className="space-y-4">
-              {certs.map((c) => (
-                <li key={c._id} className="border-l-2 border-line pl-3">
-                  <p className="text-sm font-medium text-ink">{c.title}</p>
-                  {c.issuer && (
-                    <p className="text-xs text-ink-dim">{c.issuer}</p>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </Reveal>
-
-        <Reveal delay={0.08}>
-          <div className="glass h-full p-6">
-            <h3 className="mb-5 flex items-center gap-2 font-mono text-sm font-semibold uppercase tracking-wider text-neon">
-              <Trophy className="h-4 w-4" /> Achievements
-            </h3>
-            <ul className="space-y-4">
-              {achievements.map((c) => (
-                <li key={c._id} className="border-l-2 border-line pl-3">
-                  <p className="text-sm font-medium text-ink">{c.title}</p>
-                  {c.issuer && (
-                    <p className="text-xs text-ink-dim">{c.issuer}</p>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </Reveal>
-
-        <Reveal delay={0.16}>
-          <div className="glass h-full p-6">
-            <h3 className="mb-5 flex items-center gap-2 font-mono text-sm font-semibold uppercase tracking-wider text-neon">
-              <FileText className="h-4 w-4" /> Publications
-            </h3>
-            <ul className="space-y-4">
-              {publications.map((p) => (
-                <li key={p._id} className="border-l-2 border-line pl-3">
-                  <p className="text-sm font-medium text-ink">{p.title}</p>
-                  {p.venue && (
-                    <p className="text-xs text-ink-dim">{p.venue}</p>
-                  )}
-                  {p.url && (
-                    <a
-                      href={p.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="mt-1 inline-flex items-center gap-1 text-xs text-neon"
-                    >
-                      Read <ExternalLink className="h-3 w-3" />
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </Reveal>
+        <Column icon={Award} title="Certifications" items={certs} delay={0} />
+        <Column
+          icon={Trophy}
+          title="Achievements"
+          items={achievements}
+          delay={0.08}
+        />
+        <Column
+          icon={FileText}
+          title="Publications"
+          items={publications}
+          delay={0.16}
+        />
       </div>
     </Section>
   );

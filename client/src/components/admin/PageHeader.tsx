@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { motion, useReducedMotion } from 'motion/react';
 
 interface PageHeaderProps {
   title: string;
@@ -6,18 +7,32 @@ interface PageHeaderProps {
   action?: ReactNode;
 }
 
+/**
+ * Shared premium admin page header (same API — instant cohesion across every
+ * manager; project rule #3/#8). Token-driven + subtle reveal.
+ */
 export default function PageHeader({
   title,
   subtitle,
   action,
 }: PageHeaderProps) {
+  const reduce = useReducedMotion();
   return (
-    <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+    <motion.div
+      initial={reduce ? false : { opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      className="mb-8 flex flex-wrap items-end justify-between gap-4 border-b border-border/60 pb-6"
+    >
       <div>
-        <h1 className="text-2xl font-bold text-ink">{title}</h1>
-        {subtitle && <p className="mt-1 text-sm text-ink-soft">{subtitle}</p>}
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          {title}
+        </h1>
+        {subtitle && (
+          <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
+        )}
       </div>
       {action}
-    </div>
+    </motion.div>
   );
 }

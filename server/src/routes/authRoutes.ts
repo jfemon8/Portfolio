@@ -5,6 +5,8 @@ import { protect } from '../middleware/auth.js';
 import { strictLimiter } from '../middleware/rateLimit.js';
 import {
   login,
+  refresh,
+  logout,
   getMe,
   updatePassword,
   updateProfileMeta,
@@ -22,6 +24,10 @@ router.post(
   validate,
   login
 );
+
+// Rotation endpoints (refresh cookie is scoped to /api/auth).
+router.post('/refresh', refresh);
+router.post('/logout', logout);
 
 router.get('/me', protect, getMe);
 router.patch('/password', protect, updatePassword);

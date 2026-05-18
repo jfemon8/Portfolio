@@ -37,8 +37,15 @@ interface FieldProps {
 
 /** Renders a single form control based on a field schema. */
 export default function Field({ field, value, form, onChange }: FieldProps) {
-  const { name, label, type = 'text', options, placeholder, help, rows } =
-    field;
+  const {
+    name,
+    label,
+    type = 'text',
+    options,
+    placeholder,
+    help,
+    rows,
+  } = field;
 
   const set = (v: unknown) => onChange(name, v);
 
@@ -153,7 +160,9 @@ export default function Field({ field, value, form, onChange }: FieldProps) {
         />
       )}
 
-      {help && <p className="mt-1 text-[11px] text-ink-dim">{help}</p>}
+      {help && (
+        <p className="mt-1 text-[11px] text-muted-foreground/70">{help}</p>
+      )}
     </div>
   );
 }

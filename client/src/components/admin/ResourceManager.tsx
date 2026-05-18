@@ -2,10 +2,13 @@ import { useState, type ReactNode } from 'react';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { useCrud } from '@/hooks/useCrud';
 import { Spinner, ErrorState, EmptyState } from '@/components/ui/States';
+import GlassCard from '@/components/shared/GlassCard';
+import { Button } from '@/components/ui/button';
 import type { WithId } from '@/types';
 import PageHeader from './PageHeader';
 import Modal from './Modal';
 import Field, { type FieldSchema, type FormState } from './Field';
+import { getByPath, setByPath } from '@/lib/object';
 
 export interface ResourceConfig<T extends WithId> {
   title: string;
@@ -20,7 +23,7 @@ export interface ResourceConfig<T extends WithId> {
   renderItem: (item: T) => ReactNode;
 }
 
-/** Schema-driven CRUD screen reused by every simple resource. */
+/** Schema-driven CRUD screen reused by every simple resource (rule #3/#8). */
 export default function ResourceManager<T extends WithId>({
   config,
 }: {
@@ -44,11 +47,10 @@ export default function ResourceManager<T extends WithId>({
   const close = (): void => setEditing(null);
 
   const onField = (name: string, value: unknown): void =>
-    setForm((f) => ({ ...f, [name]: value }));
+    setForm((f) => setByPath(f, name, value));
 
-  const isEditing = (
-    e: T | Record<string, never> | null
-  ): e is T => !!e && '_id' in e;
+  const isEditing = (e: T | Record<string, never> | null): e is T =>
+    !!e && '_id' in e;
 
   const save = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
@@ -80,9 +82,9 @@ export default function ResourceManager<T extends WithId>({
         title={config.title}
         subtitle={config.subtitle}
         action={
-          <button onClick={openNew} className="btn-primary">
+          <Button onClick={openNew}>
             <Plus className="h-4 w-4" /> Add new
-          </button>
+          </Button>
         }
       />
 
@@ -94,26 +96,29 @@ export default function ResourceManager<T extends WithId>({
 
       <div className="space-y-3">
         {items.map((item) => (
-          <div
+          <GlassCard
             key={item._id}
-            className="glass flex items-center justify-between gap-4 p-4"
+            interactive
+            className="flex items-center justify-between gap-4 p-4"
           >
             <div className="min-w-0">{config.renderItem(item)}</div>
             <div className="flex shrink-0 gap-2">
               <button
                 onClick={() => openEdit(item)}
-                className="rounded-lg border border-line p-2 text-ink-soft hover:border-neon/40 hover:text-neon"
+                aria-label="Edit"
+                className="rounded-lg border border-border/70 p-2 text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon"
               >
                 <Pencil className="h-4 w-4" />
               </button>
               <button
                 onClick={() => void del(item)}
-                className="rounded-lg border border-line p-2 text-ink-soft hover:border-neon-pink/40 hover:text-neon-pink"
+                aria-label="Delete"
+                className="rounded-lg border border-border/70 p-2 text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
               >
                 <Trash2 className="h-4 w-4" />
               </button>
             </div>
-          </div>
+          </GlassCard>
         ))}
       </div>
 
@@ -133,24 +138,23 @@ export default function ResourceManager<T extends WithId>({
               <div key={f.name} className={f.full ? 'sm:col-span-2' : ''}>
                 <Field
                   field={f}
-                  value={form[f.name]}
+                  value={getByPath(form, f.name)}
                   form={form}
                   onChange={onField}
                 />
               </div>
             ))}
           </div>
-          <div className="flex justify-end gap-2 border-t border-line pt-4">
-            <button type="button" onClick={close} className="btn-ghost">
+          <div className="flex justify-end gap-2 border-t border-border/60 pt-4">
+            <Button type="button" variant="ghost" onClick={close}>
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={create.isPending || update.isPending}
-              className="btn-primary"
             >
               {create.isPending || update.isPending ? 'Saving…' : 'Save'}
-            </button>
+            </Button>
           </div>
         </form>
       </Modal>
