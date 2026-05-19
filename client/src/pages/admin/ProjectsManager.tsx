@@ -21,6 +21,8 @@ const config: ResourceConfig<ProjectDoc> = {
     coverPublicId: '',
     sourceUrl: '',
     liveUrl: '',
+    videoUrl: '',
+    metrics: [],
     featured: false,
     status: 'completed',
     year: '',
@@ -150,6 +152,19 @@ const config: ResourceConfig<ProjectDoc> = {
     },
     { name: 'sourceUrl', label: 'Source URL', type: 'url' },
     { name: 'liveUrl', label: 'Live URL', type: 'url' },
+    {
+      name: 'videoUrl',
+      label: 'Video preview URL (mp4 / Cloudinary)',
+      type: 'url',
+      full: true,
+    },
+    {
+      name: 'metrics',
+      label: 'Performance metrics',
+      type: 'pairs',
+      full: true,
+      itemLabels: ['Metric', 'Value'],
+    },
     { name: 'order', label: 'Order', type: 'number' },
     { name: 'featured', label: 'Featured', type: 'switch' },
     {

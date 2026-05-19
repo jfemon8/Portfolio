@@ -40,6 +40,11 @@ const projectSchema = new mongoose.Schema<IProject>(
     },
     sourceUrl: { type: String, default: '' },
     liveUrl: { type: String, default: '' },
+    videoUrl: { type: String, default: '' },
+    metrics: {
+      type: [{ label: String, value: String }],
+      default: [],
+    },
     featured: { type: Boolean, default: false },
     status: {
       type: String,

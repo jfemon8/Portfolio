@@ -11,6 +11,7 @@ import CpStats from '@/components/sections/CpStats';
 import FeaturedProjects from '@/components/sections/FeaturedProjects';
 import Experience from '@/components/sections/Experience';
 import Education from '@/components/sections/Education';
+import Research from '@/components/sections/Research';
 import Credentials from '@/components/sections/Credentials';
 import Contact from '@/components/sections/Contact';
 
@@ -53,6 +54,7 @@ export default function Home() {
       <FeaturedProjects />
       <Experience />
       <Education />
+      <Research />
       <Credentials />
       <Contact profile={profile} />
     </>

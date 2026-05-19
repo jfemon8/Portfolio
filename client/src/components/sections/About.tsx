@@ -3,6 +3,7 @@ import { Section, SectionHeading } from '@/components/shared/Section';
 import Reveal from '@/components/motion/Reveal';
 import GlassCard from '@/components/shared/GlassCard';
 import Counter from '@/components/shared/Counter';
+import FloatingTechIcons from '@/components/motion/FloatingTechIcons';
 import type { ProfileDoc } from '@/types';
 
 const personalSkills = [
@@ -19,6 +20,7 @@ export default function About({ profile }: { profile?: ProfileDoc }) {
 
   return (
     <Section id="about">
+      <FloatingTechIcons />
       <SectionHeading
         index="01."
         title="About me"

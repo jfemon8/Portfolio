@@ -1,3 +1,4 @@
+import { type MouseEvent as ReactMouseEvent } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Sun, Moon } from 'lucide-react';
 import { useThemeStore } from '@/stores/theme';
@@ -14,10 +15,31 @@ export default function ThemeToggle({ className }: { className?: string }) {
   const reduce = useReducedMotion();
   const isDark = resolved === 'dark';
 
+  /**
+   * Premium animated theme switch via the View Transitions API — a circular
+   * reveal from the click point. Graceful fallback (instant) when the API is
+   * unsupported or the user prefers reduced motion.
+   */
+  const onToggle = (e: ReactMouseEvent): void => {
+    const start = (
+      document as unknown as {
+        startViewTransition?: (cb: () => void) => unknown;
+      }
+    ).startViewTransition;
+    if (reduce || typeof start !== 'function') {
+      toggle();
+      return;
+    }
+    const root = document.documentElement;
+    root.style.setProperty('--vt-x', `${e.clientX}px`);
+    root.style.setProperty('--vt-y', `${e.clientY}px`);
+    start.call(document, () => toggle());
+  };
+
   return (
     <button
       type="button"
-      onClick={toggle}
+      onClick={onToggle}
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} theme`}
       className={cn(
         'relative grid h-10 w-10 place-items-center rounded-xl border border-border/70',

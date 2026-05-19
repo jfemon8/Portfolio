@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Section, SectionHeading } from '@/components/shared/Section';
 import Reveal from '@/components/motion/Reveal';
+import Spotlight from '@/components/motion/Spotlight';
 import ProjectCard from '@/components/shared/ProjectCard';
 import { Button } from '@/components/ui/button';
 import { Spinner, ErrorState, EmptyState } from '@/components/ui/States';
@@ -37,7 +38,10 @@ export default function FeaturedProjects() {
         <EmptyState message="Projects coming soon." />
       )}
 
-      <div className="grid auto-rows-[1fr] gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <Spotlight
+        size={560}
+        className="grid auto-rows-[1fr] gap-5 sm:grid-cols-2 lg:grid-cols-3"
+      >
         {projects.map((p, i) => {
           const big = i === 0;
           return (
@@ -50,7 +54,7 @@ export default function FeaturedProjects() {
             </Reveal>
           );
         })}
-      </div>
+      </Spotlight>
 
       <div className="mt-10 text-center sm:hidden">
         <Link to="/projects">

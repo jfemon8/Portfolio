@@ -1,14 +1,8 @@
-import {
-  Award,
-  Trophy,
-  FileText,
-  ExternalLink,
-  type LucideIcon,
-} from 'lucide-react';
+import { Award, Trophy, ExternalLink, type LucideIcon } from 'lucide-react';
 import { Section, SectionHeading } from '@/components/shared/Section';
 import Reveal from '@/components/motion/Reveal';
 import GlassCard from '@/components/shared/GlassCard';
-import { useCertifications, usePublications } from '@/hooks/usePortfolio';
+import { useCertifications } from '@/hooks/usePortfolio';
 
 interface ColumnItem {
   id: string;
@@ -61,7 +55,6 @@ function Column({
 
 export default function Credentials() {
   const { data: certData } = useCertifications();
-  const { data: pubData } = usePublications();
   const all = certData?.data ?? [];
 
   const certs: ColumnItem[] = all
@@ -70,33 +63,21 @@ export default function Credentials() {
   const achievements: ColumnItem[] = all
     .filter((c) => c.category === 'achievement')
     .map((c) => ({ id: c._id, title: c.title, meta: c.issuer }));
-  const publications: ColumnItem[] = (pubData?.data ?? []).map((p) => ({
-    id: p._id,
-    title: p.title,
-    meta: p.venue,
-    url: p.url,
-  }));
 
   return (
     <Section id="credentials">
       <SectionHeading
         index="06."
         title="Credentials"
-        subtitle="Certifications, achievements & research."
+        subtitle="Certifications & achievements."
       />
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-6 sm:grid-cols-2">
         <Column icon={Award} title="Certifications" items={certs} delay={0} />
         <Column
           icon={Trophy}
           title="Achievements"
           items={achievements}
           delay={0.08}
-        />
-        <Column
-          icon={FileText}
-          title="Publications"
-          items={publications}
-          delay={0.16}
         />
       </div>
     </Section>

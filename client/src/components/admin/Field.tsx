@@ -1,3 +1,4 @@
+import { Plus, Trash2 } from 'lucide-react';
 import ImageUpload from './ImageUpload';
 import Toggle from '@/components/ui/Toggle';
 
@@ -11,6 +12,7 @@ export type FieldType =
   | 'switch'
   | 'list'
   | 'tags'
+  | 'pairs'
   | 'image';
 
 export interface FieldSchema {
@@ -24,6 +26,8 @@ export interface FieldSchema {
   full?: boolean;
   publicIdKey?: string;
   folder?: string;
+  /** column placeholders for the `pairs` (label/value list) type */
+  itemLabels?: [string, string];
 }
 
 export type FormState = Record<string, unknown>;
@@ -78,6 +82,9 @@ export default function Field({ field, value, form, onChange }: FieldProps) {
   }
 
   const asArray = Array.isArray(value) ? (value as string[]) : [];
+  const pairList = Array.isArray(value)
+    ? (value as { label: string; value: string }[])
+    : [];
 
   return (
     <div>
@@ -148,6 +155,54 @@ export default function Field({ field, value, form, onChange }: FieldProps) {
             )
           }
         />
+      )}
+
+      {type === 'pairs' && (
+        <div className="space-y-2">
+          {pairList.map((p, i) => (
+            <div key={i} className="flex gap-2">
+              <input
+                className="input"
+                placeholder={field.itemLabels?.[0] ?? 'Label'}
+                value={p.label}
+                onChange={(e) =>
+                  set(
+                    pairList.map((x, j) =>
+                      j === i ? { ...x, label: e.target.value } : x
+                    )
+                  )
+                }
+              />
+              <input
+                className="input"
+                placeholder={field.itemLabels?.[1] ?? 'Value'}
+                value={p.value}
+                onChange={(e) =>
+                  set(
+                    pairList.map((x, j) =>
+                      j === i ? { ...x, value: e.target.value } : x
+                    )
+                  )
+                }
+              />
+              <button
+                type="button"
+                onClick={() => set(pairList.filter((_, j) => j !== i))}
+                aria-label="Remove"
+                className="shrink-0 rounded-lg border border-border/70 p-2.5 text-muted-foreground/70 transition-colors hover:border-destructive/40 hover:text-destructive"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() => set([...pairList, { label: '', value: '' }])}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border/70 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon"
+          >
+            <Plus className="h-3.5 w-3.5" /> Add
+          </button>
+        </div>
       )}
 
       {(type === 'text' || type === 'url' || type === 'email') && (

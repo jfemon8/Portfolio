@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Section, SectionHeading } from '@/components/shared/Section';
+import SkillOrbit from '@/components/motion/SkillOrbit';
 import { Spinner, ErrorState } from '@/components/ui/States';
 import { useSkills } from '@/hooks/usePortfolio';
 import { staggerContainer } from '@/config/animation';
@@ -36,6 +37,10 @@ export default function Skills() {
     : (available[0]?.key ?? 'language');
 
   const items = skills.filter((s) => s.category === activeKey);
+  const featured = skills.filter((s) => s.featured);
+  const orbitNames = (featured.length ? featured : skills)
+    .slice(0, 12)
+    .map((s) => s.name);
 
   return (
     <Section id="skills">
@@ -50,6 +55,7 @@ export default function Skills() {
 
       {!isLoading && !isError && (
         <>
+          <SkillOrbit skills={orbitNames} className="mb-14 hidden sm:block" />
           <div className="mb-10 flex flex-wrap gap-2">
             {available.map((g) => {
               const on = g.key === activeKey;

@@ -30,7 +30,8 @@
   }
 
   html.light {
-    --background: 0 0% 100%;
+    /* Softened from pure white so the bright centre is easier on the eyes. */
+    --background: 0 0% 95%;
     --foreground: 240 24% 8%;
     --card: 0 0% 100%;
     --card-foreground: 240 24% 8%;
@@ -70,6 +71,16 @@
     @apply bg-bg text-ink font-sans antialiased;
     background-image: theme('backgroundImage.radial-fade');
     background-repeat: no-repeat;
+  }
+
+  /* Premium display typeface for all headings (Satoshi → Inter fallback).
+     The app uses semantic h1–h4 everywhere, so this is the single,
+     consistent application point (project rule #3/#8). */
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display;
   }
 
   /* Light theme overrides (toggleable) */
@@ -178,7 +189,7 @@
   }
 
   .section-title {
-    @apply text-3xl font-extrabold tracking-tight sm:text-4xl;
+    @apply font-display text-3xl font-extrabold tracking-tight sm:text-4xl;
   }
 
   .gradient-text {
@@ -261,4 +272,25 @@
 }
 .prose-neon th {
   @apply bg-card/60 font-semibold text-foreground;
+}
+
+/* Animated theme switch (View Transitions API): the new theme is revealed
+   as a circle expanding from the toggle click point (--vt-x/--vt-y set in
+   ThemeToggle). Unsupported browsers / reduced-motion fall back to instant
+   (guarded in JS). Not expressible as a Tailwind utility (root pseudo). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-new(root) {
+  animation: vt-theme-clip 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes vt-theme-clip {
+  from {
+    clip-path: circle(0% at var(--vt-x, 50%) var(--vt-y, 50%));
+  }
+  to {
+    clip-path: circle(150% at var(--vt-x, 50%) var(--vt-y, 50%));
+  }
 }

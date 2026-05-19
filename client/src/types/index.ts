@@ -121,6 +121,8 @@ export interface Project {
   gallery: GalleryImage[];
   sourceUrl: string;
   liveUrl: string;
+  videoUrl: string;
+  metrics: Stat[];
   featured: boolean;
   status: ProjectStatus;
   year: string;
