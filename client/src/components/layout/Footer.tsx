@@ -1,6 +1,14 @@
 import { Link } from 'react-router-dom';
-import { Github, Linkedin, Mail, Code2, Heart, type LucideIcon } from 'lucide-react';
+import {
+  Github,
+  Linkedin,
+  Mail,
+  Code2,
+  Heart,
+  type LucideIcon,
+} from 'lucide-react';
 import { useProfile } from '@/hooks/usePortfolio';
+import { useSiteCopy } from '@/hooks/useSiteCopy';
 
 const iconMap: Record<string, LucideIcon> = {
   github: Github,
@@ -13,13 +21,21 @@ export default function Footer() {
   const { data } = useProfile();
   const p = data?.data;
   const year = new Date().getFullYear();
+  const f = useSiteCopy('footer', {
+    wordmark: '<emon />',
+    linkProjects: 'Projects',
+    linkBlog: 'Blog',
+    linkAdmin: 'Admin',
+    builtPrefix: 'Built with',
+    builtSuffix: 'using the MERN stack.',
+  });
 
   return (
     <footer className="border-t border-line bg-bg-soft/60">
       <div className="container-x py-12">
         <div className="flex flex-col items-center gap-6 text-center">
           <Link to="/" className="font-mono text-xl font-bold gradient-text">
-            &lt;emon /&gt;
+            {f.wordmark}
           </Link>
           <p className="max-w-md text-sm text-ink-soft">
             {p?.tagline || 'Building responsive, dynamic & scalable web apps.'}
@@ -45,20 +61,19 @@ export default function Footer() {
 
           <div className="mt-2 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-ink-dim">
             <Link to="/projects" className="link-underline hover:text-neon">
-              Projects
+              {f.linkProjects}
             </Link>
             <Link to="/blog" className="link-underline hover:text-neon">
-              Blog
+              {f.linkBlog}
             </Link>
             <Link to="/admin/login" className="link-underline hover:text-neon">
-              Admin
+              {f.linkAdmin}
             </Link>
           </div>
 
           <p className="mt-4 flex items-center gap-1.5 text-xs text-ink-dim">
-            © {year} {p?.name || 'Md Jannatul Ferdhous Emon'}. Built with
-            <Heart className="h-3.5 w-3.5 text-neon-pink" /> using the MERN
-            stack.
+            © {year} {p?.name || 'Md Jannatul Ferdhous Emon'}. {f.builtPrefix}
+            <Heart className="h-3.5 w-3.5 text-neon-pink" /> {f.builtSuffix}
           </p>
         </div>
       </div>

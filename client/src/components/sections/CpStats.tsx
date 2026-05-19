@@ -9,6 +9,8 @@ import {
   Star,
 } from 'lucide-react';
 import { Section, SectionHeading } from '@/components/shared/Section';
+import { useSectionCopy } from '@/hooks/useSectionCopy';
+import { useSiteCopy } from '@/hooks/useSiteCopy';
 import GlassCard from '@/components/shared/GlassCard';
 import SparkArea from '@/components/shared/SparkArea';
 import Heatmap from '@/components/shared/Heatmap';
@@ -27,20 +29,44 @@ import { useCpStats } from '@/hooks/usePortfolio';
 export default function CpStats() {
   const { data, isLoading, isError } = useCpStats();
   const cp = data?.data;
+  const copy = useSectionCopy('cp', {
+    index: '~/cp',
+    title: 'Competitive programming',
+    subtitle:
+      'Live Codeforces & LeetCode standing — problem-solving under time pressure.',
+  });
+  const lab = useSiteCopy('labels', {
+    cpCurrentRating: 'Current rating',
+    cpMaxRating: 'Max rating',
+    cpContests: 'Contests',
+    cpUnrated: 'Unrated',
+    cpCfProfile: 'Codeforces profile',
+    cpRatingHistory: 'Rating history',
+    cpLeetcode: 'LeetCode',
+    cpLcProfile: 'Profile',
+    cpSolved: 'Solved',
+    cpEasy: 'Easy',
+    cpMedium: 'Medium',
+    cpHard: 'Hard',
+    cpSubmissionActivity: 'Submission activity',
+    cpCodechef: 'CodeChef',
+    cpHighest: 'Highest',
+    cpCcProfile: 'CodeChef profile',
+  });
   if (isLoading || isError || !cp) return null;
 
   const cards = [
     {
-      label: 'Current rating',
+      label: lab.cpCurrentRating,
       value: cp.rating != null ? String(cp.rating) : '—',
       icon: TrendingUp,
     },
     {
-      label: 'Max rating',
+      label: lab.cpMaxRating,
       value: cp.maxRating != null ? String(cp.maxRating) : '—',
       icon: Award,
     },
-    { label: 'Contests', value: String(cp.contests), icon: Trophy },
+    { label: lab.cpContests, value: String(cp.contests), icon: Trophy },
   ];
 
   const lc = cp.leetcode;
@@ -83,9 +109,9 @@ export default function CpStats() {
   return (
     <Section id="competitive">
       <SectionHeading
-        index="~/cp"
-        title="Competitive programming"
-        subtitle="Live Codeforces & LeetCode standing — problem-solving under time pressure."
+        index={copy.index}
+        title={copy.title}
+        subtitle={copy.subtitle}
       />
 
       <Reveal>
@@ -133,7 +159,7 @@ export default function CpStats() {
             <div>
               <p className="font-semibold text-foreground">@{cp.handle}</p>
               <p className="text-xs capitalize text-muted-foreground/70">
-                {cp.rank || 'Unrated'}
+                {cp.rank || lab.cpUnrated}
                 {cp.maxRank ? ` · max ${cp.maxRank}` : ''}
               </p>
             </div>
@@ -145,7 +171,7 @@ export default function CpStats() {
               rel="noreferrer"
               className="inline-flex items-center gap-1.5 rounded-xl border border-border/70 bg-card/50 px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
             >
-              <ExternalLink className="h-4 w-4" /> Codeforces profile
+              <ExternalLink className="h-4 w-4" /> {lab.cpCfProfile}
             </a>
           </Magnetic>
         </GlassCard>
@@ -156,7 +182,8 @@ export default function CpStats() {
           <GlassCard className="mt-5 p-6">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
               <h3 className="flex items-center gap-2 font-semibold text-foreground">
-                <LineChart className="h-5 w-5 text-neon" /> Rating history
+                <LineChart className="h-5 w-5 text-neon" />{' '}
+                {lab.cpRatingHistory}
               </h3>
               <span className="text-xs text-muted-foreground/70">
                 {cp.ratingHistory.length} contests · peak{' '}
@@ -178,7 +205,7 @@ export default function CpStats() {
           <GlassCard className="mt-5 p-6">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <h3 className="flex items-center gap-2 font-semibold text-foreground">
-                <Code2 className="h-5 w-5 text-neon" /> LeetCode
+                <Code2 className="h-5 w-5 text-neon" /> {lab.cpLeetcode}
                 {cp.leetcode.ranking != null && (
                   <span className="text-xs font-normal text-muted-foreground/70">
                     · global #{cp.leetcode.ranking.toLocaleString()}
@@ -192,16 +219,16 @@ export default function CpStats() {
                   rel="noreferrer"
                   className="inline-flex items-center gap-1.5 rounded-xl border border-border/70 bg-card/50 px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
                 >
-                  <ExternalLink className="h-4 w-4" /> Profile
+                  <ExternalLink className="h-4 w-4" /> {lab.cpLcProfile}
                 </a>
               </Magnetic>
             </div>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               {[
-                { label: 'Solved', value: cp.leetcode.totalSolved },
-                { label: 'Easy', value: cp.leetcode.easy },
-                { label: 'Medium', value: cp.leetcode.medium },
-                { label: 'Hard', value: cp.leetcode.hard },
+                { label: lab.cpSolved, value: cp.leetcode.totalSolved },
+                { label: lab.cpEasy, value: cp.leetcode.easy },
+                { label: lab.cpMedium, value: cp.leetcode.medium },
+                { label: lab.cpHard, value: cp.leetcode.hard },
               ].map((s) => (
                 <div
                   key={s.label}
@@ -220,7 +247,7 @@ export default function CpStats() {
             {cp.leetcode.calendar && cp.leetcode.calendar.length > 0 && (
               <div className="mt-5">
                 <p className="mb-2 text-xs uppercase tracking-wide text-muted-foreground/70">
-                  Submission activity
+                  {lab.cpSubmissionActivity}
                 </p>
                 <Heatmap
                   data={cp.leetcode.calendar}
@@ -241,13 +268,13 @@ export default function CpStats() {
               </span>
               <div>
                 <p className="font-semibold text-foreground">
-                  CodeChef · {cp.codechef.rating ?? '—'}
+                  {lab.cpCodechef} · {cp.codechef.rating ?? '—'}
                   <span className="ml-2 text-neon">
                     {'★'.repeat(cp.codechef.stars)}
                   </span>
                 </p>
                 <p className="text-xs text-muted-foreground/70">
-                  Highest {cp.codechef.highestRating ?? '—'}
+                  {lab.cpHighest} {cp.codechef.highestRating ?? '—'}
                 </p>
               </div>
             </div>
@@ -258,7 +285,7 @@ export default function CpStats() {
                 rel="noreferrer"
                 className="inline-flex items-center gap-1.5 rounded-xl border border-border/70 bg-card/50 px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
               >
-                <ExternalLink className="h-4 w-4" /> CodeChef profile
+                <ExternalLink className="h-4 w-4" /> {lab.cpCcProfile}
               </a>
             </Magnetic>
           </GlassCard>

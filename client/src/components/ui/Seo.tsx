@@ -3,8 +3,7 @@ import {
   AUTHOR_NAME,
   SITE_TITLE,
   DEFAULT_DESCRIPTION,
-  DEFAULT_OG_IMAGE,
-  absoluteUrl,
+  SITE_URL,
 } from '@/config/site';
 import { useSeoSettings } from '@/hooks/usePortfolio';
 
@@ -46,12 +45,17 @@ export default function Seo({
 }: SeoProps) {
   const { data: seoData } = useSeoSettings();
   const s = seoData?.data;
-  const fullTitle = title
-    ? `${title} — ${AUTHOR_NAME}`
-    : s?.metaTitle || SITE_TITLE;
+  const author = s?.authorName || AUTHOR_NAME;
+  const siteName = s?.siteName || SITE_TITLE;
+  const origin = (s?.siteUrl || SITE_URL).replace(/\/$/, '');
+  const abs = (p = ''): string =>
+    /^https?:\/\//.test(p)
+      ? p
+      : `${origin}${p.startsWith('/') ? p : `/${p}`}`;
+  const fullTitle = title ? `${title} — ${author}` : s?.metaTitle || siteName;
   const desc = description || s?.metaDescription || DEFAULT_DESCRIPTION;
-  const url = absoluteUrl(path);
-  const ogImage = image ? absoluteUrl(image) : s?.ogImage || DEFAULT_OG_IMAGE;
+  const url = abs(path);
+  const ogImage = image ? abs(image) : s?.ogImage || `${origin}/og.png`;
   const keywords = s?.keywords?.length ? s.keywords.join(', ') : '';
   const twitter = s?.twitterHandle?.trim();
   const robots = noindex ? 'noindex, nofollow' : 'index, follow';
@@ -69,7 +73,7 @@ export default function Seo({
       <link rel="canonical" href={url} />
       {keywords && <meta name="keywords" content={keywords} />}
 
-      <meta property="og:site_name" content={AUTHOR_NAME} />
+      <meta property="og:site_name" content={siteName} />
       <meta property="og:type" content={type} />
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={desc} />

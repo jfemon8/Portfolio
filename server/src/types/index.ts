@@ -137,12 +137,215 @@ export interface ISeoSettings {
   ogImage: string;
   ogImagePublicId: string;
   twitterHandle: string;
+  /** Site identity — overrides the config/site fallbacks at runtime. */
+  siteName: string;
+  authorName: string;
+  siteUrl: string;
 }
 
 /** Admin-managed homepage layout (singleton). */
 export interface ISiteSettings {
   heroBackground: string;
   sections: { key: string; visible: boolean }[];
+}
+
+/** One section's editable heading copy (key = stable copy id, not layout). */
+export interface ContentSection {
+  key: string;
+  index: string;
+  title: string;
+  subtitle: string;
+}
+
+/** Hero copy NOT sourced from Profile (badges, CTAs, terminal card). */
+export interface HeroCopy {
+  availableBadge: string;
+  unavailableBadge: string;
+  greeting: string;
+  ctaProjects: string;
+  ctaResume: string;
+  ctaContact: string;
+  scrollLabel: string;
+  terminalTitle: string;
+  whoamiCmd: string;
+  stackCmd: string;
+  stack: { label: string; value: string }[];
+  goalsCmd: string;
+  goalsText: string;
+}
+
+/** About "What I bring" strengths block. */
+export interface AboutCopy {
+  strengthsHeading: string;
+  strengths: string[];
+}
+
+/** Footer wordmark, link labels and the "built with" line. */
+export interface FooterCopy {
+  wordmark: string;
+  linkProjects: string;
+  linkBlog: string;
+  linkAdmin: string;
+  builtPrefix: string;
+  builtSuffix: string;
+}
+
+/** Floating-dock label overrides, keyed by the item's target. */
+export interface NavCopy {
+  items: { key: string; label: string }[];
+}
+
+/** Loading / error / empty / 404 state copy (+ per-page overrides). */
+export interface StatesCopy {
+  loading: string;
+  error: string;
+  retry: string;
+  empty: string;
+  notFoundError: string;
+  notFoundHome: string;
+  homeLoading: string;
+  homeError: string;
+  projectsEmpty: string;
+  projectsFilterEmpty: string;
+  postsEmpty: string;
+  projectNotFound: string;
+  postNotFound: string;
+}
+
+/** Admin login screen copy. */
+export interface AuthCopy {
+  panelTitle: string;
+  panelSubtitle: string;
+  emailLabel: string;
+  emailPlaceholder: string;
+  emailRequired: string;
+  passwordLabel: string;
+  passwordPlaceholder: string;
+  passwordRequired: string;
+  signIn: string;
+  signingIn: string;
+  footer: string;
+  welcomeToast: string;
+  failToast: string;
+}
+
+/** Contact-form labels, placeholders, validation, toasts & info labels. */
+export interface FormsCopy {
+  nameLabel: string;
+  namePlaceholder: string;
+  nameRequired: string;
+  emailLabel: string;
+  emailPlaceholder: string;
+  emailRequired: string;
+  emailInvalid: string;
+  subjectLabel: string;
+  subjectPlaceholder: string;
+  messageLabel: string;
+  messagePlaceholder: string;
+  messageRequired: string;
+  messageMin: string;
+  send: string;
+  sending: string;
+  sentTitle: string;
+  sentBody: string;
+  sendAnother: string;
+  sentToast: string;
+  failToast: string;
+  infoEmail: string;
+  infoPhone: string;
+  infoLocation: string;
+}
+
+/** Decorative / structural label microcopy (enum-keyed maps + UI chrome). */
+export interface LabelsCopy {
+  researchStages: string[];
+  caseProblem: string;
+  caseProcess: string;
+  caseArchitecture: string;
+  caseDatabase: string;
+  caseApi: string;
+  caseChallenges: string;
+  caseSolutions: string;
+  caseOptimization: string;
+  caseLearnings: string;
+  filterAll: string;
+  filterFullstack: string;
+  filterFrontend: string;
+  filterBackend: string;
+  catLanguage: string;
+  catFramework: string;
+  catDatabase: string;
+  catTool: string;
+  catCloud: string;
+  catConcept: string;
+  cpCurrentRating: string;
+  cpMaxRating: string;
+  cpContests: string;
+  cpUnrated: string;
+  cpCfProfile: string;
+  cpRatingHistory: string;
+  cpLeetcode: string;
+  cpLcProfile: string;
+  cpSolved: string;
+  cpEasy: string;
+  cpMedium: string;
+  cpHard: string;
+  cpSubmissionActivity: string;
+  cpCodechef: string;
+  cpHighest: string;
+  cpCcProfile: string;
+  btnBack: string;
+  backToProjects: string;
+  backToBlog: string;
+  btnSourceCode: string;
+  btnLiveDemo: string;
+  btnCaseStudy: string;
+  badgeFeatured: string;
+  badgeVideo: string;
+  btnShare: string;
+  unitViews: string;
+  unitMinRead: string;
+  unitMin: string;
+  headingHighlights: string;
+  headingRelated: string;
+  toastLinkCopied: string;
+  toastCopyFailed: string;
+  searchPlaceholder: string;
+  searchAria: string;
+}
+
+/**
+ * Contact-email copy (server-rendered in mailer.ts). Supports `{{name}}`,
+ * `{{email}}`, `{{subject}}`, `{{message}}` tokens; each field falls back to
+ * the current hardcoded template when empty.
+ */
+export interface EmailCopy {
+  ownerSubjectPrefix: string;
+  ownerHeading: string;
+  ackFromName: string;
+  ackSubject: string;
+  ackHeading: string;
+  ackGreeting: string;
+  ackBody: string;
+  ackSignoff: string;
+}
+
+/**
+ * Admin-managed site copy / UI text (singleton, like SeoSettings). Grows per
+ * P12 increment; every string also has a hardcoded component fallback so an
+ * empty/missing doc renders the site identically.
+ */
+export interface ISiteContent {
+  sections: ContentSection[];
+  hero: HeroCopy;
+  about: AboutCopy;
+  footer: FooterCopy;
+  nav: NavCopy;
+  states: StatesCopy;
+  forms: FormsCopy;
+  auth: AuthCopy;
+  labels: LabelsCopy;
+  email: EmailCopy;
 }
 
 export type EmploymentType =

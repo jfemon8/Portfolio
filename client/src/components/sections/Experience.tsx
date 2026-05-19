@@ -1,5 +1,6 @@
 import { Briefcase, MapPin } from 'lucide-react';
 import { Section, SectionHeading } from '@/components/shared/Section';
+import { useSectionCopy } from '@/hooks/useSectionCopy';
 import Reveal from '@/components/motion/Reveal';
 import GlassCard from '@/components/shared/GlassCard';
 import { Spinner, ErrorState } from '@/components/ui/States';
@@ -12,13 +13,18 @@ import { useExperience } from '@/hooks/usePortfolio';
 export default function Experience() {
   const { data, isLoading, isError, refetch } = useExperience();
   const items = data?.data ?? [];
+  const copy = useSectionCopy('experience', {
+    index: '04.',
+    title: 'Experience',
+    subtitle: "Where I've worked and what I shipped.",
+  });
 
   return (
     <Section id="experience">
       <SectionHeading
-        index="04."
-        title="Experience"
-        subtitle="Where I've worked and what I shipped."
+        index={copy.index}
+        title={copy.title}
+        subtitle={copy.subtitle}
       />
 
       {isLoading && <Spinner />}

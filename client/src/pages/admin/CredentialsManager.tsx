@@ -9,10 +9,18 @@ const certConfig: ResourceConfig<CertificationDoc> = {
   subtitle: 'Certificates, awards and competitive-programming milestones.',
   singular: 'credential',
   base: 'certifications',
-  defaults: { title: '', issuer: '', category: 'certification', order: 0 },
+  defaults: {
+    title: '',
+    issuer: '',
+    issueDate: '',
+    category: 'certification',
+    description: '',
+    order: 0,
+  },
   fields: [
     { name: 'title', label: 'Title', type: 'text', full: true },
     { name: 'issuer', label: 'Issuer', type: 'text' },
+    { name: 'issueDate', label: 'Issue date', type: 'text' },
     {
       name: 'category',
       label: 'Category',
@@ -23,6 +31,13 @@ const certConfig: ResourceConfig<CertificationDoc> = {
       ],
     },
     { name: 'credentialUrl', label: 'Credential URL', type: 'url', full: true },
+    {
+      name: 'description',
+      label: 'Description',
+      type: 'textarea',
+      full: true,
+      rows: 3,
+    },
     { name: 'order', label: 'Order', type: 'number' },
   ],
   labelOf: (i) => i.title,

@@ -6,6 +6,8 @@ import PrefetchLink from '@/components/shared/PrefetchLink';
 import Seo from '@/components/ui/Seo';
 import { breadcrumbSchema } from '@/lib/structuredData';
 import { Section, SectionHeading } from '@/components/shared/Section';
+import { useSectionCopy } from '@/hooks/useSectionCopy';
+import { useSiteCopy } from '@/hooks/useSiteCopy';
 import Reveal from '@/components/motion/Reveal';
 import GlassCard from '@/components/shared/GlassCard';
 import {
@@ -31,6 +33,20 @@ export default function Blog() {
     query ? `?q=${encodeURIComponent(query)}` : ''
   );
   const posts = data?.data ?? [];
+  const copy = useSectionCopy('blog', {
+    index: '~/blog',
+    title: 'Writing & notes',
+    subtitle:
+      'Thoughts on development, the MERN stack, .NET and competitive programming.',
+  });
+  const st = useSiteCopy('states', {
+    postsEmpty: 'No posts published yet — check back soon!',
+  });
+  const lab = useSiteCopy('labels', {
+    searchPlaceholder: 'Search articles…',
+    searchAria: 'Search articles',
+    unitMin: 'min',
+  });
 
   return (
     <>
@@ -45,17 +61,17 @@ export default function Blog() {
       />
       <Section id="blog-page" className="pt-32">
         <SectionHeading
-          index="~/blog"
-          title="Writing & notes"
-          subtitle="Thoughts on development, the MERN stack, .NET and competitive programming."
+          index={copy.index}
+          title={copy.title}
+          subtitle={copy.subtitle}
           action={
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" />
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="Search articles…"
-                aria-label="Search articles"
+                placeholder={lab.searchPlaceholder}
+                aria-label={lab.searchAria}
                 className="input w-56 pl-9"
               />
             </div>
@@ -65,7 +81,7 @@ export default function Blog() {
         {isLoading && <CardGridSkeleton />}
         {isError && <ErrorState onRetry={() => void refetch()} />}
         {!isLoading && !isError && posts.length === 0 && (
-          <EmptyState message="No posts published yet — check back soon!" />
+          <EmptyState message={st.postsEmpty} />
         )}
 
         <div className="grid auto-rows-[1fr] gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -114,7 +130,8 @@ export default function Blog() {
                         {fmt(post.publishedAt || post.createdAt)}
                       </span>
                       <span className="flex items-center gap-1.5">
-                        <Clock className="h-3.5 w-3.5" /> {post.readingTime} min
+                        <Clock className="h-3.5 w-3.5" /> {post.readingTime}{' '}
+                        {lab.unitMin}
                         <ArrowUpRight className="ml-1 h-4 w-4 text-neon transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                       </span>
                     </div>

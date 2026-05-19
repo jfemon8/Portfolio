@@ -12,6 +12,14 @@
       "source": "/sitemap.xml",
       "destination": "https://emon-api.vercel.app/api/sitemap.xml"
     },
+    {
+      "source": "/site.webmanifest",
+      "destination": "https://emon-api.vercel.app/api/site.webmanifest"
+    },
+    {
+      "source": "/robots.txt",
+      "destination": "https://emon-api.vercel.app/api/robots.txt"
+    },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [

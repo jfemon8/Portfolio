@@ -1,7 +1,0 @@
-# Md Jannatul Ferdhous Emon — Developer Portfolio
-User-agent: *
-Allow: /
-Disallow: /admin
-Disallow: /api
-
-Sitemap: https://jfemon.vercel.app/sitemap.xml

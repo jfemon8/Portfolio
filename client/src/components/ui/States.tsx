@@ -1,11 +1,13 @@
 import { Loader2, AlertTriangle, Inbox } from 'lucide-react';
 import { cn } from '@/lib/cn';
+import { useSiteCopy } from '@/hooks/useSiteCopy';
 
-export function Spinner({ label = 'Loading…' }: { label?: string }) {
+export function Spinner({ label }: { label?: string }) {
+  const c = useSiteCopy('states', { loading: 'Loading…' });
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-20 text-ink-soft">
       <Loader2 className="h-7 w-7 animate-spin text-neon" />
-      <span className="text-sm">{label}</span>
+      <span className="text-sm">{label ?? c.loading}</span>
     </div>
   );
 }
@@ -15,32 +17,30 @@ interface ErrorStateProps {
   onRetry?: () => void;
 }
 
-export function ErrorState({
-  message = 'Failed to load.',
-  onRetry,
-}: ErrorStateProps) {
+export function ErrorState({ message, onRetry }: ErrorStateProps) {
+  const c = useSiteCopy('states', {
+    error: 'Failed to load.',
+    retry: 'Try again',
+  });
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
       <AlertTriangle className="h-8 w-8 text-neon-pink" />
-      <p className="text-ink-soft">{message}</p>
+      <p className="text-ink-soft">{message ?? c.error}</p>
       {onRetry && (
         <button onClick={onRetry} className="btn-outline mt-1">
-          Try again
+          {c.retry}
         </button>
       )}
     </div>
   );
 }
 
-export function EmptyState({
-  message = 'Nothing here yet.',
-}: {
-  message?: string;
-}) {
+export function EmptyState({ message }: { message?: string }) {
+  const c = useSiteCopy('states', { empty: 'Nothing here yet.' });
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-16 text-ink-dim">
       <Inbox className="h-8 w-8" />
-      <p className="text-sm">{message}</p>
+      <p className="text-sm">{message ?? c.empty}</p>
     </div>
   );
 }

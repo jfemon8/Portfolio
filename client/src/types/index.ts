@@ -259,6 +259,7 @@ export type MessageDoc = Entity<Message>;
 export type CpStatsDoc = Entity<CpStats>;
 export type SeoSettingsDoc = Entity<SeoSettings>;
 export type SiteSettingsDoc = Entity<SiteSettings>;
+export type SiteContentDoc = Entity<SiteContent>;
 
 /* ---- auth ---- */
 export type UserRole = 'superAdmin' | 'admin' | 'visitor';
@@ -312,6 +313,9 @@ export interface AuthUser {
 }
 
 export interface SeoSettings {
+  siteName: string;
+  authorName: string;
+  siteUrl: string;
   metaTitle: string;
   metaDescription: string;
   keywords: string[];
@@ -323,6 +327,186 @@ export interface SeoSettings {
 export interface SiteSettings {
   heroBackground: string;
   sections: { key: string; visible: boolean }[];
+}
+
+export interface ContentSection {
+  key: string;
+  index: string;
+  title: string;
+  subtitle: string;
+}
+
+export interface HeroCopy {
+  availableBadge: string;
+  unavailableBadge: string;
+  greeting: string;
+  ctaProjects: string;
+  ctaResume: string;
+  ctaContact: string;
+  scrollLabel: string;
+  terminalTitle: string;
+  whoamiCmd: string;
+  stackCmd: string;
+  stack: { label: string; value: string }[];
+  goalsCmd: string;
+  goalsText: string;
+}
+
+export interface AboutCopy {
+  strengthsHeading: string;
+  strengths: string[];
+}
+
+export interface FooterCopy {
+  wordmark: string;
+  linkProjects: string;
+  linkBlog: string;
+  linkAdmin: string;
+  builtPrefix: string;
+  builtSuffix: string;
+}
+
+export interface NavCopy {
+  items: { key: string; label: string }[];
+}
+
+export interface StatesCopy {
+  loading: string;
+  error: string;
+  retry: string;
+  empty: string;
+  notFoundError: string;
+  notFoundHome: string;
+  homeLoading: string;
+  homeError: string;
+  projectsEmpty: string;
+  projectsFilterEmpty: string;
+  postsEmpty: string;
+  projectNotFound: string;
+  postNotFound: string;
+}
+
+export interface AuthCopy {
+  panelTitle: string;
+  panelSubtitle: string;
+  emailLabel: string;
+  emailPlaceholder: string;
+  emailRequired: string;
+  passwordLabel: string;
+  passwordPlaceholder: string;
+  passwordRequired: string;
+  signIn: string;
+  signingIn: string;
+  footer: string;
+  welcomeToast: string;
+  failToast: string;
+}
+
+export interface FormsCopy {
+  nameLabel: string;
+  namePlaceholder: string;
+  nameRequired: string;
+  emailLabel: string;
+  emailPlaceholder: string;
+  emailRequired: string;
+  emailInvalid: string;
+  subjectLabel: string;
+  subjectPlaceholder: string;
+  messageLabel: string;
+  messagePlaceholder: string;
+  messageRequired: string;
+  messageMin: string;
+  send: string;
+  sending: string;
+  sentTitle: string;
+  sentBody: string;
+  sendAnother: string;
+  sentToast: string;
+  failToast: string;
+  infoEmail: string;
+  infoPhone: string;
+  infoLocation: string;
+}
+
+export interface LabelsCopy {
+  researchStages: string[];
+  caseProblem: string;
+  caseProcess: string;
+  caseArchitecture: string;
+  caseDatabase: string;
+  caseApi: string;
+  caseChallenges: string;
+  caseSolutions: string;
+  caseOptimization: string;
+  caseLearnings: string;
+  filterAll: string;
+  filterFullstack: string;
+  filterFrontend: string;
+  filterBackend: string;
+  catLanguage: string;
+  catFramework: string;
+  catDatabase: string;
+  catTool: string;
+  catCloud: string;
+  catConcept: string;
+  cpCurrentRating: string;
+  cpMaxRating: string;
+  cpContests: string;
+  cpUnrated: string;
+  cpCfProfile: string;
+  cpRatingHistory: string;
+  cpLeetcode: string;
+  cpLcProfile: string;
+  cpSolved: string;
+  cpEasy: string;
+  cpMedium: string;
+  cpHard: string;
+  cpSubmissionActivity: string;
+  cpCodechef: string;
+  cpHighest: string;
+  cpCcProfile: string;
+  btnBack: string;
+  backToProjects: string;
+  backToBlog: string;
+  btnSourceCode: string;
+  btnLiveDemo: string;
+  btnCaseStudy: string;
+  badgeFeatured: string;
+  badgeVideo: string;
+  btnShare: string;
+  unitViews: string;
+  unitMinRead: string;
+  unitMin: string;
+  headingHighlights: string;
+  headingRelated: string;
+  toastLinkCopied: string;
+  toastCopyFailed: string;
+  searchPlaceholder: string;
+  searchAria: string;
+}
+
+export interface EmailCopy {
+  ownerSubjectPrefix: string;
+  ownerHeading: string;
+  ackFromName: string;
+  ackSubject: string;
+  ackHeading: string;
+  ackGreeting: string;
+  ackBody: string;
+  ackSignoff: string;
+}
+
+export interface SiteContent {
+  sections: ContentSection[];
+  hero: HeroCopy;
+  about: AboutCopy;
+  footer: FooterCopy;
+  nav: NavCopy;
+  states: StatesCopy;
+  forms: FormsCopy;
+  auth: AuthCopy;
+  labels: LabelsCopy;
+  email: EmailCopy;
 }
 
 export interface CloudinaryAsset {

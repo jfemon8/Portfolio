@@ -1,5 +1,7 @@
 import nodemailer, { type Transporter } from 'nodemailer';
 import { env } from './env.js';
+import { SiteContent } from '../models/SiteContent.js';
+import type { ISiteContent } from '../types/index.js';
 
 let transporter: Transporter | null = null;
 
@@ -29,7 +31,9 @@ export interface ContactEmailResult {
 }
 
 const safe = (s: unknown): string =>
-  String(s ?? '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  String(s ?? '')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
 
 /**
  * Sends the contact-form notification to the owner and an auto-reply to the
@@ -49,14 +53,48 @@ export async function sendContactEmail({
     return { sent: false, reason: 'smtp_not_configured' };
   }
 
+  // Admin-managed templates (best-effort; any failure → hardcoded fallback).
+  let ec: Partial<ISiteContent['email']> = {};
+  try {
+    const sc = await SiteContent.findOne()
+      .select('email')
+      .lean<{ email?: ISiteContent['email'] } | null>();
+    ec = sc?.email ?? {};
+  } catch {
+    /* keep ec = {} → every field falls back below */
+  }
+
+  const tokens: Record<string, string> = {
+    name: safe(name),
+    email: safe(email),
+    subject: safe(subject),
+    message: safe(message),
+  };
+  const fill = (t: string): string =>
+    t.replace(
+      /\{\{(name|email|subject|message)\}\}/g,
+      (_, k: string) => tokens[k] ?? ''
+    );
+  /** HTML-context copy: trim → fallback → interpolate tokens. */
+  const html = (v: string | undefined, fb: string): string =>
+    fill((v && v.trim()) || fb);
+  /** Header-context copy (subject/from): trim → fallback, no HTML escaping. */
+  const hdr = (v: string | undefined, fb: string): string =>
+    (v && v.trim()) || fb;
+
   const ownerMail = {
     from: `"Portfolio Contact" <${env.smtp.user}>`,
     to: env.smtp.receiver,
     replyTo: email,
-    subject: `📬 New portfolio message: ${subject || 'No subject'}`,
+    subject: `${hdr(ec.ownerSubjectPrefix, '📬 New portfolio message:')} ${
+      subject || 'No subject'
+    }`,
     html: `
       <div style="font-family:system-ui,Segoe UI,sans-serif;max-width:600px;margin:auto;border:1px solid #1f2937;border-radius:12px;overflow:hidden">
-        <div style="background:#0a0a0f;color:#00ffd1;padding:20px 24px;font-size:18px;font-weight:700">New Contact Message</div>
+        <div style="background:#0a0a0f;color:#00ffd1;padding:20px 24px;font-size:18px;font-weight:700">${html(
+          ec.ownerHeading,
+          'New Contact Message'
+        )}</div>
         <div style="padding:24px;background:#0f0f17;color:#e5e7eb">
           <p><strong>Name:</strong> ${safe(name)}</p>
           <p><strong>Email:</strong> ${safe(email)}</p>
@@ -68,16 +106,27 @@ export async function sendContactEmail({
   };
 
   const ackMail = {
-    from: `"Md Jannatul Ferdhous Emon" <${env.smtp.user}>`,
+    from: `"${hdr(ec.ackFromName, 'Md Jannatul Ferdhous Emon')}" <${
+      env.smtp.user
+    }>`,
     to: email,
-    subject: 'Thanks for reaching out! 👋',
+    subject: hdr(ec.ackSubject, 'Thanks for reaching out! 👋'),
     html: `
       <div style="font-family:system-ui,Segoe UI,sans-serif;max-width:600px;margin:auto;border:1px solid #1f2937;border-radius:12px;overflow:hidden">
-        <div style="background:#0a0a0f;color:#00ffd1;padding:20px 24px;font-size:18px;font-weight:700">Message received ✅</div>
+        <div style="background:#0a0a0f;color:#00ffd1;padding:20px 24px;font-size:18px;font-weight:700">${html(
+          ec.ackHeading,
+          'Message received ✅'
+        )}</div>
         <div style="padding:24px;background:#0f0f17;color:#e5e7eb">
-          <p>Hi ${safe(name)},</p>
-          <p>Thanks for getting in touch. I've received your message and will get back to you as soon as possible.</p>
-          <p style="color:#9ca3af">— Md Jannatul Ferdhous Emon</p>
+          <p>${html(ec.ackGreeting, 'Hi {{name}},')}</p>
+          <p>${html(
+            ec.ackBody,
+            "Thanks for getting in touch. I've received your message and will get back to you as soon as possible."
+          )}</p>
+          <p style="color:#9ca3af">${html(
+            ec.ackSignoff,
+            '— Md Jannatul Ferdhous Emon'
+          )}</p>
         </div>
       </div>`,
   };

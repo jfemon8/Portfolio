@@ -29,6 +29,7 @@ const BlogEditor = lazy(() => import('@/pages/admin/BlogEditor'));
 const MessagesManager = lazy(() => import('@/pages/admin/MessagesManager'));
 const AnalyticsManager = lazy(() => import('@/pages/admin/AnalyticsManager'));
 const SettingsManager = lazy(() => import('@/pages/admin/SettingsManager'));
+const SiteCopyManager = lazy(() => import('@/pages/admin/SiteCopyManager'));
 const UsersManager = lazy(() => import('@/pages/admin/UsersManager'));
 const AuditLogViewer = lazy(() => import('@/pages/admin/AuditLogViewer'));
 const MediaLibrary = lazy(() => import('@/pages/admin/MediaLibrary'));
@@ -90,6 +91,7 @@ export default function App() {
               </RequireRole>
             }
           />
+          <Route path="site-copy" element={<SiteCopyManager />} />
           <Route path="settings" element={<SettingsManager />} />
         </Route>
       </Routes>

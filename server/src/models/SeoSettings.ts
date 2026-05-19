@@ -14,6 +14,9 @@ const seoSettingsSchema = new mongoose.Schema<ISeoSettings>(
     ogImage: { type: String, default: '' },
     ogImagePublicId: { type: String, default: '' },
     twitterHandle: { type: String, default: '' },
+    siteName: { type: String, default: '' },
+    authorName: { type: String, default: '' },
+    siteUrl: { type: String, default: '' },
   },
   { timestamps: true }
 );

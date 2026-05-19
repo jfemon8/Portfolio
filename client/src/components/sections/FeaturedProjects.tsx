@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Section, SectionHeading } from '@/components/shared/Section';
+import { useSectionCopy } from '@/hooks/useSectionCopy';
+import { useSiteCopy } from '@/hooks/useSiteCopy';
 import Reveal from '@/components/motion/Reveal';
 import Spotlight from '@/components/motion/Spotlight';
 import ProjectCard from '@/components/shared/ProjectCard';
@@ -16,13 +18,21 @@ import { cn } from '@/lib/cn';
 export default function FeaturedProjects() {
   const { data, isLoading, isError, refetch } = useProjects('?featured=true');
   const projects = data?.data ?? [];
+  const copy = useSectionCopy('featured', {
+    index: '03.',
+    title: 'Featured work',
+    subtitle: "A selection of products I've designed, built and shipped.",
+  });
+  const st = useSiteCopy('states', {
+    projectsEmpty: 'Projects coming soon.',
+  });
 
   return (
     <Section id="projects">
       <SectionHeading
-        index="03."
-        title="Featured work"
-        subtitle="A selection of products I've designed, built and shipped."
+        index={copy.index}
+        title={copy.title}
+        subtitle={copy.subtitle}
         action={
           <Link to="/projects" className="hidden sm:block">
             <Button variant="outline">
@@ -35,7 +45,7 @@ export default function FeaturedProjects() {
       {isLoading && <Spinner />}
       {isError && <ErrorState onRetry={() => void refetch()} />}
       {!isLoading && !isError && projects.length === 0 && (
-        <EmptyState message="Projects coming soon." />
+        <EmptyState message={st.projectsEmpty} />
       )}
 
       <Spotlight

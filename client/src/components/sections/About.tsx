@@ -1,5 +1,7 @@
 import { Languages, Sparkles } from 'lucide-react';
 import { Section, SectionHeading } from '@/components/shared/Section';
+import { useSectionCopy } from '@/hooks/useSectionCopy';
+import { useSiteCopy } from '@/hooks/useSiteCopy';
 import Reveal from '@/components/motion/Reveal';
 import GlassCard from '@/components/shared/GlassCard';
 import Counter from '@/components/shared/Counter';
@@ -17,14 +19,23 @@ const personalSkills = [
 
 export default function About({ profile }: { profile?: ProfileDoc }) {
   const stats = profile?.stats ?? [];
+  const copy = useSectionCopy('about', {
+    index: '01.',
+    title: 'About me',
+    subtitle: 'Who I am, how I think, and what I bring to a team.',
+  });
+  const about = useSiteCopy('about', {
+    strengthsHeading: 'What I bring',
+    strengths: personalSkills,
+  });
 
   return (
     <Section id="about">
       <FloatingTechIcons />
       <SectionHeading
-        index="01."
-        title="About me"
-        subtitle="Who I am, how I think, and what I bring to a team."
+        index={copy.index}
+        title={copy.title}
+        subtitle={copy.subtitle}
       />
 
       <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr]">
@@ -51,10 +62,11 @@ export default function About({ profile }: { profile?: ProfileDoc }) {
 
           <div className="mt-9">
             <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-foreground">
-              <Sparkles className="h-4 w-4 text-neon" /> What I bring
+              <Sparkles className="h-4 w-4 text-neon" />{' '}
+              {about.strengthsHeading}
             </h3>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              {personalSkills.map((s, i) => (
+              {about.strengths.map((s, i) => (
                 <Reveal key={s} delay={i * 0.04}>
                   <div className="flex items-center gap-2 rounded-lg border border-border/70 bg-card/50 px-3 py-2 text-sm text-muted-foreground backdrop-blur">
                     <span className="text-neon">▹</span>

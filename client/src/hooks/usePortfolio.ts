@@ -14,6 +14,7 @@ import type {
   ProjectDoc,
   SeoSettingsDoc,
   SiteSettingsDoc,
+  SiteContentDoc,
   PublicationDoc,
   SkillDoc,
 } from '@/types';
@@ -46,6 +47,13 @@ export const useSiteSettings = () =>
   useQuery({
     queryKey: ['site'],
     queryFn: () => get<ItemResponse<SiteSettingsDoc>>('/site'),
+    staleTime: CONTENT,
+  });
+
+export const useSiteContent = () =>
+  useQuery({
+    queryKey: ['siteContent'],
+    queryFn: () => get<ItemResponse<SiteContentDoc>>('/site-content'),
     staleTime: CONTENT,
   });
 

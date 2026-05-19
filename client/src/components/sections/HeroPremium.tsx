@@ -11,6 +11,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { useTypewriter } from '@/hooks/useTypewriter';
+import { useSiteCopy } from '@/hooks/useSiteCopy';
 import { track } from '@/lib/api';
 import { duration, ease } from '@/config/animation';
 import Spotlight from '@/components/motion/Spotlight';
@@ -48,6 +49,25 @@ export default function HeroPremium({
     ? profile.roles
     : ['Front-End Developer', 'MERN Stack Developer'];
   const typed = useTypewriter(roles);
+  const hero = useSiteCopy('hero', {
+    availableBadge: 'Available for opportunities',
+    unavailableBadge: 'Currently building',
+    greeting: "Hi, I'm",
+    ctaProjects: 'View Projects',
+    ctaResume: 'Resume',
+    ctaContact: 'Contact me',
+    scrollLabel: 'Scroll down',
+    terminalTitle: 'emon@portfolio: ~',
+    whoamiCmd: 'whoami',
+    stackCmd: 'cat stack.json',
+    stack: [
+      { label: 'frontend', value: 'React, Next.js, Tailwind' },
+      { label: 'backend', value: 'Node, Express, .NET' },
+      { label: 'database', value: 'MongoDB, SQL Server' },
+    ],
+    goalsCmd: 'echo $GOALS',
+    goalsText: 'Become a well-rounded software engineer 🚀',
+  });
 
   const rise = (delay: number) => ({
     initial: reduce ? false : { opacity: 0, y: 22 },
@@ -81,16 +101,14 @@ export default function HeroPremium({
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-neon opacity-70" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-neon" />
               </span>
-              {profile?.available
-                ? 'Available for opportunities'
-                : 'Currently building'}
+              {profile?.available ? hero.availableBadge : hero.unavailableBadge}
             </motion.span>
 
             <motion.h1
               {...rise(0.06)}
               className="mt-6 text-balance text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl"
             >
-              Hi, I'm{' '}
+              {hero.greeting}{' '}
               <span className="gradient-text">
                 {profile?.name || 'Md Jannatul Ferdhous Emon'}
               </span>
@@ -128,7 +146,7 @@ export default function HeroPremium({
             >
               <Magnetic strength={0.4}>
                 <Button size="lg" onClick={onProjects}>
-                  View Projects <ArrowRight className="h-4 w-4" />
+                  {hero.ctaProjects} <ArrowRight className="h-4 w-4" />
                 </Button>
               </Magnetic>
               {profile?.resumeUrl && (
@@ -140,13 +158,13 @@ export default function HeroPremium({
                     onClick={() => track('resume_download', '/', 'hero')}
                   >
                     <Button size="lg" variant="outline">
-                      <Download className="h-4 w-4" /> Resume
+                      <Download className="h-4 w-4" /> {hero.ctaResume}
                     </Button>
                   </a>
                 </Magnetic>
               )}
               <Button size="lg" variant="ghost" onClick={onContact}>
-                Contact me
+                {hero.ctaContact}
               </Button>
             </motion.div>
 
@@ -186,33 +204,34 @@ export default function HeroPremium({
                 <span className="h-3 w-3 rounded-full bg-[#ffbd2e]" />
                 <span className="h-3 w-3 rounded-full bg-[#27c93f]" />
                 <span className="ml-2 font-mono text-xs text-muted-foreground">
-                  emon@portfolio: ~
+                  {hero.terminalTitle}
                 </span>
               </div>
               <pre className="overflow-x-auto p-5 font-mono text-[13px] leading-relaxed text-muted-foreground">
                 <code>
-                  <span className="text-neon">$</span> whoami{'\n'}
+                  <span className="text-neon">$</span> {hero.whoamiCmd}
+                  {'\n'}
                   <span className="text-foreground">
                     {profile?.name || 'Md Jannatul Ferdhous Emon'}
                   </span>
                   {'\n\n'}
-                  <span className="text-neon">$</span> cat stack.json{'\n'}
+                  <span className="text-neon">$</span> {hero.stackCmd}
+                  {'\n'}
                   {'{'}
-                  {'\n'} <span className="text-neon-violet">"frontend"</span>:{' '}
-                  <span className="text-neon-blue">
-                    "React, Next.js, Tailwind"
-                  </span>
-                  ,{'\n'} <span className="text-neon-violet">"backend"</span>:{' '}
-                  <span className="text-neon-blue">"Node, Express, .NET"</span>,
-                  {'\n'} <span className="text-neon-violet">"database"</span>:{' '}
-                  <span className="text-neon-blue">"MongoDB, SQL Server"</span>
+                  {hero.stack.map((e, i) => (
+                    <span key={e.label}>
+                      {'\n'}{' '}
+                      <span className="text-neon-violet">"{e.label}"</span>:{' '}
+                      <span className="text-neon-blue">"{e.value}"</span>
+                      {i < hero.stack.length - 1 ? ',' : ''}
+                    </span>
+                  ))}
                   {'\n'}
                   {'}'}
                   {'\n\n'}
-                  <span className="text-neon">$</span> echo $GOALS{'\n'}
-                  <span className="text-foreground">
-                    Become a well-rounded software engineer 🚀
-                  </span>
+                  <span className="text-neon">$</span> {hero.goalsCmd}
+                  {'\n'}
+                  <span className="text-foreground">{hero.goalsText}</span>
                   {'\n'}
                   <span className="text-neon">$</span>{' '}
                   <span className="inline-block h-4 w-2 animate-blink bg-neon align-middle" />
@@ -242,7 +261,7 @@ export default function HeroPremium({
         <motion.button
           type="button"
           onClick={onContact}
-          aria-label="Scroll down"
+          aria-label={hero.scrollLabel}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}

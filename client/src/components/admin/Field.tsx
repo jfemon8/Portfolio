@@ -13,6 +13,7 @@ export type FieldType =
   | 'list'
   | 'tags'
   | 'pairs'
+  | 'gallery'
   | 'image';
 
 export interface FieldSchema {
@@ -84,6 +85,9 @@ export default function Field({ field, value, form, onChange }: FieldProps) {
   const asArray = Array.isArray(value) ? (value as string[]) : [];
   const pairList = Array.isArray(value)
     ? (value as { label: string; value: string }[])
+    : [];
+  const galleryList = Array.isArray(value)
+    ? (value as { url: string; publicId: string; caption: string }[])
     : [];
 
   return (
@@ -201,6 +205,59 @@ export default function Field({ field, value, form, onChange }: FieldProps) {
             className="inline-flex items-center gap-1.5 rounded-lg border border-border/70 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon"
           >
             <Plus className="h-3.5 w-3.5" /> Add
+          </button>
+        </div>
+      )}
+
+      {type === 'gallery' && (
+        <div className="space-y-3">
+          {galleryList.map((g, i) => (
+            <div key={i} className="rounded-xl border border-border/70 p-3">
+              <ImageUpload
+                label={`Image ${i + 1}`}
+                value={g.url}
+                publicId={g.publicId}
+                folder={field.folder}
+                onChange={({ url, publicId }) =>
+                  set(
+                    galleryList.map((x, j) =>
+                      j === i ? { ...x, url, publicId } : x
+                    )
+                  )
+                }
+              />
+              <div className="mt-2 flex gap-2">
+                <input
+                  className="input"
+                  placeholder="Caption (optional)"
+                  value={g.caption}
+                  onChange={(e) =>
+                    set(
+                      galleryList.map((x, j) =>
+                        j === i ? { ...x, caption: e.target.value } : x
+                      )
+                    )
+                  }
+                />
+                <button
+                  type="button"
+                  onClick={() => set(galleryList.filter((_, j) => j !== i))}
+                  aria-label="Remove image"
+                  className="shrink-0 rounded-lg border border-border/70 p-2.5 text-muted-foreground/70 transition-colors hover:border-destructive/40 hover:text-destructive"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() =>
+              set([...galleryList, { url: '', publicId: '', caption: '' }])
+            }
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border/70 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon"
+          >
+            <Plus className="h-3.5 w-3.5" /> Add image
           </button>
         </div>
       )}

@@ -19,19 +19,20 @@ import Reveal from '@/components/motion/Reveal';
 import Magnetic from '@/components/motion/Magnetic';
 import { Button } from '@/components/ui/button';
 import { Spinner, ErrorState } from '@/components/ui/States';
-import { useProject } from '@/hooks/usePortfolio';
+import { useProject, useProfile } from '@/hooks/usePortfolio';
+import { useSiteCopy } from '@/hooks/useSiteCopy';
 import type { CaseStudy } from '@/types';
 
-const CASE_SECTIONS: { key: keyof CaseStudy; label: string }[] = [
-  { key: 'problem', label: 'Problem statement' },
-  { key: 'process', label: 'UI / UX process' },
-  { key: 'architecture', label: 'Technical architecture' },
-  { key: 'database', label: 'Database design' },
-  { key: 'api', label: 'API architecture' },
-  { key: 'challenges', label: 'Challenges faced' },
-  { key: 'solutions', label: 'Solutions implemented' },
-  { key: 'optimization', label: 'Optimization strategy' },
-  { key: 'learnings', label: 'Learnings' },
+const CASE_KEYS: (keyof CaseStudy)[] = [
+  'problem',
+  'process',
+  'architecture',
+  'database',
+  'api',
+  'challenges',
+  'solutions',
+  'optimization',
+  'learnings',
 ];
 
 export default function ProjectDetail() {
@@ -39,7 +40,28 @@ export default function ProjectDetail() {
   const navigate = useNavigate();
   const [lb, setLb] = useState<number | null>(null);
   const { data, isLoading, isError, refetch } = useProject(slug);
+  const { data: profData } = useProfile();
   const p = data?.data;
+  const st = useSiteCopy('states', {
+    projectNotFound: 'Project not found.',
+  });
+  const lab = useSiteCopy('labels', {
+    caseProblem: 'Problem statement',
+    caseProcess: 'UI / UX process',
+    caseArchitecture: 'Technical architecture',
+    caseDatabase: 'Database design',
+    caseApi: 'API architecture',
+    caseChallenges: 'Challenges faced',
+    caseSolutions: 'Solutions implemented',
+    caseOptimization: 'Optimization strategy',
+    caseLearnings: 'Learnings',
+    btnBack: 'Back',
+    backToProjects: 'Back to projects',
+    btnSourceCode: 'Source code',
+    btnLiveDemo: 'Live demo',
+    headingHighlights: 'Key highlights',
+    unitViews: 'views',
+  });
 
   if (isLoading)
     return (
@@ -51,11 +73,11 @@ export default function ProjectDetail() {
     return (
       <div className="container-x py-32 text-center">
         <ErrorState
-          message="Project not found."
+          message={st.projectNotFound}
           onRetry={() => void refetch()}
         />
         <Link to="/projects" className="mt-6 inline-block">
-          <Button variant="outline">Back to projects</Button>
+          <Button variant="outline">{lab.backToProjects}</Button>
         </Link>
       </div>
     );
@@ -68,7 +90,7 @@ export default function ProjectDetail() {
         image={p.coverImage}
         path={`/projects/${p.slug}`}
         jsonLd={[
-          projectSchema(p),
+          projectSchema(p, profData?.data?.name),
           breadcrumbSchema([
             { name: 'Home', path: '/' },
             { name: 'Projects', path: '/projects' },
@@ -82,7 +104,7 @@ export default function ProjectDetail() {
             onClick={() => navigate(-1)}
             className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-neon"
           >
-            <ArrowLeft className="h-4 w-4" /> Back
+            <ArrowLeft className="h-4 w-4" /> {lab.btnBack}
           </button>
 
           <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground/70">
@@ -95,7 +117,7 @@ export default function ProjectDetail() {
               </span>
             )}
             <span className="flex items-center gap-1.5">
-              <Eye className="h-3.5 w-3.5" /> {p.views} views
+              <Eye className="h-3.5 w-3.5" /> {p.views} {lab.unitViews}
             </span>
             <span className="flex items-center gap-1.5 capitalize text-neon">
               <CheckCircle2 className="h-3.5 w-3.5" /> {p.status}
@@ -112,7 +134,7 @@ export default function ProjectDetail() {
               <Magnetic strength={0.4}>
                 <a href={p.sourceUrl} target="_blank" rel="noreferrer">
                   <Button size="lg">
-                    <Github className="h-4 w-4" /> Source code
+                    <Github className="h-4 w-4" /> {lab.btnSourceCode}
                   </Button>
                 </a>
               </Magnetic>
@@ -121,7 +143,7 @@ export default function ProjectDetail() {
               <Magnetic strength={0.4}>
                 <a href={p.liveUrl} target="_blank" rel="noreferrer">
                   <Button size="lg" variant="outline">
-                    <ExternalLink className="h-4 w-4" /> Live demo
+                    <ExternalLink className="h-4 w-4" /> {lab.btnLiveDemo}
                   </Button>
                 </a>
               </Magnetic>
@@ -190,7 +212,7 @@ export default function ProjectDetail() {
           <Reveal delay={0.1}>
             <GlassCard className="mt-8 p-6">
               <h2 className="mb-4 font-semibold text-foreground">
-                Key highlights
+                {lab.headingHighlights}
               </h2>
               <ul className="grid gap-2 sm:grid-cols-2">
                 {p.highlights.map((h, i) => (
@@ -209,26 +231,35 @@ export default function ProjectDetail() {
 
         {(() => {
           const cs = p.caseStudy;
-          const sections = cs
-            ? CASE_SECTIONS.filter((s) => cs[s.key]?.trim())
-            : [];
+          const caseLabels: Record<keyof CaseStudy, string> = {
+            problem: lab.caseProblem,
+            process: lab.caseProcess,
+            architecture: lab.caseArchitecture,
+            database: lab.caseDatabase,
+            api: lab.caseApi,
+            challenges: lab.caseChallenges,
+            solutions: lab.caseSolutions,
+            optimization: lab.caseOptimization,
+            learnings: lab.caseLearnings,
+          };
+          const sections = cs ? CASE_KEYS.filter((k) => cs[k]?.trim()) : [];
 
           if (sections.length > 0) {
             return (
               <div className="mt-14 space-y-14">
-                {sections.map((s, i) => (
-                  <Reveal key={s.key} delay={0.04}>
+                {sections.map((k, i) => (
+                  <Reveal key={k} delay={0.04}>
                     <section>
                       <div className="mb-5 flex items-center gap-3">
                         <span className="font-mono text-sm text-neon">
                           {String(i + 1).padStart(2, '0')}.
                         </span>
                         <h2 className="text-2xl font-bold tracking-tight text-foreground">
-                          {s.label}
+                          {caseLabels[k]}
                         </h2>
                         <span className="h-px flex-1 bg-border/60" />
                       </div>
-                      <Markdown>{cs![s.key]}</Markdown>
+                      <Markdown>{cs![k]}</Markdown>
                     </section>
                   </Reveal>
                 ))}

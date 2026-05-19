@@ -42,7 +42,10 @@ export const breadcrumbSchema = (
   })),
 });
 
-export const articleSchema = (post: BlogPostDoc): Json => ({
+export const articleSchema = (
+  post: BlogPostDoc,
+  authorName?: string
+): Json => ({
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
   headline: post.title,
@@ -50,12 +53,12 @@ export const articleSchema = (post: BlogPostDoc): Json => ({
   ...(post.coverImage ? { image: post.coverImage } : {}),
   datePublished: post.publishedAt || post.createdAt,
   dateModified: post.updatedAt,
-  author: { '@type': 'Person', name: AUTHOR_NAME, url: SITE_URL },
+  author: { '@type': 'Person', name: authorName || AUTHOR_NAME, url: SITE_URL },
   ...(post.tags?.length ? { keywords: post.tags.join(', ') } : {}),
   mainEntityOfPage: absoluteUrl(`/blog/${post.slug}`),
 });
 
-export const projectSchema = (p: ProjectDoc): Json => ({
+export const projectSchema = (p: ProjectDoc, authorName?: string): Json => ({
   '@context': 'https://schema.org',
   '@type': 'CreativeWork',
   name: p.title,
@@ -64,6 +67,6 @@ export const projectSchema = (p: ProjectDoc): Json => ({
   ...(p.coverImage ? { image: p.coverImage } : {}),
   dateModified: p.updatedAt,
   ...(p.techStack?.length ? { keywords: p.techStack.join(', ') } : {}),
-  author: { '@type': 'Person', name: AUTHOR_NAME, url: SITE_URL },
+  author: { '@type': 'Person', name: authorName || AUTHOR_NAME, url: SITE_URL },
   url: absoluteUrl(`/projects/${p.slug}`),
 });

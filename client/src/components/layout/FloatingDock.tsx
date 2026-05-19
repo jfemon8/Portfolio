@@ -16,6 +16,7 @@ import ThemeToggle from '@/components/ui/ThemeToggle';
 import { scrollToId } from '@/lib/smoothScroll';
 import { prefetchRoute } from '@/lib/prefetch';
 import { cn } from '@/lib/cn';
+import { useSiteCopy } from '@/hooks/useSiteCopy';
 
 interface DockItem {
   label: string;
@@ -42,6 +43,9 @@ export default function FloatingDock() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('hero');
+  const nav = useSiteCopy('nav', {
+    items: [] as { key: string; label: string }[],
+  });
 
   // Lightweight scroll-spy for the home anchor sections.
   useEffect(() => {
@@ -91,6 +95,8 @@ export default function FloatingDock() {
       <div className="no-scrollbar flex max-w-full items-center gap-1 overflow-x-auto rounded-2xl border border-border/70 bg-card/70 p-2 backdrop-blur-xl shadow-[0_20px_60px_-25px_rgba(0,0,0,0.8)]">
         {ITEMS.map((item) => {
           const active = isActive(item.target);
+          const label =
+            nav.items.find((n) => n.key === item.target)?.label || item.label;
           return (
             <Magnetic key={item.label} strength={0.25}>
               <button
@@ -101,7 +107,7 @@ export default function FloatingDock() {
                 onFocus={() => {
                   if (item.target.startsWith('/')) prefetchRoute(item.target);
                 }}
-                aria-label={item.label}
+                aria-label={label}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
                   'group relative flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition-colors',
@@ -118,7 +124,7 @@ export default function FloatingDock() {
                   />
                 )}
                 <item.icon className="relative h-4 w-4 shrink-0" />
-                <span className="relative hidden md:inline">{item.label}</span>
+                <span className="relative hidden md:inline">{label}</span>
               </button>
             </Magnetic>
           );

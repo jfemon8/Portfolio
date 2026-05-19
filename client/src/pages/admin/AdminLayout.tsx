@@ -16,6 +16,7 @@ import {
   Users,
   ScrollText,
   Settings,
+  Type,
   LogOut,
   Menu,
   X,
@@ -67,6 +68,7 @@ const NAV: NavItem[] = [
     icon: ScrollText,
     roles: ['superAdmin'],
   },
+  { to: '/admin/site-copy', label: 'Site copy', icon: Type },
   { to: '/admin/settings', label: 'Settings', icon: Settings },
 ];
 

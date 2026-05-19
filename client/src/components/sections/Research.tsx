@@ -1,6 +1,8 @@
 import { motion, useReducedMotion } from 'motion/react';
 import { FileText, ExternalLink, Quote } from 'lucide-react';
 import { Section, SectionHeading } from '@/components/shared/Section';
+import { useSectionCopy } from '@/hooks/useSectionCopy';
+import { useSiteCopy } from '@/hooks/useSiteCopy';
 import GlassCard from '@/components/shared/GlassCard';
 import Reveal from '@/components/motion/Reveal';
 import Magnetic from '@/components/motion/Magnetic';
@@ -10,14 +12,14 @@ import { usePublications } from '@/hooks/usePortfolio';
 /** Generic research/ML pipeline motif — decorative, theme-token driven. */
 const STAGES = ['Dataset', 'Resampling', 'Ensemble', 'Detection'];
 
-function Pipeline() {
+function Pipeline({ stages }: { stages: string[] }) {
   const reduce = useReducedMotion();
   return (
     <div
       aria-hidden
       className="mb-12 flex flex-wrap items-center gap-2 font-mono text-[11px] text-muted-foreground"
     >
-      {STAGES.map((s, i) => (
+      {stages.map((s, i) => (
         <div key={s} className="flex items-center gap-2">
           <motion.span
             className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-foreground"
@@ -31,7 +33,7 @@ function Pipeline() {
           >
             {s}
           </motion.span>
-          {i < STAGES.length - 1 && <span className="h-px w-6 bg-border/70" />}
+          {i < stages.length - 1 && <span className="h-px w-6 bg-border/70" />}
         </div>
       ))}
     </div>
@@ -46,17 +48,23 @@ function Pipeline() {
 export default function Research() {
   const { data } = usePublications();
   const pubs = data?.data ?? [];
+  const copy = useSectionCopy('research', {
+    index: '~/research',
+    title: 'Research',
+    subtitle: 'Peer-reviewed work & academic publications.',
+  });
+  const lab = useSiteCopy('labels', { researchStages: STAGES });
   if (pubs.length === 0) return null;
 
   return (
     <Section id="research">
       <SectionHeading
-        index="~/research"
-        title="Research"
-        subtitle="Peer-reviewed work & academic publications."
+        index={copy.index}
+        title={copy.title}
+        subtitle={copy.subtitle}
       />
 
-      <Pipeline />
+      <Pipeline stages={lab.researchStages} />
 
       <div className="grid gap-6 lg:grid-cols-2">
         {pubs.map((p, i) => (

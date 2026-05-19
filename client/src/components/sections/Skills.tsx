@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Section, SectionHeading } from '@/components/shared/Section';
+import { useSectionCopy } from '@/hooks/useSectionCopy';
+import { useSiteCopy } from '@/hooks/useSiteCopy';
 import SkillOrbit from '@/components/motion/SkillOrbit';
 import { Spinner, ErrorState } from '@/components/ui/States';
 import { useSkills } from '@/hooks/usePortfolio';
@@ -41,13 +43,35 @@ export default function Skills() {
   const orbitNames = (featured.length ? featured : skills)
     .slice(0, 12)
     .map((s) => s.name);
+  const copy = useSectionCopy('skills', {
+    index: '02.',
+    title: 'Skills & tech',
+    subtitle: 'The stack I build with — explore by category.',
+  });
+  const lab = useSiteCopy('labels', {
+    catLanguage: 'Languages',
+    catFramework: 'Frameworks',
+    catDatabase: 'Databases',
+    catTool: 'Tools',
+    catCloud: 'Cloud',
+    catConcept: 'Concepts',
+  });
+  const catLabel: Record<SkillCategory, string> = {
+    language: lab.catLanguage,
+    framework: lab.catFramework,
+    database: lab.catDatabase,
+    tool: lab.catTool,
+    cloud: lab.catCloud,
+    concept: lab.catConcept,
+    other: lab.catConcept,
+  };
 
   return (
     <Section id="skills">
       <SectionHeading
-        index="02."
-        title="Skills & tech"
-        subtitle="The stack I build with — explore by category."
+        index={copy.index}
+        title={copy.title}
+        subtitle={copy.subtitle}
       />
 
       {isLoading && <Spinner />}
@@ -81,7 +105,7 @@ export default function Skills() {
                       }}
                     />
                   )}
-                  <span className="relative">{g.label}</span>
+                  <span className="relative">{catLabel[g.key]}</span>
                 </button>
               );
             })}

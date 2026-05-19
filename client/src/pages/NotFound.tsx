@@ -1,8 +1,13 @@
 import { Link } from 'react-router-dom';
 import Seo from '@/components/ui/Seo';
 import { Button } from '@/components/ui/button';
+import { useSiteCopy } from '@/hooks/useSiteCopy';
 
 export default function NotFound() {
+  const c = useSiteCopy('states', {
+    notFoundError: 'bash: no such file or directory',
+    notFoundHome: 'cd ~/home',
+  });
   return (
     <>
       <Seo title="404 — Not found" noindex />
@@ -12,10 +17,10 @@ export default function NotFound() {
           <p className="mt-4 font-mono text-muted-foreground">
             <span className="text-neon">$</span> cd {window.location.pathname}
             <br />
-            bash: no such file or directory
+            {c.notFoundError}
           </p>
           <Link to="/" className="mt-8 inline-block">
-            <Button>cd ~/home</Button>
+            <Button>{c.notFoundHome}</Button>
           </Link>
         </div>
       </div>

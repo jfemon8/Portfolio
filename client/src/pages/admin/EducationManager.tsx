@@ -16,6 +16,7 @@ const config: ResourceConfig<EducationDoc> = {
     startYear: '',
     endYear: '',
     grade: '',
+    description: '',
     order: 0,
   },
   fields: [
@@ -26,6 +27,13 @@ const config: ResourceConfig<EducationDoc> = {
     { name: 'startYear', label: 'Start year', type: 'text' },
     { name: 'endYear', label: 'End year', type: 'text' },
     { name: 'grade', label: 'Grade (e.g. CGPA: 3.38)', type: 'text' },
+    {
+      name: 'description',
+      label: 'Description',
+      type: 'textarea',
+      full: true,
+      rows: 3,
+    },
     { name: 'order', label: 'Order', type: 'number' },
   ],
   labelOf: (i) => i.institution,

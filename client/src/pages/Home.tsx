@@ -4,6 +4,7 @@ import Seo from '@/components/ui/Seo';
 import { personSchema, websiteSchema } from '@/lib/structuredData';
 import { Spinner, ErrorState } from '@/components/ui/States';
 import { useProfile, useSiteSettings } from '@/hooks/usePortfolio';
+import { useSiteCopy } from '@/hooks/useSiteCopy';
 import { HOME_SECTIONS } from '@/config/homeSections';
 import { scrollToId } from '@/lib/smoothScroll';
 import HeroPremium from '@/components/sections/HeroPremium';
@@ -22,20 +23,21 @@ export default function Home() {
   const { data: siteData } = useSiteSettings();
   const navigate = useNavigate();
   const profile = data?.data;
+  const st = useSiteCopy('states', {
+    homeLoading: 'Loading portfolio…',
+    homeError: "Couldn't reach the API. Is the backend running?",
+  });
 
   if (isLoading)
     return (
       <div className="grid min-h-[70vh] place-items-center">
-        <Spinner label="Loading portfolio…" />
+        <Spinner label={st.homeLoading} />
       </div>
     );
   if (isError)
     return (
       <div className="grid min-h-[70vh] place-items-center">
-        <ErrorState
-          message="Couldn't reach the API. Is the backend running?"
-          onRetry={() => void refetch()}
-        />
+        <ErrorState message={st.homeError} onRetry={() => void refetch()} />
       </div>
     );
 

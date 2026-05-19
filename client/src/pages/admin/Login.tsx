@@ -10,6 +10,7 @@ import GlassCard from '@/components/shared/GlassCard';
 import { Button } from '@/components/ui/button';
 import Seo from '@/components/ui/Seo';
 import type { ApiError } from '@/types';
+import { useSiteCopy } from '@/hooks/useSiteCopy';
 
 interface LoginForm {
   email: string;
@@ -30,6 +31,21 @@ export default function Login() {
   const from =
     (location.state as { from?: { pathname?: string } } | null)?.from
       ?.pathname || '/admin';
+  const c = useSiteCopy('auth', {
+    panelTitle: 'Admin Panel',
+    panelSubtitle: 'Sign in to manage your portfolio',
+    emailLabel: 'Email',
+    emailPlaceholder: 'you@example.com',
+    emailRequired: 'Email required',
+    passwordLabel: 'Password',
+    passwordPlaceholder: '••••••••',
+    passwordRequired: 'Password required',
+    signIn: 'Sign in',
+    signingIn: 'Signing in…',
+    footer: 'Protected area · authorized access only',
+    welcomeToast: 'Welcome back 👋',
+    failToast: 'Login failed',
+  });
 
   if (!loading && isAuthed) return <Navigate to={from} replace />;
 
@@ -37,10 +53,10 @@ export default function Login() {
     setSubmitting(true);
     try {
       await login(email, password);
-      toast.success('Welcome back 👋');
+      toast.success(c.welcomeToast);
       navigate(from, { replace: true });
     } catch (err) {
-      toast.error((err as ApiError).message || 'Login failed');
+      toast.error((err as ApiError).message || c.failToast);
     } finally {
       setSubmitting(false);
     }
@@ -72,22 +88,22 @@ export default function Login() {
                 <Lock className="h-5 w-5" />
               </span>
               <div>
-                <h1 className="font-bold text-foreground">Admin Panel</h1>
+                <h1 className="font-bold text-foreground">{c.panelTitle}</h1>
                 <p className="text-xs text-muted-foreground/70">
-                  Sign in to manage your portfolio
+                  {c.panelSubtitle}
                 </p>
               </div>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div>
-                <label className="label">Email</label>
+                <label className="label">{c.emailLabel}</label>
                 <input
                   className="input"
                   type="email"
                   autoComplete="username"
-                  placeholder="you@example.com"
-                  {...register('email', { required: 'Email required' })}
+                  placeholder={c.emailPlaceholder}
+                  {...register('email', { required: c.emailRequired })}
                 />
                 {errors.email && (
                   <p className="mt-1 text-xs text-destructive">
@@ -96,13 +112,13 @@ export default function Login() {
                 )}
               </div>
               <div>
-                <label className="label">Password</label>
+                <label className="label">{c.passwordLabel}</label>
                 <input
                   className="input"
                   type="password"
                   autoComplete="current-password"
-                  placeholder="••••••••"
-                  {...register('password', { required: 'Password required' })}
+                  placeholder={c.passwordPlaceholder}
+                  {...register('password', { required: c.passwordRequired })}
                 />
                 {errors.password && (
                   <p className="mt-1 text-xs text-destructive">
@@ -118,16 +134,16 @@ export default function Login() {
               >
                 {submitting ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin" /> Signing in…
+                    <Loader2 className="h-4 w-4 animate-spin" /> {c.signingIn}
                   </>
                 ) : (
-                  'Sign in'
+                  c.signIn
                 )}
               </Button>
             </form>
           </GlassCard>
           <p className="mt-5 text-center text-xs text-muted-foreground/60">
-            Protected area · authorized access only
+            {c.footer}
           </p>
         </motion.div>
       </div>

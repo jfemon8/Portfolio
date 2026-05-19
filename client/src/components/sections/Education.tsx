@@ -1,5 +1,6 @@
 import { GraduationCap, MapPin } from 'lucide-react';
 import { Section, SectionHeading } from '@/components/shared/Section';
+import { useSectionCopy } from '@/hooks/useSectionCopy';
 import Reveal from '@/components/motion/Reveal';
 import Tilt3D from '@/components/motion/Tilt3D';
 import GlassCard from '@/components/shared/GlassCard';
@@ -9,10 +10,19 @@ import { useEducation } from '@/hooks/usePortfolio';
 export default function Education() {
   const { data, isLoading } = useEducation();
   const items = data?.data ?? [];
+  const copy = useSectionCopy('education', {
+    index: '05.',
+    title: 'Education',
+    subtitle: '',
+  });
 
   return (
     <Section id="education">
-      <SectionHeading index="05." title="Education" />
+      <SectionHeading
+        index={copy.index}
+        title={copy.title}
+        subtitle={copy.subtitle}
+      />
       {isLoading && <Spinner />}
       <div className="grid gap-5 md:grid-cols-3">
         {items.map((e, i) => (
@@ -38,6 +48,11 @@ export default function Education() {
                 {e.location && (
                   <p className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground/70">
                     <MapPin className="h-3.5 w-3.5" /> {e.location}
+                  </p>
+                )}
+                {e.description && (
+                  <p className="mt-3 text-xs leading-relaxed text-muted-foreground/70 line-clamp-3">
+                    {e.description}
                   </p>
                 )}
               </GlassCard>

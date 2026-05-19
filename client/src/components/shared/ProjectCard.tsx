@@ -13,6 +13,7 @@ import SmartImage from '@/components/shared/SmartImage';
 import PrefetchLink from '@/components/shared/PrefetchLink';
 import { track } from '@/lib/api';
 import { cn } from '@/lib/cn';
+import { useSiteCopy } from '@/hooks/useSiteCopy';
 import type { ProjectDoc } from '@/types';
 
 interface ProjectCardProps {
@@ -33,6 +34,13 @@ export default function ProjectCard({
 }: ProjectCardProps) {
   const href = `/projects/${project.slug}`;
   const onOpen = () => track('project_click', '/projects', project.slug);
+  const lab = useSiteCopy('labels', {
+    badgeFeatured: 'Featured',
+    badgeVideo: 'Video',
+    btnSourceCode: 'Source code',
+    btnLiveDemo: 'Live demo',
+    btnCaseStudy: 'Case study',
+  });
 
   return (
     <Tilt3D
@@ -69,7 +77,7 @@ export default function ProjectCard({
 
           {project.featured && (
             <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-[11px] font-semibold text-neon backdrop-blur">
-              <Star className="h-3 w-3 fill-neon" /> Featured
+              <Star className="h-3 w-3 fill-neon" /> {lab.badgeFeatured}
             </span>
           )}
           <span className="absolute left-3 top-3 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-[11px] font-medium capitalize text-muted-foreground backdrop-blur">
@@ -77,7 +85,7 @@ export default function ProjectCard({
           </span>
           {project.videoUrl && (
             <span className="absolute bottom-3 left-3 flex items-center gap-1 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-[11px] font-medium text-neon backdrop-blur">
-              <Play className="h-3 w-3 fill-neon" /> Video
+              <Play className="h-3 w-3 fill-neon" /> {lab.badgeVideo}
             </span>
           )}
         </PrefetchLink>
@@ -137,7 +145,7 @@ export default function ProjectCard({
                   href={project.sourceUrl}
                   target="_blank"
                   rel="noreferrer"
-                  aria-label="Source code"
+                  aria-label={lab.btnSourceCode}
                   className="flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-neon"
                 >
                   <Github className="h-4 w-4" />
@@ -150,7 +158,7 @@ export default function ProjectCard({
                   href={project.liveUrl}
                   target="_blank"
                   rel="noreferrer"
-                  aria-label="Live demo"
+                  aria-label={lab.btnLiveDemo}
                   className="flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-neon"
                 >
                   <ExternalLink className="h-4 w-4" />
@@ -162,7 +170,7 @@ export default function ProjectCard({
               onClick={onOpen}
               className="ml-auto flex items-center gap-1 font-medium text-neon"
             >
-              Case study
+              {lab.btnCaseStudy}
               <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </PrefetchLink>
           </div>

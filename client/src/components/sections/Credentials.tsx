@@ -1,5 +1,6 @@
 import { Award, Trophy, ExternalLink, type LucideIcon } from 'lucide-react';
 import { Section, SectionHeading } from '@/components/shared/Section';
+import { useSectionCopy } from '@/hooks/useSectionCopy';
 import Reveal from '@/components/motion/Reveal';
 import GlassCard from '@/components/shared/GlassCard';
 import { useCertifications } from '@/hooks/usePortfolio';
@@ -8,6 +9,7 @@ interface ColumnItem {
   id: string;
   title: string;
   meta?: string;
+  desc?: string;
   url?: string;
 }
 
@@ -35,6 +37,11 @@ function Column({
               {it.meta && (
                 <p className="text-xs text-muted-foreground/70">{it.meta}</p>
               )}
+              {it.desc && (
+                <p className="mt-1 text-xs leading-relaxed text-muted-foreground/70 line-clamp-2">
+                  {it.desc}
+                </p>
+              )}
               {it.url && (
                 <a
                   href={it.url}
@@ -59,17 +66,32 @@ export default function Credentials() {
 
   const certs: ColumnItem[] = all
     .filter((c) => c.category === 'certification')
-    .map((c) => ({ id: c._id, title: c.title, meta: c.issuer }));
+    .map((c) => ({
+      id: c._id,
+      title: c.title,
+      meta: [c.issuer, c.issueDate].filter(Boolean).join(' · '),
+      desc: c.description,
+    }));
   const achievements: ColumnItem[] = all
     .filter((c) => c.category === 'achievement')
-    .map((c) => ({ id: c._id, title: c.title, meta: c.issuer }));
+    .map((c) => ({
+      id: c._id,
+      title: c.title,
+      meta: [c.issuer, c.issueDate].filter(Boolean).join(' · '),
+      desc: c.description,
+    }));
+  const copy = useSectionCopy('credentials', {
+    index: '06.',
+    title: 'Credentials',
+    subtitle: 'Certifications & achievements.',
+  });
 
   return (
     <Section id="credentials">
       <SectionHeading
-        index="06."
-        title="Credentials"
-        subtitle="Certifications & achievements."
+        index={copy.index}
+        title={copy.title}
+        subtitle={copy.subtitle}
       />
       <div className="grid gap-6 sm:grid-cols-2">
         <Column icon={Award} title="Certifications" items={certs} delay={0} />

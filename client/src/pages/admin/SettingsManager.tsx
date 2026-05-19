@@ -54,6 +54,9 @@ export default function SettingsManager() {
     setSavingSeo(true);
     try {
       await api.put('/seo', {
+        siteName: seo.siteName,
+        authorName: seo.authorName,
+        siteUrl: seo.siteUrl,
         metaTitle: seo.metaTitle,
         metaDescription: seo.metaDescription,
         keywords: seo.keywords,
@@ -260,6 +263,41 @@ export default function SettingsManager() {
           </h3>
           {seo && (
             <div className="grid gap-4">
+              <div className="grid gap-4 sm:grid-cols-3">
+                <div>
+                  <label className="label">Site name</label>
+                  <input
+                    className="input"
+                    value={seo.siteName}
+                    placeholder="Brand / site name"
+                    onChange={(e) =>
+                      setSeo({ ...seo, siteName: e.target.value })
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="label">Author name</label>
+                  <input
+                    className="input"
+                    value={seo.authorName}
+                    placeholder="Your name"
+                    onChange={(e) =>
+                      setSeo({ ...seo, authorName: e.target.value })
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="label">Site URL</label>
+                  <input
+                    className="input"
+                    value={seo.siteUrl}
+                    placeholder="https://example.com"
+                    onChange={(e) =>
+                      setSeo({ ...seo, siteUrl: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
               <div>
                 <label className="label">Default meta title</label>
                 <input

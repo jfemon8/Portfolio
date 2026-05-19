@@ -2,6 +2,8 @@ import { useState } from 'react';
 import Seo from '@/components/ui/Seo';
 import { breadcrumbSchema } from '@/lib/structuredData';
 import { Section, SectionHeading } from '@/components/shared/Section';
+import { useSectionCopy } from '@/hooks/useSectionCopy';
+import { useSiteCopy } from '@/hooks/useSiteCopy';
 import Reveal from '@/components/motion/Reveal';
 import ProjectCard from '@/components/shared/ProjectCard';
 import {
@@ -15,12 +17,7 @@ import type { ProjectCategory } from '@/types';
 
 type Filter = 'all' | ProjectCategory;
 
-const filters: { key: Filter; label: string }[] = [
-  { key: 'all', label: 'All' },
-  { key: 'fullstack', label: 'Full-stack' },
-  { key: 'frontend', label: 'Front-end' },
-  { key: 'backend', label: 'Back-end' },
-];
+const FILTERS: Filter[] = ['all', 'fullstack', 'frontend', 'backend'];
 
 export default function Projects() {
   const [filter, setFilter] = useState<Filter>('all');
@@ -28,6 +25,27 @@ export default function Projects() {
   const all = data?.data ?? [];
   const projects =
     filter === 'all' ? all : all.filter((p) => p.category === filter);
+  const copy = useSectionCopy('projects', {
+    index: '~/projects',
+    title: "Things I've built",
+    subtitle:
+      'Full-stack platforms, front-ends and experiments — from MERN products to .NET e-commerce.',
+  });
+  const st = useSiteCopy('states', {
+    projectsFilterEmpty: 'No projects in this category yet.',
+  });
+  const lab = useSiteCopy('labels', {
+    filterAll: 'All',
+    filterFullstack: 'Full-stack',
+    filterFrontend: 'Front-end',
+    filterBackend: 'Back-end',
+  });
+  const filterLabel: Record<string, string> = {
+    all: lab.filterAll,
+    fullstack: lab.filterFullstack,
+    frontend: lab.filterFrontend,
+    backend: lab.filterBackend,
+  };
 
   return (
     <>
@@ -42,24 +60,24 @@ export default function Projects() {
       />
       <Section id="projects-page" className="pt-32">
         <SectionHeading
-          index="~/projects"
-          title="Things I've built"
-          subtitle="Full-stack platforms, front-ends and experiments — from MERN products to .NET e-commerce."
+          index={copy.index}
+          title={copy.title}
+          subtitle={copy.subtitle}
         />
 
         <div className="mb-12 flex flex-wrap gap-2">
-          {filters.map((f) => (
+          {FILTERS.map((f) => (
             <button
-              key={f.key}
-              onClick={() => setFilter(f.key)}
+              key={f}
+              onClick={() => setFilter(f)}
               className={cn(
                 'rounded-full border px-4 py-1.5 text-sm transition-all duration-200',
-                filter === f.key
+                filter === f
                   ? 'border-primary/50 bg-primary/10 text-primary shadow-glow'
                   : 'border-border/70 text-muted-foreground hover:border-primary/30 hover:text-foreground'
               )}
             >
-              {f.label}
+              {filterLabel[f]}
             </button>
           ))}
         </div>
@@ -67,7 +85,7 @@ export default function Projects() {
         {isLoading && <CardGridSkeleton />}
         {isError && <ErrorState onRetry={() => void refetch()} />}
         {!isLoading && !isError && projects.length === 0 && (
-          <EmptyState message="No projects in this category yet." />
+          <EmptyState message={st.projectsFilterEmpty} />
         )}
 
         <div className="grid auto-rows-[1fr] gap-5 sm:grid-cols-2 lg:grid-cols-3">

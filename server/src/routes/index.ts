@@ -4,6 +4,7 @@ import userRoutes from './userRoutes.js';
 import profileRoutes from './profileRoutes.js';
 import seoRoutes from './seoRoutes.js';
 import siteRoutes from './siteRoutes.js';
+import siteContentRoutes from './siteContentRoutes.js';
 import projectRoutes from './projectRoutes.js';
 import contentRoutes from './contentRoutes.js';
 import blogRoutes from './blogRoutes.js';
@@ -13,6 +14,7 @@ import auditRoutes from './auditRoutes.js';
 import uploadRoutes from './uploadRoutes.js';
 import cpRoutes from './cpRoutes.js';
 import { getSitemap } from '../controllers/sitemapController.js';
+import { getManifest, getRobots } from '../controllers/siteMetaController.js';
 
 const router = Router();
 
@@ -20,14 +22,18 @@ router.get('/health', (_req, res) => {
   res.json({ success: true, status: 'ok', time: new Date().toISOString() });
 });
 
-// Public, dynamic XML sitemap (served at the site origin via vercel.json).
+// Public, dynamic sitemap / manifest / robots (served at the site origin
+// via vercel.json rewrites — the static public/ copies were removed).
 router.get('/sitemap.xml', getSitemap);
+router.get('/site.webmanifest', getManifest);
+router.get('/robots.txt', getRobots);
 
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
 router.use('/profile', profileRoutes);
 router.use('/seo', seoRoutes);
 router.use('/site', siteRoutes);
+router.use('/site-content', siteContentRoutes);
 router.use('/projects', projectRoutes);
 router.use('/blog', blogRoutes);
 router.use('/messages', messageRoutes);
