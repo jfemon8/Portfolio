@@ -18,11 +18,13 @@ import {
   MousePointerClick,
   FileDown,
   Mail,
+  Users,
   type LucideIcon,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import PageHeader from '@/components/admin/PageHeader';
 import GlassCard from '@/components/shared/GlassCard';
+import Heatmap from '@/components/shared/Heatmap';
 import { Spinner } from '@/components/ui/States';
 import type { AnalyticsSummary, ItemResponse, VisitType } from '@/types';
 
@@ -59,14 +61,18 @@ export default function AnalyticsManager() {
   const a = data?.data;
   if (!a) return null;
 
+  // Defensive defaults — frontend & backend deploy as independent Vercel
+  // projects, so tolerate an old summary payload during a deploy gap.
+  const byBrowser = a.byBrowser ?? [];
+  const byCountry = a.byCountry ?? [];
+  const scrollDepth = a.scrollDepth ?? [];
+  const depthMap = new Map(scrollDepth.map((d) => [d._id, d.count]));
+  const depthMax = Math.max(1, ...scrollDepth.map((d) => d.count));
+
   const cards = [
     { label: 'Page views (total)', value: a.pageviews.total, icon: Eye },
     { label: `Views (${days}d)`, value: a.pageviews.range, icon: Eye },
-    {
-      label: 'Projects',
-      value: a.counts.projects,
-      icon: MousePointerClick,
-    },
+    { label: `Sessions (${days}d)`, value: a.sessions ?? 0, icon: Users },
     { label: 'Unread messages', value: a.counts.unread, icon: Mail },
   ];
 
@@ -200,6 +206,99 @@ export default function AnalyticsManager() {
               <Bar dataKey="views" fill="#a855f7" radius={[0, 6, 6, 0]} />
             </BarChart>
           </ResponsiveContainer>
+        </GlassCard>
+
+        <GlassCard className="p-6 lg:col-span-3">
+          <h3 className="mb-4 font-semibold text-foreground">
+            Visitor activity
+          </h3>
+          <Heatmap
+            data={a.byDay.map((d) => ({ date: d.date, count: d.views }))}
+            weeks={Math.ceil(days / 7)}
+            ariaLabel={`${a.pageviews.range} page views in the last ${days} days`}
+          />
+        </GlassCard>
+
+        <GlassCard className="p-6 lg:col-span-2">
+          <h3 className="mb-4 font-semibold text-foreground">By country</h3>
+          {byCountry.length === 0 ? (
+            <p className="py-10 text-center text-sm text-muted-foreground">
+              No country data yet.
+            </p>
+          ) : (
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={byCountry} layout="vertical">
+                <XAxis
+                  type="number"
+                  stroke={axisStroke}
+                  fontSize={11}
+                  allowDecimals={false}
+                />
+                <YAxis
+                  type="category"
+                  dataKey="_id"
+                  stroke={axisStroke}
+                  fontSize={11}
+                  width={50}
+                />
+                <Tooltip
+                  contentStyle={tooltipStyle}
+                  cursor={{ fill: 'hsl(var(--muted))' }}
+                />
+                <Bar dataKey="count" fill="#38bdf8" radius={[0, 6, 6, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </GlassCard>
+
+        <GlassCard className="p-6">
+          <h3 className="mb-4 font-semibold text-foreground">By browser</h3>
+          {byBrowser.length === 0 ? (
+            <p className="py-10 text-center text-sm text-muted-foreground">
+              No data yet.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {byBrowser.map((b) => (
+                <div
+                  key={b._id}
+                  className="flex items-center justify-between text-sm"
+                >
+                  <span className="text-muted-foreground">{b._id}</span>
+                  <span className="font-mono text-foreground">{b.count}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </GlassCard>
+
+        <GlassCard className="p-6 lg:col-span-3">
+          <h3 className="font-semibold text-foreground">Scroll depth</h3>
+          <p className="mb-4 text-xs text-muted-foreground">
+            How far visitors scroll through a page.
+          </p>
+          <div className="space-y-3">
+            {[25, 50, 75, 100].map((bucket) => {
+              const count = depthMap.get(bucket) ?? 0;
+              const pct = Math.round((count / depthMax) * 100);
+              return (
+                <div key={bucket} className="flex items-center gap-3 text-sm">
+                  <span className="w-10 shrink-0 font-mono text-muted-foreground">
+                    {bucket}%
+                  </span>
+                  <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-border/40">
+                    <div
+                      className="h-full rounded-full bg-primary"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <span className="w-12 shrink-0 text-right font-mono text-foreground">
+                    {count}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
         </GlassCard>
       </div>
     </div>

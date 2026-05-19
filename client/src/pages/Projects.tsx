@@ -4,7 +4,11 @@ import { breadcrumbSchema } from '@/lib/structuredData';
 import { Section, SectionHeading } from '@/components/shared/Section';
 import Reveal from '@/components/motion/Reveal';
 import ProjectCard from '@/components/shared/ProjectCard';
-import { Spinner, ErrorState, EmptyState } from '@/components/ui/States';
+import {
+  ErrorState,
+  EmptyState,
+  CardGridSkeleton,
+} from '@/components/ui/States';
 import { useProjects } from '@/hooks/usePortfolio';
 import { cn } from '@/lib/cn';
 import type { ProjectCategory } from '@/types';
@@ -60,7 +64,7 @@ export default function Projects() {
           ))}
         </div>
 
-        {isLoading && <Spinner />}
+        {isLoading && <CardGridSkeleton />}
         {isError && <ErrorState onRetry={() => void refetch()} />}
         {!isLoading && !isError && projects.length === 0 && (
           <EmptyState message="No projects in this category yet." />

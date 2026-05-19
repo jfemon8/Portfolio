@@ -15,6 +15,7 @@ const visitSchema = new mongoose.Schema<IVisit>(
         'resume_download',
         'contact_submit',
         'social_click',
+        'scroll_depth',
       ],
       default: 'pageview',
     },
@@ -22,7 +23,10 @@ const visitSchema = new mongoose.Schema<IVisit>(
     ref: { type: String, default: '' },
     referrer: { type: String, default: 'direct' },
     device: { type: String, default: 'unknown' },
+    browser: { type: String, default: 'unknown' },
     country: { type: String, default: '' },
+    sid: { type: String, default: '' },
+    depth: { type: Number, default: 0 },
     day: { type: String, index: true },
   },
   { timestamps: true }

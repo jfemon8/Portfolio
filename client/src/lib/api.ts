@@ -55,14 +55,47 @@ api.interceptors.response.use(
   }
 );
 
+/**
+ * Opaque, cookie-less session id — an ephemeral random token kept in
+ * `sessionStorage` (NOT a cookie): it dies when the tab/session closes, is
+ * never sent cross-site and carries no personal data, so it lets us count
+ * distinct sessions while staying privacy-friendly. Storage failures
+ * (private mode) degrade silently to no session id.
+ */
+const SID_KEY = 'portfolio_sid';
+const sessionId = (): string => {
+  try {
+    let s = sessionStorage.getItem(SID_KEY);
+    if (!s) {
+      s =
+        typeof crypto !== 'undefined' && 'randomUUID' in crypto
+          ? crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      sessionStorage.setItem(SID_KEY, s);
+    }
+    return s;
+  } catch {
+    return '';
+  }
+};
+
 /** Fire-and-forget analytics beacon (never throws). */
 export const track = (
   type: VisitType,
   path: string,
-  ref?: string
+  ref?: string,
+  depth?: number
 ): void => {
   try {
-    void api.post('/analytics/track', { type, path, ref }).catch(() => undefined);
+    void api
+      .post('/analytics/track', {
+        type,
+        path,
+        ref,
+        sid: sessionId(),
+        depth,
+      })
+      .catch(() => undefined);
   } catch {
     /* noop */
   }

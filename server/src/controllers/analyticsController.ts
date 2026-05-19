@@ -11,12 +11,42 @@ const deviceFromUA = (ua = ''): string => {
   return 'desktop';
 };
 
+/** Coarse browser family from UA — privacy-friendly, no fingerprinting. */
+const browserFromUA = (ua = ''): string => {
+  if (/Edg\//.test(ua)) return 'Edge';
+  if (/OPR\/|Opera/.test(ua)) return 'Opera';
+  if (/SamsungBrowser/.test(ua)) return 'Samsung';
+  if (/Firefox\/|FxiOS\//.test(ua)) return 'Firefox';
+  if (/Chrome\/|CriOS\//.test(ua)) return 'Chrome';
+  if (/Safari\//.test(ua)) return 'Safari';
+  return 'unknown';
+};
+
+/**
+ * Country code from Vercel's native geo header (edge-injected). We store
+ * ONLY the 2-letter code — never the IP — so it stays privacy-friendly and
+ * needs no GeoIP dependency. Empty locally / on non-Vercel hosts.
+ */
+const countryFromReq = (req: Request): string => {
+  const h = req.headers['x-vercel-ip-country'];
+  const raw = Array.isArray(h) ? h[0] : h;
+  return (raw || '').toUpperCase().slice(0, 2);
+};
+
+/** Clamp a scroll-depth value to an integer 0–100. */
+const clampDepth = (v: unknown): number => {
+  const n = Math.round(Number(v));
+  return Number.isFinite(n) ? Math.min(100, Math.max(0, n)) : 0;
+};
+
 /** Public — record a lightweight, cookie-less analytics event. */
 export const track = asyncHandler(async (req: Request, res: Response) => {
-  const { type, path, ref } = (req.body ?? {}) as {
+  const { type, path, ref, sid, depth } = (req.body ?? {}) as {
     type?: string;
     path?: string;
     ref?: string;
+    sid?: string;
+    depth?: number;
   };
   await Visit.create({
     type: (type as never) || 'pageview',
@@ -24,6 +54,10 @@ export const track = asyncHandler(async (req: Request, res: Response) => {
     ref: ref || '',
     referrer: String(req.headers.referer || 'direct').slice(0, 200),
     device: deviceFromUA(req.headers['user-agent']),
+    browser: browserFromUA(req.headers['user-agent']),
+    country: countryFromReq(req),
+    sid: String(sid || '').slice(0, 40),
+    depth: clampDepth(depth),
   });
   res.json({ success: true });
 });
@@ -36,9 +70,13 @@ export const summary = asyncHandler(async (req: Request, res: Response) => {
   const [
     totalViews,
     rangeViews,
+    sessionsAgg,
     byDay,
     byType,
     byDevice,
+    byBrowser,
+    byCountry,
+    scrollDepth,
     topProjects,
     topPosts,
     totals,
@@ -46,17 +84,45 @@ export const summary = asyncHandler(async (req: Request, res: Response) => {
     Visit.countDocuments({ type: 'pageview' }),
     Visit.countDocuments({ type: 'pageview', createdAt: { $gte: since } }),
     Visit.aggregate([
-      { $match: { createdAt: { $gte: since } } },
+      { $match: { createdAt: { $gte: since }, sid: { $ne: '' } } },
+      { $group: { _id: '$sid' } },
+      { $count: 'n' },
+    ]),
+    Visit.aggregate([
+      { $match: { type: 'pageview', createdAt: { $gte: since } } },
       { $group: { _id: '$day', views: { $sum: 1 } } },
       { $sort: { _id: 1 } },
     ]),
     Visit.aggregate([
-      { $match: { createdAt: { $gte: since } } },
+      // scroll_depth has its own funnel — keep the events list meaningful
+      { $match: { type: { $ne: 'scroll_depth' }, createdAt: { $gte: since } } },
       { $group: { _id: '$type', count: { $sum: 1 } } },
     ]),
     Visit.aggregate([
       { $match: { type: 'pageview', createdAt: { $gte: since } } },
       { $group: { _id: '$device', count: { $sum: 1 } } },
+    ]),
+    Visit.aggregate([
+      { $match: { type: 'pageview', createdAt: { $gte: since } } },
+      { $group: { _id: '$browser', count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+    ]),
+    Visit.aggregate([
+      {
+        $match: {
+          type: 'pageview',
+          createdAt: { $gte: since },
+          country: { $nin: ['', null] },
+        },
+      },
+      { $group: { _id: '$country', count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 8 },
+    ]),
+    Visit.aggregate([
+      { $match: { type: 'scroll_depth', createdAt: { $gte: since } } },
+      { $group: { _id: '$depth', count: { $sum: 1 } } },
+      { $sort: { _id: 1 } },
     ]),
     Project.find().select('title slug views').sort({ views: -1 }).limit(5),
     BlogPost.find({ status: 'published' })
@@ -76,9 +142,13 @@ export const summary = asyncHandler(async (req: Request, res: Response) => {
     data: {
       range: { days, since },
       pageviews: { total: totalViews, range: rangeViews },
+      sessions: sessionsAgg[0]?.n ?? 0,
       byDay: byDay.map((d) => ({ date: d._id, views: d.views })),
       byType,
       byDevice,
+      byBrowser,
+      byCountry,
+      scrollDepth,
       topProjects,
       topPosts,
       counts: {

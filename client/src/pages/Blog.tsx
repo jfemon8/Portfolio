@@ -1,4 +1,5 @@
-import { useState, type FormEvent } from 'react';
+import { useState } from 'react';
+import { useDebounce } from '@/hooks/useDebounce';
 import { Calendar, Clock, ArrowUpRight, Search } from 'lucide-react';
 import SmartImage from '@/components/shared/SmartImage';
 import PrefetchLink from '@/components/shared/PrefetchLink';
@@ -7,8 +8,11 @@ import { breadcrumbSchema } from '@/lib/structuredData';
 import { Section, SectionHeading } from '@/components/shared/Section';
 import Reveal from '@/components/motion/Reveal';
 import GlassCard from '@/components/shared/GlassCard';
-import { Button } from '@/components/ui/button';
-import { Spinner, ErrorState, EmptyState } from '@/components/ui/States';
+import {
+  ErrorState,
+  EmptyState,
+  CardGridSkeleton,
+} from '@/components/ui/States';
 import { useBlogList } from '@/hooks/usePortfolio';
 
 const fmt = (d?: string): string =>
@@ -22,16 +26,11 @@ const fmt = (d?: string): string =>
 
 export default function Blog() {
   const [q, setQ] = useState('');
-  const [query, setQuery] = useState('');
+  const query = useDebounce(q.trim(), 350);
   const { data, isLoading, isError, refetch } = useBlogList(
     query ? `?q=${encodeURIComponent(query)}` : ''
   );
   const posts = data?.data ?? [];
-
-  const onSearch = (e: FormEvent): void => {
-    e.preventDefault();
-    setQuery(q.trim());
-  };
 
   return (
     <>
@@ -50,24 +49,20 @@ export default function Blog() {
           title="Writing & notes"
           subtitle="Thoughts on development, the MERN stack, .NET and competitive programming."
           action={
-            <form onSubmit={onSearch} className="flex gap-2">
-              <div className="relative">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" />
-                <input
-                  value={q}
-                  onChange={(e) => setQ(e.target.value)}
-                  placeholder="Search articles…"
-                  className="input w-56 pl-9"
-                />
-              </div>
-              <Button variant="outline" type="submit">
-                Search
-              </Button>
-            </form>
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" />
+              <input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Search articles…"
+                aria-label="Search articles"
+                className="input w-56 pl-9"
+              />
+            </div>
           }
         />
 
-        {isLoading && <Spinner />}
+        {isLoading && <CardGridSkeleton />}
         {isError && <ErrorState onRetry={() => void refetch()} />}
         {!isLoading && !isError && posts.length === 0 && (
           <EmptyState message="No posts published yet — check back soon!" />

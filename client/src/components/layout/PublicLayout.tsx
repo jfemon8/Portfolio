@@ -7,6 +7,7 @@ import ScrollProgress from './ScrollProgress';
 import PageTransition from './PageTransition';
 import SmoothScroll from './SmoothScroll';
 import { track } from '@/lib/api';
+import { useScrollDepth } from '@/hooks/useScrollDepth';
 import { initThemeSync } from '@/stores/theme';
 
 /**
@@ -26,6 +27,8 @@ export default function PublicLayout() {
   useEffect(() => {
     track('pageview', pathname);
   }, [pathname]);
+
+  useScrollDepth(pathname);
 
   return (
     <SmoothScroll>

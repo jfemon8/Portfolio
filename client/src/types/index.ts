@@ -243,7 +243,8 @@ export type VisitType =
   | 'project_click'
   | 'resume_download'
   | 'contact_submit'
-  | 'social_click';
+  | 'social_click'
+  | 'scroll_depth';
 
 /* ---- hydrated (with id + timestamps) ---- */
 export type ProfileDoc = Entity<Profile>;
@@ -389,9 +390,15 @@ export interface MeResponse {
 export interface AnalyticsSummary {
   range: { days: number; since: string };
   pageviews: { total: number; range: number };
+  /** distinct cookie-less sessions in range */
+  sessions: number;
   byDay: { date: string; views: number }[];
   byType: { _id: VisitType; count: number }[];
   byDevice: { _id: string; count: number }[];
+  byBrowser: { _id: string; count: number }[];
+  byCountry: { _id: string; count: number }[];
+  /** scroll-depth funnel — _id is the 25/50/75/100 bucket */
+  scrollDepth: { _id: number; count: number }[];
   topProjects: Pick<ProjectDoc, '_id' | 'title' | 'slug' | 'views'>[];
   topPosts: Pick<BlogPostDoc, '_id' | 'title' | 'slug' | 'views'>[];
   counts: {

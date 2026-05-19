@@ -310,7 +310,8 @@ export type VisitType =
   | 'project_click'
   | 'resume_download'
   | 'contact_submit'
-  | 'social_click';
+  | 'social_click'
+  | 'scroll_depth';
 
 export interface IVisit {
   type: VisitType;
@@ -318,7 +319,14 @@ export interface IVisit {
   ref: string;
   referrer: string;
   device: string;
+  /** UA-derived browser family (privacy-friendly — no fingerprinting). */
+  browser: string;
+  /** Vercel-native 2-letter country code; '' when unavailable (local/dev). */
   country: string;
+  /** Opaque cookie-less session id (ephemeral, sessionStorage — not a cookie). */
+  sid: string;
+  /** Max scroll-depth percentage for `scroll_depth` events (0–100). */
+  depth: number;
   day: string;
 }
 
