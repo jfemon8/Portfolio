@@ -98,6 +98,8 @@ export default function ProfileManager() {
     ['email', 'Email'],
     ['phone', 'Phone'],
     ['codeforcesHandle', 'Codeforces handle'],
+    ['leetcodeHandle', 'LeetCode handle'],
+    ['codechefHandle', 'CodeChef handle'],
   ];
 
   return (

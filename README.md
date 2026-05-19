@@ -22,7 +22,7 @@ site stays up to date without any code changes.
 - 🗂️ Interactive 3D-tilt project showcase (bento) + case studies with video previews & metrics
 - 📝 Blog with syntax-highlighted Markdown, search, scheduled publishing & reading progress
 - 💼 Cinematic experience timeline, interactive skill cloud, education, research & credentials
-- 📈 Live competitive-programming stats (Codeforces)
+- 📈 Live competitive-programming stats (Codeforces, LeetCode & CodeChef) with rating history
 - 📬 Working contact form with email notifications
 - 🌗 Animated dark / light theme, SEO-optimized, fully responsive
 - 🔐 Secure role-based admin dashboard for fully dynamic content

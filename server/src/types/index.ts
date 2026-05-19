@@ -92,9 +92,30 @@ export interface IProfile {
   languages: LanguageProficiency[];
   available: boolean;
   codeforcesHandle: string;
+  leetcodeHandle: string;
+  codechefHandle: string;
 }
 
-/** Cached competitive-programming snapshot (Codeforces). */
+/** LeetCode solved/ranking snapshot (optional, nested in ICpStats). */
+export interface ILeetCodeStats {
+  handle: string;
+  totalSolved: number;
+  easy: number;
+  medium: number;
+  hard: number;
+  ranking: number | null;
+  calendar: { date: string; count: number }[];
+}
+
+/** CodeChef snapshot (optional, nested in ICpStats; best-effort). */
+export interface ICodeChefStats {
+  handle: string;
+  rating: number | null;
+  highestRating: number | null;
+  stars: number;
+}
+
+/** Cached CP snapshot (Codeforces + optional LeetCode/CodeChef). */
 export interface ICpStats {
   handle: string;
   rating: number | null;
@@ -102,6 +123,9 @@ export interface ICpStats {
   rank: string;
   maxRank: string;
   contests: number;
+  leetcode: ILeetCodeStats | null;
+  codechef: ICodeChefStats | null;
+  ratingHistory: { contest: string; rating: number; date: string }[];
   fetchedAt: Date;
 }
 

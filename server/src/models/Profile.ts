@@ -31,6 +31,8 @@ const profileSchema = new mongoose.Schema<IProfile>(
     },
     available: { type: Boolean, default: true },
     codeforcesHandle: { type: String, default: '' },
+    leetcodeHandle: { type: String, default: '' },
+    codechefHandle: { type: String, default: '' },
   },
   { timestamps: true }
 );

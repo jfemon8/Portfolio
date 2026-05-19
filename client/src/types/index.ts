@@ -54,6 +54,25 @@ export interface Profile {
   languages: LanguageProficiency[];
   available: boolean;
   codeforcesHandle: string;
+  leetcodeHandle: string;
+  codechefHandle: string;
+}
+
+export interface CodeChefStats {
+  handle: string;
+  rating: number | null;
+  highestRating: number | null;
+  stars: number;
+}
+
+export interface LeetCodeStats {
+  handle: string;
+  totalSolved: number;
+  easy: number;
+  medium: number;
+  hard: number;
+  ranking: number | null;
+  calendar: { date: string; count: number }[];
 }
 
 export interface CpStats {
@@ -63,6 +82,9 @@ export interface CpStats {
   rank: string;
   maxRank: string;
   contests: number;
+  leetcode: LeetCodeStats | null;
+  codechef: CodeChefStats | null;
+  ratingHistory: { contest: string; rating: number; date: string }[];
   fetchedAt: string;
 }
 

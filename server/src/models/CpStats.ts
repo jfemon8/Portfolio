@@ -7,6 +7,29 @@ import type { ICpStats } from '../types/index.js';
  * serves this doc and only refetches when it goes stale — one doc per
  * handle. Mongoose ESM-safe pattern (do NOT regress to named imports).
  */
+const leetcodeSchema = new mongoose.Schema(
+  {
+    handle: String,
+    totalSolved: Number,
+    easy: Number,
+    medium: Number,
+    hard: Number,
+    ranking: Number,
+    calendar: { type: [{ date: String, count: Number }], default: [] },
+  },
+  { _id: false }
+);
+
+const codechefSchema = new mongoose.Schema(
+  {
+    handle: String,
+    rating: Number,
+    highestRating: Number,
+    stars: Number,
+  },
+  { _id: false }
+);
+
 const cpStatsSchema = new mongoose.Schema<ICpStats>(
   {
     handle: { type: String, required: true, unique: true, index: true },
@@ -15,6 +38,12 @@ const cpStatsSchema = new mongoose.Schema<ICpStats>(
     rank: { type: String, default: '' },
     maxRank: { type: String, default: '' },
     contests: { type: Number, default: 0 },
+    leetcode: { type: leetcodeSchema, default: null },
+    codechef: { type: codechefSchema, default: null },
+    ratingHistory: {
+      type: [{ contest: String, rating: Number, date: String }],
+      default: [],
+    },
     fetchedAt: { type: Date, default: () => new Date() },
   },
   { timestamps: true }
