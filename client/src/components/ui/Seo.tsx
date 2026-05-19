@@ -6,6 +6,7 @@ import {
   DEFAULT_OG_IMAGE,
   absoluteUrl,
 } from '@/config/site';
+import { useSeoSettings } from '@/hooks/usePortfolio';
 
 /**
  * Single, reusable SEO head manager (project rule #3/#8). Every route renders
@@ -33,7 +34,7 @@ interface SeoProps {
 
 export default function Seo({
   title,
-  description = DEFAULT_DESCRIPTION,
+  description,
   image,
   path = '',
   type = 'website',
@@ -43,9 +44,16 @@ export default function Seo({
   tags,
   jsonLd,
 }: SeoProps) {
-  const fullTitle = title ? `${title} — ${AUTHOR_NAME}` : SITE_TITLE;
+  const { data: seoData } = useSeoSettings();
+  const s = seoData?.data;
+  const fullTitle = title
+    ? `${title} — ${AUTHOR_NAME}`
+    : s?.metaTitle || SITE_TITLE;
+  const desc = description || s?.metaDescription || DEFAULT_DESCRIPTION;
   const url = absoluteUrl(path);
-  const ogImage = image ? absoluteUrl(image) : DEFAULT_OG_IMAGE;
+  const ogImage = image ? absoluteUrl(image) : s?.ogImage || DEFAULT_OG_IMAGE;
+  const keywords = s?.keywords?.length ? s.keywords.join(', ') : '';
+  const twitter = s?.twitterHandle?.trim();
   const robots = noindex ? 'noindex, nofollow' : 'index, follow';
   const schemas = jsonLd
     ? Array.isArray(jsonLd)
@@ -56,14 +64,15 @@ export default function Seo({
   return (
     <Helmet>
       <title>{fullTitle}</title>
-      <meta name="description" content={description} />
+      <meta name="description" content={desc} />
       <meta name="robots" content={robots} />
       <link rel="canonical" href={url} />
+      {keywords && <meta name="keywords" content={keywords} />}
 
       <meta property="og:site_name" content={AUTHOR_NAME} />
       <meta property="og:type" content={type} />
       <meta property="og:title" content={fullTitle} />
-      <meta property="og:description" content={description} />
+      <meta property="og:description" content={desc} />
       <meta property="og:url" content={url} />
       <meta property="og:image" content={ogImage} />
       <meta property="og:locale" content="en_US" />
@@ -79,8 +88,10 @@ export default function Seo({
         ))}
 
       <meta name="twitter:card" content="summary_large_image" />
+      {twitter && <meta name="twitter:site" content={twitter} />}
+      {twitter && <meta name="twitter:creator" content={twitter} />}
       <meta name="twitter:title" content={fullTitle} />
-      <meta name="twitter:description" content={description} />
+      <meta name="twitter:description" content={desc} />
       <meta name="twitter:image" content={ogImage} />
 
       {schemas.map((s, i) => (

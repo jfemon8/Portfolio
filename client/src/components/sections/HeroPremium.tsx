@@ -17,6 +17,7 @@ import Spotlight from '@/components/motion/Spotlight';
 import Particles from '@/components/motion/Particles';
 import Magnetic from '@/components/motion/Magnetic';
 import GlassCard from '@/components/shared/GlassCard';
+import SmartImage from '@/components/shared/SmartImage';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/cn';
 import type { ProfileDoc } from '@/types';
@@ -30,12 +31,15 @@ const iconMap: Record<string, LucideIcon> = {
 
 interface HeroPremiumProps {
   profile?: ProfileDoc;
+  /** Optional admin-set background image (subtle, behind the premium layers). */
+  background?: string;
   onContact: () => void;
   onProjects: () => void;
 }
 
 export default function HeroPremium({
   profile,
+  background,
   onContact,
   onProjects,
 }: HeroPremiumProps) {
@@ -53,6 +57,16 @@ export default function HeroPremium({
 
   return (
     <section id="hero" className="relative overflow-hidden">
+      {background && (
+        <SmartImage
+          src={background}
+          alt=""
+          aria-hidden
+          priority
+          imgWidth={1920}
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-20"
+        />
+      )}
       <Spotlight className="flex min-h-screen items-center">
         <Particles count={28} />
 

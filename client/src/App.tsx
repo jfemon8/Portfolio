@@ -31,6 +31,7 @@ const AnalyticsManager = lazy(() => import('@/pages/admin/AnalyticsManager'));
 const SettingsManager = lazy(() => import('@/pages/admin/SettingsManager'));
 const UsersManager = lazy(() => import('@/pages/admin/UsersManager'));
 const AuditLogViewer = lazy(() => import('@/pages/admin/AuditLogViewer'));
+const MediaLibrary = lazy(() => import('@/pages/admin/MediaLibrary'));
 
 const Fallback = (
   <div className="grid min-h-screen place-items-center">
@@ -71,6 +72,7 @@ export default function App() {
           <Route path="blog/new" element={<BlogEditor />} />
           <Route path="blog/:id/edit" element={<BlogEditor />} />
           <Route path="messages" element={<MessagesManager />} />
+          <Route path="media" element={<MediaLibrary />} />
           <Route path="analytics" element={<AnalyticsManager />} />
           <Route
             path="users"

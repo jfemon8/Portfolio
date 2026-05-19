@@ -105,6 +105,22 @@ export interface ICpStats {
   fetchedAt: Date;
 }
 
+/** Admin-managed site SEO defaults (singleton). */
+export interface ISeoSettings {
+  metaTitle: string;
+  metaDescription: string;
+  keywords: string[];
+  ogImage: string;
+  ogImagePublicId: string;
+  twitterHandle: string;
+}
+
+/** Admin-managed homepage layout (singleton). */
+export interface ISiteSettings {
+  heroBackground: string;
+  sections: { key: string; visible: boolean }[];
+}
+
 export type EmploymentType =
   | 'full-time'
   | 'part-time'

@@ -12,6 +12,8 @@ import type {
   PaginatedResponse,
   ProfileDoc,
   ProjectDoc,
+  SeoSettingsDoc,
+  SiteSettingsDoc,
   PublicationDoc,
   SkillDoc,
 } from '@/types';
@@ -22,6 +24,18 @@ export const useProfile = () =>
   useQuery({
     queryKey: ['profile'],
     queryFn: () => get<ItemResponse<ProfileDoc>>('/profile'),
+  });
+
+export const useSeoSettings = () =>
+  useQuery({
+    queryKey: ['seo'],
+    queryFn: () => get<ItemResponse<SeoSettingsDoc>>('/seo'),
+  });
+
+export const useSiteSettings = () =>
+  useQuery({
+    queryKey: ['site'],
+    queryFn: () => get<ItemResponse<SiteSettingsDoc>>('/site'),
   });
 
 export const useProjects = (params = '') =>

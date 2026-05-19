@@ -11,6 +11,7 @@ import {
   Award,
   Newspaper,
   Inbox,
+  Images,
   BarChart3,
   Users,
   ScrollText,
@@ -51,6 +52,7 @@ const NAV: NavItem[] = [
   { to: '/admin/education', label: 'Education', icon: GraduationCap },
   { to: '/admin/credentials', label: 'Credentials', icon: Award },
   { to: '/admin/blog', label: 'Blog', icon: Newspaper },
+  { to: '/admin/media', label: 'Media', icon: Images },
   { to: '/admin/messages', label: 'Messages', icon: Inbox },
   { to: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
   {

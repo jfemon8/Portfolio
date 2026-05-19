@@ -5,6 +5,7 @@ import {
   uploadImageHandler,
   uploadResumeHandler,
   deleteAssetHandler,
+  listAssetsHandler,
 } from '../controllers/uploadController.js';
 
 const router = Router();
@@ -23,6 +24,7 @@ router.post(
   uploadDoc.single('resume'),
   uploadResumeHandler
 );
+router.get('/assets', protect, adminOnly, listAssetsHandler);
 router.delete('/asset', protect, adminOnly, deleteAssetHandler);
 
 export default router;

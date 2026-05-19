@@ -234,6 +234,8 @@ export type PublicationDoc = Entity<Publication>;
 export type BlogPostDoc = Entity<BlogPost>;
 export type MessageDoc = Entity<Message>;
 export type CpStatsDoc = Entity<CpStats>;
+export type SeoSettingsDoc = Entity<SeoSettings>;
+export type SiteSettingsDoc = Entity<SiteSettings>;
 
 /* ---- auth ---- */
 export type UserRole = 'superAdmin' | 'admin' | 'visitor';
@@ -284,6 +286,35 @@ export interface AuthUser {
   isImmutableSuperAdmin?: boolean;
   avatar: string;
   lastLogin?: string;
+}
+
+export interface SeoSettings {
+  metaTitle: string;
+  metaDescription: string;
+  keywords: string[];
+  ogImage: string;
+  ogImagePublicId: string;
+  twitterHandle: string;
+}
+
+export interface SiteSettings {
+  heroBackground: string;
+  sections: { key: string; visible: boolean }[];
+}
+
+export interface CloudinaryAsset {
+  publicId: string;
+  url: string;
+  format: string;
+  bytes: number;
+  width: number;
+  height: number;
+  createdAt: string;
+}
+export interface MediaListResponse {
+  success: true;
+  data: CloudinaryAsset[];
+  nextCursor: string | null;
 }
 
 /* ---- API envelopes ---- */

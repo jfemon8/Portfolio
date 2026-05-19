@@ -1,8 +1,10 @@
+import { Fragment, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Seo from '@/components/ui/Seo';
 import { personSchema, websiteSchema } from '@/lib/structuredData';
 import { Spinner, ErrorState } from '@/components/ui/States';
-import { useProfile } from '@/hooks/usePortfolio';
+import { useProfile, useSiteSettings } from '@/hooks/usePortfolio';
+import { HOME_SECTIONS } from '@/config/homeSections';
 import { scrollToId } from '@/lib/smoothScroll';
 import HeroPremium from '@/components/sections/HeroPremium';
 import About from '@/components/sections/About';
@@ -17,6 +19,7 @@ import Contact from '@/components/sections/Contact';
 
 export default function Home() {
   const { data, isLoading, isError, refetch } = useProfile();
+  const { data: siteData } = useSiteSettings();
   const navigate = useNavigate();
   const profile = data?.data;
 
@@ -36,6 +39,32 @@ export default function Home() {
       </div>
     );
 
+  const sectionEl: Record<string, ReactNode> = {
+    about: <About profile={profile} />,
+    skills: <Skills />,
+    cp: <CpStats />,
+    projects: <FeaturedProjects />,
+    experience: <Experience />,
+    education: <Education />,
+    research: <Research />,
+    credentials: <Credentials />,
+    contact: <Contact profile={profile} />,
+  };
+
+  // Single source of truth for keys/order is HOME_SECTIONS; the server only
+  // stores overrides. Loading / empty / error → default order (never breaks).
+  const known = HOME_SECTIONS.map((s) => s.key);
+  const cfg = (siteData?.data?.sections ?? []).filter((c) =>
+    known.includes(c.key)
+  );
+  const inCfg = new Set(cfg.map((c) => c.key));
+  const keys = cfg.length
+    ? [
+        ...cfg.filter((c) => c.visible).map((c) => c.key),
+        ...known.filter((k) => !inCfg.has(k)),
+      ]
+    : known;
+
   return (
     <>
       <Seo
@@ -45,18 +74,13 @@ export default function Home() {
       />
       <HeroPremium
         profile={profile}
+        background={siteData?.data?.heroBackground || undefined}
         onContact={() => scrollToId('contact')}
         onProjects={() => navigate('/projects')}
       />
-      <About profile={profile} />
-      <Skills />
-      <CpStats />
-      <FeaturedProjects />
-      <Experience />
-      <Education />
-      <Research />
-      <Credentials />
-      <Contact profile={profile} />
+      {keys.map((k) => (
+        <Fragment key={k}>{sectionEl[k]}</Fragment>
+      ))}
     </>
   );
 }
