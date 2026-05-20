@@ -88,7 +88,7 @@ export default function HeroPremium({
       <Spotlight className="flex items-center lg:min-h-[100svh]">
         <Particles count={28} />
 
-        <div className="container-x relative z-10 grid items-center gap-10 py-12 sm:py-20 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14 lg:py-24">
+        <div className="container-x relative z-10 grid items-center gap-6 py-12 sm:gap-10 sm:py-20 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14 lg:py-24">
           {/* Left — identity */}
           <div>
             <motion.span

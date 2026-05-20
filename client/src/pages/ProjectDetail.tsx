@@ -246,7 +246,7 @@ export default function ProjectDetail() {
 
           if (sections.length > 0) {
             return (
-              <div className="mt-14 space-y-14">
+              <div className="mt-10 space-y-8 sm:mt-14 sm:space-y-14">
                 {sections.map((k, i) => (
                   <Reveal key={k} delay={0.04}>
                     <section>

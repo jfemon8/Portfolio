@@ -380,7 +380,7 @@ export default function SettingsManager() {
             <LayoutList className="h-4 w-4" /> Homepage &amp; hero
           </h3>
           {site && (
-            <div className="space-y-5">
+            <div className="space-y-3 sm:space-y-5">
               <div>
                 <label className="label">Section order &amp; visibility</label>
                 <ul className="space-y-2">

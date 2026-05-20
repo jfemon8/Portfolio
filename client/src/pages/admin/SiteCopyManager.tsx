@@ -125,12 +125,6 @@ const FOOTER_FIELDS: FieldSchema[] = [
   { name: 'footer.linkProjects', label: 'Link — Projects', type: 'text' },
   { name: 'footer.linkBlog', label: 'Link — Blog', type: 'text' },
   { name: 'footer.linkAdmin', label: 'Link — Admin', type: 'text' },
-  { name: 'footer.builtPrefix', label: '"Built with" prefix', type: 'text' },
-  {
-    name: 'footer.builtSuffix',
-    label: '"…the MERN stack" suffix',
-    type: 'text',
-  },
 ];
 
 const STATES_FIELDS: FieldSchema[] = [
@@ -503,7 +497,7 @@ export default function SiteCopyManager() {
             title='Section headings — the title, sub-title and tiny "index" tag above each public section'
             defaultOpen
           >
-            <div className="space-y-5">
+            <div className="space-y-3 sm:space-y-5">
               {SECTION_KEYS.map(({ key, label }) => {
                 const s = sec(key);
                 return (

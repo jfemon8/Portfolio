@@ -113,7 +113,7 @@ export default function BlogEditor() {
           </div>
         </GlassCard>
 
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           <GlassCard className="space-y-4 p-6">
             <h3 className="font-semibold text-neon">Settings</h3>
             <div>

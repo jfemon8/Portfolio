@@ -1,12 +1,5 @@
 import { Link } from 'react-router-dom';
-import {
-  Github,
-  Linkedin,
-  Mail,
-  Code2,
-  Heart,
-  type LucideIcon,
-} from 'lucide-react';
+import { Github, Linkedin, Mail, Code2, type LucideIcon } from 'lucide-react';
 import { useProfile } from '@/hooks/usePortfolio';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
 
@@ -26,8 +19,6 @@ export default function Footer() {
     linkProjects: 'Projects',
     linkBlog: 'Blog',
     linkAdmin: 'Admin',
-    builtPrefix: 'Built with',
-    builtSuffix: 'using the MERN stack.',
   });
 
   return (
@@ -71,9 +62,8 @@ export default function Footer() {
             </Link>
           </div>
 
-          <p className="mt-4 flex items-center gap-1.5 text-xs text-ink-dim">
-            © {year} {p?.name || 'Md Jannatul Ferdhous Emon'}. {f.builtPrefix}
-            <Heart className="h-3.5 w-3.5 text-neon-pink" /> {f.builtSuffix}
+          <p className="mt-4 text-xs text-ink-dim">
+            © {year} {p?.name || 'Md Jannatul Ferdhous Emon'}.
           </p>
         </div>
       </div>

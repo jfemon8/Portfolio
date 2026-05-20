@@ -38,7 +38,7 @@ export default function About({ profile }: { profile?: ProfileDoc }) {
         subtitle={copy.subtitle}
       />
 
-      <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr]">
+      <div className="grid gap-6 sm:gap-10 lg:grid-cols-[1.4fr_1fr]">
         <Reveal>
           <p className="text-balance text-lg leading-relaxed text-muted-foreground">
             {profile?.summary}
@@ -79,7 +79,7 @@ export default function About({ profile }: { profile?: ProfileDoc }) {
         </Reveal>
 
         <Reveal delay={0.1}>
-          <GlassCard className="space-y-5 p-6">
+          <GlassCard className="space-y-3 p-6 sm:space-y-5">
             <div>
               <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-foreground">
                 <Languages className="h-4 w-4 text-neon" /> Languages
