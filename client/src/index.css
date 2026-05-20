@@ -185,13 +185,22 @@
            bg-bg-elevated px-3 py-1 text-xs font-medium text-ink-soft;
   }
 
+  /* Theme-aware input — shadcn tokens so the same class works in both
+     themes: dark mode keeps its dark card-color bg + light text; light
+     mode swaps to a pure-white bg (`--card` = 0 0% 100%) + dark text
+     (`--foreground` = 240 24% 8%) so inputs read as a clean white field
+     on the light page bg. Focus ring uses `primary` (theme-aware brand). */
   .input {
-    @apply w-full min-h-11 rounded-xl border border-line bg-bg-soft px-4 py-2.5
-           text-base text-ink placeholder:text-ink-dim transition-colors
-           focus:border-neon/60 focus:outline-none focus:ring-1 focus:ring-neon/40;
+    @apply w-full min-h-11 rounded-xl border border-border bg-card px-4 py-2.5
+           text-base text-foreground placeholder:text-muted-foreground
+           transition-colors focus:border-primary/60 focus:outline-none
+           focus:ring-1 focus:ring-primary/40;
   }
+  /* Theme-aware label — `text-muted-foreground` switches per theme
+     (light gray in dark mode, mid-dark gray in light mode) so labels
+     stay readable above the now-white inputs in light mode. */
   .label {
-    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wider text-ink-soft;
+    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground;
   }
 
   /* Animated brand gradient — the existing `gradient-x` keyframe (defined in

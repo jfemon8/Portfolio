@@ -120,9 +120,14 @@ export default function Contact({ profile }: { profile?: ProfileDoc }) {
 
       <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
         <Reveal>
-          <div className="space-y-4">
+          {/* `flex flex-col gap-8` instead of `space-y-8` because the wrapped
+              `<a>` elements are `display: inline` by default, and inline
+              elements ignore `margin-top` — so Tailwind's space-y had zero
+              effect. Flex children get a proper block-axis box, so `gap`
+              applies cleanly between the cards. */}
+          <div className="flex flex-col gap-8">
             {info.map((c) => (
-              <a key={c.id} href={c.href || undefined}>
+              <a key={c.id} href={c.href || undefined} className="block">
                 <GlassCard interactive className="flex items-center gap-4 p-5">
                   <span className="grid h-11 w-11 place-items-center rounded-xl border border-primary/30 bg-card/60 text-neon">
                     <c.icon className="h-5 w-5" />

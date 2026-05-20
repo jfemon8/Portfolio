@@ -78,8 +78,8 @@ export default function MarkdownEditor({
   };
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border/70 bg-card/40">
-      <div className="flex items-center gap-1 border-b border-border/60 bg-card/60 px-2 py-1.5">
+    <div className="overflow-hidden rounded-xl border border-border/70 bg-card">
+      <div className="flex items-center gap-1 border-b border-border/60 bg-muted/40 px-2 py-1.5">
         {TOOLS.map((t) => (
           <button
             key={t.title}
