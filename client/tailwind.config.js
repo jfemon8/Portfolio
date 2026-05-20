@@ -56,8 +56,13 @@ export default {
           elevated: '#1a1a24',
         },
         line: '#23232f',
+        // `neon.DEFAULT` is theme-aware: light mode swaps the bright `#00ffd1`
+        // for a darker teal (`--neon` var defined in index.css) so every
+        // `text-neon`/`bg-neon`/`border-neon` reads cleanly on the light bg
+        // instead of washing out. The accent variants (dim/violet/pink/blue)
+        // stay fixed — they're brand accents used sparingly.
         neon: {
-          DEFAULT: '#00ffd1',
+          DEFAULT: 'hsl(var(--neon) / <alpha-value>)',
           dim: '#0bbfa3',
           violet: '#a855f7',
           pink: '#ec4899',

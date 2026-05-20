@@ -70,7 +70,10 @@ export default function MessagesManager() {
 
   return (
     <div>
-      <PageHeader title="Messages" subtitle={`${data?.unread ?? 0} unread`} />
+      <PageHeader
+        title="Messages"
+        subtitle={`Visitor submissions from the Contact form on your public site · ${data?.unread ?? 0} unread`}
+      />
 
       <div className="mb-5 flex flex-wrap gap-2">
         {filters.map((ff) => (

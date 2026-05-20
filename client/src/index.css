@@ -27,6 +27,8 @@
     --input: 240 18% 16%;
     --ring: 168 100% 50%;
     --radius: 0.85rem;
+    /* Brand neon — bright in dark mode (matches the original `#00ffd1`). */
+    --neon: 168 100% 50%;
   }
 
   html.light {
@@ -50,6 +52,10 @@
     --border: 240 12% 88%;
     --input: 240 12% 88%;
     --ring: 174 90% 36%;
+    /* Light-mode neon: darker teal so brand accents (stats, dots, badges,
+       section-title `.`, status labels) stay legible on the light bg
+       instead of washing out as `#00ffd1` did. */
+    --neon: 174 90% 36%;
   }
 }
 

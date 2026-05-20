@@ -94,7 +94,7 @@ export default function MediaLibrary() {
     <div>
       <PageHeader
         title="Media library"
-        subtitle="Browse, copy & delete Cloudinary assets."
+        subtitle="Every image uploaded across the site (avatar, project covers, blog covers, hero background, SEO social image). Filter by folder, copy URLs, or delete assets you no longer use."
         action={
           <select
             value={folder}

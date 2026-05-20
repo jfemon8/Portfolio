@@ -5,7 +5,8 @@ import type { SkillDoc } from '@/types';
 
 const config: ResourceConfig<SkillDoc> = {
   title: 'Skills',
-  subtitle: 'Technologies grouped by category with proficiency bars.',
+  subtitle:
+    'Technologies displayed in the Skills & tech section on your homepage. Each skill becomes a card with name, percentage and an animated gradient progress bar; switch between categories with the tabs above the grid.',
   singular: 'skill',
   base: 'skills',
   defaults: {

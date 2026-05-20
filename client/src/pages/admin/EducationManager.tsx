@@ -5,7 +5,8 @@ import type { EducationDoc } from '@/types';
 
 const config: ResourceConfig<EducationDoc> = {
   title: 'Education',
-  subtitle: 'Academic background.',
+  subtitle:
+    'Schools, degrees & grades shown in the Education section on your homepage.',
   singular: 'education',
   base: 'education',
   defaults: {

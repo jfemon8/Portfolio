@@ -5,7 +5,8 @@ import type { ExperienceDoc } from '@/types';
 
 const config: ResourceConfig<ExperienceDoc> = {
   title: 'Experience',
-  subtitle: 'Your work history shown on the timeline.',
+  subtitle:
+    'Roles shown on the Work / Experience timeline on your homepage. Order is controlled by the Order field below (lower numbers come first).',
   singular: 'experience',
   base: 'experience',
   modalSize: 'lg',

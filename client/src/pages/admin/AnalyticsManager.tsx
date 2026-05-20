@@ -80,7 +80,7 @@ export default function AnalyticsManager() {
     <div>
       <PageHeader
         title="Analytics"
-        subtitle="Privacy-friendly, cookie-less visitor insights."
+        subtitle="Privacy-friendly, cookie-less visitor insights — page views, sessions, scroll depth, device & country breakdown."
         action={
           <select
             value={days}

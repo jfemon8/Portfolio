@@ -168,7 +168,10 @@ export default function SettingsManager() {
 
   return (
     <div>
-      <PageHeader title="Settings" subtitle="Manage your admin account." />
+      <PageHeader
+        title="Settings"
+        subtitle="Your admin account password, SEO metadata (browser tab title + social-share preview shown when someone shares your link), and the homepage section order & visibility."
+      />
 
       <div className="grid max-w-3xl gap-6">
         <GlassCard className="p-6">

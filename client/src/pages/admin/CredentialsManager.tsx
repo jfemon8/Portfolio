@@ -6,7 +6,8 @@ import type { CertificationDoc, PublicationDoc } from '@/types';
 
 const certConfig: ResourceConfig<CertificationDoc> = {
   title: 'Certifications & Achievements',
-  subtitle: 'Certificates, awards and competitive-programming milestones.',
+  subtitle:
+    'Certificates, awards & competitive-programming milestones shown in the Credentials section on your homepage.',
   singular: 'credential',
   base: 'certifications',
   defaults: {
@@ -53,7 +54,8 @@ const certConfig: ResourceConfig<CertificationDoc> = {
 
 const pubConfig: ResourceConfig<PublicationDoc> = {
   title: 'Publications',
-  subtitle: 'Research papers & articles.',
+  subtitle:
+    'Research papers & publications shown in the Research section on your homepage.',
   singular: 'publication',
   base: 'publications',
   modalSize: 'lg',

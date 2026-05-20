@@ -487,7 +487,7 @@ export default function SiteCopyManager() {
     <div>
       <PageHeader
         title="Site copy"
-        subtitle="Edit on-site text. Leave a field blank to use the built-in default."
+        subtitle="Every piece of text on the public site — section headings, button labels, status messages, toasts, contact-form errors and the auto-reply email template. Leave any field blank to use the built-in English default."
         action={
           <Button onClick={save} disabled={!form || saving}>
             {saving && <Loader2 className="h-4 w-4 animate-spin" />}
@@ -498,7 +498,11 @@ export default function SiteCopyManager() {
 
       {form && (
         <div className="grid max-w-4xl gap-3">
-          <Panel icon={LayoutList} title="Section headings" defaultOpen>
+          <Panel
+            icon={LayoutList}
+            title='Section headings — the title, sub-title and tiny "index" tag above each public section'
+            defaultOpen
+          >
             <div className="space-y-5">
               {SECTION_KEYS.map(({ key, label }) => {
                 const s = sec(key);
@@ -545,19 +549,31 @@ export default function SiteCopyManager() {
             </div>
           </Panel>
 
-          <Panel icon={Terminal} title="Hero">
+          <Panel
+            icon={Terminal}
+            title="Hero — top of homepage (badges, greeting, CTA buttons, scroll label, terminal card)"
+          >
             {fieldGrid(HERO_FIELDS)}
           </Panel>
 
-          <Panel icon={Sparkles} title="About — strengths">
+          <Panel
+            icon={Sparkles}
+            title='About — the "What I bring" heading + bullet list under the About section'
+          >
             {fieldGrid(ABOUT_FIELDS)}
           </Panel>
 
-          <Panel icon={PanelBottom} title="Footer">
+          <Panel
+            icon={PanelBottom}
+            title="Footer — wordmark and links shown at the bottom of every public page"
+          >
             {fieldGrid(FOOTER_FIELDS)}
           </Panel>
 
-          <Panel icon={Compass} title="Navigation (dock labels)">
+          <Panel
+            icon={Compass}
+            title="Navigation — labels shown on the floating dock at the bottom of every public page"
+          >
             <div className="grid gap-4 sm:grid-cols-2">
               {NAV_TARGETS.map(({ key, label }) => (
                 <div key={key}>
@@ -576,23 +592,38 @@ export default function SiteCopyManager() {
             </div>
           </Panel>
 
-          <Panel icon={Inbox} title="States & 404">
+          <Panel
+            icon={Inbox}
+            title="States & 404 — loading / empty / error messages and the Not-Found page"
+          >
             {fieldGrid(STATES_FIELDS)}
           </Panel>
 
-          <Panel icon={MessageSquare} title="Forms (contact)">
+          <Panel
+            icon={MessageSquare}
+            title="Contact form — input labels, placeholders, validation errors and submit-button text"
+          >
             {fieldGrid(FORMS_FIELDS)}
           </Panel>
 
-          <Panel icon={KeyRound} title="Admin login">
+          <Panel
+            icon={KeyRound}
+            title="Admin login page — the /admin/login screen labels, errors and toast messages"
+          >
             {fieldGrid(AUTH_FIELDS)}
           </Panel>
 
-          <Panel icon={Tags} title="Labels & chrome">
+          <Panel
+            icon={Tags}
+            title="Labels & chrome — small UI text across the site (buttons, badges, filters, units, headings)"
+          >
             {fieldGrid(LABELS_FIELDS)}
           </Panel>
 
-          <Panel icon={Mail} title="Contact emails">
+          <Panel
+            icon={Mail}
+            title="Contact emails — subject + body of mail sent when a visitor submits the contact form (yours + the auto-reply)"
+          >
             {fieldGrid(EMAIL_FIELDS)}
           </Panel>
 

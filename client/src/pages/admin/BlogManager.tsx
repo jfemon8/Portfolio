@@ -43,7 +43,7 @@ export default function BlogManager() {
     <div>
       <PageHeader
         title="Blog"
-        subtitle="Write and manage articles."
+        subtitle="Articles shown on the public /blog page (each one also gets its own /blog/:slug detail page). Drafts stay hidden from visitors until status is set to Published."
         action={
           <Link to="/admin/blog/new">
             <Button>

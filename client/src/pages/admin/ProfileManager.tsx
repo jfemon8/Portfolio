@@ -106,7 +106,7 @@ export default function ProfileManager() {
     <form onSubmit={submit}>
       <PageHeader
         title="Profile"
-        subtitle="The identity shown in the hero, about and contact sections."
+        subtitle="Your name, title, tagline, avatar, resume, social links, languages and hero stats — used in the Hero (top of homepage), the About section and the Contact section on the public site."
         action={
           <Button type="submit" disabled={save.isPending}>
             {save.isPending ? (

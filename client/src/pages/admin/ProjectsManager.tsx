@@ -5,7 +5,8 @@ import type { ProjectDoc } from '@/types';
 
 const config: ResourceConfig<ProjectDoc> = {
   title: 'Projects',
-  subtitle: 'Portfolio projects and case studies.',
+  subtitle:
+    'Projects shown on the public /projects page (each one also gets a /projects/:slug detail page with the full case study). Mark a project as Featured to also show it in the Featured-projects strip on your homepage.',
   singular: 'project',
   base: 'projects',
   modalSize: 'lg',
