@@ -1,14 +1,7 @@
 import { Link } from 'react-router-dom';
-import { Github, Linkedin, Mail, Code2, type LucideIcon } from 'lucide-react';
 import { useProfile } from '@/hooks/usePortfolio';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
-
-const iconMap: Record<string, LucideIcon> = {
-  github: Github,
-  linkedin: Linkedin,
-  mail: Mail,
-  code: Code2,
-};
+import { SocialIcon } from '@/lib/socialIcon';
 
 export default function Footer() {
   const { data } = useProfile();
@@ -33,21 +26,18 @@ export default function Footer() {
           </p>
 
           <div className="flex items-center gap-3">
-            {(p?.socials ?? []).map((s) => {
-              const Icon = iconMap[s.icon] ?? Code2;
-              return (
-                <a
-                  key={s.label}
-                  href={s.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label={s.label}
-                  className="rounded-xl border border-line bg-bg-card p-3 text-ink-soft transition-all hover:-translate-y-1 hover:border-neon/50 hover:text-neon"
-                >
-                  <Icon className="h-5 w-5" />
-                </a>
-              );
-            })}
+            {(p?.socials ?? []).map((s) => (
+              <a
+                key={s.label}
+                href={s.url}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={s.label}
+                className="rounded-xl border border-line bg-bg-card p-3 text-ink-soft transition-all hover:-translate-y-1 hover:border-neon/50 hover:text-neon"
+              >
+                <SocialIcon social={s} />
+              </a>
+            ))}
           </div>
 
           <div className="mt-2 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-ink-dim">

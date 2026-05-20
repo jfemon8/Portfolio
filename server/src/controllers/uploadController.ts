@@ -18,12 +18,24 @@ export const uploadImageHandler = asyncHandler(
   }
 );
 
-/** Admin — upload the resume PDF as a raw asset. */
+/** Admin — upload the resume PDF as a raw asset. The public_id is built
+ *  with a `.pdf` suffix so Cloudinary's CDN URL ends with `.pdf` and the
+ *  browser serves it as `application/pdf` (download lands as a usable
+ *  resume.pdf file; in-tab preview opens the PDF viewer). Without the
+ *  suffix the raw asset URL is extension-less and downloads as a
+ *  type-less blob that looks corrupted. */
 export const uploadResumeHandler = asyncHandler(
   async (req: Request, res: Response) => {
     if (!req.file) throw ApiError.badRequest('No PDF file provided.');
+    const base = (req.file.originalname || 'resume')
+      .replace(/\.[^.]+$/, '')
+      .replace(/[^a-zA-Z0-9-_]/g, '_')
+      .toLowerCase()
+      .slice(0, 40);
+    const publicId = `${base || 'resume'}-${Date.now()}.pdf`;
     const result = await uploadBuffer(req.file.buffer, {
       folder: 'portfolio/resume',
+      publicId,
       resourceType: 'raw',
     });
     res.status(201).json({ success: true, ...result });

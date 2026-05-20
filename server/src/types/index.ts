@@ -62,6 +62,8 @@ export interface Social {
   label: string;
   url: string;
   icon: string;
+  iconImage?: string;
+  iconImagePublicId?: string;
 }
 
 export interface Stat {

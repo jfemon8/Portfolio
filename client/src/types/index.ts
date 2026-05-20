@@ -19,7 +19,12 @@ export type Entity<T> = T & WithId & Timestamps;
 export interface Social {
   label: string;
   url: string;
+  /** Built-in icon key (legacy: 'github' | 'linkedin' | 'mail' | 'code'). New
+   *  entries can leave empty — display logic auto-derives from `label`. */
   icon: string;
+  /** Optional Cloudinary URL — when set, overrides the auto-derived icon. */
+  iconImage?: string;
+  iconImagePublicId?: string;
 }
 export interface Stat {
   label: string;

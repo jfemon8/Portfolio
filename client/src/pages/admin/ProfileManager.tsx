@@ -9,10 +9,10 @@ import Toggle from '@/components/ui/Toggle';
 import GlassCard from '@/components/shared/GlassCard';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/States';
-import type { ApiError, ItemResponse, ProfileDoc } from '@/types';
+import type { ApiError, ItemResponse, ProfileDoc, Social } from '@/types';
 
 type ProfileForm = ProfileDoc;
-type ArrayKey = 'socials' | 'stats' | 'languages';
+type FlatArrayKey = 'stats' | 'languages';
 
 export default function ProfileManager() {
   const qc = useQueryClient();
@@ -43,8 +43,9 @@ export default function ProfileManager() {
   const set = <K extends keyof ProfileForm>(k: K, v: ProfileForm[K]): void =>
     setF((p) => (p ? { ...p, [k]: v } : p));
 
+  /** Stats / languages — flat `{ label, value }` / `{ name, level }` rows. */
   const setArr = (
-    key: ArrayKey,
+    key: FlatArrayKey,
     idx: number,
     field: string,
     val: string
@@ -56,12 +57,52 @@ export default function ProfileManager() {
       return { ...p, [key]: arr };
     });
 
-  const addArr = (key: ArrayKey, obj: Record<string, string>): void =>
+  const addArr = (key: FlatArrayKey, obj: Record<string, string>): void =>
     setF((p) => (p ? { ...p, [key]: [...(p[key] as unknown[]), obj] } : p));
 
-  const delArr = (key: ArrayKey, idx: number): void =>
+  const delArr = (key: FlatArrayKey, idx: number): void =>
     setF((p) =>
       p ? { ...p, [key]: (p[key] as unknown[]).filter((_, i) => i !== idx) } : p
+    );
+
+  /** Socials get their own setters — they carry image-upload fields too,
+   *  so the generic `Record<string,string>` setArr doesn't fit cleanly. */
+  const setSocial = <K extends keyof Social>(
+    idx: number,
+    field: K,
+    val: Social[K]
+  ): void =>
+    setF((p) => {
+      if (!p) return p;
+      const arr = [...p.socials];
+      const current = arr[idx];
+      if (!current) return p;
+      arr[idx] = { ...current, [field]: val };
+      return { ...p, socials: arr };
+    });
+
+  const addSocial = (): void =>
+    setF((p) =>
+      p
+        ? {
+            ...p,
+            socials: [
+              ...p.socials,
+              {
+                label: '',
+                url: '',
+                icon: '',
+                iconImage: '',
+                iconImagePublicId: '',
+              },
+            ],
+          }
+        : p
+    );
+
+  const delSocial = (idx: number): void =>
+    setF((p) =>
+      p ? { ...p, socials: p.socials.filter((_, i) => i !== idx) } : p
     );
 
   const uploadResume = async (file?: File): Promise<void> => {
@@ -107,16 +148,6 @@ export default function ProfileManager() {
       <PageHeader
         title="Profile"
         subtitle="Your name, title, tagline, avatar, resume, social links, languages and hero stats — used in the Hero (top of homepage), the About section and the Contact section on the public site."
-        action={
-          <Button type="submit" disabled={save.isPending}>
-            {save.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Save className="h-4 w-4" />
-            )}
-            Save changes
-          </Button>
-        }
       />
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -160,7 +191,62 @@ export default function ProfileManager() {
               }
             />
           </div>
-          <div className="flex items-center gap-3 pt-2">
+
+          {/* Stats (Hero Terminal) — inline within Basics, immediately under
+              Hero roles. Custom layout (not the shared ArrayEditor) so it
+              renders as a flat sub-section instead of a nested GlassCard. */}
+          <div className="border-t border-border/60 pt-4">
+            <div className="mb-3 flex items-center justify-between">
+              <label className="label mb-0">Stats (Hero Terminal)</label>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => addArr('stats', { label: '', value: '' })}
+                className="text-xs"
+              >
+                <Plus className="h-4 w-4" /> Add
+              </Button>
+            </div>
+            <div className="space-y-2">
+              {(f.stats ?? []).map((s, i) => (
+                <div
+                  key={i}
+                  className="flex flex-col gap-2 sm:flex-row sm:items-center"
+                >
+                  <input
+                    className="input flex-1"
+                    placeholder="Label (e.g. Problems Solved)"
+                    value={s.label}
+                    onChange={(e) =>
+                      setArr('stats', i, 'label', e.target.value)
+                    }
+                  />
+                  <input
+                    className="input flex-1"
+                    placeholder="Value (e.g. 1000+)"
+                    value={s.value}
+                    onChange={(e) =>
+                      setArr('stats', i, 'value', e.target.value)
+                    }
+                  />
+                  <button
+                    type="button"
+                    onClick={() => delArr('stats', i)}
+                    aria-label="Remove stat"
+                    className="shrink-0 self-end rounded-lg border border-border p-2.5 text-muted-foreground/70 transition-colors hover:border-destructive/40 hover:text-destructive sm:self-auto"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              ))}
+              {(f.stats ?? []).length === 0 && (
+                <p className="text-xs text-muted-foreground/70">None yet.</p>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 border-t border-border/60 pt-4">
             <Toggle
               checked={f.available}
               onChange={(v) => set('available', v)}
@@ -173,36 +259,53 @@ export default function ProfileManager() {
 
         <div className="space-y-4 sm:space-y-6">
           <GlassCard className="space-y-4 p-6">
-            <h3 className="font-semibold text-neon">Avatar & Resume</h3>
+            <h3 className="font-semibold text-neon">Avatar &amp; Resume</h3>
             <ImageUpload
               label="Avatar"
               value={f.avatar}
               publicId={f.avatarPublicId}
               folder="portfolio/profile"
+              variant="avatar"
               onChange={({ url, publicId }) => {
                 set('avatar', url);
                 set('avatarPublicId', publicId);
               }}
             />
-            <div>
+            <div className="space-y-2">
               <label className="label">Resume (PDF)</label>
+              {/* In-browser PDF viewer — modern browsers render PDFs in
+                  iframes natively. After the server's `.pdf` public-id
+                  fix, the Cloudinary URL serves with `application/pdf`
+                  Content-Type so this preview + downloads both work. */}
               {f.resumeUrl && (
-                <a
-                  href={f.resumeUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mb-2 block truncate text-xs text-neon hover:underline"
-                >
-                  {f.resumeUrl}
-                </a>
+                <div className="overflow-hidden rounded-xl border border-border bg-card">
+                  <iframe
+                    src={f.resumeUrl}
+                    title="Resume preview"
+                    className="block h-72 w-full"
+                  />
+                  <div className="flex items-center justify-between gap-2 border-t border-border bg-muted/40 px-3 py-2 text-xs">
+                    <span className="truncate font-mono text-muted-foreground/70">
+                      {f.resumeUrl.split('/').pop()}
+                    </span>
+                    <a
+                      href={f.resumeUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="shrink-0 font-semibold text-primary hover:underline"
+                    >
+                      Open in new tab ↗
+                    </a>
+                  </div>
+                </div>
               )}
-              <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-border/70 px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:border-primary/50 hover:text-primary">
+              <label className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary/50 hover:bg-muted/60 hover:text-primary">
                 {resumeBusy ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <FileUp className="h-4 w-4" />
                 )}
-                Upload resume PDF
+                {f.resumeUrl ? 'Replace resume PDF' : 'Upload resume PDF'}
                 <input
                   type="file"
                   accept="application/pdf"
@@ -213,31 +316,80 @@ export default function ProfileManager() {
             </div>
           </GlassCard>
 
-          <ArrayEditor
-            title="Social links"
-            items={f.socials as unknown as Record<string, string>[]}
-            cols={[
-              ['label', 'Label'],
-              ['url', 'URL'],
-              ['icon', 'Icon (github/linkedin/mail/code)'],
-            ]}
-            onChange={(i, k, v) => setArr('socials', i, k, v)}
-            onAdd={() =>
-              addArr('socials', { label: '', url: '', icon: 'code' })
-            }
-            onDelete={(i) => delArr('socials', i)}
-          />
-          <ArrayEditor
-            title="Stats (hero terminal)"
-            items={f.stats as unknown as Record<string, string>[]}
-            cols={[
-              ['label', 'Label'],
-              ['value', 'Value'],
-            ]}
-            onChange={(i, k, v) => setArr('stats', i, k, v)}
-            onAdd={() => addArr('stats', { label: '', value: '' })}
-            onDelete={(i) => delArr('stats', i)}
-          />
+          <GlassCard className="p-6">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="font-semibold text-neon">Social links</h3>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={addSocial}
+                className="text-xs"
+              >
+                <Plus className="h-4 w-4" /> Add
+              </Button>
+            </div>
+            <p className="mb-4 text-[11px] text-muted-foreground/70">
+              Icon is auto-picked from the Label (e.g. GitHub, LinkedIn, Email).
+              Upload an image only if you want to override it.
+            </p>
+            <div className="space-y-4">
+              {f.socials.map((s, i) => (
+                <div
+                  key={i}
+                  className="rounded-xl border border-border bg-muted/30 p-4"
+                >
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <label className="label">Label</label>
+                      <input
+                        className="input"
+                        placeholder="GitHub / LinkedIn / Email…"
+                        value={s.label}
+                        onChange={(e) => setSocial(i, 'label', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="label">URL</label>
+                      <input
+                        className="input"
+                        placeholder="https://…"
+                        value={s.url}
+                        onChange={(e) => setSocial(i, 'url', e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div className="mt-3">
+                    <ImageUpload
+                      label="Icon image (override)"
+                      value={s.iconImage}
+                      publicId={s.iconImagePublicId}
+                      folder="portfolio/profile"
+                      variant="compact"
+                      onChange={({ url, publicId }) => {
+                        setSocial(i, 'iconImage', url);
+                        setSocial(i, 'iconImagePublicId', publicId);
+                      }}
+                    />
+                  </div>
+                  <div className="mt-3 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => delSocial(i)}
+                      aria-label="Remove social link"
+                      className="rounded-lg border border-border p-2 text-muted-foreground/70 transition-colors hover:border-destructive/40 hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {f.socials.length === 0 && (
+                <p className="text-xs text-muted-foreground/70">None yet.</p>
+              )}
+            </div>
+          </GlassCard>
+
           <ArrayEditor
             title="Languages"
             items={f.languages as unknown as Record<string, string>[]}
@@ -250,6 +402,20 @@ export default function ProfileManager() {
             onDelete={(i) => delArr('languages', i)}
           />
         </div>
+      </div>
+
+      {/* Sticky-bottom Save bar — replaces the previous PageHeader-action
+          button so the save affordance is always within thumb-reach as the
+          admin scrolls through the long Profile form. */}
+      <div className="sticky bottom-4 z-10 mt-6 flex justify-end">
+        <Button type="submit" disabled={save.isPending} size="lg">
+          {save.isPending ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Save className="h-4 w-4" />
+          )}
+          Save changes
+        </Button>
       </div>
     </form>
   );
@@ -302,7 +468,7 @@ function ArrayEditor({
             <button
               type="button"
               onClick={() => onDelete(i)}
-              className="mb-0.5 rounded-lg border border-border/70 p-2.5 text-muted-foreground/70 transition-colors hover:border-destructive/40 hover:text-destructive"
+              className="mb-0.5 rounded-lg border border-border p-2.5 text-muted-foreground/70 transition-colors hover:border-destructive/40 hover:text-destructive"
             >
               <Trash2 className="h-4 w-4" />
             </button>

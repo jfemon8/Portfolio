@@ -1,3 +1,5 @@
+import { cn } from '@/lib/cn';
+
 interface ToggleProps {
   checked: boolean;
   onChange: (next: boolean) => void;
@@ -6,8 +8,10 @@ interface ToggleProps {
 }
 
 /**
- * Shared on/off switch. Single source of truth for the toggle used across the
- * admin forms (Field, ProfileManager, BlogEditor) — project rule #3.
+ * Shared on/off switch (shadcn-style). Theme-aware: track is `bg-primary`
+ * (brand teal) when checked, `bg-muted` when not. Thumb is `bg-background`
+ * so it shows white-on-teal in light mode and dark-on-teal in dark mode.
+ * Border-2 trick keeps the thumb visually inside the track at both ends.
  */
 export default function Toggle({ checked, onChange, label, id }: ToggleProps) {
   const button = (
@@ -17,14 +21,16 @@ export default function Toggle({ checked, onChange, label, id }: ToggleProps) {
       aria-checked={checked}
       id={id}
       onClick={() => onChange(!checked)}
-      className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${
-        checked ? 'bg-neon' : 'bg-bg-elevated'
-      }`}
+      className={cn(
+        'peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+        checked ? 'bg-primary' : 'bg-muted'
+      )}
     >
       <span
-        className={`absolute top-1 h-5 w-5 rounded-full bg-bg transition-transform ${
-          checked ? 'translate-x-6' : 'translate-x-1'
-        }`}
+        className={cn(
+          'pointer-events-none block h-5 w-5 rounded-full bg-background shadow-md ring-0 transition-transform',
+          checked ? 'translate-x-5' : 'translate-x-0'
+        )}
       />
     </button>
   );
@@ -32,7 +38,7 @@ export default function Toggle({ checked, onChange, label, id }: ToggleProps) {
   if (!label) return button;
 
   return (
-    <label className="flex items-center gap-3 text-sm text-ink-soft">
+    <label className="flex items-center gap-3 text-sm text-muted-foreground">
       {button}
       {label}
     </label>

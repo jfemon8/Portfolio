@@ -2,7 +2,13 @@ import mongoose, { type Model } from 'mongoose';
 import type { IProfile } from '../types/index.js';
 
 const socialSchema = new mongoose.Schema(
-  { label: String, url: String, icon: String },
+  {
+    label: { type: String, default: '' },
+    url: { type: String, default: '' },
+    icon: { type: String, default: '' },
+    iconImage: { type: String, default: '' },
+    iconImagePublicId: { type: String, default: '' },
+  },
   { _id: false }
 );
 

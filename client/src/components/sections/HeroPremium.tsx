@@ -1,14 +1,5 @@
 import { motion, useReducedMotion } from 'motion/react';
-import {
-  ArrowRight,
-  Download,
-  Github,
-  Linkedin,
-  Mail,
-  Code2,
-  MapPin,
-  type LucideIcon,
-} from 'lucide-react';
+import { ArrowRight, Download, MapPin } from 'lucide-react';
 import { useTypewriter } from '@/hooks/useTypewriter';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
 import { track } from '@/lib/api';
@@ -19,14 +10,8 @@ import Magnetic from '@/components/motion/Magnetic';
 import GlassCard from '@/components/shared/GlassCard';
 import SmartImage from '@/components/shared/SmartImage';
 import { Button } from '@/components/ui/button';
+import { SocialIcon } from '@/lib/socialIcon';
 import type { ProfileDoc } from '@/types';
-
-const iconMap: Record<string, LucideIcon> = {
-  github: Github,
-  linkedin: Linkedin,
-  mail: Mail,
-  code: Code2,
-};
 
 interface HeroPremiumProps {
   profile?: ProfileDoc;
@@ -172,23 +157,20 @@ export default function HeroPremium({
               {...rise(0.34)}
               className="mt-9 flex items-center gap-3"
             >
-              {(profile?.socials ?? []).map((s) => {
-                const Icon = iconMap[s.icon] ?? Code2;
-                return (
-                  <Magnetic key={s.label} strength={0.5}>
-                    <a
-                      href={s.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label={s.label}
-                      onClick={() => track('social_click', '/', s.label)}
-                      className="grid h-11 w-11 place-items-center rounded-xl border border-border/70 bg-card/50 text-muted-foreground backdrop-blur transition-colors hover:border-primary/50 hover:text-primary"
-                    >
-                      <Icon className="h-5 w-5" />
-                    </a>
-                  </Magnetic>
-                );
-              })}
+              {(profile?.socials ?? []).map((s) => (
+                <Magnetic key={s.label} strength={0.5}>
+                  <a
+                    href={s.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={s.label}
+                    onClick={() => track('social_click', '/', s.label)}
+                    className="grid h-11 w-11 place-items-center rounded-xl border border-border/70 bg-card/50 text-muted-foreground backdrop-blur transition-colors hover:border-primary/50 hover:text-primary"
+                  >
+                    <SocialIcon social={s} />
+                  </a>
+                </Magnetic>
+              ))}
             </motion.div>
           </div>
 
