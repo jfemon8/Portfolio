@@ -27,7 +27,6 @@ pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker;
 interface PdfViewerProps {
   url: string;
   fileName?: string;
-  height?: number;
   allowFullscreen?: boolean;
 }
 
@@ -43,7 +42,6 @@ interface PdfViewerProps {
 export default function PdfViewer({
   url,
   fileName,
-  height = 600,
   allowFullscreen = true,
 }: PdfViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -239,22 +237,21 @@ export default function PdfViewer({
   // ── Computed dimensions ──
   const pageWidth = Math.min(containerWidth - 48, 1200) * scale;
 
-  const containerHeight = fullscreen
-    ? 'calc(100dvh - 48px)'
-    : typeof window !== 'undefined' && window.innerWidth < 640
-      ? '60dvh'
-      : `min(70vh, ${height}px)`;
-
   return (
     <div
       ref={wrapperRef}
       tabIndex={-1}
-      className={`select-none overflow-hidden rounded-xl border border-border bg-card outline-none ${
+      // Flex-column wrapper: the toolbar is `shrink-0`, the scrollable
+      // document area is `flex-1 min-h-0` so it can shrink below its
+      // content size (mandatory for nested overflow:auto to actually
+      // scroll). The parent (PdfPreviewModal card / fullscreen frame /
+      // any caller) sets the wrapper's HEIGHT; the inner panes share it.
+      className={`flex h-full select-none flex-col overflow-hidden rounded-xl border border-border bg-card outline-none ${
         fullscreen ? 'fixed inset-0 z-[100] rounded-none border-0' : ''
       }`}
     >
       {/* ── Toolbar ── */}
-      <div className="flex items-center justify-between gap-2 border-b border-border bg-muted/40 px-3 py-2 sm:px-4">
+      <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border bg-muted/40 px-3 py-2 sm:px-4">
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <FileText className="hidden h-4 w-4 shrink-0 text-red-500 sm:block" />
           <span
@@ -408,8 +405,7 @@ export default function PdfViewer({
       {/* ── Scrollable document ── */}
       <div
         ref={containerRef}
-        className="overflow-auto overscroll-contain bg-muted/20"
-        style={{ height: containerHeight }}
+        className="min-h-0 flex-1 overflow-auto overscroll-contain bg-muted/20"
       >
         {error ? (
           <div className="flex h-full flex-col items-center justify-center gap-3 p-8 text-sm text-muted-foreground">
