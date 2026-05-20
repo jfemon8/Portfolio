@@ -1,11 +1,4 @@
-import {
-  Github,
-  ExternalLink,
-  ArrowUpRight,
-  Star,
-  Eye,
-  Play,
-} from 'lucide-react';
+import { Github, Globe, ArrowUpRight, Star, Eye, Play } from 'lucide-react';
 import Tilt3D from '@/components/motion/Tilt3D';
 import Magnetic from '@/components/motion/Magnetic';
 import GlassCard from '@/components/shared/GlassCard';
@@ -80,8 +73,9 @@ export default function ProjectCard({
               <Star className="h-3 w-3 fill-neon" /> {lab.badgeFeatured}
             </span>
           )}
-          <span className="absolute left-3 top-3 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-[11px] font-medium capitalize text-muted-foreground backdrop-blur">
-            {project.category}
+          <span className="absolute left-3 top-3 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-[11px] font-medium text-muted-foreground backdrop-blur">
+            {project.category.charAt(0).toUpperCase() +
+              project.category.slice(1)}
           </span>
           {project.videoUrl && (
             <span className="absolute bottom-3 left-3 flex items-center gap-1 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-[11px] font-medium text-neon backdrop-blur">
@@ -146,6 +140,7 @@ export default function ProjectCard({
                   target="_blank"
                   rel="noreferrer"
                   aria-label={lab.btnSourceCode}
+                  title={lab.btnSourceCode}
                   className="-m-2 flex items-center gap-1.5 p-2 text-muted-foreground transition-colors hover:text-neon"
                 >
                   <Github className="h-4 w-4" />
@@ -159,9 +154,10 @@ export default function ProjectCard({
                   target="_blank"
                   rel="noreferrer"
                   aria-label={lab.btnLiveDemo}
+                  title={lab.btnLiveDemo}
                   className="-m-2 flex items-center gap-1.5 p-2 text-muted-foreground transition-colors hover:text-neon"
                 >
-                  <ExternalLink className="h-4 w-4" />
+                  <Globe className="h-4 w-4" />
                 </a>
               </Magnetic>
             )}
