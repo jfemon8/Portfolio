@@ -3,7 +3,6 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Section, SectionHeading } from '@/components/shared/Section';
 import { useSectionCopy } from '@/hooks/useSectionCopy';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
-import SkillOrbit from '@/components/motion/SkillOrbit';
 import { Spinner, ErrorState } from '@/components/ui/States';
 import { useSkills } from '@/hooks/usePortfolio';
 import { staggerContainer } from '@/config/animation';
@@ -39,10 +38,6 @@ export default function Skills() {
     : (available[0]?.key ?? 'language');
 
   const items = skills.filter((s) => s.category === activeKey);
-  const featured = skills.filter((s) => s.featured);
-  const orbitNames = (featured.length ? featured : skills)
-    .slice(0, 12)
-    .map((s) => s.name);
   const copy = useSectionCopy('skills', {
     index: '02.',
     title: 'Skills & tech',
@@ -79,17 +74,6 @@ export default function Skills() {
 
       {!isLoading && !isError && (
         <>
-          <SkillOrbit skills={orbitNames} className="mb-14 hidden sm:block" />
-          {/* Mobile-only branded "my stack" medallion — purely decorative
-              (orbit overflows narrow viewports). The card grid below is the
-              real content surface; the medallion is a small brand anchor. */}
-          <div aria-hidden className="mb-8 flex justify-center sm:hidden">
-            <div className="grid h-20 w-20 place-items-center rounded-full border border-primary/30 bg-primary/10 text-center font-mono text-[11px] font-semibold leading-tight text-neon shadow-glow">
-              my
-              <br />
-              stack
-            </div>
-          </div>
           <div className="mb-10 flex flex-wrap gap-2">
             {available.map((g) => {
               const on = g.key === activeKey;
