@@ -101,20 +101,28 @@
     @apply bg-neon/30 text-white;
   }
 
-  /* Custom scrollbar */
+  /* Custom scrollbar — theme-aware. Track is transparent (so it blends
+     into whatever surface owns the scroll); thumb uses `bg-border` (light
+     gray in light mode, dark gray in dark mode) with a padding-clip so
+     the thumb floats inside the gutter. Hover uses `muted-foreground` for
+     a subtle darkening cue. Firefox gets `scrollbar-color` / `-width`. */
   ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-bg-soft;
+    background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-line rounded-full;
-    border: 2px solid theme('colors.bg.soft');
+    @apply rounded-full bg-border;
+    background-clip: padding-box;
+    border: 2px solid transparent;
   }
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-neon-dim;
+    @apply bg-muted-foreground/40;
+  }
+  * {
+    scrollbar-color: hsl(var(--border)) transparent;
   }
 
   /* A11y: one consistent keyboard-focus ring app-wide (matches the Button
