@@ -7,7 +7,6 @@ import {
   Mail,
   Code2,
   MapPin,
-  ChevronDown,
   type LucideIcon,
 } from 'lucide-react';
 import { useTypewriter } from '@/hooks/useTypewriter';
@@ -20,7 +19,6 @@ import Magnetic from '@/components/motion/Magnetic';
 import GlassCard from '@/components/shared/GlassCard';
 import SmartImage from '@/components/shared/SmartImage';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/cn';
 import type { ProfileDoc } from '@/types';
 
 const iconMap: Record<string, LucideIcon> = {
@@ -90,7 +88,7 @@ export default function HeroPremium({
       <Spotlight className="flex items-center lg:min-h-[100svh]">
         <Particles count={28} />
 
-        <div className="container-x relative z-10 grid items-center gap-10 py-16 sm:py-24 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14 lg:py-28">
+        <div className="container-x relative z-10 grid items-center gap-10 py-12 sm:py-20 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14 lg:py-24">
           {/* Left — identity */}
           <div>
             <motion.span
@@ -259,21 +257,6 @@ export default function HeroPremium({
             </GlassCard>
           </motion.div>
         </div>
-
-        <motion.button
-          type="button"
-          onClick={onContact}
-          aria-label={hero.scrollLabel}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className={cn(
-            'absolute bottom-24 left-1/2 -translate-x-1/2 text-muted-foreground/60',
-            'hidden sm:block'
-          )}
-        >
-          <ChevronDown className="h-6 w-6 animate-bounce" />
-        </motion.button>
       </Spotlight>
     </section>
   );

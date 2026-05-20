@@ -59,7 +59,7 @@ export default function Blog() {
           { name: 'Blog', path: '/blog' },
         ])}
       />
-      <Section id="blog-page" className="pt-24 sm:pt-32">
+      <Section id="blog-page" className="pt-16 sm:pt-24">
         <SectionHeading
           index={copy.index}
           title={copy.title}

@@ -18,7 +18,7 @@ export function Section({ id, className, children }: SectionProps) {
     <section
       id={id}
       className={cn(
-        'relative scroll-mt-24 py-16 xs:py-20 sm:py-24 lg:py-28 xl:py-32 3xl:py-40',
+        'relative scroll-mt-24 py-12 xs:py-16 sm:py-20 lg:py-24 xl:py-28 3xl:py-36',
         className
       )}
     >

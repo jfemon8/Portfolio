@@ -131,6 +131,10 @@ export default {
           'linear-gradient(135deg,#00ffd1 0%,#38bdf8 45%,#a855f7 100%)',
         'radial-fade':
           'radial-gradient(ellipse 80% 60% at 50% -10%,rgba(0,255,209,.12),transparent 60%)',
+        // Light theme uses a slightly stronger teal so the central oval reads
+        // as a subtle hue-tinted area instead of a pure-white blowout.
+        'radial-fade-light':
+          'radial-gradient(ellipse 80% 60% at 50% -10%,rgba(0,191,163,.18),transparent 60%)',
       },
       backgroundSize: { grid: '40px 40px' },
       keyframes: {

@@ -47,31 +47,54 @@ export default function FloatingDock() {
     items: [] as { key: string; label: string }[],
   });
 
-  // Lightweight scroll-spy for the home anchor sections.
+  // Scroll-spy: rAF-throttled scroll listener — works regardless of when
+  // section elements actually mount (the previous IntersectionObserver
+  // attached once on mount, so it silently observed nothing if Home was
+  // still showing its loading spinner at that moment, leaving the dock
+  // permanently stuck on "Home").
   useEffect(() => {
-    if (pathname !== '/') return;
-    const els = SECTION_IDS.map((id) => document.getElementById(id)).filter(
-      (e): e is HTMLElement => !!e
-    );
-    const obs = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible) setActiveSection(visible.target.id);
-      },
-      { rootMargin: '-45% 0px -45% 0px', threshold: [0, 0.25, 0.5, 1] }
-    );
-    els.forEach((el) => obs.observe(el));
-    return () => obs.disconnect();
+    if (pathname !== '/') {
+      // Drop stale activeSection so the next visit to Home starts fresh.
+      setActiveSection('hero');
+      return;
+    }
+    let raf = 0;
+    const update = (): void => {
+      raf = 0;
+      // The "active line" sits ~30% from the top of the viewport: a section
+      // becomes active once its TOP crosses above this line.
+      const anchor = window.innerHeight * 0.3;
+      let current = SECTION_IDS[0] ?? 'hero';
+      for (const id of SECTION_IDS) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        if (el.getBoundingClientRect().top - anchor <= 0) current = id;
+      }
+      setActiveSection(current);
+    };
+    const schedule = (): void => {
+      if (raf) return;
+      raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    return () => {
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, [pathname]);
 
-  const go = (target: string) => {
+  const go = (target: string): void => {
     if (target.startsWith('#')) {
       const id = target.slice(1);
       if (pathname !== '/') {
-        navigate('/');
-        setTimeout(() => scrollToId(id), 120);
+        // Use the URL hash so PublicLayout's hash-aware effect performs the
+        // scroll (it polls for late-mounting sections). Avoids the race
+        // between navigate() and a fixed setTimeout(scrollToId).
+        // Hero = top of home; navigate without hash to keep the URL clean.
+        navigate(id === 'hero' ? '/' : `/${target}`);
       } else {
         scrollToId(id);
       }
@@ -92,7 +115,7 @@ export default function FloatingDock() {
       transition={{ delay: 0.4, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className="fixed inset-x-0 bottom-5 z-50 flex justify-center px-4"
     >
-      <div className="no-scrollbar flex max-w-full items-center gap-1 overflow-x-auto rounded-2xl border border-border/70 bg-card/70 p-1.5 backdrop-blur-xl shadow-[0_20px_60px_-25px_rgba(0,0,0,0.8)] sm:p-2">
+      <div className="no-scrollbar flex max-w-full items-center gap-1 overflow-x-auto rounded-2xl border border-border/70 bg-card/80 p-1.5 backdrop-blur-xl shadow-[0_24px_70px_-25px_rgba(0,0,0,0.85)] sm:p-2">
         {ITEMS.map((item) => {
           const active = isActive(item.target);
           const label =
@@ -109,6 +132,7 @@ export default function FloatingDock() {
                 }}
                 aria-label={label}
                 aria-current={active ? 'page' : undefined}
+                title={label}
                 className={cn(
                   'group relative flex items-center gap-2 rounded-xl px-2.5 py-2 text-sm transition-colors sm:px-3',
                   active
@@ -119,7 +143,7 @@ export default function FloatingDock() {
                 {active && (
                   <motion.span
                     layoutId="dock-active"
-                    className="absolute inset-0 rounded-xl bg-primary/10 ring-1 ring-primary/30"
+                    className="absolute inset-0 rounded-xl bg-primary/15 ring-1 ring-primary/40"
                     transition={{ type: 'spring', stiffness: 320, damping: 26 }}
                   />
                 )}

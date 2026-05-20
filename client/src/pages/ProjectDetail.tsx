@@ -98,7 +98,7 @@ export default function ProjectDetail() {
           ]),
         ]}
       />
-      <article className="container-x max-w-4xl pb-24 pt-24 sm:pt-32">
+      <article className="container-x max-w-4xl pb-24 pt-16 sm:pt-24">
         <Reveal>
           <button
             onClick={() => navigate(-1)}

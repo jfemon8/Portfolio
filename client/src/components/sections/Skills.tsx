@@ -80,31 +80,15 @@ export default function Skills() {
       {!isLoading && !isError && (
         <>
           <SkillOrbit skills={orbitNames} className="mb-14 hidden sm:block" />
-          {/* P13.5 — mobile-only static stack visual (the animated orbit
-              overflows narrow viewports, so phones get a calmer medallion
-              + featured-chip cloud). Decorative; tabs below remain the
-              accessible source of truth. */}
-          <div
-            aria-hidden
-            className="mb-10 flex flex-col items-center sm:hidden"
-          >
+          {/* Mobile-only branded "my stack" medallion — purely decorative
+              (orbit overflows narrow viewports). The card grid below is the
+              real content surface; the medallion is a small brand anchor. */}
+          <div aria-hidden className="mb-8 flex justify-center sm:hidden">
             <div className="grid h-20 w-20 place-items-center rounded-full border border-primary/30 bg-primary/10 text-center font-mono text-[11px] font-semibold leading-tight text-neon shadow-glow">
               my
               <br />
               stack
             </div>
-            {orbitNames.length > 0 && (
-              <div className="mt-6 flex max-w-md flex-wrap justify-center gap-2">
-                {orbitNames.slice(0, 8).map((name) => (
-                  <span
-                    key={name}
-                    className="rounded-full border border-border/70 bg-card/70 px-3 py-1 text-xs text-muted-foreground backdrop-blur"
-                  >
-                    {name}
-                  </span>
-                ))}
-              </div>
-            )}
           </div>
           <div className="mb-10 flex flex-wrap gap-2">
             {available.map((g) => {
@@ -144,24 +128,44 @@ export default function Skills() {
               initial={reduce ? false : 'hidden'}
               animate="show"
               exit={reduce ? undefined : { opacity: 0, y: -8 }}
-              className="flex flex-wrap gap-3"
+              className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
             >
               {items.map((s) => (
                 <motion.li
                   key={s._id}
                   variants={{
-                    hidden: { opacity: 0, y: 16, scale: 0.9 },
+                    hidden: { opacity: 0, y: 16, scale: 0.95 },
                     show: { opacity: 1, y: 0, scale: 1 },
                   }}
-                  whileHover={reduce ? undefined : { y: -4, scale: 1.05 }}
-                  className="group relative cursor-default rounded-xl border border-border/70 bg-card/50 px-4 py-3 backdrop-blur transition-colors hover:border-primary/50 hover:shadow-glow"
+                  whileHover={reduce ? undefined : { y: -4 }}
+                  className="group relative overflow-hidden rounded-2xl border border-border/70 bg-card/60 p-4 backdrop-blur-xl transition-all duration-300 hover:border-primary/40 hover:shadow-neon-glow"
                 >
-                  <span className="text-sm font-medium text-foreground">
-                    {s.name}
-                  </span>
-                  <span className="ml-2 font-mono text-[11px] text-muted-foreground/60 transition-colors group-hover:text-neon sm:text-muted-foreground/0">
-                    {s.level}%
-                  </span>
+                  {/* Hover-only diagonal sheen for a touch of depth. */}
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 bg-gradient-to-br from-transparent to-primary/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  />
+                  <div className="relative flex items-baseline justify-between gap-2">
+                    <span className="truncate text-sm font-semibold text-foreground transition-colors group-hover:text-neon">
+                      {s.name}
+                    </span>
+                    <span className="font-mono text-[11px] text-muted-foreground/80 transition-colors group-hover:text-neon">
+                      {s.level}%
+                    </span>
+                  </div>
+                  <div className="relative mt-3 h-1.5 overflow-hidden rounded-full bg-border/40">
+                    <motion.span
+                      initial={reduce ? { width: `${s.level}%` } : { width: 0 }}
+                      whileInView={{ width: `${s.level}%` }}
+                      viewport={{ once: true }}
+                      transition={{
+                        duration: 0.9,
+                        delay: 0.15,
+                        ease: [0.22, 1, 0.36, 1],
+                      }}
+                      className="block h-full rounded-full bg-gradient-to-r from-primary to-neon-blue"
+                    />
+                  </div>
                 </motion.li>
               ))}
             </motion.ul>

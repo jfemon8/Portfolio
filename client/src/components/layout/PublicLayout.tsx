@@ -9,6 +9,7 @@ import SmoothScroll from './SmoothScroll';
 import { track } from '@/lib/api';
 import { useScrollDepth } from '@/hooks/useScrollDepth';
 import { initThemeSync } from '@/stores/theme';
+import { scrollToId } from '@/lib/smoothScroll';
 
 /**
  * Premium public shell (P2): Lenis smooth-scroll · cinematic backdrop ·
@@ -20,8 +21,26 @@ export default function PublicLayout() {
 
   useEffect(() => initThemeSync(), []);
 
+  // Hash-aware scroll handling: when the URL carries `/#section`, poll
+  // briefly for the target's element (sections may mount async after the
+  // route changes), then smooth-scroll to it. Plain route changes still
+  // jump to the top instantly. This is what makes cross-page dock clicks
+  // (e.g. `/projects` → click "Skills") land on the right section.
   useEffect(() => {
-    if (!hash) window.scrollTo({ top: 0, behavior: 'instant' });
+    if (hash) {
+      const id = hash.slice(1);
+      let attempts = 0;
+      const tryScroll = (): void => {
+        if (document.getElementById(id)) {
+          scrollToId(id);
+          return;
+        }
+        if (attempts++ < 30) setTimeout(tryScroll, 40);
+      };
+      tryScroll();
+    } else {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
   }, [pathname, hash]);
 
   useEffect(() => {
