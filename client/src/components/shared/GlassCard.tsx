@@ -17,8 +17,8 @@ const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
       className={cn(
         'relative rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl',
         'shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_24px_60px_-30px_rgba(0,0,0,0.7)]',
-        interactive &&
-          'transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-glow',
+        // P13.5 — single shared lifted-card definition (theme-aware).
+        interactive && 'glass-hover',
         className
       )}
       {...props}

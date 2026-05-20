@@ -85,7 +85,7 @@ export default function BlogPostPage() {
           ]),
         ]}
       />
-      <article className="container-x max-w-3xl pb-24 pt-32">
+      <article className="container-x max-w-3xl pb-24 pt-24 sm:pt-32">
         <Reveal>
           <button
             onClick={() => navigate(-1)}
@@ -152,7 +152,7 @@ export default function BlogPostPage() {
             <h2 className="mb-6 text-xl font-bold text-foreground">
               {lab.headingRelated}
             </h2>
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {related.map((r, i) => (
                 <Reveal key={r._id} delay={i * 0.06}>
                   <Link to={`/blog/${r.slug}`} className="block h-full">

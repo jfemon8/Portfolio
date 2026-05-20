@@ -164,7 +164,7 @@ export default function Field({ field, value, form, onChange }: FieldProps) {
       {type === 'pairs' && (
         <div className="space-y-2">
           {pairList.map((p, i) => (
-            <div key={i} className="flex gap-2">
+            <div key={i} className="flex flex-col gap-2 sm:flex-row">
               <input
                 className="input"
                 placeholder={field.itemLabels?.[0] ?? 'Label'}
@@ -226,7 +226,7 @@ export default function Field({ field, value, form, onChange }: FieldProps) {
                   )
                 }
               />
-              <div className="mt-2 flex gap-2">
+              <div className="mt-2 flex flex-col gap-2 sm:flex-row">
                 <input
                   className="input"
                   placeholder="Caption (optional)"

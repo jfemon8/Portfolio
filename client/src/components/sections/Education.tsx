@@ -24,7 +24,7 @@ export default function Education() {
         subtitle={copy.subtitle}
       />
       {isLoading && <Spinner />}
-      <div className="grid gap-5 md:grid-cols-3">
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((e, i) => (
           <Reveal key={e._id} delay={i * 0.07}>
             <Tilt3D max={7} className="group relative h-full rounded-2xl">

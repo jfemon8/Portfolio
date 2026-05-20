@@ -105,7 +105,7 @@ export default function AuditLogViewer() {
                   {l.entityId ? `#${l.entityId.slice(-6)}` : ''}
                 </span>
               )}
-              <span className="ml-auto flex items-center gap-3 text-[11px] text-muted-foreground/60">
+              <span className="flex items-center gap-3 text-[11px] text-muted-foreground/60 sm:ml-auto">
                 {l.ip && (
                   <span className="flex items-center gap-1">
                     <Globe className="h-3 w-3" /> {l.ip}

@@ -32,7 +32,7 @@ export default function Terminal({
           {title}
         </span>
       </div>
-      <pre className="overflow-x-auto p-5 font-mono text-[13px] leading-relaxed text-muted-foreground">
+      <pre className="whitespace-pre-wrap break-words p-5 font-mono text-[11px] leading-relaxed text-muted-foreground sm:text-[13px]">
         <code>
           {lines.map((ln, i) => {
             const isCmd = ln.startsWith('$ ');

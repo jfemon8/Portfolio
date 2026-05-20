@@ -59,7 +59,7 @@ export default function Blog() {
           { name: 'Blog', path: '/blog' },
         ])}
       />
-      <Section id="blog-page" className="pt-32">
+      <Section id="blog-page" className="pt-24 sm:pt-32">
         <SectionHeading
           index={copy.index}
           title={copy.title}
@@ -72,7 +72,7 @@ export default function Blog() {
                 onChange={(e) => setQ(e.target.value)}
                 placeholder={lab.searchPlaceholder}
                 aria-label={lab.searchAria}
-                className="input w-56 pl-9"
+                className="input w-full pl-9 sm:w-56"
               />
             </div>
           }

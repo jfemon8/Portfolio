@@ -131,7 +131,7 @@ export default function Contact({ profile }: { profile?: ProfileDoc }) {
                     <p className="text-xs uppercase tracking-wider text-muted-foreground/70">
                       {c.label}
                     </p>
-                    <p className="truncate text-sm text-muted-foreground">
+                    <p className="break-words text-sm text-muted-foreground">
                       {c.value}
                     </p>
                   </div>

@@ -87,10 +87,10 @@ export default function HeroPremium({
           className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-20"
         />
       )}
-      <Spotlight className="flex min-h-screen items-center">
+      <Spotlight className="flex items-center lg:min-h-[100svh]">
         <Particles count={28} />
 
-        <div className="container-x relative z-10 grid items-center gap-14 py-28 lg:grid-cols-[1.15fr_0.85fr]">
+        <div className="container-x relative z-10 grid items-center gap-10 py-16 sm:py-24 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14 lg:py-28">
           {/* Left — identity */}
           <div>
             <motion.span
@@ -116,10 +116,12 @@ export default function HeroPremium({
 
             <motion.div
               {...rise(0.12)}
-              className="mt-5 flex items-center gap-2 font-mono text-lg text-muted-foreground sm:text-2xl"
+              className="mt-5 flex flex-wrap items-center gap-2 font-mono text-lg text-muted-foreground sm:text-2xl"
             >
               <span className="text-neon">&gt;</span>
-              <span className="text-foreground">{typed}</span>
+              <span className="min-w-0 break-words text-foreground">
+                {typed}
+              </span>
               <span className="inline-block h-6 w-[3px] animate-blink bg-neon" />
             </motion.div>
 
@@ -207,7 +209,7 @@ export default function HeroPremium({
                   {hero.terminalTitle}
                 </span>
               </div>
-              <pre className="overflow-x-auto p-5 font-mono text-[13px] leading-relaxed text-muted-foreground">
+              <pre className="whitespace-pre-wrap break-words p-5 font-mono text-[11px] leading-relaxed text-muted-foreground sm:text-[13px]">
                 <code>
                   <span className="text-neon">$</span> {hero.whoamiCmd}
                   {'\n'}

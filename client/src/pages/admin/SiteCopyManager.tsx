@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import toast from 'react-hot-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -13,6 +13,8 @@ import {
   KeyRound,
   Tags,
   Mail,
+  ChevronDown,
+  type LucideIcon,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useSiteContent } from '@/hooks/usePortfolio';
@@ -21,10 +23,38 @@ import Field, {
   type FieldSchema,
   type FormState,
 } from '@/components/admin/Field';
-import GlassCard from '@/components/shared/GlassCard';
 import { Button } from '@/components/ui/button';
 import { getByPath, setByPath } from '@/lib/object';
 import type { ApiError, ContentSection } from '@/types';
+
+/** Collapsible glass section — native <details>, zero-dep & accessible. */
+function Panel({
+  icon: Icon,
+  title,
+  defaultOpen = false,
+  children,
+}: {
+  icon: LucideIcon;
+  title: string;
+  defaultOpen?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <details
+      open={defaultOpen}
+      className="group relative overflow-hidden rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_24px_60px_-30px_rgba(0,0,0,0.7)]"
+    >
+      <summary className="flex cursor-pointer select-none list-none items-center gap-2 p-4 font-semibold text-neon transition-colors hover:text-neon/80 sm:p-6 [&::-webkit-details-marker]:hidden">
+        <Icon className="h-4 w-4 shrink-0" />
+        <span className="flex-1">{title}</span>
+        <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180" />
+      </summary>
+      <div className="border-t border-border/60 p-4 pt-5 sm:p-6">
+        {children}
+      </div>
+    </details>
+  );
+}
 
 /** Known section copy-keys (matches the P12.2 useSectionCopy call sites). */
 const SECTION_KEYS: { key: string; label: string }[] = [
@@ -467,11 +497,8 @@ export default function SiteCopyManager() {
       />
 
       {form && (
-        <div className="grid max-w-4xl gap-6">
-          <GlassCard className="p-6">
-            <h3 className="mb-5 flex items-center gap-2 font-semibold text-neon">
-              <LayoutList className="h-4 w-4" /> Section headings
-            </h3>
+        <div className="grid max-w-4xl gap-3">
+          <Panel icon={LayoutList} title="Section headings" defaultOpen>
             <div className="space-y-5">
               {SECTION_KEYS.map(({ key, label }) => {
                 const s = sec(key);
@@ -516,33 +543,21 @@ export default function SiteCopyManager() {
                 );
               })}
             </div>
-          </GlassCard>
+          </Panel>
 
-          <GlassCard className="p-6">
-            <h3 className="mb-5 flex items-center gap-2 font-semibold text-neon">
-              <Terminal className="h-4 w-4" /> Hero
-            </h3>
+          <Panel icon={Terminal} title="Hero">
             {fieldGrid(HERO_FIELDS)}
-          </GlassCard>
+          </Panel>
 
-          <GlassCard className="p-6">
-            <h3 className="mb-5 flex items-center gap-2 font-semibold text-neon">
-              <Sparkles className="h-4 w-4" /> About — strengths
-            </h3>
+          <Panel icon={Sparkles} title="About — strengths">
             {fieldGrid(ABOUT_FIELDS)}
-          </GlassCard>
+          </Panel>
 
-          <GlassCard className="p-6">
-            <h3 className="mb-5 flex items-center gap-2 font-semibold text-neon">
-              <PanelBottom className="h-4 w-4" /> Footer
-            </h3>
+          <Panel icon={PanelBottom} title="Footer">
             {fieldGrid(FOOTER_FIELDS)}
-          </GlassCard>
+          </Panel>
 
-          <GlassCard className="p-6">
-            <h3 className="mb-5 flex items-center gap-2 font-semibold text-neon">
-              <Compass className="h-4 w-4" /> Navigation (dock labels)
-            </h3>
+          <Panel icon={Compass} title="Navigation (dock labels)">
             <div className="grid gap-4 sm:grid-cols-2">
               {NAV_TARGETS.map(({ key, label }) => (
                 <div key={key}>
@@ -559,44 +574,29 @@ export default function SiteCopyManager() {
                 </div>
               ))}
             </div>
-          </GlassCard>
+          </Panel>
 
-          <GlassCard className="p-6">
-            <h3 className="mb-5 flex items-center gap-2 font-semibold text-neon">
-              <Inbox className="h-4 w-4" /> States &amp; 404
-            </h3>
+          <Panel icon={Inbox} title="States & 404">
             {fieldGrid(STATES_FIELDS)}
-          </GlassCard>
+          </Panel>
 
-          <GlassCard className="p-6">
-            <h3 className="mb-5 flex items-center gap-2 font-semibold text-neon">
-              <MessageSquare className="h-4 w-4" /> Forms (contact)
-            </h3>
+          <Panel icon={MessageSquare} title="Forms (contact)">
             {fieldGrid(FORMS_FIELDS)}
-          </GlassCard>
+          </Panel>
 
-          <GlassCard className="p-6">
-            <h3 className="mb-5 flex items-center gap-2 font-semibold text-neon">
-              <KeyRound className="h-4 w-4" /> Admin login
-            </h3>
+          <Panel icon={KeyRound} title="Admin login">
             {fieldGrid(AUTH_FIELDS)}
-          </GlassCard>
+          </Panel>
 
-          <GlassCard className="p-6">
-            <h3 className="mb-5 flex items-center gap-2 font-semibold text-neon">
-              <Tags className="h-4 w-4" /> Labels &amp; chrome
-            </h3>
+          <Panel icon={Tags} title="Labels & chrome">
             {fieldGrid(LABELS_FIELDS)}
-          </GlassCard>
+          </Panel>
 
-          <GlassCard className="p-6">
-            <h3 className="mb-5 flex items-center gap-2 font-semibold text-neon">
-              <Mail className="h-4 w-4" /> Contact emails
-            </h3>
+          <Panel icon={Mail} title="Contact emails">
             {fieldGrid(EMAIL_FIELDS)}
-          </GlassCard>
+          </Panel>
 
-          <div className="flex justify-end">
+          <div className="sticky bottom-4 z-10 flex justify-end">
             <Button onClick={save} disabled={saving}>
               {saving && <Loader2 className="h-4 w-4 animate-spin" />}
               Save site copy

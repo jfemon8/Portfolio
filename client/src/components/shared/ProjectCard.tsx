@@ -146,7 +146,7 @@ export default function ProjectCard({
                   target="_blank"
                   rel="noreferrer"
                   aria-label={lab.btnSourceCode}
-                  className="flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-neon"
+                  className="-m-2 flex items-center gap-1.5 p-2 text-muted-foreground transition-colors hover:text-neon"
                 >
                   <Github className="h-4 w-4" />
                 </a>
@@ -159,7 +159,7 @@ export default function ProjectCard({
                   target="_blank"
                   rel="noreferrer"
                   aria-label={lab.btnLiveDemo}
-                  className="flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-neon"
+                  className="-m-2 flex items-center gap-1.5 p-2 text-muted-foreground transition-colors hover:text-neon"
                 >
                   <ExternalLink className="h-4 w-4" />
                 </a>

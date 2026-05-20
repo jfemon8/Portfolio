@@ -392,7 +392,7 @@ export default function SettingsManager() {
                           aria-label="Move up"
                           disabled={i === 0}
                           onClick={() => moveSection(i, -1)}
-                          className="text-muted-foreground/70 transition-colors hover:text-neon disabled:opacity-30"
+                          className="rounded p-1.5 text-muted-foreground/70 transition-colors hover:text-neon disabled:opacity-30"
                         >
                           <ChevronUp className="h-4 w-4" />
                         </button>
@@ -401,7 +401,7 @@ export default function SettingsManager() {
                           aria-label="Move down"
                           disabled={i === site.sections.length - 1}
                           onClick={() => moveSection(i, 1)}
-                          className="text-muted-foreground/70 transition-colors hover:text-neon disabled:opacity-30"
+                          className="rounded p-1.5 text-muted-foreground/70 transition-colors hover:text-neon disabled:opacity-30"
                         >
                           <ChevronDown className="h-4 w-4" />
                         </button>

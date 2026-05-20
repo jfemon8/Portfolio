@@ -105,7 +105,7 @@ export default function AnalyticsManager() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <GlassCard className="p-6 lg:col-span-2">
+        <GlassCard className="p-4 sm:p-6 lg:col-span-2">
           <h3 className="mb-4 font-semibold text-foreground">
             Page views over time
           </h3>
@@ -131,7 +131,7 @@ export default function AnalyticsManager() {
           </ResponsiveContainer>
         </GlassCard>
 
-        <GlassCard className="p-6">
+        <GlassCard className="p-4 sm:p-6">
           <h3 className="mb-4 font-semibold text-foreground">By device</h3>
           <ResponsiveContainer width="100%" height={240}>
             <PieChart>
@@ -166,7 +166,7 @@ export default function AnalyticsManager() {
           </div>
         </GlassCard>
 
-        <GlassCard className="p-6">
+        <GlassCard className="p-4 sm:p-6">
           <h3 className="mb-4 font-semibold text-foreground">Events</h3>
           <div className="space-y-3">
             {a.byType.map((t) => {
@@ -187,7 +187,7 @@ export default function AnalyticsManager() {
           </div>
         </GlassCard>
 
-        <GlassCard className="p-6 lg:col-span-2">
+        <GlassCard className="p-4 sm:p-6 lg:col-span-2">
           <h3 className="mb-4 font-semibold text-foreground">Top projects</h3>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={a.topProjects} layout="vertical">
@@ -197,7 +197,7 @@ export default function AnalyticsManager() {
                 dataKey="title"
                 stroke={axisStroke}
                 fontSize={11}
-                width={110}
+                width={90}
               />
               <Tooltip
                 contentStyle={tooltipStyle}
@@ -208,7 +208,7 @@ export default function AnalyticsManager() {
           </ResponsiveContainer>
         </GlassCard>
 
-        <GlassCard className="p-6 lg:col-span-3">
+        <GlassCard className="p-4 sm:p-6 lg:col-span-3">
           <h3 className="mb-4 font-semibold text-foreground">
             Visitor activity
           </h3>
@@ -219,7 +219,7 @@ export default function AnalyticsManager() {
           />
         </GlassCard>
 
-        <GlassCard className="p-6 lg:col-span-2">
+        <GlassCard className="p-4 sm:p-6 lg:col-span-2">
           <h3 className="mb-4 font-semibold text-foreground">By country</h3>
           {byCountry.length === 0 ? (
             <p className="py-10 text-center text-sm text-muted-foreground">
@@ -251,7 +251,7 @@ export default function AnalyticsManager() {
           )}
         </GlassCard>
 
-        <GlassCard className="p-6">
+        <GlassCard className="p-4 sm:p-6">
           <h3 className="mb-4 font-semibold text-foreground">By browser</h3>
           {byBrowser.length === 0 ? (
             <p className="py-10 text-center text-sm text-muted-foreground">
@@ -272,7 +272,7 @@ export default function AnalyticsManager() {
           )}
         </GlassCard>
 
-        <GlassCard className="p-6 lg:col-span-3">
+        <GlassCard className="p-4 sm:p-6 lg:col-span-3">
           <h3 className="font-semibold text-foreground">Scroll depth</h3>
           <p className="mb-4 text-xs text-muted-foreground">
             How far visitors scroll through a page.

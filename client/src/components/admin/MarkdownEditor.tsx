@@ -86,7 +86,7 @@ export default function MarkdownEditor({
             type="button"
             title={t.title}
             onClick={() => apply(t)}
-            className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-card hover:text-neon"
+            className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-card hover:text-neon"
           >
             <t.icon className="h-4 w-4" />
           </button>

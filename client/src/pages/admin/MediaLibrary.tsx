@@ -142,7 +142,7 @@ export default function MediaLibrary() {
                 <button
                   onClick={() => void copyUrl(a.url)}
                   title="Copy URL"
-                  className="flex-1 rounded-lg border border-border/70 p-2 text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon"
+                  className="flex-1 rounded-lg border border-border/70 p-2.5 text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon"
                 >
                   <Copy className="mx-auto h-4 w-4" />
                 </button>
@@ -152,7 +152,7 @@ export default function MediaLibrary() {
                     del.mutate(a.publicId)
                   }
                   title="Delete"
-                  className="flex-1 rounded-lg border border-border/70 p-2 text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
+                  className="flex-1 rounded-lg border border-border/70 p-2.5 text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
                 >
                   <Trash2 className="mx-auto h-4 w-4" />
                 </button>

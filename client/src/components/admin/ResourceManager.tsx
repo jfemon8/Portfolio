@@ -106,14 +106,14 @@ export default function ResourceManager<T extends WithId>({
               <button
                 onClick={() => openEdit(item)}
                 aria-label="Edit"
-                className="rounded-lg border border-border/70 p-2 text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon"
+                className="rounded-lg border border-border/70 p-2.5 text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon"
               >
                 <Pencil className="h-4 w-4" />
               </button>
               <button
                 onClick={() => void del(item)}
                 aria-label="Delete"
-                className="rounded-lg border border-border/70 p-2 text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
+                className="rounded-lg border border-border/70 p-2.5 text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
               >
                 <Trash2 className="h-4 w-4" />
               </button>

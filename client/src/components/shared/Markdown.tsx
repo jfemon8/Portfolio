@@ -38,6 +38,12 @@ const components: Components = {
   a: (props) => <a {...props} target="_blank" rel="noreferrer" />,
   // SyntaxHighlighter renders its own <pre>; collapse react-markdown's wrapper.
   pre: ({ children }) => <>{children}</>,
+  // Wide tables scroll within the article instead of overflowing the page.
+  table: (props) => (
+    <div className="my-6 overflow-x-auto">
+      <table {...props} />
+    </div>
+  ),
   code({ className, children }) {
     const match = /language-(\w+)/.exec(className || '');
     const text = String(children).replace(/\n$/, '');
@@ -62,19 +68,21 @@ const components: Components = {
             <span className="h-2.5 w-2.5 rounded-full bg-[#27c93f]" />
           </span>
         </div>
-        <SyntaxHighlighter
-          language={match[1]}
-          style={oneDark}
-          customStyle={{
-            margin: 0,
-            background: 'hsl(var(--background))',
-            fontSize: '0.85rem',
-            padding: '1.1rem 1.25rem',
-          }}
-          codeTagProps={{ style: { fontFamily: 'inherit' } }}
-        >
-          {text}
-        </SyntaxHighlighter>
+        <div className="overflow-x-auto">
+          <SyntaxHighlighter
+            language={match[1]}
+            style={oneDark}
+            customStyle={{
+              margin: 0,
+              background: 'hsl(var(--background))',
+              fontSize: '0.85rem',
+              padding: '1.1rem 1.25rem',
+            }}
+            codeTagProps={{ style: { fontFamily: 'inherit' } }}
+          >
+            {text}
+          </SyntaxHighlighter>
+        </div>
       </div>
     );
   },

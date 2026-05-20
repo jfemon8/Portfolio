@@ -17,7 +17,10 @@ export function Section({ id, className, children }: SectionProps) {
   return (
     <section
       id={id}
-      className={cn('relative scroll-mt-24 py-24 sm:py-32', className)}
+      className={cn(
+        'relative scroll-mt-24 py-16 xs:py-20 sm:py-24 lg:py-28 xl:py-32 3xl:py-40',
+        className
+      )}
     >
       <div className="container-x">{children}</div>
     </section>
@@ -46,7 +49,7 @@ export function SectionHeading({
   return (
     <div
       className={cn(
-        'mb-14 flex flex-wrap items-end gap-6',
+        'mb-10 flex flex-wrap items-end gap-6 sm:mb-14 3xl:mb-20',
         centered ? 'flex-col text-center' : 'justify-between'
       )}
     >
@@ -62,7 +65,7 @@ export function SectionHeading({
             {index}
           </span>
         )}
-        <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+        <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl lg:text-5xl 3xl:text-6xl">
           {title} <span className="text-neon">.</span>
         </h2>
         {subtitle && (

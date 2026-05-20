@@ -1,7 +1,15 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { Mail, MailOpen, Star, Trash2, Archive, Reply } from 'lucide-react';
+import {
+  Mail,
+  MailOpen,
+  Star,
+  Trash2,
+  Archive,
+  Reply,
+  ChevronLeft,
+} from 'lucide-react';
 import { api } from '@/lib/api';
 import PageHeader from '@/components/admin/PageHeader';
 import GlassCard from '@/components/shared/GlassCard';
@@ -58,7 +66,7 @@ export default function MessagesManager() {
   };
 
   const iconBtn =
-    'rounded-lg border border-border/70 p-2 text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon';
+    'rounded-lg border border-border/70 p-2.5 text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon';
 
   return (
     <div>
@@ -87,7 +95,7 @@ export default function MessagesManager() {
       )}
 
       <div className="grid gap-4 lg:grid-cols-[380px_1fr]">
-        <div className="space-y-2">
+        <div className={cn('space-y-2', active && 'hidden lg:block')}>
           {messages.map((m) => (
             <button
               key={m._id}
@@ -121,7 +129,13 @@ export default function MessagesManager() {
         </div>
 
         {active ? (
-          <GlassCard className="h-fit p-6">
+          <GlassCard className="h-fit p-4 sm:p-6">
+            <button
+              onClick={() => setActive(null)}
+              className="mb-4 flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground lg:hidden"
+            >
+              <ChevronLeft className="h-4 w-4" /> Back to messages
+            </button>
             <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border/60 pb-4">
               <div>
                 <h2 className="text-lg font-bold text-foreground">
@@ -191,7 +205,7 @@ export default function MessagesManager() {
                     window.confirm('Delete this message?') &&
                     del.mutate(active._id)
                   }
-                  className="rounded-lg border border-border/70 p-2 text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
+                  className="rounded-lg border border-border/70 p-2.5 text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
                   title="Delete"
                 >
                   <Trash2 className="h-4 w-4" />

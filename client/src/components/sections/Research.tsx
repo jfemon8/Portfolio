@@ -33,7 +33,9 @@ function Pipeline({ stages }: { stages: string[] }) {
           >
             {s}
           </motion.span>
-          {i < stages.length - 1 && <span className="h-px w-6 bg-border/70" />}
+          {i < stages.length - 1 && (
+            <span className="hidden h-px w-6 bg-border/70 sm:block" />
+          )}
         </div>
       ))}
     </div>

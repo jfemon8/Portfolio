@@ -104,7 +104,7 @@ export default function About({ profile }: { profile?: ProfileDoc }) {
               <dl className="space-y-2 text-sm">
                 <div className="flex justify-between gap-3">
                   <dt className="text-muted-foreground/70">Email</dt>
-                  <dd className="truncate text-muted-foreground">
+                  <dd className="break-words text-muted-foreground">
                     {profile?.email}
                   </dd>
                 </div>

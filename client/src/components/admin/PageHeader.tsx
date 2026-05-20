@@ -22,7 +22,7 @@ export default function PageHeader({
       initial={reduce ? false : { opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      className="mb-8 flex flex-wrap items-end justify-between gap-4 border-b border-border/60 pb-6"
+      className="mb-8 flex flex-col gap-4 border-b border-border/60 pb-6 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between"
     >
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-foreground">

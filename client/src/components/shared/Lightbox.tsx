@@ -70,7 +70,7 @@ export default function Lightbox({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-xl border border-border/70 bg-card/60 text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
+            className="absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-xl border border-border/70 bg-card/60 text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
           >
             <X className="h-5 w-5" />
           </button>

@@ -45,8 +45,7 @@ export default function ImageUpload({
       toast.success('Image uploaded');
     } catch (err) {
       toast.error(
-        (err as ApiError).message ||
-          'Upload failed (is Cloudinary configured?)'
+        (err as ApiError).message || 'Upload failed (is Cloudinary configured?)'
       );
     } finally {
       setBusy(false);
@@ -62,7 +61,7 @@ export default function ImageUpload({
           <button
             type="button"
             onClick={() => onChange({ url: '', publicId: '' })}
-            className="absolute right-2 top-2 rounded-lg bg-bg/80 p-1.5 text-neon-pink opacity-0 backdrop-blur transition group-hover:opacity-100"
+            className="absolute right-2 top-2 rounded-lg bg-bg/80 p-2 text-neon-pink opacity-100 backdrop-blur transition sm:opacity-0 sm:group-hover:opacity-100"
           >
             <X className="h-4 w-4" />
           </button>

@@ -58,7 +58,7 @@ export default function Projects() {
           { name: 'Projects', path: '/projects' },
         ])}
       />
-      <Section id="projects-page" className="pt-32">
+      <Section id="projects-page" className="pt-24 sm:pt-32">
         <SectionHeading
           index={copy.index}
           title={copy.title}

@@ -167,7 +167,7 @@ export default function UsersManager() {
                     })
                   }
                   title={locked ? 'Protected account' : 'Edit'}
-                  className="rounded-lg border border-border/70 p-2 text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon disabled:opacity-40 disabled:hover:border-border/70 disabled:hover:text-muted-foreground"
+                  className="rounded-lg border border-border/70 p-2.5 text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon disabled:opacity-40 disabled:hover:border-border/70 disabled:hover:text-muted-foreground"
                 >
                   <Pencil className="h-4 w-4" />
                 </button>
@@ -183,7 +183,7 @@ export default function UsersManager() {
                         ? 'You cannot delete yourself'
                         : 'Delete'
                   }
-                  className="rounded-lg border border-border/70 p-2 text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive disabled:opacity-40 disabled:hover:border-border/70 disabled:hover:text-muted-foreground"
+                  className="rounded-lg border border-border/70 p-2.5 text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive disabled:opacity-40 disabled:hover:border-border/70 disabled:hover:text-muted-foreground"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>

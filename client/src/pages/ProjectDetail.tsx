@@ -98,7 +98,7 @@ export default function ProjectDetail() {
           ]),
         ]}
       />
-      <article className="container-x max-w-4xl pb-24 pt-32">
+      <article className="container-x max-w-4xl pb-24 pt-24 sm:pt-32">
         <Reveal>
           <button
             onClick={() => navigate(-1)}
@@ -157,7 +157,7 @@ export default function ProjectDetail() {
               src={p.coverImage}
               alt={p.title}
               priority
-              className="mt-9 w-full rounded-2xl border border-border/70"
+              className="mt-9 aspect-video w-full rounded-2xl border border-border/70 object-cover"
             />
           </Reveal>
         )}
@@ -292,7 +292,7 @@ export default function ProjectDetail() {
                         src={g.url}
                         alt={g.caption || `${p.title} ${i + 1}`}
                         imgWidth={900}
-                        className="w-full object-cover"
+                        className="aspect-video w-full object-cover"
                       />
                     </GlassCard>
                   </button>

@@ -93,6 +93,14 @@ export default function AdminLayout() {
     return () => window.removeEventListener('keydown', onKey);
   }, [toggleCommand]);
 
+  // Lock body scroll while the mobile drawer is open (mirrors Modal/Lightbox).
+  useEffect(() => {
+    if (mobileOpen) document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileOpen]);
+
   const visibleNav = NAV.filter(
     (n) => !n.roles || (user && n.roles.includes(user.role))
   );
@@ -224,11 +232,11 @@ export default function AdminLayout() {
         {mobileOpen && (
           <div
             onClick={() => setMobileOpen(false)}
-            className="fixed inset-0 top-16 z-30 bg-black/60 lg:hidden"
+            className="fixed inset-0 z-30 bg-black/60 lg:hidden"
           />
         )}
 
-        <main className="min-h-[calc(100vh-4rem)] flex-1 p-5 sm:p-8">
+        <main className="mx-auto min-h-[calc(100vh-4rem)] w-full max-w-screen-2xl flex-1 p-4 sm:p-6 lg:p-8">
           <Outlet />
         </main>
       </div>

@@ -92,7 +92,7 @@ export default function FloatingDock() {
       transition={{ delay: 0.4, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className="fixed inset-x-0 bottom-5 z-50 flex justify-center px-4"
     >
-      <div className="no-scrollbar flex max-w-full items-center gap-1 overflow-x-auto rounded-2xl border border-border/70 bg-card/70 p-2 backdrop-blur-xl shadow-[0_20px_60px_-25px_rgba(0,0,0,0.8)]">
+      <div className="no-scrollbar flex max-w-full items-center gap-1 overflow-x-auto rounded-2xl border border-border/70 bg-card/70 p-1.5 backdrop-blur-xl shadow-[0_20px_60px_-25px_rgba(0,0,0,0.8)] sm:p-2">
         {ITEMS.map((item) => {
           const active = isActive(item.target);
           const label =
@@ -110,7 +110,7 @@ export default function FloatingDock() {
                 aria-label={label}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'group relative flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition-colors',
+                  'group relative flex items-center gap-2 rounded-xl px-2.5 py-2 text-sm transition-colors sm:px-3',
                   active
                     ? 'text-primary'
                     : 'text-muted-foreground hover:text-foreground'

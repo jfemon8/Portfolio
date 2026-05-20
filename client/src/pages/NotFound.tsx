@@ -15,7 +15,8 @@ export default function NotFound() {
         <div>
           <p className="font-mono text-7xl font-extrabold gradient-text">404</p>
           <p className="mt-4 font-mono text-muted-foreground">
-            <span className="text-neon">$</span> cd {window.location.pathname}
+            <span className="text-neon">$</span> cd{' '}
+            <span className="break-all">{window.location.pathname}</span>
             <br />
             {c.notFoundError}
           </p>

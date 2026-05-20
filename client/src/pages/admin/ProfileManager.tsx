@@ -288,7 +288,7 @@ function ArrayEditor({
       </div>
       <div className="space-y-3">
         {items.map((it, i) => (
-          <div key={i} className="flex items-end gap-2">
+          <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-end">
             {cols.map(([key, label]) => (
               <div key={key} className="flex-1">
                 <label className="label">{label}</label>

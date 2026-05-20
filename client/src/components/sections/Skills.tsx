@@ -80,6 +80,32 @@ export default function Skills() {
       {!isLoading && !isError && (
         <>
           <SkillOrbit skills={orbitNames} className="mb-14 hidden sm:block" />
+          {/* P13.5 — mobile-only static stack visual (the animated orbit
+              overflows narrow viewports, so phones get a calmer medallion
+              + featured-chip cloud). Decorative; tabs below remain the
+              accessible source of truth. */}
+          <div
+            aria-hidden
+            className="mb-10 flex flex-col items-center sm:hidden"
+          >
+            <div className="grid h-20 w-20 place-items-center rounded-full border border-primary/30 bg-primary/10 text-center font-mono text-[11px] font-semibold leading-tight text-neon shadow-glow">
+              my
+              <br />
+              stack
+            </div>
+            {orbitNames.length > 0 && (
+              <div className="mt-6 flex max-w-md flex-wrap justify-center gap-2">
+                {orbitNames.slice(0, 8).map((name) => (
+                  <span
+                    key={name}
+                    className="rounded-full border border-border/70 bg-card/70 px-3 py-1 text-xs text-muted-foreground backdrop-blur"
+                  >
+                    {name}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
           <div className="mb-10 flex flex-wrap gap-2">
             {available.map((g) => {
               const on = g.key === activeKey;
@@ -133,7 +159,7 @@ export default function Skills() {
                   <span className="text-sm font-medium text-foreground">
                     {s.name}
                   </span>
-                  <span className="ml-2 font-mono text-[11px] text-muted-foreground/0 transition-colors group-hover:text-neon">
+                  <span className="ml-2 font-mono text-[11px] text-muted-foreground/60 transition-colors group-hover:text-neon sm:text-muted-foreground/0">
                     {s.level}%
                   </span>
                 </motion.li>

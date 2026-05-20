@@ -56,20 +56,21 @@ export default function Modal({
             transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
             onClick={(e) => e.stopPropagation()}
             className={cn(
-              'my-8 w-full rounded-2xl border border-border/70 bg-card/80 shadow-glow backdrop-blur-2xl',
+              'my-4 flex max-h-[90dvh] w-full flex-col rounded-2xl border border-border/70 bg-card/80 shadow-glow backdrop-blur-2xl sm:my-8 sm:max-h-[85dvh]',
               max
             )}
           >
-            <div className="flex items-center justify-between border-b border-border/60 px-6 py-4">
+            <div className="flex shrink-0 items-center justify-between border-b border-border/60 px-4 py-4 sm:px-6">
               <h2 className="font-bold text-foreground">{title}</h2>
               <button
                 onClick={onClose}
-                className="rounded-lg p-1.5 text-muted-foreground/70 transition-colors hover:bg-card hover:text-destructive"
+                aria-label="Close"
+                className="rounded-lg p-2.5 text-muted-foreground/70 transition-colors hover:bg-card hover:text-destructive"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <div className="max-h-[70vh] overflow-y-auto p-6">{children}</div>
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6">{children}</div>
           </motion.div>
         </motion.div>
       )}

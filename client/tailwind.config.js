@@ -6,6 +6,47 @@ export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
     extend: {
+      // P13.1 — small-phone + ultrawide tiers (merge with the defaults
+      // sm/md/lg/xl/2xl; Tailwind sorts by min-width so order is correct).
+      screens: {
+        xs: '400px',
+        '3xl': '1920px',
+      },
+      /**
+       * P13.1 — fluid type scale. Display steps (2xl→7xl) interpolate
+       * MIN@360px → MAX@1280px: headings shrink to fit phones and are
+       * pixel-identical to the previous fixed Tailwind defaults at ≥1280px
+       * (desktop design 100% unchanged). Body steps (xs/sm/base/lg/xl) are
+       * intentionally left at the Tailwind defaults (legibility — no fluid
+       * body reflow). Line-heights mirror the Tailwind defaults so ≥1280px
+       * renders byte-identical.
+       */
+      fontSize: {
+        '2xl': [
+          'clamp(1.25rem, 1.152rem + 0.435vw, 1.5rem)',
+          { lineHeight: '2rem' },
+        ],
+        '3xl': [
+          'clamp(1.5rem, 1.353rem + 0.652vw, 1.875rem)',
+          { lineHeight: '2.25rem' },
+        ],
+        '4xl': [
+          'clamp(1.6875rem, 1.467rem + 0.978vw, 2.25rem)',
+          { lineHeight: '2.5rem' },
+        ],
+        '5xl': [
+          'clamp(2rem, 1.609rem + 1.739vw, 3rem)',
+          { lineHeight: '1' },
+        ],
+        '6xl': [
+          'clamp(2.375rem, 1.837rem + 2.391vw, 3.75rem)',
+          { lineHeight: '1' },
+        ],
+        '7xl': [
+          'clamp(2.75rem, 2.065rem + 3.043vw, 4.5rem)',
+          { lineHeight: '1' },
+        ],
+      },
       colors: {
         // ---- Dark Developer / Neon palette (existing — unchanged) ----
         bg: {
@@ -79,6 +120,10 @@ export default {
           '0 0 0 1px rgba(168,85,247,.18), 0 8px 40px -8px rgba(168,85,247,.4)',
         card: '0 1px 0 0 rgba(255,255,255,.04) inset, 0 12px 40px -16px rgba(0,0,0,.8)',
         glow: '0 0 60px -12px hsl(var(--ring) / 0.55)',
+        // P13.5 — theme-aware lifted-card glow (hairline + directional drop).
+        // Used by .glass-hover + GlassCard interactive.
+        'neon-glow':
+          '0 0 0 1px hsl(var(--primary) / 0.18), 0 28px 60px -20px hsl(var(--primary) / 0.4)',
       },
       backgroundImage: {
         grid: 'linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px)',
