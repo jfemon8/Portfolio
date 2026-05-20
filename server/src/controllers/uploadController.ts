@@ -125,35 +125,104 @@ export const proxyFileHandler = (
     );
     const filename = downloadName || lastSeg;
 
-    https
-      .get(rawUrl, (upstream) => {
-        if (!upstream.statusCode || upstream.statusCode >= 400) {
-          upstream.resume();
-          return next(
-            new ApiError(upstream.statusCode || 502, 'Upstream fetch failed')
+    // Extract publicId + resource/delivery type from the URL so we can ask
+    // Cloudinary's admin API for a signed download link.
+    //
+    // Cloudinary blocks bare delivery of `raw` PDF / ZIP assets by default
+    // (security policy: "Allow PDF and ZIP files delivery" is OFF) — those
+    // public `res.cloudinary.com` URLs return 401. The fix is to fetch the
+    // file via Cloudinary's admin endpoint instead, which authenticates
+    // with our API key/secret and bypasses the delivery restriction.
+    //
+    // URL shape: /{cloud}/{resource_type}/{type}/[v{version}/]{publicId…}
+    //   e.g. /dlggmm4a0/raw/upload/v1779294586/portfolio/resume/file.pdf
+    const segments = parsed.pathname.split('/').filter(Boolean);
+    segments.shift(); // cloud
+    const resourceType = segments.shift() ?? 'raw';
+    const deliveryType = segments.shift() ?? 'upload';
+    if (segments[0] && /^v\d+$/.test(segments[0])) segments.shift();
+    const publicIdWithExt = segments.join('/');
+
+    if (!publicIdWithExt) {
+      return next(ApiError.badRequest('Unrecognized Cloudinary URL'));
+    }
+    if (!env.cloudinary.configured) {
+      return next(
+        ApiError.badRequest('Cloudinary is not configured on the server.')
+      );
+    }
+
+    // `private_download_url` returns a signed `api.cloudinary.com/v1_1/{cloud}/
+    // {resource_type}/download?...&api_key=...&signature=...` URL. The admin
+    // endpoint serves the file authenticated, regardless of the public
+    // PDF/ZIP delivery policy.
+    //
+    // IMPORTANT: this portfolio's resume uploader appends `.pdf` directly
+    // to the Cloudinary `public_id` so the CDN URL ends in `.pdf`. So the
+    // stored public_id is e.g. `portfolio/resume/resume_xxx-1234.pdf`
+    // (extension INCLUDED). When asking the admin API for a signed
+    // download URL we must pass that EXACT public_id and leave `format`
+    // empty — splitting on the last dot and passing format='pdf' would
+    // query Cloudinary for a different (non-existent) public_id and 404.
+    const upstreamUrl = cloudinary.utils.private_download_url(
+      publicIdWithExt,
+      '',
+      {
+        resource_type: resourceType,
+        type: deliveryType,
+        expires_at: Math.floor(Date.now() / 1000) + 60,
+      }
+    );
+
+    // Cloudinary's admin download endpoint sometimes responds with a 302
+    // redirect to the actual file location — follow up to 3 hops. Direct
+    // hits also work and are taken on the first iteration.
+    const fetchUpstream = (urlToFetch: string, redirectsLeft: number): void => {
+      https
+        .get(urlToFetch, (upstream) => {
+          const status = upstream.statusCode ?? 0;
+          if (
+            status >= 300 &&
+            status < 400 &&
+            upstream.headers.location &&
+            redirectsLeft > 0
+          ) {
+            upstream.resume();
+            const nextUrl = new URL(
+              upstream.headers.location,
+              urlToFetch
+            ).toString();
+            return fetchUpstream(nextUrl, redirectsLeft - 1);
+          }
+          if (status >= 400) {
+            upstream.resume();
+            console.error('[upload/proxy] Upstream', status, 'for', urlToFetch);
+            return next(new ApiError(status, 'Upstream fetch failed'));
+          }
+
+          res.setHeader('Content-Type', mime);
+          if (upstream.headers['content-length']) {
+            res.setHeader('Content-Length', upstream.headers['content-length']);
+          }
+          const disposition = inline ? 'inline' : 'attachment';
+          // Both `filename` (legacy) and `filename*` (RFC 5987) for unicode.
+          const encoded = encodeURIComponent(filename);
+          res.setHeader(
+            'Content-Disposition',
+            `${disposition}; filename="${filename.replace(/"/g, '')}"; filename*=UTF-8''${encoded}`
           );
-        }
+          // Cloudinary URLs are versioned (immutable) — cache for an hour.
+          res.setHeader('Cache-Control', 'public, max-age=3600');
 
-        res.setHeader('Content-Type', mime);
-        if (upstream.headers['content-length']) {
-          res.setHeader('Content-Length', upstream.headers['content-length']);
-        }
-        const disposition = inline ? 'inline' : 'attachment';
-        // Both `filename` (legacy) and `filename*` (RFC 5987) for unicode.
-        const encoded = encodeURIComponent(filename);
-        res.setHeader(
-          'Content-Disposition',
-          `${disposition}; filename="${filename.replace(/"/g, '')}"; filename*=UTF-8''${encoded}`
-        );
-        // Cloudinary URLs are versioned (immutable) — cache for an hour.
-        res.setHeader('Cache-Control', 'public, max-age=3600');
+          upstream.pipe(res);
+        })
+        .on('error', (err) => {
+          console.error('[upload/proxy] Upstream error:', err);
+          next(new ApiError(502, 'Upstream fetch failed'));
+        });
+    };
 
-        upstream.pipe(res);
-      })
-      .on('error', (err) => {
-        console.error('[upload/proxy] Upstream error:', err);
-        next(new ApiError(502, 'Upstream fetch failed'));
-      });
+    fetchUpstream(upstreamUrl, 3);
   } catch (err) {
     next(err);
   }

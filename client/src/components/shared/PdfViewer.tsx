@@ -66,13 +66,26 @@ export default function PdfViewer({
   // `Content-Disposition` filename. Strategy adopted from RDSWA.
   const displayName =
     fileName || url.split('/').pop()?.split('?')[0] || 'document.pdf';
+
+  // The toolbar shows `displayName` (e.g. "Resume" reads cleaner than
+  // "Resume.pdf"), but the DOWNLOAD filename must keep an extension —
+  // otherwise the browser saves it as `Resume` with no ext, the OS can't
+  // identify the file type, and opening fails. Derive: keep displayName
+  // if it already has an extension; otherwise inherit the URL's
+  // extension (falling back to `.pdf` since this viewer is PDF-only).
+  const urlExtMatch = url.match(/\.([a-z0-9]{1,8})(?:$|\?)/i);
+  const urlExt = urlExtMatch ? `.${urlExtMatch[1]}` : '.pdf';
+  const downloadName = /\.[a-z0-9]{1,8}$/i.test(displayName)
+    ? displayName
+    : `${displayName}${urlExt}`;
+
   const viewUrl = useMemo(
-    () => proxyFileUrl(url, displayName, true),
-    [url, displayName]
+    () => proxyFileUrl(url, downloadName, true),
+    [url, downloadName]
   );
   const downloadHref = useMemo(
-    () => proxyFileUrl(url, displayName, false),
-    [url, displayName]
+    () => proxyFileUrl(url, downloadName, false),
+    [url, downloadName]
   );
 
   // ── Container width tracking ──
@@ -382,7 +395,7 @@ export default function PdfViewer({
           )}
           <a
             href={downloadHref}
-            download={fileName || 'document.pdf'}
+            download={downloadName}
             className="rounded-lg p-1.5 text-foreground hover:bg-accent sm:p-2"
             aria-label="Download PDF"
             title="Download"
