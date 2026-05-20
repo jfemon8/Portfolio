@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { Plus, Pencil, Trash2, Eye, Globe, FileEdit } from 'lucide-react';
 import { api } from '@/lib/api';
 import PageHeader from '@/components/admin/PageHeader';
+import { useConfirm } from '@/components/admin/ConfirmModal';
 import GlassCard from '@/components/shared/GlassCard';
 import { Button } from '@/components/ui/button';
 import { Spinner, ErrorState, EmptyState } from '@/components/ui/States';
@@ -12,6 +13,7 @@ import type { BlogPostDoc, BlogStatus, ListResponse } from '@/types';
 
 export default function BlogManager() {
   const qc = useQueryClient();
+  const confirm = useConfirm();
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['blog', 'admin'],
     queryFn: async () =>
@@ -122,9 +124,15 @@ export default function BlogManager() {
                 <Pencil className="h-4 w-4" />
               </Link>
               <button
-                onClick={() =>
-                  window.confirm(`Delete "${p.title}"?`) && del.mutate(p._id)
-                }
+                onClick={async () => {
+                  const ok = await confirm({
+                    title: 'Delete post?',
+                    message: `"${p.title}" will be permanently removed. This cannot be undone.`,
+                    confirmLabel: 'Delete',
+                    variant: 'danger',
+                  });
+                  if (ok) del.mutate(p._id);
+                }}
                 title="Delete"
                 className="rounded-lg border border-border/70 p-2 text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
               >

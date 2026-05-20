@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import PageHeader from '@/components/admin/PageHeader';
+import { useConfirm } from '@/components/admin/ConfirmModal';
 import GlassCard from '@/components/shared/GlassCard';
 import { Button } from '@/components/ui/button';
 import { Spinner, EmptyState } from '@/components/ui/States';
@@ -29,6 +30,7 @@ const filters: { k: FilterKey; l: string }[] = [
 
 export default function MessagesManager() {
   const qc = useQueryClient();
+  const confirm = useConfirm();
   const [filter, setFilter] = useState<FilterKey>('all');
   const [active, setActive] = useState<MessageDoc | null>(null);
 
@@ -204,10 +206,15 @@ export default function MessagesManager() {
                   <Archive className="h-4 w-4" />
                 </button>
                 <button
-                  onClick={() =>
-                    window.confirm('Delete this message?') &&
-                    del.mutate(active._id)
-                  }
+                  onClick={async () => {
+                    const ok = await confirm({
+                      title: 'Delete message?',
+                      message: `Message from ${active.name} will be permanently removed. This cannot be undone.`,
+                      confirmLabel: 'Delete',
+                      variant: 'danger',
+                    });
+                    if (ok) del.mutate(active._id);
+                  }}
                   className="rounded-lg border border-border/70 p-2.5 text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
                   title="Delete"
                 >

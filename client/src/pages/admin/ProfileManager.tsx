@@ -1,12 +1,22 @@
 import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { Plus, Trash2, Save, FileUp, Loader2 } from 'lucide-react';
+import {
+  Plus,
+  Trash2,
+  Save,
+  FileUp,
+  Loader2,
+  Eye,
+  Download,
+} from 'lucide-react';
 import { api } from '@/lib/api';
+import { proxyFileUrl } from '@/lib/fileProxy';
 import PageHeader from '@/components/admin/PageHeader';
 import ImageUpload from '@/components/admin/ImageUpload';
 import Toggle from '@/components/ui/Toggle';
 import GlassCard from '@/components/shared/GlassCard';
+import PdfPreviewModal from '@/components/shared/PdfPreviewModal';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/States';
 import type { ApiError, ItemResponse, ProfileDoc, Social } from '@/types';
@@ -23,6 +33,7 @@ export default function ProfileManager() {
   });
   const [f, setF] = useState<ProfileForm | null>(null);
   const [resumeBusy, setResumeBusy] = useState(false);
+  const [resumeViewerOpen, setResumeViewerOpen] = useState(false);
 
   useEffect(() => {
     if (data?.data) setF(data.data);
@@ -246,6 +257,58 @@ export default function ProfileManager() {
             </div>
           </div>
 
+          {/* Languages — inline within Basics, immediately under Stats. */}
+          <div className="border-t border-border/60 pt-4">
+            <div className="mb-3 flex items-center justify-between">
+              <label className="label mb-0">Languages</label>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => addArr('languages', { name: '', level: '' })}
+                className="text-xs"
+              >
+                <Plus className="h-4 w-4" /> Add
+              </Button>
+            </div>
+            <div className="space-y-2">
+              {(f.languages ?? []).map((l, i) => (
+                <div
+                  key={i}
+                  className="flex flex-col gap-2 sm:flex-row sm:items-center"
+                >
+                  <input
+                    className="input flex-1"
+                    placeholder="Language (e.g. English)"
+                    value={l.name}
+                    onChange={(e) =>
+                      setArr('languages', i, 'name', e.target.value)
+                    }
+                  />
+                  <input
+                    className="input flex-1"
+                    placeholder="Level (e.g. Fluent, Native)"
+                    value={l.level}
+                    onChange={(e) =>
+                      setArr('languages', i, 'level', e.target.value)
+                    }
+                  />
+                  <button
+                    type="button"
+                    onClick={() => delArr('languages', i)}
+                    aria-label="Remove language"
+                    className="shrink-0 self-end rounded-lg border border-border p-2.5 text-muted-foreground/70 transition-colors hover:border-destructive/40 hover:text-destructive sm:self-auto"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              ))}
+              {(f.languages ?? []).length === 0 && (
+                <p className="text-xs text-muted-foreground/70">None yet.</p>
+              )}
+            </div>
+          </div>
+
           <div className="flex items-center gap-3 border-t border-border/60 pt-4">
             <Toggle
               checked={f.available}
@@ -273,30 +336,27 @@ export default function ProfileManager() {
             />
             <div className="space-y-2">
               <label className="label">Resume (PDF)</label>
-              {/* In-browser PDF viewer — modern browsers render PDFs in
-                  iframes natively. After the server's `.pdf` public-id
-                  fix, the Cloudinary URL serves with `application/pdf`
-                  Content-Type so this preview + downloads both work. */}
+              {/* When a resume exists: two clear action buttons.
+                  – View opens a modal with an in-browser PDF viewer.
+                  – Download forces a file download via Cloudinary's
+                    `fl_attachment` flag (URL transform, no extra API).
+                  When empty: only the Upload button below shows. */}
               {f.resumeUrl && (
-                <div className="overflow-hidden rounded-xl border border-border bg-card">
-                  <iframe
-                    src={f.resumeUrl}
-                    title="Resume preview"
-                    className="block h-72 w-full"
-                  />
-                  <div className="flex items-center justify-between gap-2 border-t border-border bg-muted/40 px-3 py-2 text-xs">
-                    <span className="truncate font-mono text-muted-foreground/70">
-                      {f.resumeUrl.split('/').pop()}
-                    </span>
-                    <a
-                      href={f.resumeUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="shrink-0 font-semibold text-primary hover:underline"
-                    >
-                      Open in new tab ↗
-                    </a>
-                  </div>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => setResumeViewerOpen(true)}
+                  >
+                    <Eye className="h-4 w-4" /> View Resume
+                  </Button>
+                  <a
+                    href={proxyFileUrl(f.resumeUrl, 'resume.pdf', false)}
+                    className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border bg-muted/40 px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-primary/50 hover:bg-muted/60 hover:text-primary"
+                  >
+                    <Download className="h-4 w-4" /> Download Resume
+                  </a>
                 </div>
               )}
               <label className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary/50 hover:bg-muted/60 hover:text-primary">
@@ -389,20 +449,21 @@ export default function ProfileManager() {
               )}
             </div>
           </GlassCard>
-
-          <ArrayEditor
-            title="Languages"
-            items={f.languages as unknown as Record<string, string>[]}
-            cols={[
-              ['name', 'Language'],
-              ['level', 'Level'],
-            ]}
-            onChange={(i, k, v) => setArr('languages', i, k, v)}
-            onAdd={() => addArr('languages', { name: '', level: '' })}
-            onDelete={(i) => delArr('languages', i)}
-          />
         </div>
       </div>
+
+      {/* Resume preview — react-pdf-backed viewer in an animated overlay.
+          Lazy-loaded, so the ~600 KB pdfjs worker only ships when an admin
+          actually clicks "View Resume". Replaces the prior native iframe
+          which lacked zoom, pagination, fullscreen, and pinch-to-zoom. */}
+      <PdfPreviewModal
+        target={
+          resumeViewerOpen && f.resumeUrl
+            ? { fileUrl: f.resumeUrl, title: 'Resume' }
+            : null
+        }
+        onClose={() => setResumeViewerOpen(false)}
+      />
 
       {/* Sticky-bottom Save bar — replaces the previous PageHeader-action
           button so the save affordance is always within thumb-reach as the
@@ -418,66 +479,5 @@ export default function ProfileManager() {
         </Button>
       </div>
     </form>
-  );
-}
-
-interface ArrayEditorProps {
-  title: string;
-  items: Record<string, string>[];
-  cols: [string, string][];
-  onChange: (idx: number, key: string, value: string) => void;
-  onAdd: () => void;
-  onDelete: (idx: number) => void;
-}
-
-function ArrayEditor({
-  title,
-  items,
-  cols,
-  onChange,
-  onAdd,
-  onDelete,
-}: ArrayEditorProps) {
-  return (
-    <GlassCard className="p-6">
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-semibold text-neon">{title}</h3>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={onAdd}
-          className="text-xs"
-        >
-          <Plus className="h-4 w-4" /> Add
-        </Button>
-      </div>
-      <div className="space-y-3">
-        {items.map((it, i) => (
-          <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-end">
-            {cols.map(([key, label]) => (
-              <div key={key} className="flex-1">
-                <label className="label">{label}</label>
-                <input
-                  className="input"
-                  value={it[key] || ''}
-                  onChange={(e) => onChange(i, key, e.target.value)}
-                />
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={() => onDelete(i)}
-              className="mb-0.5 rounded-lg border border-border p-2.5 text-muted-foreground/70 transition-colors hover:border-destructive/40 hover:text-destructive"
-            >
-              <Trash2 className="h-4 w-4" />
-            </button>
-          </div>
-        ))}
-        {items.length === 0 && (
-          <p className="text-xs text-muted-foreground/70">None yet.</p>
-        )}
-      </div>
-    </GlassCard>
   );
 }

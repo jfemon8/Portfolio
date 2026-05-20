@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import { ChevronLeft, ChevronRight, Trash2, Copy } from 'lucide-react';
 import { api } from '@/lib/api';
 import PageHeader from '@/components/admin/PageHeader';
+import { useConfirm } from '@/components/admin/ConfirmModal';
 import GlassCard from '@/components/shared/GlassCard';
 import SmartImage from '@/components/shared/SmartImage';
 import { Button } from '@/components/ui/button';
@@ -36,6 +37,7 @@ const fileSize = (b: number): string =>
  */
 export default function MediaLibrary() {
   const qc = useQueryClient();
+  const confirm = useConfirm();
   const [folder, setFolder] = useState('');
   const [stack, setStack] = useState<(string | undefined)[]>([undefined]);
   const [pi, setPi] = useState(0);
@@ -147,10 +149,15 @@ export default function MediaLibrary() {
                   <Copy className="mx-auto h-4 w-4" />
                 </button>
                 <button
-                  onClick={() =>
-                    window.confirm(`Delete ${a.publicId}?`) &&
-                    del.mutate(a.publicId)
-                  }
+                  onClick={async () => {
+                    const ok = await confirm({
+                      title: 'Delete asset?',
+                      message: `"${a.publicId}" will be permanently removed from Cloudinary. This cannot be undone.`,
+                      confirmLabel: 'Delete',
+                      variant: 'danger',
+                    });
+                    if (ok) del.mutate(a.publicId);
+                  }}
                   title="Delete"
                   className="flex-1 rounded-lg border border-border/70 p-2.5 text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
                 >

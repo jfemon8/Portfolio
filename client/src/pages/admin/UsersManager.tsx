@@ -6,6 +6,7 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import PageHeader from '@/components/admin/PageHeader';
 import Modal from '@/components/admin/Modal';
+import { useConfirm } from '@/components/admin/ConfirmModal';
 import GlassCard from '@/components/shared/GlassCard';
 import { Button } from '@/components/ui/button';
 import { Spinner, ErrorState, EmptyState } from '@/components/ui/States';
@@ -31,6 +32,7 @@ const empty: FormState = {
 
 export default function UsersManager() {
   const qc = useQueryClient();
+  const confirm = useConfirm();
   const { user: me } = useAuth();
   const [form, setForm] = useState<FormState | null>(null);
 
@@ -173,9 +175,16 @@ export default function UsersManager() {
                 </button>
                 <button
                   disabled={locked || isSelf}
-                  onClick={() =>
-                    window.confirm(`Delete ${u.email}?`) && del.mutate(u._id)
-                  }
+                  onClick={async () => {
+                    const ok = await confirm({
+                      title: 'Delete user?',
+                      message: `${u.email} will be permanently removed and lose all access. Type the email to confirm.`,
+                      confirmLabel: 'Delete user',
+                      variant: 'danger',
+                      requireTypeToConfirm: u.email,
+                    });
+                    if (ok) del.mutate(u._id);
+                  }}
                   title={
                     locked
                       ? 'Protected account'

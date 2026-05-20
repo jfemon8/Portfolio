@@ -8,6 +8,7 @@ import type { WithId } from '@/types';
 import PageHeader from './PageHeader';
 import Modal from './Modal';
 import Field, { type FieldSchema, type FormState } from './Field';
+import { useConfirm } from './ConfirmModal';
 import { getByPath, setByPath } from '@/lib/object';
 
 export interface ResourceConfig<T extends WithId> {
@@ -31,6 +32,7 @@ export default function ResourceManager<T extends WithId>({
 }) {
   const { items, isLoading, isError, refetch, create, update, remove } =
     useCrud<T>(config.base, config.queryKey ?? config.base);
+  const confirm = useConfirm();
   const [editing, setEditing] = useState<T | Record<string, never> | null>(
     null
   );
@@ -71,9 +73,14 @@ export default function ResourceManager<T extends WithId>({
   };
 
   const del = async (item: T): Promise<void> => {
-    if (window.confirm(`Delete "${config.labelOf?.(item) ?? 'this item'}"?`)) {
-      await remove.mutateAsync(item._id);
-    }
+    const label = config.labelOf?.(item) ?? 'this item';
+    const ok = await confirm({
+      title: `Delete ${config.singular}?`,
+      message: `"${label}" will be permanently removed. This cannot be undone.`,
+      confirmLabel: 'Delete',
+      variant: 'danger',
+    });
+    if (ok) await remove.mutateAsync(item._id);
   };
 
   return (

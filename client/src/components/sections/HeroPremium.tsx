@@ -11,6 +11,7 @@ import GlassCard from '@/components/shared/GlassCard';
 import SmartImage from '@/components/shared/SmartImage';
 import { Button } from '@/components/ui/button';
 import { SocialIcon } from '@/lib/socialIcon';
+import { proxyFileUrl } from '@/lib/fileProxy';
 import type { ProfileDoc } from '@/types';
 
 interface HeroPremiumProps {
@@ -137,9 +138,8 @@ export default function HeroPremium({
               {profile?.resumeUrl && (
                 <Magnetic strength={0.4}>
                   <a
-                    href={profile.resumeUrl}
-                    target="_blank"
-                    rel="noreferrer"
+                    href={proxyFileUrl(profile.resumeUrl, 'resume.pdf', false)}
+                    download
                     onClick={() => track('resume_download', '/', 'hero')}
                   >
                     <Button size="lg" variant="outline">
