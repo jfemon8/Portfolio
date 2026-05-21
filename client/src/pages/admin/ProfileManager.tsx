@@ -32,11 +32,14 @@ export default function ProfileManager() {
       (await api.get<ItemResponse<ProfileDoc>>('/profile')).data,
   });
   const [f, setF] = useState<ProfileForm | null>(null);
+  const [rolesText, setRolesText] = useState('');
   const [resumeBusy, setResumeBusy] = useState(false);
   const [resumeViewerOpen, setResumeViewerOpen] = useState(false);
 
   useEffect(() => {
-    if (data?.data) setF(data.data);
+    if (!data?.data) return;
+    setF(data.data);
+    setRolesText((data.data.roles ?? []).join('\n'));
   }, [data]);
 
   const save = useMutation({
@@ -139,7 +142,13 @@ export default function ProfileManager() {
 
   const submit = (e: React.FormEvent): void => {
     e.preventDefault();
-    save.mutate(f);
+    save.mutate({
+      ...f,
+      roles: rolesText
+        .split('\n')
+        .map((s) => s.trim())
+        .filter(Boolean),
+    });
   };
 
   const basics: [keyof ProfileForm, string][] = [
@@ -190,16 +199,8 @@ export default function ProfileManager() {
             <textarea
               rows={4}
               className="input resize-y font-mono text-xs"
-              value={f.roles.join('\n')}
-              onChange={(e) =>
-                set(
-                  'roles',
-                  e.target.value
-                    .split('\n')
-                    .map((s) => s.trim())
-                    .filter(Boolean)
-                )
-              }
+              value={rolesText}
+              onChange={(e) => setRolesText(e.target.value)}
             />
           </div>
 
