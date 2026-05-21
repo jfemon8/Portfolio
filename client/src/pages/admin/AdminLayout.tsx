@@ -156,11 +156,19 @@ export default function AdminLayout() {
             emon<span className="text-muted-foreground/60">/admin</span>
           </Link>
 
+          {/* All three icon affordances share the same `h-10 w-10` square
+              footprint on mobile so they read as a unified row. The Search
+              button only expands to a labelled chip on sm+ where there's
+              room for "Search…" + ⌘K hint. View Live Site is no longer
+              hidden on mobile — it sits next to the theme toggle. Icons
+              all standardised to `h-5 w-5` for visual consistency. */}
           <button
             onClick={toggleCommand}
-            className="ml-auto flex items-center gap-2 rounded-xl border border-border bg-muted/50 px-3 py-2 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+            aria-label="Search"
+            title="Search"
+            className="ml-auto inline-flex h-10 w-10 items-center justify-center gap-2 rounded-xl border border-border bg-muted/50 text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground sm:h-10 sm:w-auto sm:px-3 sm:text-sm"
           >
-            <Command className="h-3.5 w-3.5" />
+            <Command className="h-5 w-5 sm:h-3.5 sm:w-3.5" />
             <span className="hidden sm:inline">Search…</span>
             <kbd className="hidden rounded border border-border px-1.5 font-mono text-[10px] sm:inline">
               ⌘K
@@ -171,7 +179,7 @@ export default function AdminLayout() {
             href="/"
             target="_blank"
             rel="noreferrer"
-            className="hidden rounded-xl border border-border bg-muted/50 p-2 text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary sm:block"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-muted/50 text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary"
             title="View live site"
             aria-label="View live site"
           >
