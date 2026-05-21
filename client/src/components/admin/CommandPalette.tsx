@@ -22,7 +22,10 @@ export default function CommandPalette({ items }: { items: CommandItem[] }) {
   const navigate = useNavigate();
   const reduce = useReducedMotion();
   const [q, setQ] = useState('');
-  const [active, setActive] = useState(0);
+  // `active = -1` until the user types or arrow-navigates — avoids the
+  // "Dashboard auto-selected the moment I open ⌘K" perception. Enter
+  // still works because typing or arrowing sets active to 0+.
+  const [active, setActive] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const results = useMemo(() => {
@@ -39,7 +42,7 @@ export default function CommandPalette({ items }: { items: CommandItem[] }) {
   useEffect(() => {
     if (open) {
       setQ('');
-      setActive(0);
+      setActive(-1);
       setTimeout(() => inputRef.current?.focus(), 40);
       document.body.style.overflow = 'hidden';
     }
@@ -48,7 +51,11 @@ export default function CommandPalette({ items }: { items: CommandItem[] }) {
     };
   }, [open]);
 
-  useEffect(() => setActive(0), [q]);
+  // Once the user types, promote the first match to active so Enter
+  // selects it. Clearing the field falls back to "no selection".
+  useEffect(() => {
+    setActive(q.trim() ? 0 : -1);
+  }, [q]);
 
   if (!open) return null;
 
@@ -89,14 +96,20 @@ export default function CommandPalette({ items }: { items: CommandItem[] }) {
           onKeyDown={onKey}
           className="w-full max-w-xl overflow-hidden rounded-2xl border border-border/70 bg-card/80 shadow-glow backdrop-blur-2xl"
         >
-          <div className="flex items-center gap-3 border-b border-border/60 px-4">
+          {/* `focus-within:border-primary` gives a clean focus cue without
+              needing the global 4-px-out box-shadow ring (which leaks
+              above the modal because the card has `backdrop-blur-2xl`,
+              creating a stacking context that doesn't clip child box
+              shadows). The input itself has `focus-visible:ring-0` to
+              suppress that global ring. */}
+          <div className="flex items-center gap-3 border-b border-border/60 px-4 transition-colors focus-within:border-primary">
             <Search className="h-4 w-4 text-muted-foreground/70" />
             <input
               ref={inputRef}
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Jump to…"
-              className="w-full bg-transparent py-4 text-sm text-foreground outline-none placeholder:text-muted-foreground/60"
+              className="w-full bg-transparent py-4 text-sm text-foreground outline-none placeholder:text-muted-foreground/60 focus-visible:ring-0 focus-visible:ring-offset-0"
             />
             <kbd className="rounded border border-border/60 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground/70">
               ESC
