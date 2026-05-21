@@ -31,6 +31,7 @@ export default function BlogEditor() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [f, setF] = useState<BlogForm>(empty);
+  const [tagsText, setTagsText] = useState('');
 
   const { data, isLoading } = useQuery({
     queryKey: ['blog', 'admin', id],
@@ -40,7 +41,9 @@ export default function BlogEditor() {
   });
 
   useEffect(() => {
-    if (data?.data) setF(data.data);
+    if (!data?.data) return;
+    setF(data.data);
+    setTagsText((data.data.tags ?? []).join(','));
   }, [data]);
 
   const save = useMutation({
@@ -56,6 +59,16 @@ export default function BlogEditor() {
     onError: (e) => toast.error((e as ApiError).message || 'Save failed'),
   });
 
+  const submit = (): void => {
+    save.mutate({
+      ...f,
+      tags: tagsText
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean),
+    });
+  };
+
   if (id && isLoading) return <Spinner />;
 
   const set = <K extends keyof BlogForm>(k: K, v: BlogForm[K]): void =>
@@ -70,10 +83,7 @@ export default function BlogEditor() {
         >
           <ArrowLeft className="h-4 w-4" /> Back to posts
         </button>
-        <Button
-          onClick={() => save.mutate(f)}
-          disabled={save.isPending || !f.title}
-        >
+        <Button onClick={submit} disabled={save.isPending || !f.title}>
           {save.isPending ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
@@ -167,16 +177,8 @@ export default function BlogEditor() {
               <label className="label">Tags (comma separated)</label>
               <input
                 className="input"
-                value={(f.tags ?? []).join(', ')}
-                onChange={(e) =>
-                  set(
-                    'tags',
-                    e.target.value
-                      .split(',')
-                      .map((s) => s.trim())
-                      .filter(Boolean)
-                  )
-                }
+                value={tagsText}
+                onChange={(e) => setTagsText(e.target.value)}
               />
             </div>
             <div className="flex items-center gap-3">

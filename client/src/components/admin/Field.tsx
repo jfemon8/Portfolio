@@ -53,6 +53,8 @@ export default function Field({ field, value, form, onChange }: FieldProps) {
   } = field;
 
   const set = (v: unknown) => onChange(name, v);
+  const labelCase = (text: string): string =>
+    text ? text.charAt(0).toUpperCase() + text.slice(1) : text;
 
   if (type === 'image') {
     return (
@@ -112,7 +114,7 @@ export default function Field({ field, value, form, onChange }: FieldProps) {
         >
           {options?.map((o) => (
             <option key={o.value} value={o.value}>
-              {o.label}
+              {labelCase(o.label)}
             </option>
           ))}
         </select>
@@ -134,30 +136,16 @@ export default function Field({ field, value, form, onChange }: FieldProps) {
           className="input resize-y font-mono text-xs"
           placeholder={placeholder || 'One item per line'}
           value={asArray.join('\n')}
-          onChange={(e) =>
-            set(
-              e.target.value
-                .split('\n')
-                .map((s) => s.trim())
-                .filter(Boolean)
-            )
-          }
+          onChange={(e) => set(e.target.value.split('\n'))}
         />
       )}
 
       {type === 'tags' && (
         <input
           className="input"
-          placeholder={placeholder || 'comma, separated, values'}
-          value={asArray.join(', ')}
-          onChange={(e) =>
-            set(
-              e.target.value
-                .split(',')
-                .map((s) => s.trim())
-                .filter(Boolean)
-            )
-          }
+          placeholder={placeholder || 'comma,separated,values'}
+          value={asArray.join(',')}
+          onChange={(e) => set(e.target.value.split(','))}
         />
       )}
 

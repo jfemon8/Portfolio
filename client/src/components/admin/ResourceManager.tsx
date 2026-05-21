@@ -57,6 +57,18 @@ export default function ResourceManager<T extends WithId>({
   const save = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
     const payload: FormState = { ...form };
+    for (const field of config.fields) {
+      if (field.type !== 'list' && field.type !== 'tags') continue;
+      const current = getByPath(payload, field.name);
+      if (!Array.isArray(current)) continue;
+      setByPath(
+        payload,
+        field.name,
+        current
+          .map((item) => (typeof item === 'string' ? item.trim() : ''))
+          .filter(Boolean)
+      );
+    }
     delete payload._id;
     delete payload.__v;
     delete payload.createdAt;

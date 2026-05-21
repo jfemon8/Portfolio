@@ -43,10 +43,13 @@ export default function SettingsManager() {
   const qc = useQueryClient();
   const { data: seoRes } = useSeoSettings();
   const [seo, setSeo] = useState<SeoSettings | null>(null);
+  const [keywordsText, setKeywordsText] = useState('');
   const [savingSeo, setSavingSeo] = useState(false);
 
   useEffect(() => {
-    if (seoRes?.data) setSeo(seoRes.data);
+    if (!seoRes?.data) return;
+    setSeo(seoRes.data);
+    setKeywordsText((seoRes.data.keywords ?? []).join(','));
   }, [seoRes]);
 
   const saveSeo = async (): Promise<void> => {
@@ -59,7 +62,10 @@ export default function SettingsManager() {
         siteUrl: seo.siteUrl,
         metaTitle: seo.metaTitle,
         metaDescription: seo.metaDescription,
-        keywords: seo.keywords,
+        keywords: keywordsText
+          .split(',')
+          .map((k) => k.trim())
+          .filter(Boolean),
         ogImage: seo.ogImage,
         ogImagePublicId: seo.ogImagePublicId,
         twitterHandle: seo.twitterHandle,
@@ -329,17 +335,9 @@ export default function SettingsManager() {
                   <label className="label">Keywords (comma separated)</label>
                   <input
                     className="input"
-                    value={seo.keywords.join(', ')}
+                    value={keywordsText}
                     placeholder="react, mern, portfolio"
-                    onChange={(e) =>
-                      setSeo({
-                        ...seo,
-                        keywords: e.target.value
-                          .split(',')
-                          .map((k) => k.trim())
-                          .filter(Boolean),
-                      })
-                    }
+                    onChange={(e) => setKeywordsText(e.target.value)}
                   />
                 </div>
                 <div>
