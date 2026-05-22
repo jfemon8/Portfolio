@@ -32,6 +32,7 @@ const config: ResourceConfig<EducationDoc> = {
       name: 'description',
       label: 'Description',
       type: 'textarea',
+      editor: 'richtext',
       full: true,
       rows: 3,
     },

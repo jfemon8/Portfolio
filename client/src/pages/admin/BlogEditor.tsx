@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { Save, ArrowLeft, Loader2 } from 'lucide-react';
 import { api } from '@/lib/api';
 import ImageUpload from '@/components/admin/ImageUpload';
-import MarkdownEditor from '@/components/admin/MarkdownEditor';
+import RichTextEditor from '@/components/admin/RichTextEditor';
 import Toggle from '@/components/ui/Toggle';
 import GlassCard from '@/components/shared/GlassCard';
 import { Button } from '@/components/ui/button';
@@ -116,7 +116,7 @@ export default function BlogEditor() {
           </div>
           <div>
             <label className="label">Content</label>
-            <MarkdownEditor
+            <RichTextEditor
               value={f.content ?? ''}
               onChange={(v) => set('content', v)}
             />

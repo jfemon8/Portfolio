@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 import { ArrowLeft, Calendar, Clock, Eye, Share2 } from 'lucide-react';
 import Seo from '@/components/ui/Seo';
 import { articleSchema, breadcrumbSchema } from '@/lib/structuredData';
-import Markdown from '@/components/shared/Markdown';
+import RichText from '@/components/shared/RichText';
 import SmartImage from '@/components/shared/SmartImage';
 import GlassCard from '@/components/shared/GlassCard';
 import Reveal from '@/components/motion/Reveal';
@@ -143,7 +143,7 @@ export default function BlogPostPage() {
 
         <Reveal delay={0.1}>
           <div className="mt-10">
-            <Markdown>{post.content}</Markdown>
+            <RichText html={post.content} />
           </div>
         </Reveal>
 

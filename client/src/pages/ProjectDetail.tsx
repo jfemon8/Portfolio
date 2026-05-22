@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import Seo from '@/components/ui/Seo';
 import { projectSchema, breadcrumbSchema } from '@/lib/structuredData';
-import Markdown from '@/components/shared/Markdown';
+import RichText from '@/components/shared/RichText';
 import SmartImage from '@/components/shared/SmartImage';
 import Lightbox from '@/components/shared/Lightbox';
 import GlassCard from '@/components/shared/GlassCard';
@@ -261,7 +261,7 @@ export default function ProjectDetail() {
                         </h2>
                         <span className="h-px flex-1 bg-border/60" />
                       </div>
-                      <Markdown>{cs![k]}</Markdown>
+                      <RichText html={cs![k]} />
                     </section>
                   </Reveal>
                 ))}
@@ -272,7 +272,7 @@ export default function ProjectDetail() {
           return p.description ? (
             <Reveal delay={0.12}>
               <div className="mt-10">
-                <Markdown>{p.description}</Markdown>
+                <RichText html={p.description} />
               </div>
             </Reveal>
           ) : null;
