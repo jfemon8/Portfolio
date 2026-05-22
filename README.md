@@ -43,7 +43,7 @@ role-based access control
 
 ## 👤 Author
 
-**Md Jannatul Ferdhous Emon** — Front-End / MERN Developer
+**Md Jannatul Ferdhous Emon** — Front-End Developer / Software Engineer
 
 🌐 Portfolio: [jfemon.vercel.app](https://jfemon.vercel.app)
 

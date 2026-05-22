@@ -54,10 +54,10 @@ const config: ResourceConfig<ExperienceDoc> = {
   labelOf: (i) => i.role,
   renderItem: (i) => (
     <>
-      <p className="font-semibold text-ink">
+      <p className="font-semibold text-foreground">
         {i.role} <span className="text-neon">@ {i.company}</span>
       </p>
-      <p className="text-xs text-ink-dim">
+      <p className="text-xs text-muted-foreground">
         {i.startDate} — {i.endDate} · {i.location}
       </p>
     </>
