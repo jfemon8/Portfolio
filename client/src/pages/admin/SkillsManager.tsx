@@ -2,6 +2,7 @@ import ResourceManager, {
   type ResourceConfig,
 } from '@/components/admin/ResourceManager';
 import type { SkillDoc } from '@/types';
+import { capitalizeFirst } from '@/lib/text';
 
 const config: ResourceConfig<SkillDoc> = {
   title: 'Skills',
@@ -41,8 +42,9 @@ const config: ResourceConfig<SkillDoc> = {
   labelOf: (i) => i.name,
   renderItem: (i) => (
     <>
-      <p className="font-semibold text-ink">
-        {i.name} <span className="chip ml-1 capitalize">{i.category}</span>
+      <p className="font-semibold text-foreground">
+        {i.name}{' '}
+        <span className="chip ml-1">{capitalizeFirst(i.category)}</span>
       </p>
       <div className="mt-1.5 h-1.5 w-40 overflow-hidden rounded-full bg-bg-elevated">
         <div

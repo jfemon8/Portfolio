@@ -21,6 +21,7 @@ import { Button } from '@/components/ui/button';
 import { Spinner, ErrorState } from '@/components/ui/States';
 import { useProject, useProfile } from '@/hooks/usePortfolio';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
+import { capitalizeFirst } from '@/lib/text';
 import type { CaseStudy } from '@/types';
 
 const CASE_KEYS: (keyof CaseStudy)[] = [
@@ -109,7 +110,7 @@ export default function ProjectDetail() {
 
           <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground/70">
             <span className="rounded-full border border-border/60 bg-card/60 px-3 py-1 capitalize text-muted-foreground">
-              {p.category}
+              {capitalizeFirst(p.category)}
             </span>
             {p.year && (
               <span className="flex items-center gap-1.5">
@@ -120,7 +121,8 @@ export default function ProjectDetail() {
               <Eye className="h-3.5 w-3.5" /> {p.views} {lab.unitViews}
             </span>
             <span className="flex items-center gap-1.5 capitalize text-neon">
-              <CheckCircle2 className="h-3.5 w-3.5" /> {p.status}
+              <CheckCircle2 className="h-3.5 w-3.5" />{' '}
+              {capitalizeFirst(p.status)}
             </span>
           </div>
 

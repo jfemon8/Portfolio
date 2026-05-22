@@ -40,8 +40,8 @@ const config: ResourceConfig<EducationDoc> = {
   labelOf: (i) => i.institution,
   renderItem: (i) => (
     <>
-      <p className="font-semibold text-ink">{i.institution}</p>
-      <p className="text-xs text-ink-dim">
+      <p className="font-semibold text-foreground">{i.institution}</p>
+      <p className="text-xs text-muted-foreground">
         {i.degree} {i.field && `— ${i.field}`} · {i.startYear}–{i.endYear} ·{' '}
         {i.grade}
       </p>

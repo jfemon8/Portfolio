@@ -3,6 +3,7 @@ import ResourceManager, {
   type ResourceConfig,
 } from '@/components/admin/ResourceManager';
 import type { CertificationDoc, PublicationDoc } from '@/types';
+import { capitalizeFirst } from '@/lib/text';
 
 const certConfig: ResourceConfig<CertificationDoc> = {
   title: 'Certifications & Achievements',
@@ -44,9 +45,9 @@ const certConfig: ResourceConfig<CertificationDoc> = {
   labelOf: (i) => i.title,
   renderItem: (i) => (
     <>
-      <p className="font-semibold text-ink">{i.title}</p>
-      <p className="text-xs text-ink-dim">
-        {i.issuer} · <span className="capitalize">{i.category}</span>
+      <p className="font-semibold text-foreground">{i.title}</p>
+      <p className="text-xs text-muted-foreground">
+        {i.issuer} · <span>{capitalizeFirst(i.category)}</span>
       </p>
     </>
   ),
@@ -86,8 +87,8 @@ const pubConfig: ResourceConfig<PublicationDoc> = {
   labelOf: (i) => i.title,
   renderItem: (i) => (
     <>
-      <p className="font-semibold text-ink">{i.title}</p>
-      <p className="text-xs text-ink-dim">
+      <p className="font-semibold text-foreground">{i.title}</p>
+      <p className="text-xs text-muted-foreground">
         {i.venue} {i.year && `· ${i.year}`}
       </p>
     </>

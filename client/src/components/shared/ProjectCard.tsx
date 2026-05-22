@@ -7,6 +7,7 @@ import PrefetchLink from '@/components/shared/PrefetchLink';
 import { track } from '@/lib/api';
 import { cn } from '@/lib/cn';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
+import { capitalizeFirst } from '@/lib/text';
 import type { ProjectDoc } from '@/types';
 
 interface ProjectCardProps {
@@ -74,8 +75,7 @@ export default function ProjectCard({
             </span>
           )}
           <span className="absolute left-3 top-3 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-[11px] font-medium text-muted-foreground backdrop-blur">
-            {project.category.charAt(0).toUpperCase() +
-              project.category.slice(1)}
+            {capitalizeFirst(project.category)}
           </span>
           {project.videoUrl && (
             <span className="absolute bottom-3 left-3 flex items-center gap-1 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-[11px] font-medium text-neon backdrop-blur">

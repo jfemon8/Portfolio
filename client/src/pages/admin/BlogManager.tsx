@@ -73,7 +73,7 @@ export default function BlogManager() {
                 {p.title}
                 <span
                   className={cn(
-                    'ml-2 align-middle text-[11px] capitalize',
+                    'ml-2 align-middle text-[11px]',
                     p.status === 'published'
                       ? 'text-neon'
                       : p.status === 'scheduled'
@@ -81,7 +81,7 @@ export default function BlogManager() {
                         : 'text-muted-foreground/60'
                   )}
                 >
-                  ● {p.status}
+                  ● {p.status.charAt(0).toUpperCase() + p.status.slice(1)}
                 </span>
               </p>
               <p className="text-xs text-muted-foreground/70">

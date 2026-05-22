@@ -69,9 +69,9 @@ export default {
           blue: '#38bdf8',
         },
         ink: {
-          DEFAULT: '#e7e7ee',
-          soft: '#a1a1b5',
-          dim: '#6b6b7d',
+          DEFAULT: 'hsl(var(--foreground) / <alpha-value>)',
+          soft: 'hsl(var(--muted-foreground) / <alpha-value>)',
+          dim: 'hsl(var(--muted-foreground) / 0.72)',
         },
         // ---- ShadCN/UI semantic tokens (CSS-variable driven, theme presets) ----
         border: 'hsl(var(--border) / <alpha-value>)',

@@ -2,6 +2,7 @@ import ResourceManager, {
   type ResourceConfig,
 } from '@/components/admin/ResourceManager';
 import type { ProjectDoc } from '@/types';
+import { capitalizeFirst } from '@/lib/text';
 
 const config: ResourceConfig<ProjectDoc> = {
   title: 'Projects',
@@ -196,11 +197,11 @@ const config: ResourceConfig<ProjectDoc> = {
         />
       )}
       <div>
-        <p className="font-semibold text-ink">
+        <p className="font-semibold text-foreground">
           {i.title} {i.featured && <span className="text-xs text-neon">★</span>}
         </p>
-        <p className="text-xs text-ink-dim">
-          {i.category} · {i.views} views · /{i.slug}
+        <p className="text-xs text-muted-foreground">
+          {capitalizeFirst(i.category)} · {i.views} views · /{i.slug}
         </p>
       </div>
     </div>
