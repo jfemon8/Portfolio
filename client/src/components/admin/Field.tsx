@@ -1,5 +1,6 @@
 import { Plus, Trash2 } from 'lucide-react';
 import ImageUpload from './ImageUpload';
+import MarkdownEditor from './MarkdownEditor';
 import Toggle from '@/components/ui/Toggle';
 
 export type FieldType =
@@ -20,6 +21,7 @@ export interface FieldSchema {
   name: string;
   label: string;
   type?: FieldType;
+  editor?: 'plain' | 'markdown';
   options?: { value: string; label: string }[];
   placeholder?: string;
   help?: string;
@@ -96,15 +98,23 @@ export default function Field({ field, value, form, onChange }: FieldProps) {
     <div>
       <label className="label">{label}</label>
 
-      {type === 'textarea' && (
-        <textarea
-          rows={rows || 4}
-          className="input resize-y"
-          placeholder={placeholder}
-          value={typeof value === 'string' ? value : ''}
-          onChange={(e) => set(e.target.value)}
-        />
-      )}
+      {type === 'textarea' &&
+        (field.editor === 'markdown' ? (
+          <MarkdownEditor
+            rows={rows || 4}
+            placeholder={placeholder}
+            value={typeof value === 'string' ? value : ''}
+            onChange={(v) => set(v)}
+          />
+        ) : (
+          <textarea
+            rows={rows || 4}
+            className="input resize-y"
+            placeholder={placeholder}
+            value={typeof value === 'string' ? value : ''}
+            onChange={(e) => set(e.target.value)}
+          />
+        ))}
 
       {type === 'select' && (
         <select
