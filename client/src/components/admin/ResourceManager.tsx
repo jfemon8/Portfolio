@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useCrud } from '@/hooks/useCrud';
 import { Spinner, ErrorState, EmptyState } from '@/components/ui/States';
 import GlassCard from '@/components/shared/GlassCard';
@@ -37,25 +38,101 @@ export default function ResourceManager<T extends WithId>({
     null
   );
   const [form, setForm] = useState<FormState>({});
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  const fieldLabelByName = (name: string): string =>
+    config.fields.find((field) => field.name === name)?.label ?? name;
+
+  const formatValidationMessage = (name: string, message: string): string => {
+    const label = fieldLabelByName(name);
+
+    if (/required/i.test(message)) {
+      return `${label} is required.`;
+    }
+
+    if (/enum/i.test(message)) {
+      return `${label} must be one of the available options.`;
+    }
+
+    if (/shorter than the minimum/i.test(message)) {
+      return `${label} is too short.`;
+    }
+
+    if (/longer than the maximum/i.test(message)) {
+      return `${label} is too long.`;
+    }
+
+    return message;
+  };
+
+  const extractFieldErrors = (
+    details: unknown
+  ): Record<string, string> | null => {
+    if (!Array.isArray(details) || details.length === 0) return null;
+
+    const next: Record<string, string> = {};
+
+    for (const item of details) {
+      if (!item) continue;
+
+      if (
+        typeof item === 'object' &&
+        'field' in item &&
+        typeof (item as { field?: unknown }).field === 'string' &&
+        'message' in item &&
+        typeof (item as { message?: unknown }).message === 'string'
+      ) {
+        const { field, message } = item as { field: string; message: string };
+        next[field] = formatValidationMessage(field, message);
+        continue;
+      }
+
+      if (typeof item === 'string') {
+        const match = item.match(/Path `([^`]+)` is required\.?/i);
+        if (match?.[1]) {
+          next[match[1]] = `${fieldLabelByName(match[1])} is required.`;
+        }
+      }
+    }
+
+    return Object.keys(next).length ? next : null;
+  };
 
   const openNew = (): void => {
     setForm({ ...(config.defaults as FormState) });
     setEditing({});
+    setFieldErrors({});
   };
   const openEdit = (item: T): void => {
     setForm({ ...(config.defaults as FormState), ...item });
     setEditing(item);
+    setFieldErrors({});
   };
-  const close = (): void => setEditing(null);
+  const close = (): void => {
+    setEditing(null);
+    setFieldErrors({});
+  };
 
-  const onField = (name: string, value: unknown): void =>
+  const onField = (name: string, value: unknown): void => {
     setForm((f) => setByPath(f, name, value));
+    clearFieldError(name);
+  };
+
+  const clearFieldError = (name: string): void => {
+    setFieldErrors((prev) => {
+      if (!prev[name]) return prev;
+      const next = { ...prev };
+      delete next[name];
+      return next;
+    });
+  };
 
   const isEditing = (e: T | Record<string, never> | null): e is T =>
     !!e && '_id' in e;
 
   const save = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
+    setFieldErrors({});
     const payload: FormState = { ...form };
     for (const field of config.fields) {
       if (field.type !== 'list' && field.type !== 'tags') continue;
@@ -74,12 +151,30 @@ export default function ResourceManager<T extends WithId>({
     delete payload.createdAt;
     delete payload.updatedAt;
     if (isEditing(editing)) {
-      await update.mutateAsync({
-        id: editing._id,
-        body: payload as Partial<T>,
-      });
+      try {
+        await update.mutateAsync({
+          id: editing._id,
+          body: payload as Partial<T>,
+        });
+      } catch (err) {
+        const next = extractFieldErrors((err as { details?: unknown }).details);
+        if (next) {
+          setFieldErrors(next);
+          toast.error('Please fix the highlighted fields and try again.');
+        }
+        return;
+      }
     } else {
-      await create.mutateAsync(payload as Partial<T>);
+      try {
+        await create.mutateAsync(payload as Partial<T>);
+      } catch (err) {
+        const next = extractFieldErrors((err as { details?: unknown }).details);
+        if (next) {
+          setFieldErrors(next);
+          toast.error('Please fix the highlighted fields and try again.');
+        }
+        return;
+      }
     }
     close();
   };
@@ -161,6 +256,11 @@ export default function ResourceManager<T extends WithId>({
                   form={form}
                   onChange={onField}
                 />
+                {fieldErrors[f.name] && (
+                  <p className="mt-1 text-xs text-destructive">
+                    {fieldErrors[f.name]}
+                  </p>
+                )}
               </div>
             ))}
           </div>

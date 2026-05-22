@@ -1,4 +1,9 @@
-import type { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
+import type {
+  Request,
+  Response,
+  NextFunction,
+  ErrorRequestHandler,
+} from 'express';
 import { env } from '../config/env.js';
 
 /** 404 handler for unmatched routes. */
@@ -16,7 +21,7 @@ interface MongooseLikeError extends Error {
   value?: unknown;
   code?: number;
   keyValue?: Record<string, unknown>;
-  errors?: Record<string, { message: string }>;
+  errors?: Record<string, { path?: string; message: string }>;
 }
 
 /** Central error handler — last middleware in the chain. */
@@ -43,7 +48,10 @@ export const errorHandler: ErrorRequestHandler = (
   if (err.name === 'ValidationError' && err.errors) {
     status = 400;
     message = 'Validation failed';
-    details = Object.values(err.errors).map((e) => e.message);
+    details = Object.values(err.errors).map((e) => ({
+      field: e.path,
+      message: e.message,
+    }));
   }
   if (err.name === 'MulterError') {
     status = 400;

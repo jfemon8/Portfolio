@@ -8,11 +8,17 @@ import type { ApiError, ListResponse, WithId } from '@/types';
  *   list GET /<base> · create POST /<base>
  *   update PUT /<base>/:id · remove DELETE /<base>/:id
  */
-export function useCrud<T extends WithId>(base: string, queryKey: string = base) {
+export function useCrud<T extends WithId>(
+  base: string,
+  queryKey: string = base
+) {
   const qc = useQueryClient();
   const invalidate = () => qc.invalidateQueries({ queryKey: [queryKey] });
-  const msg = (e: unknown, fallback: string) =>
-    toast.error((e as ApiError)?.message || fallback);
+  const msg = (e: unknown, fallback: string) => {
+    const err = e as ApiError;
+    if (err?.details?.length) return;
+    toast.error(err?.message || fallback);
+  };
 
   const listQuery = useQuery({
     queryKey: [queryKey],
@@ -40,8 +46,7 @@ export function useCrud<T extends WithId>(base: string, queryKey: string = base)
   });
 
   const remove = useMutation({
-    mutationFn: async (id: string) =>
-      (await api.delete(`/${base}/${id}`)).data,
+    mutationFn: async (id: string) => (await api.delete(`/${base}/${id}`)).data,
     onSuccess: () => {
       invalidate();
       toast.success('Deleted');

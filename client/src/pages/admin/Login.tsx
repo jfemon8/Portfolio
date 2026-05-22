@@ -9,6 +9,7 @@ import PremiumBackground from '@/components/layout/PremiumBackground';
 import GlassCard from '@/components/shared/GlassCard';
 import { Button } from '@/components/ui/button';
 import Seo from '@/components/ui/Seo';
+import { getValidationMessage } from '@/lib/validation';
 import type { ApiError } from '@/types';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
 
@@ -36,10 +37,10 @@ export default function Login() {
     panelSubtitle: 'Sign in to manage your portfolio',
     emailLabel: 'Email',
     emailPlaceholder: 'you@example.com',
-    emailRequired: 'Email required',
+    emailRequired: 'Please enter your email address.',
     passwordLabel: 'Password',
     passwordPlaceholder: '••••••••',
-    passwordRequired: 'Password required',
+    passwordRequired: 'Please enter your password.',
     signIn: 'Sign in',
     signingIn: 'Signing in…',
     footer: 'Protected area · authorized access only',
@@ -60,6 +61,10 @@ export default function Login() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const onInvalid = (formErrors: unknown): void => {
+    toast.error(getValidationMessage(formErrors));
   };
 
   return (
@@ -95,7 +100,10 @@ export default function Login() {
               </div>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form
+              onSubmit={handleSubmit(onSubmit, onInvalid)}
+              className="space-y-4"
+            >
               <div>
                 <label className="label">{c.emailLabel}</label>
                 <input

@@ -20,6 +20,7 @@ import ImageUpload from '@/components/admin/ImageUpload';
 import Toggle from '@/components/ui/Toggle';
 import GlassCard from '@/components/shared/GlassCard';
 import { Button } from '@/components/ui/button';
+import { getValidationMessage } from '@/lib/validation';
 import type { ApiError, MeResponse, SeoSettings, SiteSettings } from '@/types';
 
 interface PasswordForm {
@@ -144,7 +145,7 @@ export default function SettingsManager() {
 
   const changePassword = async (v: PasswordForm): Promise<void> => {
     if (v.newPassword !== v.confirm) {
-      toast.error('New passwords do not match');
+      toast.error('New password and confirmation do not match.');
       return;
     }
     try {
@@ -157,6 +158,10 @@ export default function SettingsManager() {
     } catch (err) {
       toast.error((err as ApiError).message || 'Failed to update password');
     }
+  };
+
+  const onPasswordInvalid = (formErrors: unknown): void => {
+    toast.error(getValidationMessage(formErrors));
   };
 
   const saveName = async (): Promise<void> => {
@@ -209,7 +214,7 @@ export default function SettingsManager() {
         </GlassCard>
 
         <GlassCard className="p-6">
-          <form onSubmit={handleSubmit(changePassword)}>
+          <form onSubmit={handleSubmit(changePassword, onPasswordInvalid)}>
             <h3 className="mb-5 flex items-center gap-2 font-semibold text-neon">
               <KeyRound className="h-4 w-4" /> Change password
             </h3>
@@ -219,7 +224,9 @@ export default function SettingsManager() {
                 <input
                   type="password"
                   className="input"
-                  {...register('currentPassword', { required: 'Required' })}
+                  {...register('currentPassword', {
+                    required: 'Please enter your current password.',
+                  })}
                 />
                 {errors.currentPassword && (
                   <p className="mt-1 text-xs text-destructive">
@@ -234,8 +241,11 @@ export default function SettingsManager() {
                     type="password"
                     className="input"
                     {...register('newPassword', {
-                      required: 'Required',
-                      minLength: { value: 8, message: 'Min 8 characters' },
+                      required: 'Please enter a new password.',
+                      minLength: {
+                        value: 8,
+                        message: 'Password must be at least 8 characters long.',
+                      },
                     })}
                   />
                   {errors.newPassword && (
@@ -249,7 +259,9 @@ export default function SettingsManager() {
                   <input
                     type="password"
                     className="input"
-                    {...register('confirm', { required: 'Required' })}
+                    {...register('confirm', {
+                      required: 'Please confirm your new password.',
+                    })}
                   />
                   {errors.confirm && (
                     <p className="mt-1 text-xs text-destructive">

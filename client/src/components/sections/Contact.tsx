@@ -18,6 +18,7 @@ import Reveal from '@/components/motion/Reveal';
 import GlassCard from '@/components/shared/GlassCard';
 import { Button } from '@/components/ui/button';
 import { api } from '@/lib/api';
+import { getValidationMessage } from '@/lib/validation';
 import type { ApiError, ProfileDoc } from '@/types';
 
 interface ContactForm {
@@ -47,17 +48,17 @@ export default function Contact({ profile }: { profile?: ProfileDoc }) {
   const f = useSiteCopy('forms', {
     nameLabel: 'Name',
     namePlaceholder: 'Your name',
-    nameRequired: 'Name is required',
+    nameRequired: 'Please enter your name.',
     emailLabel: 'Email',
     emailPlaceholder: 'you@example.com',
-    emailRequired: 'Email is required',
-    emailInvalid: 'Enter a valid email',
+    emailRequired: 'Please enter your email address.',
+    emailInvalid: 'Please enter a valid email address.',
     subjectLabel: 'Subject',
     subjectPlaceholder: "What's this about?",
     messageLabel: 'Message',
     messagePlaceholder: 'Tell me about your project or opportunity…',
-    messageRequired: 'Message is required',
-    messageMin: 'At least 10 characters',
+    messageRequired: 'Please enter your message.',
+    messageMin: 'Your message should be at least 10 characters long.',
     send: 'Send message',
     sending: 'Sending…',
     sentTitle: 'Message sent',
@@ -80,6 +81,10 @@ export default function Contact({ profile }: { profile?: ProfileDoc }) {
     } catch (err) {
       toast.error((err as ApiError).message || f.failToast);
     }
+  };
+
+  const onInvalid = (formErrors: unknown): void => {
+    toast.error(getValidationMessage(formErrors));
   };
 
   const info: InfoItem[] = [
@@ -190,7 +195,7 @@ export default function Contact({ profile }: { profile?: ProfileDoc }) {
                   key="form"
                   initial={reduce ? false : { opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  onSubmit={handleSubmit(onSubmit)}
+                  onSubmit={handleSubmit(onSubmit, onInvalid)}
                   className="space-y-4"
                 >
                   <div className="grid gap-4 sm:grid-cols-2">
