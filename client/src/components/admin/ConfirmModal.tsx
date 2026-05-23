@@ -289,8 +289,15 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
                         value={typedText}
                         onChange={(e) => setTypedText(e.target.value)}
                         autoFocus
+                        // `focus-visible:ring-0 focus-visible:ring-offset-0`
+                        // suppresses the global 4-px-out ring (defined in
+                        // index.css) so it doesn't compound with this
+                        // input's own `focus:ring-2 focus:ring-*/30`
+                        // colour-coded ring and visually leak through the
+                        // modal's `backdrop-blur-xl` stacking context.
+                        // Same pattern as the CommandPalette search input.
                         className={cn(
-                          'w-full rounded-lg border bg-background px-3 py-2 font-mono text-sm transition-colors focus:outline-none focus:ring-2',
+                          'w-full rounded-lg border bg-background px-3 py-2 font-mono text-sm transition-colors focus:outline-none focus:ring-2 focus-visible:ring-offset-0',
                           typeMatches && typedText
                             ? 'border-green-500 focus:ring-green-500/30'
                             : 'border-border focus:ring-primary/30'

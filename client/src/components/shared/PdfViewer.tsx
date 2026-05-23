@@ -284,7 +284,14 @@ export default function PdfViewer({
                     setPageInput('');
                   }
                 }}
-                className="w-14 rounded-md border border-border bg-background px-2 py-1 text-center text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+                // `focus-visible:ring-offset-0` cancels the global 2-px
+                // ring-offset gap (index.css :focus-visible base rule) so
+                // it doesn't compound with this input's own
+                // `focus:ring-2 focus:ring-primary/40` ring when the
+                // viewer is rendered inside the PdfPreviewModal's
+                // backdrop-blurred overlay (or any modal). Same pattern
+                // as the ConfirmModal type-to-confirm input.
+                className="w-14 rounded-md border border-border bg-background px-2 py-1 text-center text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus-visible:ring-offset-0"
               />
               <span className="text-xs text-muted-foreground">
                 of {numPages}
