@@ -24,7 +24,6 @@ const config: ResourceConfig<ProjectDoc> = {
     gallery: [],
     sourceUrl: '',
     liveUrl: '',
-    videoUrl: '',
     metrics: [],
     featured: false,
     status: 'completed',
@@ -165,12 +164,6 @@ const config: ResourceConfig<ProjectDoc> = {
     },
     { name: 'sourceUrl', label: 'Source URL', type: 'url' },
     { name: 'liveUrl', label: 'Live URL', type: 'url' },
-    {
-      name: 'videoUrl',
-      label: 'Video preview URL (mp4 / Cloudinary)',
-      type: 'url',
-      full: true,
-    },
     {
       name: 'metrics',
       label: 'Performance metrics',
