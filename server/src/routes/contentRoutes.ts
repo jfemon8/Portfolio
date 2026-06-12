@@ -27,7 +27,15 @@ function resourceRouter<T>(Model: Model<T>, opts?: CrudOptions): Router {
 
 const router = Router();
 router.use('/experience', resourceRouter(Experience));
-router.use('/skills', resourceRouter(Skill, { sort: { order: 1, level: -1 } }));
+router.use(
+  '/skills',
+  resourceRouter(Skill, {
+    sort: { order: 1, level: -1 },
+    // Wipe the Cloudinary asset when a skill row is deleted so unreferenced
+    // icon images don't linger in the media library.
+    imageFields: ['iconImagePublicId'],
+  })
+);
 router.use('/education', resourceRouter(Education));
 router.use('/certifications', resourceRouter(Certification));
 router.use('/publications', resourceRouter(Publication));

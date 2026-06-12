@@ -1,0 +1,263 @@
+import type { ComponentType, SVGProps } from 'react';
+import {
+  SiReact,
+  SiTypescript,
+  SiJavascript,
+  SiNodedotjs,
+  SiExpress,
+  SiNextdotjs,
+  SiNestjs,
+  SiTailwindcss,
+  SiBootstrap,
+  SiSass,
+  SiCss,
+  SiHtml5,
+  SiPython,
+  SiCplusplus,
+  SiC,
+  SiSharp,
+  SiDotnet,
+  SiGo,
+  SiRust,
+  SiPhp,
+  SiKotlin,
+  SiSwift,
+  SiDart,
+  SiFlutter,
+  SiMongodb,
+  SiMysql,
+  SiPostgresql,
+  SiRedis,
+  SiSqlite,
+  SiFirebase,
+  SiSupabase,
+  SiGooglecloud,
+  SiVercel,
+  SiNetlify,
+  SiCloudflare,
+  SiDigitalocean,
+  SiHeroku,
+  SiDocker,
+  SiKubernetes,
+  SiGit,
+  SiGithub,
+  SiGitlab,
+  SiBitbucket,
+  SiLinux,
+  SiUbuntu,
+  SiNginx,
+  SiPostman,
+  SiInsomnia,
+  SiFigma,
+  SiCanva,
+  SiNotion,
+  SiSlack,
+  SiVscodium,
+  SiJetbrains,
+  SiIntellijidea,
+  SiWebpack,
+  SiVite,
+  SiBabel,
+  SiEslint,
+  SiPrettier,
+  SiJest,
+  SiTestinglibrary,
+  SiCypress,
+  SiPrisma,
+  SiGraphql,
+  SiSocketdotio,
+  SiRedux,
+  SiZod,
+  SiStorybook,
+  SiTrpc,
+  SiVuedotjs,
+  SiNuxt,
+  SiAngular,
+  SiSvelte,
+  SiAstro,
+  SiRemix,
+  SiTensorflow,
+  SiPytorch,
+  SiPandas,
+  SiNumpy,
+  SiScikitlearn,
+  SiJupyter,
+  SiOpenai,
+  SiThreedotjs,
+  SiBlender,
+  SiUnity,
+  SiUnrealengine,
+  SiCodeforces,
+  SiLeetcode,
+  SiCodechef,
+} from 'react-icons/si';
+import { FaJava, FaCode, FaAws } from 'react-icons/fa';
+
+type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
+
+/** Brand/logo icons from the Simple Icons family. Each lookup key is the
+ *  skill name in a normalised form (lowercased, alphanumerics only). We
+ *  list aliases for the same icon to widen matches (e.g. "node" and
+ *  "nodejs" both → SiNodedotjs). Skills with no match render a neutral
+ *  `FaCode` placeholder via the caller — this map only contains the
+ *  positive hits. */
+const ICON_MAP: Record<string, IconComponent> = {
+  // Web frameworks / runtimes
+  react: SiReact,
+  reactjs: SiReact,
+  nextjs: SiNextdotjs,
+  next: SiNextdotjs,
+  nuxt: SiNuxt,
+  nuxtjs: SiNuxt,
+  vue: SiVuedotjs,
+  vuejs: SiVuedotjs,
+  angular: SiAngular,
+  svelte: SiSvelte,
+  sveltekit: SiSvelte,
+  astro: SiAstro,
+  remix: SiRemix,
+  node: SiNodedotjs,
+  nodejs: SiNodedotjs,
+  express: SiExpress,
+  expressjs: SiExpress,
+  nestjs: SiNestjs,
+  nest: SiNestjs,
+
+  // Languages
+  typescript: SiTypescript,
+  ts: SiTypescript,
+  javascript: SiJavascript,
+  js: SiJavascript,
+  python: SiPython,
+  py: SiPython,
+  java: FaJava,
+  c: SiC,
+  cpp: SiCplusplus,
+  cplusplus: SiCplusplus,
+  csharp: SiSharp,
+  cs: SiSharp,
+  dotnet: SiDotnet,
+  net: SiDotnet,
+  aspnet: SiDotnet,
+  go: SiGo,
+  golang: SiGo,
+  rust: SiRust,
+  php: SiPhp,
+  kotlin: SiKotlin,
+  swift: SiSwift,
+  dart: SiDart,
+  flutter: SiFlutter,
+
+  // Markup / styling
+  html: SiHtml5,
+  html5: SiHtml5,
+  css: SiCss,
+  css3: SiCss,
+  sass: SiSass,
+  scss: SiSass,
+  tailwind: SiTailwindcss,
+  tailwindcss: SiTailwindcss,
+  bootstrap: SiBootstrap,
+
+  // Databases / data
+  mongodb: SiMongodb,
+  mongo: SiMongodb,
+  mysql: SiMysql,
+  postgresql: SiPostgresql,
+  postgres: SiPostgresql,
+  sqlite: SiSqlite,
+  redis: SiRedis,
+  firebase: SiFirebase,
+  supabase: SiSupabase,
+  prisma: SiPrisma,
+  graphql: SiGraphql,
+
+  // Cloud / DevOps — AWS uses the FA glyph because react-icons v5 dropped
+  // the Si brand entry for it.
+  aws: FaAws,
+  amazonwebservices: FaAws,
+  gcp: SiGooglecloud,
+  googlecloud: SiGooglecloud,
+  vercel: SiVercel,
+  netlify: SiNetlify,
+  cloudflare: SiCloudflare,
+  digitalocean: SiDigitalocean,
+  heroku: SiHeroku,
+  docker: SiDocker,
+  kubernetes: SiKubernetes,
+  k8s: SiKubernetes,
+  nginx: SiNginx,
+  linux: SiLinux,
+  ubuntu: SiUbuntu,
+
+  // Tools
+  git: SiGit,
+  github: SiGithub,
+  gitlab: SiGitlab,
+  bitbucket: SiBitbucket,
+  postman: SiPostman,
+  insomnia: SiInsomnia,
+  figma: SiFigma,
+  canva: SiCanva,
+  notion: SiNotion,
+  slack: SiSlack,
+  vscode: SiVscodium,
+  jetbrains: SiJetbrains,
+  intellij: SiIntellijidea,
+  webpack: SiWebpack,
+  vite: SiVite,
+  babel: SiBabel,
+  eslint: SiEslint,
+  prettier: SiPrettier,
+  jest: SiJest,
+  testinglibrary: SiTestinglibrary,
+  rtl: SiTestinglibrary,
+  cypress: SiCypress,
+  storybook: SiStorybook,
+  trpc: SiTrpc,
+
+  // State / utility libs
+  redux: SiRedux,
+  zod: SiZod,
+  socketio: SiSocketdotio,
+  'socket.io': SiSocketdotio,
+
+  // ML / data science
+  tensorflow: SiTensorflow,
+  pytorch: SiPytorch,
+  pandas: SiPandas,
+  numpy: SiNumpy,
+  scikitlearn: SiScikitlearn,
+  sklearn: SiScikitlearn,
+  jupyter: SiJupyter,
+  openai: SiOpenai,
+
+  // 3D / gaming
+  threejs: SiThreedotjs,
+  blender: SiBlender,
+  unity: SiUnity,
+  unreal: SiUnrealengine,
+  unrealengine: SiUnrealengine,
+
+  // CP platforms (mainly for tagging stats sections)
+  codeforces: SiCodeforces,
+  leetcode: SiLeetcode,
+  codechef: SiCodechef,
+};
+
+const normalise = (input: string): string =>
+  input.toLowerCase().replace(/[^a-z0-9]+/g, '');
+
+/** Returns a react-icons component for a skill name, or null if no brand
+ *  logo matches. Callers should render a neutral fallback (e.g. a generic
+ *  code glyph or the skill's initial) when null is returned. */
+export function getSkillIcon(name: string): IconComponent | null {
+  if (!name) return null;
+  const key = normalise(name);
+  return ICON_MAP[key] ?? null;
+}
+
+/** Neutral fallback glyph used by the public Skills renderer when neither
+ *  an uploaded image nor a brand logo is available. Exported so consumers
+ *  don't have to import it from `react-icons` themselves. */
+export const FallbackSkillIcon: IconComponent = FaCode;

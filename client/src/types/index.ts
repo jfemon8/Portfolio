@@ -157,22 +157,31 @@ export interface Project {
   views: number;
 }
 
-export type SkillCategory =
-  | 'language'
-  | 'framework'
-  | 'database'
-  | 'tool'
-  | 'cloud'
-  | 'concept'
-  | 'other';
+/** Skill categories are managed via /categories CRUD (see Category). The
+ *  alias stays for code that imports it as a type, but it's now an
+ *  open-ended slug string rather than a strict enum. */
+export type SkillCategory = string;
 
 export interface Skill {
   name: string;
+  /** Slug ref into the Category collection (`Category.slug`). */
   category: SkillCategory;
   level: number;
+  /** Legacy free-text icon hint (name or URL). Retained for older rows;
+   *  new skills should use `iconImage` (uploaded) and let the public
+   *  renderer fall back to a matching react-icons logo. */
   icon: string;
+  /** Cloudinary-uploaded icon URL. Empty → react-icons fallback by name. */
+  iconImage: string;
+  iconImagePublicId: string;
   order: number;
   featured: boolean;
+}
+
+export interface Category {
+  name: string;
+  slug: string;
+  order: number;
 }
 
 export interface Education {
@@ -256,6 +265,7 @@ export type ProfileDoc = Entity<Profile>;
 export type ExperienceDoc = Entity<Experience>;
 export type ProjectDoc = Entity<Project>;
 export type SkillDoc = Entity<Skill>;
+export type CategoryDoc = Entity<Category>;
 export type EducationDoc = Entity<Education>;
 export type CertificationDoc = Entity<Certification>;
 export type PublicationDoc = Entity<Publication>;

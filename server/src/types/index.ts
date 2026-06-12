@@ -423,22 +423,37 @@ export interface IProject {
   views: number;
 }
 
-export type SkillCategory =
-  | 'language'
-  | 'framework'
-  | 'database'
-  | 'tool'
-  | 'cloud'
-  | 'concept'
-  | 'other';
+/** Skill categories are now a CRUD resource (see ICategory). `SkillCategory`
+ *  remains as a string alias for backward-compat with code that imports it. */
+export type SkillCategory = string;
 
 export interface ISkill {
   name: string;
+  /** Slug reference to a Category document (`ICategory.slug`). Not enforced
+   *  as ObjectId so categories can be renamed/relabelled without breaking
+   *  skill rows, and so legacy enum values keep working when their slugs
+   *  match the seeded defaults. */
   category: SkillCategory;
   level: number;
+  /** Legacy icon hint (free text — name or URL). Kept for backward-compat
+   *  with previously-saved values; new entries should leave this empty and
+   *  use `iconImage` (Cloudinary upload) + the react-icons fallback. */
   icon: string;
+  /** Uploaded icon image URL (Cloudinary). When empty, the public renderer
+   *  falls back to a react-icons logo matched by skill name. */
+  iconImage: string;
+  iconImagePublicId: string;
   order: number;
   featured: boolean;
+}
+
+/** Skill category, managed via /categories CRUD. `slug` is the stable id
+ *  referenced by ISkill.category; `label` is the human-friendly display
+ *  string shown in the public category tabs. */
+export interface ICategory {
+  name: string;
+  slug: string;
+  order: number;
 }
 
 export interface IEducation {

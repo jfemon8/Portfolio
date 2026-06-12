@@ -17,6 +17,7 @@ import type {
   SiteContentDoc,
   PublicationDoc,
   SkillDoc,
+  CategoryDoc,
 } from '@/types';
 
 const get = async <T>(url: string): Promise<T> => (await api.get<T>(url)).data;
@@ -83,6 +84,13 @@ export const useSkills = () =>
   useQuery({
     queryKey: ['skills'],
     queryFn: () => get<ListResponse<SkillDoc>>('/skills'),
+    staleTime: CONTENT,
+  });
+
+export const useCategories = () =>
+  useQuery({
+    queryKey: ['categories'],
+    queryFn: () => get<ListResponse<CategoryDoc>>('/categories'),
     staleTime: CONTENT,
   });
 

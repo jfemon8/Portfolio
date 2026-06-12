@@ -294,6 +294,8 @@ const skills: ISkill[] = skillRows.map(([name, category, level], i) => ({
   category,
   level,
   icon: '',
+  iconImage: '',
+  iconImagePublicId: '',
   order: i,
   featured: FEATURED_SKILLS.includes(name),
 }));
