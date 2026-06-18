@@ -28,6 +28,7 @@ const config: ResourceConfig<EducationDoc> = {
     { name: 'startYear', label: 'Start year', type: 'text' },
     { name: 'endYear', label: 'End year', type: 'text' },
     { name: 'grade', label: 'Grade (e.g. CGPA: 3.38)', type: 'text' },
+    { name: 'order', label: 'Order', type: 'number' },
     {
       name: 'description',
       label: 'Description',
@@ -36,7 +37,6 @@ const config: ResourceConfig<EducationDoc> = {
       full: true,
       rows: 3,
     },
-    { name: 'order', label: 'Order', type: 'number' },
   ],
   labelOf: (i) => i.institution,
   renderItem: (i) => (
