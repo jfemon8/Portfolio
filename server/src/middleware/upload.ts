@@ -20,7 +20,9 @@ export const uploadImage = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     if (ALLOWED_IMAGES.includes(file.mimetype)) return cb(null, true);
-    cb(ApiError.badRequest('Only JPG, PNG, WEBP, GIF or SVG images are allowed.'));
+    cb(
+      ApiError.badRequest('Only JPG, PNG, WEBP, GIF or SVG images are allowed.')
+    );
   },
 });
 
@@ -30,5 +32,21 @@ export const uploadDoc = multer({
   fileFilter: (_req, file, cb) => {
     if (file.mimetype === 'application/pdf') return cb(null, true);
     cb(ApiError.badRequest('Only PDF files are allowed.'));
+  },
+});
+
+/** Accepts an image OR a PDF — used by the generic media uploader (credential
+ *  certificates, publication papers, etc.). */
+export const uploadMedia = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (
+      ALLOWED_IMAGES.includes(file.mimetype) ||
+      file.mimetype === 'application/pdf'
+    ) {
+      return cb(null, true);
+    }
+    cb(ApiError.badRequest('Only an image or a PDF file is allowed.'));
   },
 });

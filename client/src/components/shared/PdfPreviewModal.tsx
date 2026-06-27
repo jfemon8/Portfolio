@@ -1,7 +1,7 @@
 import { useEffect, lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Loader2 } from 'lucide-react';
+import { X, Loader2, ExternalLink } from 'lucide-react';
 
 // PdfViewer drags in react-pdf + its worker (~600 KB). Lazy-loading keeps
 // the main bundle weightless until a visitor actually opens a preview.
@@ -12,6 +12,12 @@ export interface PdfPreviewTarget {
   title?: string;
 }
 
+/** Optional extra action shown in the modal chrome (e.g. a "Verify" link). */
+export interface PdfPreviewAction {
+  href: string;
+  label: string;
+}
+
 /**
  * Project-wide PDF preview modal (ported from RDSWA). Wraps the
  * lazy-loaded PdfViewer in an animated dialog with backdrop blur,
@@ -20,9 +26,11 @@ export interface PdfPreviewTarget {
  */
 export default function PdfPreviewModal({
   target,
+  action,
   onClose,
 }: {
   target: PdfPreviewTarget | null;
+  action?: PdfPreviewAction;
   onClose: () => void;
 }) {
   useEffect(() => {
@@ -82,6 +90,16 @@ export default function PdfPreviewModal({
             >
               <X className="h-4 w-4" />
             </button>
+            {action && (
+              <a
+                href={action.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="absolute -left-3 -top-3 z-10 inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-2 text-xs font-medium text-foreground shadow-lg hover:bg-accent sm:-left-4 sm:-top-4"
+              >
+                {action.label} <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+            )}
             <Suspense
               fallback={
                 <div className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border bg-card text-sm text-muted-foreground">

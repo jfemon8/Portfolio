@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
 import SmartImage from '@/components/shared/SmartImage';
 
 export interface LightboxImage {
@@ -8,10 +8,17 @@ export interface LightboxImage {
   caption?: string;
 }
 
+/** Optional extra action shown in the modal chrome (e.g. a "Verify" link). */
+export interface LightboxAction {
+  href: string;
+  label: string;
+}
+
 interface LightboxProps {
   images: LightboxImage[];
   open: boolean;
   startIndex?: number;
+  action?: LightboxAction;
   onClose: () => void;
 }
 
@@ -24,6 +31,7 @@ export default function Lightbox({
   images,
   open,
   startIndex = 0,
+  action,
   onClose,
 }: LightboxProps) {
   const reduce = useReducedMotion();
@@ -81,6 +89,18 @@ export default function Lightbox({
           >
             <X className="h-5 w-5" />
           </button>
+
+          {action && (
+            <a
+              href={action.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="absolute left-4 top-4 inline-flex h-11 items-center gap-1.5 rounded-xl border border-border/70 bg-card/60 px-4 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
+            >
+              {action.label} <ExternalLink className="h-4 w-4" />
+            </a>
+          )}
 
           {many && (
             <>

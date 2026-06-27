@@ -1,5 +1,6 @@
 import { Plus, Trash2 } from 'lucide-react';
 import ImageUpload from './ImageUpload';
+import MediaUpload from './MediaUpload';
 import RichTextEditor from './RichTextEditor';
 import Toggle from '@/components/ui/Toggle';
 
@@ -15,7 +16,8 @@ export type FieldType =
   | 'tags'
   | 'pairs'
   | 'gallery'
-  | 'image';
+  | 'image'
+  | 'media';
 
 export interface FieldSchema {
   name: string;
@@ -61,6 +63,25 @@ export default function Field({ field, value, form, onChange }: FieldProps) {
   if (type === 'image') {
     return (
       <ImageUpload
+        label={label}
+        value={typeof value === 'string' ? value : ''}
+        publicId={
+          field.publicIdKey
+            ? (form[field.publicIdKey] as string | undefined)
+            : undefined
+        }
+        folder={field.folder}
+        onChange={({ url, publicId }) => {
+          set(url);
+          if (field.publicIdKey) onChange(field.publicIdKey, publicId);
+        }}
+      />
+    );
+  }
+
+  if (type === 'media') {
+    return (
+      <MediaUpload
         label={label}
         value={typeof value === 'string' ? value : ''}
         publicId={

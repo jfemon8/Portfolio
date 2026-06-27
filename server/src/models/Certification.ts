@@ -7,6 +7,8 @@ const certificationSchema = new mongoose.Schema<ICertification>(
     issuer: { type: String, default: '' },
     issueDate: { type: String, default: '' },
     credentialUrl: { type: String, default: '' },
+    mediaUrl: { type: String, default: '' },
+    mediaPublicId: { type: String, default: '' },
     category: {
       type: String,
       enum: ['certification', 'publication', 'achievement'],

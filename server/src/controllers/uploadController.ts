@@ -43,6 +43,40 @@ export const uploadResumeHandler = asyncHandler(
   }
 );
 
+/** Admin — upload a single media file that is EITHER an image OR a PDF.
+ *  Images go through the normal image pipeline; PDFs are stored as `raw`
+ *  assets with a `.pdf`-suffixed public_id (same trick as the resume upload)
+ *  so the CDN URL ends in `.pdf` and the proxy can serve it inline.
+ *  Returns { url, publicId, kind }. Optional `?folder=` query. */
+export const uploadMediaHandler = asyncHandler(
+  async (req: Request, res: Response) => {
+    if (!req.file) throw ApiError.badRequest('No file provided.');
+    const folder =
+      typeof req.query.folder === 'string' && req.query.folder
+        ? req.query.folder
+        : undefined;
+
+    if (req.file.mimetype === 'application/pdf') {
+      const base = (req.file.originalname || 'document')
+        .replace(/\.[^.]+$/, '')
+        .replace(/[^a-zA-Z0-9-_]/g, '_')
+        .toLowerCase()
+        .slice(0, 40);
+      const publicId = `${base || 'document'}-${Date.now()}.pdf`;
+      const result = await uploadBuffer(req.file.buffer, {
+        folder: folder || 'portfolio/media',
+        publicId,
+        resourceType: 'raw',
+      });
+      res.status(201).json({ success: true, kind: 'pdf', ...result });
+      return;
+    }
+
+    const result = await uploadBuffer(req.file.buffer, { folder });
+    res.status(201).json({ success: true, kind: 'image', ...result });
+  }
+);
+
 // ─────────────────────────────────────────────────────────────────────────────
 // GET /upload/proxy — Stream a Cloudinary file back to the browser with the
 // CORRECT Content-Type + a sensible Content-Disposition. Cloudinary's `raw`

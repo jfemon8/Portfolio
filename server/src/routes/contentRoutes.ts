@@ -37,7 +37,13 @@ router.use(
   })
 );
 router.use('/education', resourceRouter(Education));
-router.use('/certifications', resourceRouter(Certification));
-router.use('/publications', resourceRouter(Publication));
+router.use(
+  '/certifications',
+  resourceRouter(Certification, { imageFields: ['mediaPublicId'] })
+);
+router.use(
+  '/publications',
+  resourceRouter(Publication, { imageFields: ['mediaPublicId'] })
+);
 
 export default router;

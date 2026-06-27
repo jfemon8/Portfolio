@@ -8,6 +8,8 @@ const publicationSchema = new mongoose.Schema<IPublication>(
     authors: { type: String, default: '' },
     year: { type: String, default: '' },
     url: { type: String, default: '' },
+    mediaUrl: { type: String, default: '' },
+    mediaPublicId: { type: String, default: '' },
     abstract: { type: String, default: '' },
     order: { type: Number, default: 0 },
   },

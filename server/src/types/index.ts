@@ -478,6 +478,8 @@ export interface ICertification {
   issuer: string;
   issueDate: string;
   credentialUrl: string;
+  mediaUrl: string;
+  mediaPublicId: string;
   category: CredentialCategory;
   description: string;
   order: number;
@@ -489,6 +491,8 @@ export interface IPublication {
   authors: string;
   year: string;
   url: string;
+  mediaUrl: string;
+  mediaPublicId: string;
   abstract: string;
   order: number;
 }

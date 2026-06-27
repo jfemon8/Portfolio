@@ -1,9 +1,22 @@
-import { Award, Trophy, ExternalLink, type LucideIcon } from 'lucide-react';
+import { useRef, useState } from 'react';
+import {
+  Award,
+  Trophy,
+  ExternalLink,
+  FileText,
+  Image as ImageIcon,
+  type LucideIcon,
+} from 'lucide-react';
 import { Section, SectionHeading } from '@/components/shared/Section';
 import { useSectionCopy } from '@/hooks/useSectionCopy';
 import Reveal from '@/components/motion/Reveal';
 import GlassCard from '@/components/shared/GlassCard';
+import Lightbox from '@/components/shared/Lightbox';
+import PdfPreviewModal, {
+  type PdfPreviewTarget,
+} from '@/components/shared/PdfPreviewModal';
 import { useCertifications } from '@/hooks/usePortfolio';
+import { isPdfUrl } from '@/lib/media';
 
 interface ColumnItem {
   id: string;
@@ -11,6 +24,7 @@ interface ColumnItem {
   meta?: string;
   desc?: string;
   url?: string;
+  mediaUrl?: string;
 }
 
 function Column({
@@ -18,11 +32,16 @@ function Column({
   title,
   items,
   delay,
+  mediaLabel,
+  onOpenMedia,
 }: {
   icon: LucideIcon;
   title: string;
   items: ColumnItem[];
   delay: number;
+  /** Noun used in the "View … for X" aria-label (e.g. "certificate"). */
+  mediaLabel: string;
+  onOpenMedia: (item: ColumnItem, trigger: HTMLElement) => void;
 }) {
   return (
     <Reveal delay={delay}>
@@ -31,29 +50,61 @@ function Column({
           <Icon className="h-4 w-4" /> {title}
         </h3>
         <ul className="space-y-4">
-          {items.map((it) => (
-            <li key={it.id} className="border-l-2 border-border/70 pl-3">
-              <p className="text-sm font-medium text-foreground">{it.title}</p>
-              {it.meta && (
-                <p className="text-xs text-muted-foreground/70">{it.meta}</p>
-              )}
-              {it.desc && (
-                <p className="mt-1 text-xs leading-relaxed text-muted-foreground/70 line-clamp-2">
-                  {it.desc}
-                </p>
-              )}
-              {it.url && (
-                <a
-                  href={it.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-1 inline-flex items-center gap-1 text-xs text-neon hover:underline"
-                >
-                  Read <ExternalLink className="h-3 w-3" />
-                </a>
-              )}
-            </li>
-          ))}
+          {items.map((it) => {
+            // Title interaction: media → open the image/PDF viewer; otherwise a
+            // bare Credential URL → open the verification page in a new tab;
+            // nothing attached → plain, non-interactive text.
+            const titleClass =
+              'group/title inline-flex items-start gap-1.5 text-left text-sm font-medium text-foreground transition-colors hover:text-neon';
+            const iconClass =
+              'mt-0.5 h-3.5 w-3.5 shrink-0 opacity-60 transition-opacity group-hover/title:opacity-100';
+            return (
+              <li key={it.id} className="border-l-2 border-border/70 pl-3">
+                {it.mediaUrl ? (
+                  <button
+                    type="button"
+                    onClick={(e) => onOpenMedia(it, e.currentTarget)}
+                    aria-label={`View ${mediaLabel} for ${it.title}`}
+                    className={titleClass}
+                  >
+                    <span className="underline-offset-2 group-hover/title:underline">
+                      {it.title}
+                    </span>
+                    {isPdfUrl(it.mediaUrl) ? (
+                      <FileText className={iconClass} />
+                    ) : (
+                      <ImageIcon className={iconClass} />
+                    )}
+                  </button>
+                ) : it.url ? (
+                  <a
+                    href={it.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Open verification link for ${it.title}`}
+                    className={titleClass}
+                  >
+                    <span className="underline-offset-2 group-hover/title:underline">
+                      {it.title}
+                    </span>
+                    <ExternalLink className={iconClass} />
+                  </a>
+                ) : (
+                  <p className="text-sm font-medium text-foreground">
+                    {it.title}
+                  </p>
+                )}
+                {it.meta && (
+                  <p className="text-xs text-muted-foreground/70">{it.meta}</p>
+                )}
+                {it.desc && (
+                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground/70 line-clamp-2">
+                    {it.desc}
+                  </p>
+                )}
+              </li>
+            );
+          })}
         </ul>
       </GlassCard>
     </Reveal>
@@ -64,22 +115,51 @@ export default function Credentials() {
   const { data: certData } = useCertifications();
   const all = certData?.data ?? [];
 
-  const certs: ColumnItem[] = all
-    .filter((c) => c.category === 'certification')
-    .map((c) => ({
-      id: c._id,
-      title: c.title,
-      meta: [c.issuer, c.issueDate].filter(Boolean).join(' · '),
-      desc: c.description,
-    }));
-  const achievements: ColumnItem[] = all
+  const [lightbox, setLightbox] = useState<{
+    url: string;
+    caption?: string;
+  } | null>(null);
+  const [pdfTarget, setPdfTarget] = useState<PdfPreviewTarget | null>(null);
+  // Credential URL of the item whose viewer is currently open — surfaced as a
+  // "Verify" action inside the modal when present.
+  const [verifyUrl, setVerifyUrl] = useState<string | null>(null);
+  // Element that opened the viewer — focus is returned here on close so
+  // keyboard / screen-reader users keep their place (WCAG 2.4.3).
+  const triggerRef = useRef<HTMLElement | null>(null);
+
+  const openMedia = (item: ColumnItem, trigger: HTMLElement): void => {
+    if (!item.mediaUrl) return;
+    triggerRef.current = trigger;
+    setVerifyUrl(item.url ?? null);
+    if (isPdfUrl(item.mediaUrl)) {
+      setPdfTarget({ fileUrl: item.mediaUrl, title: item.title });
+    } else {
+      setLightbox({ url: item.mediaUrl, caption: item.title });
+    }
+  };
+
+  const verifyAction = verifyUrl
+    ? { href: verifyUrl, label: 'Verify' }
+    : undefined;
+
+  const restoreFocus = (): void => {
+    triggerRef.current?.focus();
+    triggerRef.current = null;
+  };
+
+  const toItem = (c: (typeof all)[number]): ColumnItem => ({
+    id: c._id,
+    title: c.title,
+    meta: [c.issuer, c.issueDate].filter(Boolean).join(' · '),
+    desc: c.description,
+    url: c.credentialUrl || undefined,
+    mediaUrl: c.mediaUrl || undefined,
+  });
+
+  const certs = all.filter((c) => c.category === 'certification').map(toItem);
+  const achievements = all
     .filter((c) => c.category === 'achievement')
-    .map((c) => ({
-      id: c._id,
-      title: c.title,
-      meta: [c.issuer, c.issueDate].filter(Boolean).join(' · '),
-      desc: c.description,
-    }));
+    .map(toItem);
   const copy = useSectionCopy('credentials', {
     index: '06.',
     title: 'Credentials',
@@ -94,14 +174,41 @@ export default function Credentials() {
         subtitle={copy.subtitle}
       />
       <div className="grid gap-6 sm:grid-cols-2">
-        <Column icon={Award} title="Certifications" items={certs} delay={0} />
+        <Column
+          icon={Award}
+          title="Certifications"
+          items={certs}
+          delay={0}
+          mediaLabel="certificate"
+          onOpenMedia={openMedia}
+        />
         <Column
           icon={Trophy}
           title="Achievements"
           items={achievements}
           delay={0.08}
+          mediaLabel="attachment"
+          onOpenMedia={openMedia}
         />
       </div>
+
+      <Lightbox
+        images={lightbox ? [lightbox] : []}
+        open={!!lightbox}
+        action={verifyAction}
+        onClose={() => {
+          setLightbox(null);
+          restoreFocus();
+        }}
+      />
+      <PdfPreviewModal
+        target={pdfTarget}
+        action={verifyAction}
+        onClose={() => {
+          setPdfTarget(null);
+          restoreFocus();
+        }}
+      />
     </Section>
   );
 }

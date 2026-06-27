@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import { protect, adminOnly } from '../middleware/auth.js';
-import { uploadImage, uploadDoc } from '../middleware/upload.js';
+import { uploadImage, uploadDoc, uploadMedia } from '../middleware/upload.js';
 import {
   uploadImageHandler,
   uploadResumeHandler,
+  uploadMediaHandler,
   deleteAssetHandler,
   listAssetsHandler,
   proxyFileHandler,
@@ -24,6 +25,13 @@ router.post(
   adminOnly,
   uploadDoc.single('resume'),
   uploadResumeHandler
+);
+router.post(
+  '/media',
+  protect,
+  adminOnly,
+  uploadMedia.single('file'),
+  uploadMediaHandler
 );
 router.get('/assets', protect, adminOnly, listAssetsHandler);
 router.delete('/asset', protect, adminOnly, deleteAssetHandler);
