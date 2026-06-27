@@ -16,15 +16,7 @@ import {
   CardGridSkeleton,
 } from '@/components/ui/States';
 import { useBlogList } from '@/hooks/usePortfolio';
-
-const fmt = (d?: string): string =>
-  d
-    ? new Date(d).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      })
-    : '';
+import { formatDate } from '@/lib/date';
 
 export default function Blog() {
   const [q, setQ] = useState('');
@@ -127,7 +119,7 @@ export default function Blog() {
                     <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-4 text-xs text-muted-foreground/70">
                       <span className="flex items-center gap-1.5">
                         <Calendar className="h-3.5 w-3.5" />
-                        {fmt(post.publishedAt || post.createdAt)}
+                        {formatDate(post.publishedAt || post.createdAt)}
                       </span>
                       <span className="flex items-center gap-1.5">
                         <Clock className="h-3.5 w-3.5" /> {post.readingTime}{' '}

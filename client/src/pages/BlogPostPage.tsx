@@ -11,15 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Spinner, ErrorState } from '@/components/ui/States';
 import { useBlogPost, useProfile } from '@/hooks/usePortfolio';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
-
-const fmt = (d?: string): string =>
-  d
-    ? new Date(d).toLocaleDateString('en-US', {
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-      })
-    : '';
+import { formatDate } from '@/lib/date';
 
 export default function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -112,7 +104,7 @@ export default function BlogPostPage() {
           <div className="mt-5 flex flex-wrap items-center gap-5 text-xs text-muted-foreground/70">
             <span className="flex items-center gap-1.5">
               <Calendar className="h-3.5 w-3.5" />
-              {fmt(post.publishedAt || post.createdAt)}
+              {formatDate(post.publishedAt || post.createdAt)}
             </span>
             <span className="flex items-center gap-1.5">
               <Clock className="h-3.5 w-3.5" /> {post.readingTime}{' '}

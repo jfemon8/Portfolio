@@ -7,6 +7,7 @@ import GlassCard from '@/components/shared/GlassCard';
 import { Button } from '@/components/ui/button';
 import { Spinner, ErrorState, EmptyState } from '@/components/ui/States';
 import { cn } from '@/lib/cn';
+import { formatDateTime } from '@/lib/date';
 import type { AuditAction, AuditLogDoc, PaginatedResponse } from '@/types';
 
 const ACTIONS: (AuditAction | 'all')[] = [
@@ -111,7 +112,7 @@ export default function AuditLogViewer() {
                     <Globe className="h-3 w-3" /> {l.ip}
                   </span>
                 )}
-                {new Date(l.createdAt).toLocaleString()}
+                {formatDateTime(l.createdAt)}
               </span>
             </div>
             {l.meta && Object.keys(l.meta).length > 0 && (

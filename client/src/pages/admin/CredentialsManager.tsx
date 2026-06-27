@@ -25,7 +25,7 @@ const certConfig: ResourceConfig<CertificationDoc> = {
   fields: [
     { name: 'title', label: 'Title', type: 'text', full: true },
     { name: 'issuer', label: 'Issuer', type: 'text' },
-    { name: 'issueDate', label: 'Issue date', type: 'text' },
+    { name: 'issueDate', label: 'Issue date', type: 'date' },
     {
       name: 'category',
       label: 'Category',

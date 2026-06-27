@@ -9,6 +9,7 @@ export type FieldType =
   | 'url'
   | 'email'
   | 'number'
+  | 'date'
   | 'textarea'
   | 'select'
   | 'switch'
@@ -158,6 +159,15 @@ export default function Field({ field, value, form, onChange }: FieldProps) {
           placeholder={placeholder}
           value={typeof value === 'number' ? value : ''}
           onChange={(e) => set(Number(e.target.value))}
+        />
+      )}
+
+      {type === 'date' && (
+        <input
+          type="date"
+          className="input"
+          value={typeof value === 'string' ? value : ''}
+          onChange={(e) => set(e.target.value)}
         />
       )}
 

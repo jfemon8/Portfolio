@@ -33,7 +33,13 @@ export default function SmartImage({
       alt={alt}
       loading={priority ? 'eager' : 'lazy'}
       decoding="async"
-      fetchPriority={priority ? 'high' : 'auto'}
+      // React 18 only maps the lowercase `fetchpriority` DOM attribute; the
+      // camelCase `fetchPriority` prop logs an "unknown prop" warning. `auto`
+      // is the browser default, so only the high-priority hint is worth
+      // emitting. (React 19 supports camelCase — drop the cast on upgrade.)
+      {...(priority
+        ? ({ fetchpriority: 'high' } as Record<string, string>)
+        : {})}
       {...rest}
     />
   );

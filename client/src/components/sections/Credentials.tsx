@@ -17,6 +17,7 @@ import PdfPreviewModal, {
 } from '@/components/shared/PdfPreviewModal';
 import { useCertifications } from '@/hooks/usePortfolio';
 import { isPdfUrl } from '@/lib/media';
+import { formatDate } from '@/lib/date';
 
 interface ColumnItem {
   id: string;
@@ -150,7 +151,7 @@ export default function Credentials() {
   const toItem = (c: (typeof all)[number]): ColumnItem => ({
     id: c._id,
     title: c.title,
-    meta: [c.issuer, c.issueDate].filter(Boolean).join(' · '),
+    meta: [c.issuer, formatDate(c.issueDate)].filter(Boolean).join(' · '),
     desc: c.description,
     url: c.credentialUrl || undefined,
     mediaUrl: c.mediaUrl || undefined,

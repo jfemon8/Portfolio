@@ -1,4 +1,5 @@
 import { cn } from '@/lib/cn';
+import { formatDate } from '@/lib/date';
 
 interface HeatmapProps {
   /** chronological day buckets */
@@ -62,7 +63,7 @@ export default function Heatmap({
           {col.map((cell) => (
             <span
               key={cell.key}
-              title={`${cell.key}`}
+              title={formatDate(cell.key)}
               className={cn(
                 'h-2.5 w-2.5 shrink-0 rounded-[2px]',
                 LEVELS[cell.lvl]

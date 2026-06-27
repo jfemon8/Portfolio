@@ -17,6 +17,7 @@ import GlassCard from '@/components/shared/GlassCard';
 import { Button } from '@/components/ui/button';
 import { Spinner, EmptyState } from '@/components/ui/States';
 import { cn } from '@/lib/cn';
+import { formatDate, formatDateTime } from '@/lib/date';
 import type { ListResponse, MessageDoc } from '@/types';
 
 type FilterKey = 'all' | 'unread' | 'starred' | 'archived';
@@ -119,7 +120,7 @@ export default function MessagesManager() {
                     {m.name}
                   </span>
                   <span className="shrink-0 text-[11px] text-muted-foreground/60">
-                    {new Date(m.createdAt).toLocaleDateString()}
+                    {formatDate(m.createdAt)}
                   </span>
                 </div>
                 <p className="truncate text-xs text-muted-foreground/70">
@@ -156,7 +157,7 @@ export default function MessagesManager() {
                   </a>
                 </p>
                 <p className="text-xs text-muted-foreground/60">
-                  {new Date(active.createdAt).toLocaleString()}
+                  {formatDateTime(active.createdAt)}
                 </p>
               </div>
               <div className="flex gap-2">
