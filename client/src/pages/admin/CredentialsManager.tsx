@@ -32,6 +32,7 @@ const certConfig: ResourceConfig<CertificationDoc> = {
         { value: 'achievement', label: 'Achievement' },
       ],
     },
+    { name: 'order', label: 'Order', type: 'number' },
     { name: 'credentialUrl', label: 'Credential URL', type: 'url', full: true },
     {
       name: 'description',
@@ -41,7 +42,6 @@ const certConfig: ResourceConfig<CertificationDoc> = {
       full: true,
       rows: 3,
     },
-    { name: 'order', label: 'Order', type: 'number' },
   ],
   labelOf: (i) => i.title,
   renderItem: (i) => (
@@ -75,7 +75,8 @@ const pubConfig: ResourceConfig<PublicationDoc> = {
     { name: 'venue', label: 'Venue / Journal', type: 'text' },
     { name: 'year', label: 'Year', type: 'text' },
     { name: 'authors', label: 'Authors', type: 'text', full: true },
-    { name: 'url', label: 'Link', type: 'url', full: true },
+    { name: 'url', label: 'Link', type: 'url' },
+    { name: 'order', label: 'Order', type: 'number' },
     {
       name: 'abstract',
       label: 'Abstract',
@@ -84,7 +85,6 @@ const pubConfig: ResourceConfig<PublicationDoc> = {
       full: true,
       rows: 4,
     },
-    { name: 'order', label: 'Order', type: 'number' },
   ],
   labelOf: (i) => i.title,
   renderItem: (i) => (
