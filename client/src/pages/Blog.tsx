@@ -10,21 +10,28 @@ import { useSectionCopy } from '@/hooks/useSectionCopy';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
 import Reveal from '@/components/motion/Reveal';
 import GlassCard from '@/components/shared/GlassCard';
+import { Button } from '@/components/ui/button';
 import {
   ErrorState,
   EmptyState,
   CardGridSkeleton,
 } from '@/components/ui/States';
-import { useBlogList } from '@/hooks/usePortfolio';
+import { useBlogInfinite } from '@/hooks/usePortfolio';
 import { formatDate } from '@/lib/date';
 
 export default function Blog() {
   const [q, setQ] = useState('');
   const query = useDebounce(q.trim(), 350);
-  const { data, isLoading, isError, refetch } = useBlogList(
-    query ? `?q=${encodeURIComponent(query)}` : ''
-  );
-  const posts = data?.data ?? [];
+  const {
+    data,
+    isLoading,
+    isError,
+    refetch,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useBlogInfinite(query);
+  const posts = data?.pages.flatMap((p) => p.data) ?? [];
   const copy = useSectionCopy('blog', {
     index: '~/blog',
     title: 'Writing & notes',
@@ -33,11 +40,13 @@ export default function Blog() {
   });
   const st = useSiteCopy('states', {
     postsEmpty: 'No posts published yet — check back soon!',
+    postsSearchEmpty: 'No posts match your search.',
   });
   const lab = useSiteCopy('labels', {
     searchPlaceholder: 'Search articles…',
     searchAria: 'Search articles',
     unitMin: 'min',
+    loadMore: 'Load more',
   });
 
   return (
@@ -73,7 +82,7 @@ export default function Blog() {
         {isLoading && <CardGridSkeleton />}
         {isError && <ErrorState onRetry={() => void refetch()} />}
         {!isLoading && !isError && posts.length === 0 && (
-          <EmptyState message={st.postsEmpty} />
+          <EmptyState message={query ? st.postsSearchEmpty : st.postsEmpty} />
         )}
 
         <div className="grid auto-rows-[1fr] gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -133,6 +142,18 @@ export default function Blog() {
             </Reveal>
           ))}
         </div>
+
+        {hasNextPage && (
+          <div className="mt-10 flex justify-center">
+            <Button
+              variant="ghost"
+              onClick={() => void fetchNextPage()}
+              disabled={isFetchingNextPage}
+            >
+              {isFetchingNextPage ? 'Loading…' : lab.loadMore}
+            </Button>
+          </div>
+        )}
       </Section>
     </>
   );

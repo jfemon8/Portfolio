@@ -59,7 +59,9 @@ const projectSchema = new mongoose.Schema<IProject>(
 );
 
 projectSchema.pre('validate', function setSlug(next) {
-  if (this.isModified('title') || !this.slug) {
+  // Guard on a present title so a missing one falls through to the `required`
+  // validator (clean 400) instead of throwing inside slugify (500).
+  if (this.title && (this.isModified('title') || !this.slug)) {
     this.slug = slugify(this.title, { lower: true, strict: true });
   }
   next();

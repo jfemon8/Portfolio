@@ -124,7 +124,9 @@ export const env: Env = {
   smtp: {
     host: e.SMTP_HOST,
     port: e.SMTP_PORT ?? 465,
-    secure: e.SMTP_SECURE ?? true,
+    // Implicit TLS only on 465; ports 587/25 use STARTTLS (secure:false).
+    // Defaulting to true regardless of port breaks 587 setups.
+    secure: e.SMTP_SECURE ?? (e.SMTP_PORT ?? 465) === 465,
     user: e.SMTP_USER,
     pass: e.SMTP_PASS,
     receiver: e.CONTACT_RECEIVER_EMAIL ?? e.SMTP_USER,

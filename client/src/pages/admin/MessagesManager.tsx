@@ -51,7 +51,13 @@ export default function MessagesManager() {
       id: string;
       body: Partial<Pick<MessageDoc, 'read' | 'starred' | 'archived'>>;
     }) => (await api.patch(`/messages/${id}`, body)).data,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['messages'] }),
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: ['messages'] });
+      // Keep the open detail pane in sync — otherwise `active` is a stale copy
+      // and the star/read/archive toggles show the wrong state / only toggle
+      // one way.
+      setActive((a) => (a && a._id === vars.id ? { ...a, ...vars.body } : a));
+    },
   });
   const del = useMutation({
     mutationFn: async (id: string) =>

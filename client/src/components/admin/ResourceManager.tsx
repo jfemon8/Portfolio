@@ -133,12 +133,13 @@ export default function ResourceManager<T extends WithId>({
   const save = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
     setFieldErrors({});
-    const payload: FormState = { ...form };
+    let payload: FormState = { ...form };
     for (const field of config.fields) {
       if (field.type !== 'list' && field.type !== 'tags') continue;
       const current = getByPath(payload, field.name);
       if (!Array.isArray(current)) continue;
-      setByPath(
+      // setByPath is immutable — assign its return value or the cleanup is a no-op.
+      payload = setByPath(
         payload,
         field.name,
         current

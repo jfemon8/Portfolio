@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
 import { User, type UserDoc } from '../models/User.js';
+import { RefreshToken } from '../models/RefreshToken.js';
 import * as authService from '../services/authService.js';
 import { recordAudit } from '../services/auditService.js';
 import {
@@ -75,7 +76,16 @@ export const updatePassword = asyncHandler(
       throw ApiError.unauthorized('Current password is incorrect.');
     }
     user.password = newPassword;
+    user.passwordChangedAt = new Date();
     await user.save();
+    // Revoke every outstanding refresh token for this user so a stolen
+    // refresh cookie can't mint new access tokens after the change. Combined
+    // with the passwordChangedAt check in `protect`, this fully ends all
+    // prior sessions (including this one — the user must log in again).
+    await RefreshToken.updateMany(
+      { user: user._id, revokedAt: { $exists: false } },
+      { revokedAt: new Date() }
+    );
     recordAudit({
       req,
       action: 'auth.password_changed',
@@ -83,7 +93,10 @@ export const updatePassword = asyncHandler(
       actorEmail: user.email,
       role: user.role,
     });
-    res.json({ success: true, message: 'Password updated successfully.' });
+    res.json({
+      success: true,
+      message: 'Password updated. Please log in again with your new password.',
+    });
   }
 );
 

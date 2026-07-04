@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import type {
   BlogDetailResponse,
@@ -115,10 +115,25 @@ export const usePublications = () =>
     staleTime: CONTENT,
   });
 
-export const useBlogList = (params = '') =>
-  useQuery({
-    queryKey: ['blog', params],
-    queryFn: () => get<PaginatedResponse<BlogPostDoc>>(`/blog${params}`),
+/**
+ * Paginated public blog list. Consumes the server `pagination` metadata so
+ * posts beyond the first page stay reachable (via `fetchNextPage`). `query`
+ * is the raw search term (encoded here).
+ */
+export const useBlogInfinite = (query = '') =>
+  useInfiniteQuery({
+    queryKey: ['blog', 'list', query],
+    queryFn: ({ pageParam }) => {
+      const qs = new URLSearchParams();
+      if (query) qs.set('q', query);
+      qs.set('page', String(pageParam));
+      return get<PaginatedResponse<BlogPostDoc>>(`/blog?${qs.toString()}`);
+    },
+    initialPageParam: 1,
+    getNextPageParam: (last) =>
+      last.pagination.page < last.pagination.pages
+        ? last.pagination.page + 1
+        : undefined,
     staleTime: CONTENT,
   });
 

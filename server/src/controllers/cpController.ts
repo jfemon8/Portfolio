@@ -46,7 +46,12 @@ export const getCpStats = asyncHandler(async (_req: Request, res: Response) => {
     ]);
     const doc = await CpStats.findOneAndUpdate(
       { handle },
-      { ...snap, leetcode, codechef, fetchedAt: new Date() },
+      // Store the handle under the SAME key we look it up by. Codeforces
+      // returns a canonically-cased handle in `snap.handle` (e.g. 'tourist'
+      // for a configured 'Tourist'); persisting that would make the next
+      // case-sensitive findOne({ handle }) miss forever and collide on the
+      // unique index. Pin the stored handle to the admin-configured value.
+      { ...snap, handle, leetcode, codechef, fetchedAt: new Date() },
       { new: true, upsert: true, setDefaultsOnInsert: true }
     );
     res.json({ success: true, data: doc });

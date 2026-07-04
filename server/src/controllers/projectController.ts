@@ -9,8 +9,10 @@ export const listProjects = asyncHandler(
   async (req: Request, res: Response) => {
     const filter: Record<string, unknown> = {};
     if (req.query.featured === 'true') filter.featured = true;
+    // Coerce to a primitive string so a crafted object like
+    // ?category[$ne]=x can't inject a Mongo query operator.
     if (req.query.category && req.query.category !== 'all') {
-      filter.category = req.query.category;
+      filter.category = String(req.query.category);
     }
     const projects = await Project.find(filter).sort({
       featured: -1,

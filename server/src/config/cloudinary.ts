@@ -64,10 +64,21 @@ export function uploadBuffer(
   });
 }
 
-export async function destroyAsset(publicId?: string): Promise<void> {
+export async function destroyAsset(
+  publicId?: string,
+  resourceType?: CloudinaryResourceType
+): Promise<void> {
   if (!publicId || !env.cloudinary.configured) return;
+  // The SDK defaults resource_type to 'image', which never matches a `raw`
+  // asset — so PDFs (stored with a `.pdf`-suffixed public_id) would never be
+  // deleted. Honour an explicit type, else infer 'raw' from the .pdf suffix.
+  const type: CloudinaryResourceType =
+    resourceType ?? (/\.pdf$/i.test(publicId) ? 'raw' : 'image');
   try {
-    await cloudinary.uploader.destroy(publicId);
+    await cloudinary.uploader.destroy(publicId, {
+      resource_type: type,
+      invalidate: true,
+    });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     console.warn(`Cloudinary delete failed for ${publicId}: ${msg}`);

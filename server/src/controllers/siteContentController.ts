@@ -5,8 +5,13 @@ import { SiteContent } from '../models/SiteContent.js';
 /** Public — the single site-content doc (creates an empty one if absent). */
 export const getSiteContent = asyncHandler(
   async (_req: Request, res: Response) => {
-    let content = await SiteContent.findOne();
-    if (!content) content = await SiteContent.create({});
+    // Atomic get-or-create — avoids the find-then-create race that could
+    // otherwise insert duplicate "singleton" docs on concurrent first hits.
+    const content = await SiteContent.findOneAndUpdate(
+      {},
+      {},
+      { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
     res.json({ success: true, data: content });
   }
 );

@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import type { Model, RootFilterQuery } from 'mongoose';
+import mongoose, { type Model, type RootFilterQuery } from 'mongoose';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
 import { destroyAsset } from '../config/cloudinary.js';
@@ -26,7 +26,9 @@ export const crudFactory = <T>(Model: Model<T>, opts: CrudOptions = {}) => {
   const list = asyncHandler(async (req: Request, res: Response) => {
     const filter: Record<string, unknown> = {};
     if (req.query.featured === 'true') filter.featured = true;
-    if (req.query.category) filter.category = req.query.category;
+    // Coerce to a primitive string so a crafted object like
+    // ?category[$ne]=x can't inject a Mongo query operator.
+    if (req.query.category) filter.category = String(req.query.category);
     const docs = await Model.find(filter as RootFilterQuery<T>).sort(sort);
     res.json({ success: true, count: docs.length, data: docs });
   });
@@ -65,9 +67,30 @@ export const crudFactory = <T>(Model: Model<T>, opts: CrudOptions = {}) => {
   const reorder = asyncHandler(async (req: Request, res: Response) => {
     const items = req.body.items as ReorderItem[] | undefined;
     if (!Array.isArray(items)) throw ApiError.badRequest('items[] required');
-    await Promise.all(
-      items.map((i) => Model.findByIdAndUpdate(i.id, { order: i.order }))
-    );
+    if (items.length > 500) throw ApiError.badRequest('Too many items');
+    // Validate the whole payload up front so one bad entry can't leave the
+    // list half-reordered (the old parallel findByIdAndUpdate committed some
+    // writes before rejecting on a malformed id/order).
+    for (const i of items) {
+      if (
+        !mongoose.isValidObjectId(i.id) ||
+        !Number.isFinite(Number(i.order))
+      ) {
+        throw ApiError.badRequest('Invalid reorder payload');
+      }
+    }
+    if (items.length) {
+      // One atomic round-trip instead of an N-way concurrent fan-out.
+      // Cast: the factory is generic over T, which has no statically-known
+      // `order` field, but every reorderable model does.
+      const ops = items.map((i) => ({
+        updateOne: {
+          filter: { _id: i.id },
+          update: { $set: { order: Number(i.order) } },
+        },
+      })) as unknown as Parameters<typeof Model.bulkWrite>[0];
+      await Model.bulkWrite(ops);
+    }
     res.json({ success: true, message: 'Reordered' });
   });
 

@@ -64,7 +64,12 @@ export const track = asyncHandler(async (req: Request, res: Response) => {
 
 /** Admin — aggregated dashboard summary. */
 export const summary = asyncHandler(async (req: Request, res: Response) => {
-  const days = Math.min(90, parseInt(String(req.query.days)) || 30);
+  // Clamp both bounds — a negative ?days would otherwise make `since` a
+  // future date and zero out every aggregation.
+  const days = Math.min(
+    90,
+    Math.max(1, parseInt(String(req.query.days)) || 30)
+  );
   const since = new Date(Date.now() - days * 86_400_000);
 
   const [

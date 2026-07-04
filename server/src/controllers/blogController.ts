@@ -18,14 +18,35 @@ export const publicVisibility = (): RootFilterQuery<IBlogPost> => ({
   ],
 });
 
+/** Escape regex metacharacters so a search term is matched literally
+ *  (prevents invalid-regex 500s on inputs like "C++" and closes the
+ *  regex-injection / ReDoS surface on this public endpoint). */
+const escapeRegex = (s: string): string =>
+  s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 /** Public — visible posts only, paginated, with ?tag & ?q search. */
 export const listPublished = asyncHandler(
   async (req: Request, res: Response) => {
+    // Self-heal: promote any scheduled posts whose time has arrived so their
+    // publishedAt is set (Vercel serverless has no cron; the model otherwise
+    // only promotes on .save()). Keeps ordering + displayed dates correct.
+    await BlogPost.updateMany(
+      { status: 'scheduled', scheduledFor: { $lte: new Date() } },
+      [
+        {
+          $set: {
+            status: 'published',
+            publishedAt: { $ifNull: ['$publishedAt', '$scheduledFor'] },
+          },
+        },
+      ]
+    );
+
     const page = Math.max(1, parseInt(String(req.query.page)) || 1);
     const limit = Math.min(50, parseInt(String(req.query.limit)) || 9);
     const and: RootFilterQuery<IBlogPost>[] = [publicVisibility()];
     if (req.query.q) {
-      const q = String(req.query.q);
+      const q = escapeRegex(String(req.query.q).slice(0, 100));
       and.push({
         $or: [
           { title: { $regex: q, $options: 'i' } },

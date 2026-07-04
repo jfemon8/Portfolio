@@ -11,11 +11,11 @@ import GlassCard from '@/components/shared/GlassCard';
 import { Button } from '@/components/ui/button';
 import { Spinner, ErrorState, EmptyState } from '@/components/ui/States';
 import { cn } from '@/lib/cn';
-import type { ApiError, ListResponse, UserDoc } from '@/types';
+import type { ApiError, AuthUser, ListResponse } from '@/types';
 
 type AssignableRole = 'admin' | 'visitor';
 interface FormState {
-  _id?: string;
+  id?: string;
   name: string;
   email: string;
   password: string;
@@ -38,7 +38,7 @@ export default function UsersManager() {
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['users'],
-    queryFn: async () => (await api.get<ListResponse<UserDoc>>('/users')).data,
+    queryFn: async () => (await api.get<ListResponse<AuthUser>>('/users')).data,
   });
   const users = data?.data ?? [];
 
@@ -58,7 +58,7 @@ export default function UsersManager() {
   const update = useMutation({
     mutationFn: async (b: FormState) =>
       (
-        await api.patch(`/users/${b._id}`, {
+        await api.patch(`/users/${b.id}`, {
           name: b.name,
           role: b.role,
           status: b.status,
@@ -80,7 +80,7 @@ export default function UsersManager() {
     onError: onErr,
   });
 
-  const editing = !!form?._id;
+  const editing = !!form?.id;
   const submit = (e: React.FormEvent): void => {
     e.preventDefault();
     if (!form) return;
@@ -117,10 +117,10 @@ export default function UsersManager() {
       <div className="space-y-3">
         {users.map((u) => {
           const locked = u.isImmutableSuperAdmin;
-          const isSelf = me?.id === u._id;
+          const isSelf = me?.id === u.id;
           return (
             <GlassCard
-              key={u._id}
+              key={u.id}
               className="flex flex-wrap items-center justify-between gap-4 p-4"
             >
               <div className="flex min-w-0 items-center gap-3">
@@ -160,12 +160,12 @@ export default function UsersManager() {
                   disabled={locked}
                   onClick={() =>
                     setForm({
-                      _id: u._id,
+                      id: u.id,
                       name: u.name,
                       email: u.email,
                       password: '',
                       role: u.role === 'visitor' ? 'visitor' : 'admin',
-                      status: u.status,
+                      status: u.status === 'disabled' ? 'disabled' : 'active',
                     })
                   }
                   title={locked ? 'Protected account' : 'Edit'}
@@ -183,7 +183,7 @@ export default function UsersManager() {
                       variant: 'danger',
                       requireTypeToConfirm: u.email,
                     });
-                    if (ok) del.mutate(u._id);
+                    if (ok) del.mutate(u.id);
                   }}
                   title={
                     locked

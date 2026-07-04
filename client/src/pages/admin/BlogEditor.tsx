@@ -14,6 +14,18 @@ import type { ApiError, BlogPostDoc, ItemResponse } from '@/types';
 
 type BlogForm = Partial<BlogPostDoc>;
 
+/** Format an ISO instant as a `datetime-local` value in the admin's LOCAL
+ *  wall-clock time (the input has no timezone; `toISOString` would show UTC
+ *  and misrepresent the scheduled time for non-UTC admins). */
+const toLocalInput = (iso?: string): string => {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  return new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 16);
+};
+
 const empty: BlogForm = {
   title: '',
   excerpt: '',
@@ -146,11 +158,7 @@ export default function BlogEditor() {
                 <input
                   type="datetime-local"
                   className="input"
-                  value={
-                    f.scheduledFor
-                      ? new Date(f.scheduledFor).toISOString().slice(0, 16)
-                      : ''
-                  }
+                  value={toLocalInput(f.scheduledFor)}
                   onChange={(e) =>
                     set(
                       'scheduledFor',

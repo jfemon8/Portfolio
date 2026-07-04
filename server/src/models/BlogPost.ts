@@ -27,7 +27,9 @@ const blogSchema = new mongoose.Schema<IBlogPost>(
 );
 
 blogSchema.pre('validate', function prep(next) {
-  if (this.isModified('title') || !this.slug) {
+  // Guard on a present title so a missing one falls through to the `required`
+  // validator (clean 400) instead of throwing inside slugify (500).
+  if (this.title && (this.isModified('title') || !this.slug)) {
     this.slug = slugify(this.title, { lower: true, strict: true });
   }
   if (this.isModified('content')) {

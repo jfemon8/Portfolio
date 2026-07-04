@@ -32,6 +32,18 @@ export const protect = asyncHandler(
     if (user.status === 'disabled') {
       throw ApiError.forbidden('This account has been disabled.');
     }
+    // Reject access tokens issued before the last password change, so
+    // changing the password immediately invalidates any earlier (e.g.
+    // stolen) session — jwt `iat` is in seconds.
+    if (
+      user.passwordChangedAt &&
+      decoded.iat &&
+      decoded.iat * 1000 < user.passwordChangedAt.getTime()
+    ) {
+      throw ApiError.unauthorized(
+        'Session expired after a password change. Please log in again.'
+      );
+    }
 
     req.user = user;
     next();

@@ -34,6 +34,7 @@ const userSchema = new mongoose.Schema<IUser, UserModel, IUserMethods>(
     isImmutableSuperAdmin: { type: Boolean, default: false },
     avatar: { type: String, default: '' },
     lastLogin: { type: Date },
+    passwordChangedAt: { type: Date },
   },
   { timestamps: true }
 );

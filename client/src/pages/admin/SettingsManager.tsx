@@ -30,7 +30,7 @@ interface PasswordForm {
 }
 
 export default function SettingsManager() {
-  const { user, setUser } = useAuth();
+  const { user, setUser, logout } = useAuth();
   const [savingName, setSavingName] = useState(false);
   const [name, setName] = useState(user?.name || '');
 
@@ -153,8 +153,12 @@ export default function SettingsManager() {
         currentPassword: v.currentPassword,
         newPassword: v.newPassword,
       });
-      toast.success('Password updated');
       reset();
+      // The server ends all sessions on a password change (revokes refresh
+      // tokens + invalidates prior access tokens), so log out and send the
+      // user back to sign in with the new password.
+      toast.success('Password updated — please log in again.');
+      logout();
     } catch (err) {
       toast.error((err as ApiError).message || 'Failed to update password');
     }

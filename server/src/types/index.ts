@@ -19,6 +19,10 @@ export interface IUser {
   isImmutableSuperAdmin: boolean;
   avatar: string;
   lastLogin?: Date;
+  /** When the password was last changed — access tokens issued before this
+   *  instant are rejected by `protect`, so a password change locks out any
+   *  previously-issued (e.g. stolen) session. */
+  passwordChangedAt?: Date;
 }
 
 /** Persisted, hashed refresh token (rotation + reuse detection). */
@@ -567,4 +571,7 @@ export interface JwtPayload {
   email: string;
   /** distinguishes access vs (future) typed tokens */
   type: 'access';
+  /** issued-at (seconds) — added by jwt.sign, used to reject stale tokens */
+  iat?: number;
+  exp?: number;
 }

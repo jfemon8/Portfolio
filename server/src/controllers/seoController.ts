@@ -4,8 +4,13 @@ import { SeoSettings } from '../models/SeoSettings.js';
 
 /** Public — the single SEO-settings doc (creates an empty one if absent). */
 export const getSeo = asyncHandler(async (_req: Request, res: Response) => {
-  let seo = await SeoSettings.findOne();
-  if (!seo) seo = await SeoSettings.create({});
+  // Atomic get-or-create — avoids the find-then-create race that could
+  // otherwise insert duplicate "singleton" docs on concurrent first hits.
+  const seo = await SeoSettings.findOneAndUpdate(
+    {},
+    {},
+    { new: true, upsert: true, setDefaultsOnInsert: true }
+  );
   res.json({ success: true, data: seo });
 });
 

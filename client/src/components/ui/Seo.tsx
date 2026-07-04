@@ -100,7 +100,9 @@ export default function Seo({
 
       {schemas.map((s, i) => (
         <script key={i} type="application/ld+json">
-          {JSON.stringify(s)}
+          {/* Escape '<' so admin-authored content can't break out of the
+              script tag (e.g. a "</script>" in a title) — defence in depth. */}
+          {JSON.stringify(s).replace(/</g, '\\u003c')}
         </script>
       ))}
     </Helmet>

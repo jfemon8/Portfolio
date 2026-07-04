@@ -41,7 +41,11 @@ api.interceptors.response.use(
 
     if (status === 401 && tokenStore.get()) {
       tokenStore.clear();
-      if (!window.location.pathname.startsWith('/admin/login')) {
+      // Only bounce to the login screen from within the admin area. On public
+      // pages a stale token must not yank the visitor off the site — just drop
+      // it and let AuthContext reset state.
+      const path = window.location.pathname;
+      if (path.startsWith('/admin') && !path.startsWith('/admin/login')) {
         window.location.href = '/admin/login';
       }
     }

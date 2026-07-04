@@ -4,8 +4,13 @@ import { SiteSettings } from '../models/SiteSettings.js';
 
 /** Public — the single site-layout doc (creates an empty one if absent). */
 export const getSite = asyncHandler(async (_req: Request, res: Response) => {
-  let site = await SiteSettings.findOne();
-  if (!site) site = await SiteSettings.create({});
+  // Atomic get-or-create — avoids the find-then-create race that could
+  // otherwise insert duplicate "singleton" docs on concurrent first hits.
+  const site = await SiteSettings.findOneAndUpdate(
+    {},
+    {},
+    { new: true, upsert: true, setDefaultsOnInsert: true }
+  );
   res.json({ success: true, data: site });
 });
 
