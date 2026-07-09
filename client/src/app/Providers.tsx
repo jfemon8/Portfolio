@@ -19,7 +19,9 @@ export default function Providers({ children }: { children: ReactNode }) {
   return (
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
+        <BrowserRouter
+          future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+        >
           <AuthProvider>
             {children}
             <Toaster
