@@ -1,7 +1,15 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { Plus, Pencil, Trash2, ShieldCheck, Lock } from 'lucide-react';
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  ShieldCheck,
+  Lock,
+  Eye,
+  EyeOff,
+} from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import PageHeader from '@/components/admin/PageHeader';
@@ -35,6 +43,7 @@ export default function UsersManager() {
   const confirm = useConfirm();
   const { user: me } = useAuth();
   const [form, setForm] = useState<FormState | null>(null);
+  const [showPw, setShowPw] = useState(false);
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['users'],
@@ -102,7 +111,12 @@ export default function UsersManager() {
         title="Users & Roles"
         subtitle="Super-admin only · manage admin and visitor accounts."
         action={
-          <Button onClick={() => setForm({ ...empty })}>
+          <Button
+            onClick={() => {
+              setForm({ ...empty });
+              setShowPw(false);
+            }}
+          >
             <Plus className="h-4 w-4" /> Add user
           </Button>
         }
@@ -229,22 +243,36 @@ export default function UsersManager() {
                 required
               />
             </div>
-            {!editing && (
-              <div>
-                <label className="label">Password</label>
-                <input
-                  type="password"
-                  className="input"
-                  value={form.password}
-                  onChange={(e) =>
-                    setForm({ ...form, password: e.target.value })
-                  }
-                  minLength={8}
-                  required
-                />
-              </div>
-            )}
             <div className="grid gap-4 sm:grid-cols-2">
+              {!editing && (
+                <div>
+                  <label className="label">Password</label>
+                  <div className="relative">
+                    <input
+                      type={showPw ? 'text' : 'password'}
+                      className="input pr-11"
+                      value={form.password}
+                      onChange={(e) =>
+                        setForm({ ...form, password: e.target.value })
+                      }
+                      minLength={8}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPw((s) => !s)}
+                      aria-label={showPw ? 'Hide password' : 'Show password'}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      {showPw ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
               <div>
                 <label className="label">Role</label>
                 <select
