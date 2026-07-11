@@ -98,7 +98,7 @@ export default function UsersManager() {
 
   const badge = (tone: 'neon' | 'muted' | 'warn') =>
     cn(
-      'rounded-full px-2.5 py-0.5 text-[11px] font-medium capitalize',
+      'rounded-full px-0.5 md:px-2.5 py-0.5 text-[11px] font-medium capitalize',
       tone === 'neon' && 'border border-primary/40 bg-primary/10 text-primary',
       tone === 'muted' && 'border border-border/70 text-muted-foreground',
       tone === 'warn' &&
