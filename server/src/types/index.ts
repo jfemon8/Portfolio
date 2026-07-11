@@ -529,8 +529,12 @@ export interface IMessage {
   read: boolean;
   starred: boolean;
   archived: boolean;
+  replied: boolean;
+  repliedAt?: Date;
   ip: string;
   userAgent: string;
+  /** set by schema `timestamps: true`; declared so replies can quote the date */
+  createdAt?: Date;
 }
 
 export type VisitType =

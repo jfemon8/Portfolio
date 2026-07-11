@@ -9,6 +9,8 @@ import {
   Archive,
   Reply,
   ChevronLeft,
+  Send,
+  Check,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import PageHeader from '@/components/admin/PageHeader';
@@ -18,7 +20,7 @@ import { Button } from '@/components/ui/button';
 import { Spinner, EmptyState } from '@/components/ui/States';
 import { cn } from '@/lib/cn';
 import { formatDate, formatDateTime } from '@/lib/date';
-import type { ListResponse, MessageDoc } from '@/types';
+import type { ApiError, ItemResponse, ListResponse, MessageDoc } from '@/types';
 
 type FilterKey = 'all' | 'unread' | 'starred' | 'archived';
 
@@ -34,6 +36,9 @@ export default function MessagesManager() {
   const confirm = useConfirm();
   const [filter, setFilter] = useState<FilterKey>('all');
   const [active, setActive] = useState<MessageDoc | null>(null);
+  const [reply, setReply] = useState<{ subject: string; body: string } | null>(
+    null
+  );
 
   const { data, isLoading } = useQuery({
     queryKey: ['messages', filter],
@@ -68,9 +73,35 @@ export default function MessagesManager() {
       setActive(null);
     },
   });
+  const sendReply = useMutation({
+    mutationFn: async ({
+      id,
+      subject,
+      body,
+    }: {
+      id: string;
+      subject: string;
+      body: string;
+    }) =>
+      (
+        await api.post<ItemResponse<MessageDoc>>(`/messages/${id}/reply`, {
+          subject,
+          body,
+        })
+      ).data,
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ['messages'] });
+      setActive((a) => (a && a._id === res.data._id ? res.data : a));
+      setReply(null);
+      toast.success('Reply sent');
+    },
+    onError: (e) =>
+      toast.error((e as ApiError)?.message || 'Reply could not be sent'),
+  });
 
   const open = (m: MessageDoc): void => {
     setActive(m);
+    setReply(null);
     if (!m.read) patch.mutate({ id: m._id, body: { read: true } });
   };
 
@@ -232,15 +263,76 @@ export default function MessagesManager() {
             <p className="whitespace-pre-wrap py-5 text-sm leading-relaxed text-muted-foreground">
               {active.message}
             </p>
-            <a
-              href={`mailto:${active.email}?subject=Re: ${encodeURIComponent(
-                active.subject || ''
-              )}`}
-            >
-              <Button>
-                <Reply className="h-4 w-4" /> Reply by email
-              </Button>
-            </a>
+            <div className="border-t border-border/60 pt-4">
+              {active.replied && (
+                <p className="mb-3 flex items-center gap-1.5 text-xs text-muted-foreground/70">
+                  <Check className="h-3.5 w-3.5 text-neon" />
+                  Replied
+                  {active.repliedAt && ` · ${formatDateTime(active.repliedAt)}`}
+                </p>
+              )}
+              {reply ? (
+                <div className="space-y-3">
+                  <div>
+                    <label className="label">Subject</label>
+                    <input
+                      className="input"
+                      value={reply.subject}
+                      onChange={(e) =>
+                        setReply({ ...reply, subject: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label className="label">Reply</label>
+                    <textarea
+                      rows={6}
+                      autoFocus
+                      className="input resize-y"
+                      placeholder={`Write your reply to ${active.name}…`}
+                      value={reply.body}
+                      onChange={(e) =>
+                        setReply({ ...reply, body: e.target.value })
+                      }
+                    />
+                  </div>
+                  <p className="text-[11px] text-muted-foreground/70">
+                    Sent by email to {active.email}, with the original message
+                    quoted below your reply.
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() =>
+                        sendReply.mutate({ id: active._id, ...reply })
+                      }
+                      disabled={!reply.body.trim() || sendReply.isPending}
+                    >
+                      <Send className="h-4 w-4" />
+                      {sendReply.isPending ? 'Sending…' : 'Send reply'}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={() => setReply(null)}
+                      disabled={sendReply.isPending}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <Button
+                  onClick={() =>
+                    setReply({
+                      subject: `Re: ${active.subject || 'your message'}`,
+                      body: '',
+                    })
+                  }
+                >
+                  <Reply className="h-4 w-4" />
+                  {active.replied ? 'Reply again' : 'Reply'}
+                </Button>
+              )}
+            </div>
           </GlassCard>
         ) : (
           <GlassCard className="hidden place-items-center p-10 text-muted-foreground/60 lg:grid">

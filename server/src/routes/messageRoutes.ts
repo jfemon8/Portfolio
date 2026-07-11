@@ -8,6 +8,7 @@ import {
   listMessages,
   updateMessage,
   deleteMessage,
+  replyToMessage,
 } from '../controllers/messageController.js';
 
 const router = Router();
@@ -30,5 +31,16 @@ router.post(
 router.get('/', protect, adminOnly, listMessages);
 router.patch('/:id', protect, adminOnly, updateMessage);
 router.delete('/:id', protect, adminOnly, deleteMessage);
+router.post(
+  '/:id/reply',
+  protect,
+  adminOnly,
+  [
+    body('body').trim().notEmpty().withMessage('Reply message is required'),
+    body('subject').optional().isString().trim(),
+  ],
+  validate,
+  replyToMessage
+);
 
 export default router;

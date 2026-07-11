@@ -141,4 +141,71 @@ export async function sendContactEmail({
   }
 }
 
+export interface ReplyEmailInput {
+  to: string;
+  subject: string;
+  body: string;
+  original: { name: string; message: string; createdAt?: Date };
+}
+
+/**
+ * Sends an admin-composed reply to a contact-form sender, quoting the
+ * original message. Never throws — the caller decides how to surface a
+ * failure (the admin must know the reply did not go out).
+ */
+export async function sendReplyEmail({
+  to,
+  subject,
+  body,
+  original,
+}: ReplyEmailInput): Promise<ContactEmailResult> {
+  const tx = getTransporter();
+  if (!tx) return { sent: false, reason: 'smtp_not_configured' };
+
+  // From-name follows the admin-managed ack template (fallback as in ackMail).
+  let fromName = 'Md Jannatul Ferdhous Emon';
+  try {
+    const sc = await SiteContent.findOne()
+      .select('email')
+      .lean<{ email?: ISiteContent['email'] } | null>();
+    fromName = sc?.email?.ackFromName?.trim() || fromName;
+  } catch {
+    /* keep hardcoded fallback */
+  }
+
+  const sentOn = original.createdAt
+    ? new Date(original.createdAt).toLocaleString('en-US', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      })
+    : '';
+
+  const mail = {
+    from: `"${fromName}" <${env.smtp.user}>`,
+    to,
+    replyTo: env.smtp.receiver,
+    subject,
+    html: `
+      <div style="font-family:system-ui,Segoe UI,sans-serif;max-width:600px;margin:auto;border:1px solid #1f2937;border-radius:12px;overflow:hidden">
+        <div style="background:#0a0a0f;color:#00ffd1;padding:20px 24px;font-size:18px;font-weight:700">${safe(fromName)}</div>
+        <div style="padding:24px;background:#0f0f17;color:#e5e7eb">
+          <p style="white-space:pre-wrap;margin:0">${safe(body)}</p>
+          <div style="margin-top:24px;padding-top:16px;border-top:1px solid #1f2937;color:#9ca3af;font-size:13px">
+            <p style="margin:0 0 8px">${sentOn ? `On ${safe(sentOn)}, ` : ''}${safe(original.name)} wrote:</p>
+            <p style="white-space:pre-wrap;margin:0;background:#1a1a24;padding:12px 16px;border-radius:8px;border-left:3px solid #374151">${safe(original.message)}</p>
+          </div>
+        </div>
+      </div>`,
+  };
+
+  try {
+    await tx.sendMail(mail);
+    return { sent: true };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('Reply email send failed:', msg);
+    return { sent: false, reason: msg };
+  }
+}
+
 export default getTransporter;

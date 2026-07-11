@@ -252,6 +252,8 @@ export interface Message {
   read: boolean;
   starred: boolean;
   archived: boolean;
+  replied: boolean;
+  repliedAt?: string;
   ip: string;
   userAgent: string;
 }

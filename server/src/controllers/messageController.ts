@@ -3,7 +3,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
 import { Message } from '../models/Message.js';
 import { Visit } from '../models/Visit.js';
-import { sendContactEmail } from '../config/mailer.js';
+import { sendContactEmail, sendReplyEmail } from '../config/mailer.js';
 
 /** Public — submit the contact form. Stores in DB + emails owner & sender. */
 export const submitMessage = asyncHandler(
@@ -79,5 +79,40 @@ export const deleteMessage = asyncHandler(
     const msg = await Message.findByIdAndDelete(req.params.id);
     if (!msg) throw ApiError.notFound('Message not found');
     res.json({ success: true, message: 'Message deleted' });
+  }
+);
+
+/** Send an email reply to the sender directly from the admin panel. */
+export const replyToMessage = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { subject, body } = req.body as { subject?: string; body: string };
+    const msg = await Message.findById(req.params.id);
+    if (!msg) throw ApiError.notFound('Message not found');
+
+    const result = await sendReplyEmail({
+      to: msg.email,
+      subject: subject?.trim() || `Re: ${msg.subject || 'your message'}`,
+      body,
+      original: {
+        name: msg.name,
+        message: msg.message,
+        createdAt: msg.createdAt,
+      },
+    });
+    if (!result.sent) {
+      throw new ApiError(
+        502,
+        result.reason === 'smtp_not_configured'
+          ? 'Email is not configured on the server — reply not sent.'
+          : `Reply could not be sent: ${result.reason}`
+      );
+    }
+
+    msg.replied = true;
+    msg.repliedAt = new Date();
+    if (!msg.read) msg.read = true;
+    await msg.save();
+
+    res.json({ success: true, data: msg, message: 'Reply sent' });
   }
 );

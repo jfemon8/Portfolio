@@ -10,6 +10,8 @@ const messageSchema = new mongoose.Schema<IMessage>(
     read: { type: Boolean, default: false },
     starred: { type: Boolean, default: false },
     archived: { type: Boolean, default: false },
+    replied: { type: Boolean, default: false },
+    repliedAt: { type: Date },
     ip: { type: String, default: '' },
     userAgent: { type: String, default: '' },
   },
