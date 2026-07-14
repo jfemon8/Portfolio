@@ -8,6 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 import PremiumBackground from '@/components/layout/PremiumBackground';
 import GlassCard from '@/components/shared/GlassCard';
 import { Button } from '@/components/ui/button';
+import PasswordInput from '@/components/ui/PasswordInput';
 import Seo from '@/components/ui/Seo';
 import { getValidationMessage } from '@/lib/validation';
 import type { ApiError } from '@/types';
@@ -121,9 +122,7 @@ export default function Login() {
               </div>
               <div>
                 <label className="label">{c.passwordLabel}</label>
-                <input
-                  className="input"
-                  type="password"
+                <PasswordInput
                   autoComplete="current-password"
                   placeholder={c.passwordPlaceholder}
                   {...register('password', { required: c.passwordRequired })}

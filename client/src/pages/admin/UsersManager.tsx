@@ -1,15 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import {
-  Plus,
-  Pencil,
-  Trash2,
-  ShieldCheck,
-  Lock,
-  Eye,
-  EyeOff,
-} from 'lucide-react';
+import { Plus, Pencil, Trash2, ShieldCheck, Lock } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import PageHeader from '@/components/admin/PageHeader';
@@ -17,6 +9,7 @@ import Modal from '@/components/admin/Modal';
 import { useConfirm } from '@/components/admin/ConfirmModal';
 import GlassCard from '@/components/shared/GlassCard';
 import { Button } from '@/components/ui/button';
+import PasswordInput from '@/components/ui/PasswordInput';
 import { Spinner, ErrorState, EmptyState } from '@/components/ui/States';
 import { cn } from '@/lib/cn';
 import type { ApiError, AuthUser, ListResponse } from '@/types';
@@ -65,7 +58,6 @@ export default function UsersManager() {
   const confirm = useConfirm();
   const { user: me } = useAuth();
   const [form, setForm] = useState<FormState | null>(null);
-  const [showPw, setShowPw] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
 
   const { data, isLoading, isError, refetch } = useQuery({
@@ -130,7 +122,6 @@ export default function UsersManager() {
 
   const openNew = (): void => {
     setForm({ ...empty });
-    setShowPw(false);
     setErrors({});
   };
   const openEdit = (u: AuthUser): void => {
@@ -288,27 +279,11 @@ export default function UsersManager() {
               {!editing && (
                 <div>
                   <label className="label">Password</label>
-                  <div className="relative">
-                    <input
-                      type={showPw ? 'text' : 'password'}
-                      className="input pr-11"
-                      value={form.password}
-                      onChange={(e) => setField('password', e.target.value)}
-                      aria-invalid={!!errors.password}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPw((s) => !s)}
-                      aria-label={showPw ? 'Hide password' : 'Show password'}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
-                    >
-                      {showPw ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </button>
-                  </div>
+                  <PasswordInput
+                    value={form.password}
+                    onChange={(e) => setField('password', e.target.value)}
+                    aria-invalid={!!errors.password}
+                  />
                   {errors.password && (
                     <p className="mt-1 text-xs text-destructive">
                       {errors.password}

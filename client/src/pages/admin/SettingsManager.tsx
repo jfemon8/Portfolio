@@ -20,6 +20,7 @@ import ImageUpload from '@/components/admin/ImageUpload';
 import Toggle from '@/components/ui/Toggle';
 import GlassCard from '@/components/shared/GlassCard';
 import { Button } from '@/components/ui/button';
+import PasswordInput from '@/components/ui/PasswordInput';
 import { getValidationMessage } from '@/lib/validation';
 import type { ApiError, MeResponse, SeoSettings, SiteSettings } from '@/types';
 
@@ -225,9 +226,7 @@ export default function SettingsManager() {
             <div className="grid gap-4">
               <div>
                 <label className="label">Current password</label>
-                <input
-                  type="password"
-                  className="input"
+                <PasswordInput
                   {...register('currentPassword', {
                     required: 'Please enter your current password.',
                   })}
@@ -241,9 +240,7 @@ export default function SettingsManager() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="label">New password</label>
-                  <input
-                    type="password"
-                    className="input"
+                  <PasswordInput
                     {...register('newPassword', {
                       required: 'Please enter a new password.',
                       minLength: {
@@ -260,9 +257,7 @@ export default function SettingsManager() {
                 </div>
                 <div>
                   <label className="label">Confirm new password</label>
-                  <input
-                    type="password"
-                    className="input"
+                  <PasswordInput
                     {...register('confirm', {
                       required: 'Please confirm your new password.',
                     })}
