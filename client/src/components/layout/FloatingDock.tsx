@@ -11,7 +11,6 @@ import {
   Mail,
   type LucideIcon,
 } from 'lucide-react';
-import Magnetic from '@/components/motion/Magnetic';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import { scrollToId } from '@/lib/smoothScroll';
 import { prefetchRoute } from '@/lib/prefetch';
@@ -121,36 +120,35 @@ export default function FloatingDock() {
           const label =
             nav.items.find((n) => n.key === item.target)?.label || item.label;
           return (
-            <Magnetic key={item.label} strength={0.25}>
-              <button
-                onClick={() => go(item.target)}
-                onPointerEnter={() => {
-                  if (item.target.startsWith('/')) prefetchRoute(item.target);
-                }}
-                onFocus={() => {
-                  if (item.target.startsWith('/')) prefetchRoute(item.target);
-                }}
-                aria-label={label}
-                aria-current={active ? 'page' : undefined}
-                title={label}
-                className={cn(
-                  'group relative flex items-center gap-2 rounded-xl px-2.5 py-2 text-sm transition-colors sm:px-3',
-                  active
-                    ? 'text-primary'
-                    : 'text-muted-foreground hover:text-foreground'
-                )}
-              >
-                {active && (
-                  <motion.span
-                    layoutId="dock-active"
-                    className="absolute inset-0 rounded-xl bg-primary/15 ring-1 ring-primary/40"
-                    transition={{ type: 'spring', stiffness: 320, damping: 26 }}
-                  />
-                )}
-                <item.icon className="relative h-4 w-4 shrink-0" />
-                <span className="relative hidden md:inline">{label}</span>
-              </button>
-            </Magnetic>
+            <button
+              key={item.label}
+              onClick={() => go(item.target)}
+              onPointerEnter={() => {
+                if (item.target.startsWith('/')) prefetchRoute(item.target);
+              }}
+              onFocus={() => {
+                if (item.target.startsWith('/')) prefetchRoute(item.target);
+              }}
+              aria-label={label}
+              aria-current={active ? 'page' : undefined}
+              title={label}
+              className={cn(
+                'group relative flex items-center gap-2 rounded-xl px-2.5 py-2 text-sm transition-colors sm:px-3',
+                active
+                  ? 'text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              {active && (
+                <motion.span
+                  layoutId="dock-active"
+                  className="absolute inset-0 rounded-xl bg-primary/15 ring-1 ring-primary/40"
+                  transition={{ type: 'spring', stiffness: 320, damping: 26 }}
+                />
+              )}
+              <item.icon className="relative h-4 w-4 shrink-0" />
+              <span className="relative hidden md:inline">{label}</span>
+            </button>
           );
         })}
         <span className="mx-1 h-6 w-px shrink-0 bg-border/70" />

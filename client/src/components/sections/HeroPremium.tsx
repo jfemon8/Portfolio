@@ -6,7 +6,6 @@ import { track } from '@/lib/api';
 import { duration, ease } from '@/config/animation';
 import Spotlight from '@/components/motion/Spotlight';
 import Particles from '@/components/motion/Particles';
-import Magnetic from '@/components/motion/Magnetic';
 import GlassCard from '@/components/shared/GlassCard';
 import SmartImage from '@/components/shared/SmartImage';
 import { Button } from '@/components/ui/button';
@@ -130,25 +129,21 @@ export default function HeroPremium({
               {...rise(0.28)}
               className="mt-9 flex flex-wrap items-center gap-3"
             >
-              <Magnetic strength={0.4}>
-                <Button size="lg" onClick={onProjects}>
-                  {hero.ctaProjects} <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Magnetic>
+              <Button size="lg" onClick={onProjects}>
+                {hero.ctaProjects} <ArrowRight className="h-4 w-4" />
+              </Button>
               {profile?.resumeUrl && (
-                <Magnetic strength={0.4}>
-                  <a
-                    href={proxyFileUrl(profile.resumeUrl, 'resume.pdf', false)}
-                    download
-                    onClick={() => track('resume_download', '/', 'hero')}
-                  >
-                    <Button size="lg" variant="outline">
-                      <Download className="h-4 w-4" /> {hero.ctaResume}
-                    </Button>
-                  </a>
-                </Magnetic>
+                <a
+                  href={proxyFileUrl(profile.resumeUrl, 'resume.pdf', false)}
+                  download
+                  onClick={() => track('resume_download', '/', 'hero')}
+                >
+                  <Button size="lg">
+                    <Download className="h-4 w-4" /> {hero.ctaResume}
+                  </Button>
+                </a>
               )}
-              <Button size="lg" variant="ghost" onClick={onContact}>
+              <Button size="lg" onClick={onContact}>
                 {hero.ctaContact}
               </Button>
             </motion.div>
@@ -158,18 +153,17 @@ export default function HeroPremium({
               className="mt-9 flex items-center gap-3"
             >
               {(profile?.socials ?? []).map((s) => (
-                <Magnetic key={s.label} strength={0.5}>
-                  <a
-                    href={s.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={s.label}
-                    onClick={() => track('social_click', '/', s.label)}
-                    className="grid h-11 w-11 place-items-center rounded-xl border border-border/70 bg-card/50 text-muted-foreground backdrop-blur transition-colors hover:border-primary/50 hover:text-primary"
-                  >
-                    <SocialIcon social={s} />
-                  </a>
-                </Magnetic>
+                <a
+                  key={s.label}
+                  href={s.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={s.label}
+                  onClick={() => track('social_click', '/', s.label)}
+                  className="grid h-11 w-11 place-items-center rounded-xl border border-border/70 bg-card/50 text-muted-foreground backdrop-blur transition-colors hover:border-primary/50 hover:text-primary"
+                >
+                  <SocialIcon social={s} />
+                </a>
               ))}
             </motion.div>
           </div>

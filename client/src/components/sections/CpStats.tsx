@@ -17,7 +17,6 @@ import Heatmap from '@/components/shared/Heatmap';
 import Terminal from '@/components/shared/Terminal';
 import Counter from '@/components/shared/Counter';
 import Reveal from '@/components/motion/Reveal';
-import Magnetic from '@/components/motion/Magnetic';
 import { useCpStats } from '@/hooks/usePortfolio';
 
 /**
@@ -164,16 +163,14 @@ export default function CpStats() {
               </p>
             </div>
           </div>
-          <Magnetic strength={0.4}>
-            <a
-              href={`https://codeforces.com/profile/${cp.handle}`}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-xl border border-border/70 bg-card/50 px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
-            >
-              <ExternalLink className="h-4 w-4" /> {lab.cpCfProfile}
-            </a>
-          </Magnetic>
+          <a
+            href={`https://codeforces.com/profile/${cp.handle}`}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-border/70 bg-card/50 px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
+          >
+            <ExternalLink className="h-4 w-4" /> {lab.cpCfProfile}
+          </a>
         </GlassCard>
       </Reveal>
 
@@ -212,16 +209,14 @@ export default function CpStats() {
                   </span>
                 )}
               </h3>
-              <Magnetic strength={0.4}>
-                <a
-                  href={`https://leetcode.com/u/${cp.leetcode.handle}/`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-border/70 bg-card/50 px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
-                >
-                  <ExternalLink className="h-4 w-4" /> {lab.cpLcProfile}
-                </a>
-              </Magnetic>
+              <a
+                href={`https://leetcode.com/u/${cp.leetcode.handle}/`}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-border/70 bg-card/50 px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
+              >
+                <ExternalLink className="h-4 w-4" /> {lab.cpLcProfile}
+              </a>
             </div>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               {[
@@ -278,16 +273,14 @@ export default function CpStats() {
                 </p>
               </div>
             </div>
-            <Magnetic strength={0.4}>
-              <a
-                href={`https://www.codechef.com/users/${cp.codechef.handle}`}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-xl border border-border/70 bg-card/50 px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
-              >
-                <ExternalLink className="h-4 w-4" /> {lab.cpCcProfile}
-              </a>
-            </Magnetic>
+            <a
+              href={`https://www.codechef.com/users/${cp.codechef.handle}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-border/70 bg-card/50 px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
+            >
+              <ExternalLink className="h-4 w-4" /> {lab.cpCcProfile}
+            </a>
           </GlassCard>
         </Reveal>
       )}

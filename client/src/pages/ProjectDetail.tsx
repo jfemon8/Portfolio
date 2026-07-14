@@ -16,7 +16,6 @@ import Lightbox from '@/components/shared/Lightbox';
 import GlassCard from '@/components/shared/GlassCard';
 import Counter from '@/components/shared/Counter';
 import Reveal from '@/components/motion/Reveal';
-import Magnetic from '@/components/motion/Magnetic';
 import { Button } from '@/components/ui/button';
 import { Spinner, ErrorState } from '@/components/ui/States';
 import { useProject, useProfile } from '@/hooks/usePortfolio';
@@ -133,22 +132,18 @@ export default function ProjectDetail() {
 
           <div className="mt-7 flex flex-wrap gap-3">
             {p.sourceUrl && (
-              <Magnetic strength={0.4}>
-                <a href={p.sourceUrl} target="_blank" rel="noreferrer">
-                  <Button size="lg">
-                    <Github className="h-4 w-4" /> {lab.btnSourceCode}
-                  </Button>
-                </a>
-              </Magnetic>
+              <a href={p.sourceUrl} target="_blank" rel="noreferrer">
+                <Button size="lg">
+                  <Github className="h-4 w-4" /> {lab.btnSourceCode}
+                </Button>
+              </a>
             )}
             {p.liveUrl && (
-              <Magnetic strength={0.4}>
-                <a href={p.liveUrl} target="_blank" rel="noreferrer">
-                  <Button size="lg" variant="outline">
-                    <ExternalLink className="h-4 w-4" /> {lab.btnLiveDemo}
-                  </Button>
-                </a>
-              </Magnetic>
+              <a href={p.liveUrl} target="_blank" rel="noreferrer">
+                <Button size="lg" variant="outline">
+                  <ExternalLink className="h-4 w-4" /> {lab.btnLiveDemo}
+                </Button>
+              </a>
             )}
           </div>
         </Reveal>

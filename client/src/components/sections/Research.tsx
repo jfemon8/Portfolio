@@ -5,7 +5,6 @@ import { useSectionCopy } from '@/hooks/useSectionCopy';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
 import GlassCard from '@/components/shared/GlassCard';
 import Reveal from '@/components/motion/Reveal';
-import Magnetic from '@/components/motion/Magnetic';
 import { Button } from '@/components/ui/button';
 import { usePublications } from '@/hooks/usePortfolio';
 
@@ -45,7 +44,7 @@ function Pipeline({ stages }: { stages: string[] }) {
 /**
  * Dedicated research showcase — premium publication cards + a decorative
  * pipeline motif. Self-hides when there are no publications (admin-managed).
- * Reuses Section/GlassCard/Reveal/Magnetic (project rule #3/#8).
+ * Reuses Section/GlassCard/Reveal (project rule #3/#8).
  */
 export default function Research() {
   const { data } = usePublications();
@@ -96,13 +95,11 @@ export default function Research() {
 
               {p.url && (
                 <div className="mt-6">
-                  <Magnetic strength={0.35}>
-                    <a href={p.url} target="_blank" rel="noreferrer">
-                      <Button variant="outline" size="sm">
-                        <ExternalLink className="h-4 w-4" /> Read paper
-                      </Button>
-                    </a>
-                  </Magnetic>
+                  <a href={p.url} target="_blank" rel="noreferrer">
+                    <Button variant="outline" size="sm">
+                      <ExternalLink className="h-4 w-4" /> Read paper
+                    </Button>
+                  </a>
                 </div>
               )}
             </GlassCard>

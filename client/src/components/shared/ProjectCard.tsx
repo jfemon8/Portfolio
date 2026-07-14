@@ -1,6 +1,4 @@
 import { Github, Globe, ArrowUpRight, Star, Eye, Play } from 'lucide-react';
-import Tilt3D from '@/components/motion/Tilt3D';
-import Magnetic from '@/components/motion/Magnetic';
 import GlassCard from '@/components/shared/GlassCard';
 import SmartImage from '@/components/shared/SmartImage';
 import PrefetchLink from '@/components/shared/PrefetchLink';
@@ -37,10 +35,7 @@ export default function ProjectCard({
   });
 
   return (
-    <Tilt3D
-      max={6}
-      className={cn('group relative h-full rounded-2xl', className)}
-    >
+    <div className={cn('group relative h-full rounded-2xl', className)}>
       <GlassCard interactive className="flex h-full flex-col overflow-hidden">
         {/* Cover */}
         <PrefetchLink
@@ -56,7 +51,7 @@ export default function ProjectCard({
               src={project.coverImage}
               alt={project.title}
               imgWidth={featured ? 900 : 640}
-              className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+              className="h-full w-full object-cover"
             />
           ) : (
             <div className="grid h-full place-items-center bg-grid [background-size:36px_36px]">
@@ -134,32 +129,28 @@ export default function ProjectCard({
               <Eye className="h-3.5 w-3.5" /> {project.views}
             </span>
             {project.sourceUrl && (
-              <Magnetic strength={0.4}>
-                <a
-                  href={project.sourceUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label={lab.btnSourceCode}
-                  title={lab.btnSourceCode}
-                  className="-m-2 flex items-center gap-1.5 p-2 text-muted-foreground transition-colors hover:text-neon"
-                >
-                  <Github className="h-4 w-4" />
-                </a>
-              </Magnetic>
+              <a
+                href={project.sourceUrl}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={lab.btnSourceCode}
+                title={lab.btnSourceCode}
+                className="-m-2 flex items-center gap-1.5 p-2 text-muted-foreground transition-colors hover:text-neon"
+              >
+                <Github className="h-4 w-4" />
+              </a>
             )}
             {project.liveUrl && (
-              <Magnetic strength={0.4}>
-                <a
-                  href={project.liveUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label={lab.btnLiveDemo}
-                  title={lab.btnLiveDemo}
-                  className="-m-2 flex items-center gap-1.5 p-2 text-muted-foreground transition-colors hover:text-neon"
-                >
-                  <Globe className="h-4 w-4" />
-                </a>
-              </Magnetic>
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={lab.btnLiveDemo}
+                title={lab.btnLiveDemo}
+                className="-m-2 flex items-center gap-1.5 p-2 text-muted-foreground transition-colors hover:text-neon"
+              >
+                <Globe className="h-4 w-4" />
+              </a>
             )}
             <PrefetchLink
               to={href}
@@ -167,11 +158,11 @@ export default function ProjectCard({
               className="ml-auto flex items-center gap-1 font-medium text-neon"
             >
               {lab.btnCaseStudy}
-              <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              <ArrowUpRight className="h-4 w-4" />
             </PrefetchLink>
           </div>
         </div>
       </GlassCard>
-    </Tilt3D>
+    </div>
   );
 }

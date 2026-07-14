@@ -93,7 +93,6 @@ export default function About({ profile }: { profile?: ProfileDoc }) {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                whileHover={reduce ? undefined : { scale: 1.03 }}
                 className="relative mx-auto h-44 w-44 sm:h-48 sm:w-48"
               >
                 <div

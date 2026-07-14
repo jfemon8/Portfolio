@@ -121,7 +121,6 @@ export default function Skills() {
                       hidden: { opacity: 0, y: 16, scale: 0.95 },
                       show: { opacity: 1, y: 0, scale: 1 },
                     }}
-                    whileHover={reduce ? undefined : { y: -4 }}
                     className="group relative overflow-hidden rounded-2xl border border-border/70 bg-card/60 p-4 backdrop-blur-xl transition-all duration-300 hover:border-primary/40 hover:shadow-neon-glow"
                   >
                     <span

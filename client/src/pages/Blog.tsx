@@ -99,7 +99,7 @@ export default function Blog() {
                         src={post.coverImage}
                         alt={post.title}
                         imgWidth={640}
-                        className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+                        className="h-full w-full object-cover"
                       />
                     ) : (
                       <div className="grid h-full place-items-center bg-grid [background-size:34px_34px] font-mono text-2xl text-border">
@@ -133,7 +133,7 @@ export default function Blog() {
                       <span className="flex items-center gap-1.5">
                         <Clock className="h-3.5 w-3.5" /> {post.readingTime}{' '}
                         {lab.unitMin}
-                        <ArrowUpRight className="ml-1 h-4 w-4 text-neon transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                        <ArrowUpRight className="ml-1 h-4 w-4 text-neon" />
                       </span>
                     </div>
                   </div>
