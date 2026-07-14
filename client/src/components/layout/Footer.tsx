@@ -25,7 +25,7 @@ export default function Footer() {
             {p?.tagline || 'Building responsive, dynamic & scalable web apps.'}
           </p>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-3">
             {(p?.socials ?? []).map((s) => (
               <a
                 key={s.label}

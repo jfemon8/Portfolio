@@ -75,7 +75,7 @@ export default function HeroPremium({
 
         <div className="container-x relative z-10 grid items-center gap-6 py-12 sm:gap-10 sm:py-20 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14 lg:py-24">
           {/* Left — identity */}
-          <div>
+          <div className="min-w-0">
             <motion.span
               {...rise(0)}
               className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/50 px-3.5 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur"
@@ -150,7 +150,7 @@ export default function HeroPremium({
 
             <motion.div
               {...rise(0.34)}
-              className="mt-9 flex items-center gap-3"
+              className="mt-9 flex flex-wrap items-center gap-3"
             >
               {(profile?.socials ?? []).map((s) => (
                 <a
@@ -173,6 +173,7 @@ export default function HeroPremium({
             initial={reduce ? false : { opacity: 0, scale: 0.94, y: 28 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ delay: 0.24, duration: 0.7, ease: ease.out }}
+            className="min-w-0"
           >
             <GlassCard className="overflow-hidden">
               <div className="flex items-center gap-2 border-b border-border/70 bg-background/40 px-4 py-3">
