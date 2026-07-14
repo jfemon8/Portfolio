@@ -38,12 +38,35 @@ const empty: FormState = {
   status: 'active',
 };
 
+type FieldKey = 'name' | 'email' | 'password';
+type FieldErrors = Partial<Record<FieldKey, string>>;
+
+/**
+ * App-styled validation — returns a per-field message map (empty = valid) so
+ * errors render as inline copy instead of the browser's native bubbles. Email
+ * and password only apply on create (both are locked/hidden while editing).
+ */
+const validate = (f: FormState, editing: boolean): FieldErrors => {
+  const e: FieldErrors = {};
+  if (!f.name.trim()) e.name = "Please enter the user's name.";
+  if (!editing) {
+    if (!f.email.trim()) e.email = 'Please enter an email address.';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim()))
+      e.email = 'Please enter a valid email address.';
+    if (!f.password) e.password = 'Please set a password.';
+    else if (f.password.length < 8)
+      e.password = 'Password must be at least 8 characters.';
+  }
+  return e;
+};
+
 export default function UsersManager() {
   const qc = useQueryClient();
   const confirm = useConfirm();
   const { user: me } = useAuth();
   const [form, setForm] = useState<FormState | null>(null);
   const [showPw, setShowPw] = useState(false);
+  const [errors, setErrors] = useState<FieldErrors>({});
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['users'],
@@ -93,7 +116,33 @@ export default function UsersManager() {
   const submit = (e: React.FormEvent): void => {
     e.preventDefault();
     if (!form) return;
+    const errs = validate(form, editing);
+    setErrors(errs);
+    if (Object.keys(errs).length) return;
     (editing ? update : create).mutate(form);
+  };
+  // Update a field and clear its error so the message disappears as the user
+  // fixes it (matches the inline-validation feel of the Login form).
+  const setField = (key: FieldKey, value: string): void => {
+    setForm((f) => (f ? { ...f, [key]: value } : f));
+    setErrors((x) => ({ ...x, [key]: undefined }));
+  };
+
+  const openNew = (): void => {
+    setForm({ ...empty });
+    setShowPw(false);
+    setErrors({});
+  };
+  const openEdit = (u: AuthUser): void => {
+    setForm({
+      id: u.id,
+      name: u.name,
+      email: u.email,
+      password: '',
+      role: u.role === 'visitor' ? 'visitor' : 'admin',
+      status: u.status === 'disabled' ? 'disabled' : 'active',
+    });
+    setErrors({});
   };
 
   const badge = (tone: 'neon' | 'muted' | 'warn') =>
@@ -111,12 +160,7 @@ export default function UsersManager() {
         title="Users & Roles"
         subtitle="Super-admin only · manage admin and visitor accounts."
         action={
-          <Button
-            onClick={() => {
-              setForm({ ...empty });
-              setShowPw(false);
-            }}
-          >
+          <Button onClick={openNew}>
             <Plus className="h-4 w-4" /> Add user
           </Button>
         }
@@ -172,16 +216,7 @@ export default function UsersManager() {
                 </span>
                 <button
                   disabled={locked}
-                  onClick={() =>
-                    setForm({
-                      id: u.id,
-                      name: u.name,
-                      email: u.email,
-                      password: '',
-                      role: u.role === 'visitor' ? 'visitor' : 'admin',
-                      status: u.status === 'disabled' ? 'disabled' : 'active',
-                    })
-                  }
+                  onClick={() => openEdit(u)}
                   title={locked ? 'Protected account' : 'Edit'}
                   className="rounded-lg border border-border/70 p-2.5 text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon disabled:opacity-40 disabled:hover:border-border/70 disabled:hover:text-muted-foreground"
                 >
@@ -222,15 +257,18 @@ export default function UsersManager() {
         onClose={() => setForm(null)}
       >
         {form && (
-          <form onSubmit={submit} className="space-y-4">
+          <form onSubmit={submit} className="space-y-4" noValidate>
             <div>
               <label className="label">Name</label>
               <input
                 className="input"
                 value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                required
+                onChange={(e) => setField('name', e.target.value)}
+                aria-invalid={!!errors.name}
               />
+              {errors.name && (
+                <p className="mt-1 text-xs text-destructive">{errors.name}</p>
+              )}
             </div>
             <div>
               <label className="label">Email</label>
@@ -239,9 +277,12 @@ export default function UsersManager() {
                 className={cn('input', editing && 'opacity-60')}
                 value={form.email}
                 disabled={editing}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                required
+                onChange={(e) => setField('email', e.target.value)}
+                aria-invalid={!!errors.email}
               />
+              {errors.email && (
+                <p className="mt-1 text-xs text-destructive">{errors.email}</p>
+              )}
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               {!editing && (
@@ -252,11 +293,8 @@ export default function UsersManager() {
                       type={showPw ? 'text' : 'password'}
                       className="input pr-11"
                       value={form.password}
-                      onChange={(e) =>
-                        setForm({ ...form, password: e.target.value })
-                      }
-                      minLength={8}
-                      required
+                      onChange={(e) => setField('password', e.target.value)}
+                      aria-invalid={!!errors.password}
                     />
                     <button
                       type="button"
@@ -271,6 +309,11 @@ export default function UsersManager() {
                       )}
                     </button>
                   </div>
+                  {errors.password && (
+                    <p className="mt-1 text-xs text-destructive">
+                      {errors.password}
+                    </p>
+                  )}
                 </div>
               )}
               <div>
