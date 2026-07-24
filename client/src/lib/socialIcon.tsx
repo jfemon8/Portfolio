@@ -53,11 +53,11 @@ interface SocialIconProps {
 /**
  * Renders a social-link icon with this priority chain:
  *   1. `social.iconImage`  — admin-uploaded Cloudinary URL (wins outright)
- *   2. legacy `social.icon` — string that maps to a built-in lucide icon
- *   3. auto-derive          — best-effort match on `social.label`
+ *   2. auto-derive         — best-effort match on `social.label`
  *
- * The fallback ensures a usable icon even when the admin form leaves the
- * icon fields empty.
+ * The label is the public source of truth. Legacy `social.icon` values are
+ * intentionally ignored here so old saved rows cannot drift out of sync with
+ * the current label/url pair.
  */
 export function SocialIcon({ social, className = 'h-5 w-5' }: SocialIconProps) {
   if (social.iconImage) {
@@ -70,7 +70,7 @@ export function SocialIcon({ social, className = 'h-5 w-5' }: SocialIconProps) {
       />
     );
   }
-  const key = (social.icon || deriveIconKey(social.label)).toLowerCase();
+  const key = deriveIconKey(social.label).toLowerCase();
   const Icon = iconMap[key] ?? Code2;
   return <Icon className={className} />;
 }
