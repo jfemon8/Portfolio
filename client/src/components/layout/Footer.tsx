@@ -15,7 +15,7 @@ export default function Footer() {
   });
 
   return (
-    <footer className="border-t border-line bg-bg-soft/60">
+    <footer className="border-t border-border bg-card/90 dark:border-line dark:bg-bg-soft/60">
       <div className="container-x py-12">
         <div className="flex flex-col items-center gap-6 text-center">
           <Link to="/" className="font-mono text-xl font-bold gradient-text">
