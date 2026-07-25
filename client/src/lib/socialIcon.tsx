@@ -23,17 +23,15 @@ const iconMap: Record<string, LucideIcon> = {
   code: Code2,
 };
 
-/** Auto-derive a built-in iconKey from a social's label (case-insensitive).
- *  Used as the fallback when neither `iconImage` nor a legacy `icon` string
- *  has been set in the admin form. Internal to this file so the module
- *  stays component-only for react-refresh. */
-const deriveIconKey = (label: string): string => {
-  const l = label.toLowerCase();
+/** Best-effort iconKey match from an arbitrary string (a url or a label).
+ *  Returns null when nothing matches so callers can fall through. */
+const matchIconKey = (s: string): string | null => {
+  const l = s.toLowerCase();
   for (const key of Object.keys(iconMap)) {
     if (l.includes(key)) return key;
   }
-  if (l.includes('email')) return 'mail';
-  if (l === 'x' || l.includes('x.com')) return 'twitter';
+  if (l.includes('mailto') || l.includes('email')) return 'mail';
+  if (l.includes('x.com')) return 'twitter';
   if (
     l.includes('leetcode') ||
     l.includes('codeforces') ||
@@ -42,8 +40,17 @@ const deriveIconKey = (label: string): string => {
     l.includes('hackerearth')
   )
     return 'code';
-  return 'code';
+  return null;
 };
+
+/** Derive a built-in iconKey for a social link. The `url` (the real
+ *  destination) is checked FIRST so the icon always matches where the link
+ *  actually goes — even if the label was mistyped or the label/url pair was
+ *  entered swapped (which showed e.g. a GitHub icon opening LinkedIn). Falls
+ *  back to the label, then a neutral `code` glyph. Internal to this file so
+ *  the module stays component-only for react-refresh. */
+const deriveIconKey = (social: Social): string =>
+  matchIconKey(social.url ?? '') ?? matchIconKey(social.label ?? '') ?? 'code';
 
 interface SocialIconProps {
   social: Social;
@@ -53,11 +60,11 @@ interface SocialIconProps {
 /**
  * Renders a social-link icon with this priority chain:
  *   1. `social.iconImage`  — admin-uploaded Cloudinary URL (wins outright)
- *   2. auto-derive         — best-effort match on `social.label`
+ *   2. auto-derive         — match on the `url` first, then the `label`
  *
- * The label is the public source of truth. Legacy `social.icon` values are
- * intentionally ignored here so old saved rows cannot drift out of sync with
- * the current label/url pair.
+ * The url is the destination, so matching it first keeps the icon truthful to
+ * where the link goes. Legacy `social.icon` values are intentionally ignored
+ * so old saved rows cannot drift out of sync with the current label/url pair.
  */
 export function SocialIcon({ social, className = 'h-5 w-5' }: SocialIconProps) {
   if (social.iconImage) {
@@ -70,7 +77,6 @@ export function SocialIcon({ social, className = 'h-5 w-5' }: SocialIconProps) {
       />
     );
   }
-  const key = deriveIconKey(social.label).toLowerCase();
-  const Icon = iconMap[key] ?? Code2;
+  const Icon = iconMap[deriveIconKey(social)] ?? Code2;
   return <Icon className={className} />;
 }
