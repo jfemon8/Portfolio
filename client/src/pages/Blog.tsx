@@ -4,7 +4,7 @@ import { Calendar, Clock, ArrowUpRight, Search } from 'lucide-react';
 import SmartImage from '@/components/shared/SmartImage';
 import PrefetchLink from '@/components/shared/PrefetchLink';
 import Seo from '@/components/ui/Seo';
-import { breadcrumbSchema } from '@/lib/structuredData';
+import { breadcrumbSchema, collectionPageSchema } from '@/lib/structuredData';
 import { Section, SectionHeading } from '@/components/shared/Section';
 import { useSectionCopy } from '@/hooks/useSectionCopy';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
@@ -55,10 +55,21 @@ export default function Blog() {
         title="Blog"
         path="/blog"
         description="Articles, notes and writeups."
-        jsonLd={breadcrumbSchema([
-          { name: 'Home', path: '/' },
-          { name: 'Blog', path: '/blog' },
-        ])}
+        jsonLd={[
+          breadcrumbSchema([
+            { name: 'Home', path: '/' },
+            { name: 'Blog', path: '/blog' },
+          ]),
+          collectionPageSchema(
+            'Blog',
+            '/blog',
+            posts.map((p) => ({
+              name: p.title,
+              path: `/blog/${p.slug}`,
+            })),
+            'Articles, notes and writeups.'
+          ),
+        ]}
       />
       <Section id="blog-page" className="pt-16 sm:pt-24">
         <SectionHeading

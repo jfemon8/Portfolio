@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Seo from '@/components/ui/Seo';
-import { breadcrumbSchema } from '@/lib/structuredData';
+import { breadcrumbSchema, collectionPageSchema } from '@/lib/structuredData';
 import { Section, SectionHeading } from '@/components/shared/Section';
 import { useSectionCopy } from '@/hooks/useSectionCopy';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
@@ -53,10 +53,21 @@ export default function Projects() {
         title="Projects"
         path="/projects"
         description="Full-stack platforms, front-ends and experiments — from MERN products to .NET e-commerce."
-        jsonLd={breadcrumbSchema([
-          { name: 'Home', path: '/' },
-          { name: 'Projects', path: '/projects' },
-        ])}
+        jsonLd={[
+          breadcrumbSchema([
+            { name: 'Home', path: '/' },
+            { name: 'Projects', path: '/projects' },
+          ]),
+          collectionPageSchema(
+            'Projects',
+            '/projects',
+            all.map((p) => ({
+              name: p.title,
+              path: `/projects/${p.slug}`,
+            })),
+            'Full-stack platforms, front-ends and experiments — from MERN products to .NET e-commerce.'
+          ),
+        ]}
       />
       <Section id="projects-page" className="pt-16 sm:pt-24">
         <SectionHeading

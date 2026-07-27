@@ -1,8 +1,10 @@
 import { Helmet } from 'react-helmet-async';
 import {
   AUTHOR_NAME,
+  AUTHOR_HANDLE,
   SITE_TITLE,
   DEFAULT_DESCRIPTION,
+  DEFAULT_KEYWORDS,
   SITE_URL,
 } from '@/config/site';
 import { useSeoSettings } from '@/hooks/usePortfolio';
@@ -22,7 +24,7 @@ interface SeoProps {
   image?: string;
   /** Route path (for canonical + og:url). */
   path?: string;
-  type?: 'website' | 'article';
+  type?: 'website' | 'article' | 'profile';
   /** Utility/admin pages opt out of indexing. */
   noindex?: boolean;
   publishedTime?: string;
@@ -56,9 +58,15 @@ export default function Seo({
   const desc = description || s?.metaDescription || DEFAULT_DESCRIPTION;
   const url = abs(path);
   const ogImage = image ? abs(image) : s?.ogImage || `${origin}/og.png`;
-  const keywords = s?.keywords?.length ? s.keywords.join(', ') : '';
+  const keywords = (s?.keywords?.length ? s.keywords : DEFAULT_KEYWORDS).join(
+    ', '
+  );
   const twitter = s?.twitterHandle?.trim();
-  const robots = noindex ? 'noindex, nofollow' : 'index, follow';
+  // `max-image-preview:large` lets Google show full-size image previews in
+  // search/Discover — required for strong image visibility on name queries.
+  const robots = noindex
+    ? 'noindex, nofollow'
+    : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
   const schemas = jsonLd
     ? Array.isArray(jsonLd)
       ? jsonLd
@@ -69,6 +77,7 @@ export default function Seo({
     <Helmet>
       <title>{fullTitle}</title>
       <meta name="description" content={desc} />
+      <meta name="author" content={author} />
       <meta name="robots" content={robots} />
       <link rel="canonical" href={url} />
       {keywords && <meta name="keywords" content={keywords} />}
@@ -79,7 +88,11 @@ export default function Seo({
       <meta property="og:description" content={desc} />
       <meta property="og:url" content={url} />
       <meta property="og:image" content={ogImage} />
+      <meta property="og:image:alt" content={fullTitle} />
       <meta property="og:locale" content="en_US" />
+      {type === 'profile' && (
+        <meta property="profile:username" content={AUTHOR_HANDLE} />
+      )}
       {type === 'article' && publishedTime && (
         <meta property="article:published_time" content={publishedTime} />
       )}
@@ -97,6 +110,7 @@ export default function Seo({
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={desc} />
       <meta name="twitter:image" content={ogImage} />
+      <meta name="twitter:image:alt" content={fullTitle} />
 
       {schemas.map((s, i) => (
         <script key={i} type="application/ld+json">

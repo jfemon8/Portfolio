@@ -1,7 +1,11 @@
 import { Fragment, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Seo from '@/components/ui/Seo';
-import { personSchema, websiteSchema } from '@/lib/structuredData';
+import {
+  personSchema,
+  websiteSchema,
+  profilePageSchema,
+} from '@/lib/structuredData';
 import { Spinner, ErrorState } from '@/components/ui/States';
 import { useProfile, useSiteSettings } from '@/hooks/usePortfolio';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
@@ -70,9 +74,10 @@ export default function Home() {
   return (
     <>
       <Seo
+        type="profile"
         description={profile?.tagline || undefined}
         image={profile?.avatar || undefined}
-        jsonLd={[personSchema(profile), websiteSchema()]}
+        jsonLd={[personSchema(profile), websiteSchema(), profilePageSchema()]}
       />
       <HeroPremium
         profile={profile}
