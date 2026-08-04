@@ -77,7 +77,7 @@ export default function BlogPostPage() {
           ]),
         ]}
       />
-      <article className="container-x max-w-3xl pb-24 pt-16 sm:pt-24">
+      <article className="container-x p-4">
         <Reveal>
           <button
             onClick={() => navigate(-1)}

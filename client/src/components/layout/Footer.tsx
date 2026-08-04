@@ -21,7 +21,7 @@ export default function Footer() {
           <Link to="/" className="font-mono text-xl font-bold gradient-text">
             {f.wordmark}
           </Link>
-          <p className="max-w-md text-sm text-ink-soft">
+          <p className="text-sm text-ink-soft">
             {p?.tagline || 'Building responsive, dynamic & scalable web apps.'}
           </p>
 
