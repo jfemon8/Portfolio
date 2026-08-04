@@ -12,6 +12,12 @@ import type { BlogCommentDoc, BlogEngagement, BlogReactionType } from '@/types';
 
 type CommentNode = BlogCommentDoc & { replies: CommentNode[] };
 
+type CommentErrors = {
+  name?: string;
+  email?: string;
+  content?: string;
+};
+
 const buildTree = (comments: BlogCommentDoc[]): CommentNode[] => {
   const nodes = new Map<string, CommentNode>();
   const roots: CommentNode[] = [];
@@ -53,6 +59,7 @@ export default function BlogEngagement({
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [content, setContent] = useState('');
+  const [errors, setErrors] = useState<CommentErrors>({});
   const formRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -73,6 +80,35 @@ export default function BlogEngagement({
     () => buildTree(engagement.comments),
     [engagement.comments]
   );
+
+  const validateName = (value: string): string | undefined =>
+    value.trim() ? undefined : 'Please enter your name.';
+
+  const validateEmail = (value: string): string | undefined => {
+    const trimmed = value.trim();
+    if (!trimmed) return undefined;
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)
+      ? undefined
+      : 'Please enter a valid email address.';
+  };
+
+  const validateContent = (value: string): string | undefined =>
+    value.trim() ? undefined : 'Please enter a comment.';
+
+  const validateAll = (): CommentErrors => ({
+    name: validateName(name),
+    email: validateEmail(email),
+    content: validateContent(content),
+  });
+
+  const clearError = (field: keyof CommentErrors): void => {
+    setErrors((current) => {
+      if (!current[field]) return current;
+      const next = { ...current };
+      delete next[field];
+      return next;
+    });
+  };
 
   const reactionMutation = useMutation({
     mutationFn: async (reaction: BlogReactionType) =>
@@ -102,6 +138,9 @@ export default function BlogEngagement({
     onSuccess: () => {
       toast.success(replyTo ? 'Reply posted' : 'Comment posted');
       setContent('');
+      setEmail('');
+      setName('');
+      setErrors({});
       setReplyTo(null);
       qc.invalidateQueries({ queryKey: ['blog', 'post', slug] });
     },
@@ -114,7 +153,9 @@ export default function BlogEngagement({
 
   const submitComment = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
-    if (!name.trim() || !content.trim()) return;
+    const nextErrors = validateAll();
+    setErrors(nextErrors);
+    if (nextErrors.name || nextErrors.email || nextErrors.content) return;
     commentMutation.mutate();
   };
 
@@ -165,15 +206,12 @@ export default function BlogEngagement({
         </div>
       </GlassCard>
 
-      <div
-        ref={formRef}
-        className="mt-6 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]"
-      >
-        <GlassCard className="p-5 sm:p-6">
+      <div ref={formRef} className="mt-6 space-y-6">
+        <GlassCard className="w-full p-5 sm:p-6">
           <div className="mb-4 flex items-center justify-between gap-3">
             <div>
               <h3 className="font-semibold text-foreground">
-                {replyTo ? `Reply To ${replyTo.name}` : 'Leave A Comment'}
+                {replyTo ? `Reply To ${replyTo.name}` : 'Leave a comment'}
               </h3>
               <p className="text-sm text-muted-foreground">
                 Share a thought or reply directly to someone in the thread.
@@ -191,26 +229,53 @@ export default function BlogEngagement({
             )}
           </div>
 
-          <form className="space-y-4" onSubmit={submitComment}>
+          <form className="space-y-4" onSubmit={submitComment} noValidate>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label className="label">Name</label>
                 <input
                   className="input"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    if (errors.name) clearError('name');
+                  }}
+                  onBlur={() => {
+                    setErrors((current) => ({
+                      ...current,
+                      name: validateName(name),
+                    }));
+                  }}
                   placeholder="Your name"
                 />
+                {errors.name && (
+                  <p className="mt-1 text-xs text-destructive">{errors.name}</p>
+                )}
               </div>
               <div>
                 <label className="label">Email</label>
                 <input
                   className="input"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (errors.email) clearError('email');
+                  }}
+                  onBlur={() => {
+                    setErrors((current) => ({
+                      ...current,
+                      email: validateEmail(email),
+                    }));
+                  }}
                   placeholder="you@example.com"
-                  type="email"
+                  type="text"
+                  inputMode="email"
                 />
+                {errors.email && (
+                  <p className="mt-1 text-xs text-destructive">
+                    {errors.email}
+                  </p>
+                )}
               </div>
             </div>
             <div>
@@ -218,13 +283,27 @@ export default function BlogEngagement({
               <textarea
                 className="input min-h-32 resize-y"
                 value={content}
-                onChange={(e) => setContent(e.target.value)}
+                onChange={(e) => {
+                  setContent(e.target.value);
+                  if (errors.content) clearError('content');
+                }}
+                onBlur={() => {
+                  setErrors((current) => ({
+                    ...current,
+                    content: validateContent(content),
+                  }));
+                }}
                 placeholder={
                   replyTo
                     ? `Write A Reply To ${replyTo.name}…`
                     : 'Write Your Comment…'
                 }
               />
+              {errors.content && (
+                <p className="mt-1 text-xs text-destructive">
+                  {errors.content}
+                </p>
+              )}
             </div>
             <div className="flex flex-wrap items-center justify-between gap-3">
               {replyTo ? (
@@ -258,7 +337,7 @@ export default function BlogEngagement({
           </form>
         </GlassCard>
 
-        <div className="space-y-4">
+        <div className="w-full space-y-4">
           {thread.length === 0 ? (
             <GlassCard className="p-6 text-sm text-muted-foreground">
               No comments yet. Start the conversation.
