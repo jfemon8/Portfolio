@@ -4,6 +4,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
 import { BlogPost } from '../models/BlogPost.js';
 import { BlogComment } from '../models/BlogComment.js';
+import { BlogCommentReaction } from '../models/BlogCommentReaction.js';
 import { BlogReaction } from '../models/BlogReaction.js';
 import type { IBlogPost } from '../types/index.js';
 import { destroyAsset } from '../config/cloudinary.js';
@@ -16,6 +17,12 @@ export const BLOG_REACTIONS = [
   'fire',
 ] as const;
 
+type CommentReactionSummary = {
+  reactions: { _id: (typeof BLOG_REACTIONS)[number]; count: number }[];
+  totalReactions: number;
+  visitorReaction: (typeof BLOG_REACTIONS)[number] | null;
+};
+
 const summarizeReactions = async (postId: string) => {
   const reactions = await BlogReaction.aggregate<{
     _id: string;
@@ -27,6 +34,72 @@ const summarizeReactions = async (postId: string) => {
   ]);
   const totalReactions = reactions.reduce((sum, item) => sum + item.count, 0);
   return { reactions, totalReactions };
+};
+
+const summarizeCommentReactions = async (
+  postId: string,
+  commentIds: string[],
+  visitorKey: string
+) => {
+  if (!commentIds.length) return new Map<string, CommentReactionSummary>();
+
+  const objectIds = commentIds.map((id) => new Types.ObjectId(id));
+  const [reactions, visitorReactions] = await Promise.all([
+    BlogCommentReaction.aggregate<{
+      _id: { comment: string; reaction: (typeof BLOG_REACTIONS)[number] };
+      count: number;
+    }>([
+      {
+        $match: {
+          post: new Types.ObjectId(postId),
+          comment: { $in: objectIds },
+        },
+      },
+      {
+        $group: {
+          _id: { comment: '$comment', reaction: '$reaction' },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { '_id.comment': 1, '_id.reaction': 1 } },
+    ]),
+    visitorKey
+      ? BlogCommentReaction.find({
+          post: new Types.ObjectId(postId),
+          comment: { $in: objectIds },
+          visitorKey,
+        })
+          .select('comment reaction')
+          .lean()
+      : Promise.resolve([] as { comment: Types.ObjectId; reaction: string }[]),
+  ]);
+
+  const map = new Map<string, CommentReactionSummary>();
+
+  for (const commentId of commentIds) {
+    map.set(commentId, {
+      reactions: [],
+      totalReactions: 0,
+      visitorReaction: null,
+    });
+  }
+
+  for (const item of reactions) {
+    const commentId = String(item._id.comment);
+    const entry = map.get(commentId);
+    if (!entry) continue;
+    entry.reactions.push({ _id: item._id.reaction, count: item.count });
+    entry.totalReactions += item.count;
+  }
+
+  for (const item of visitorReactions) {
+    const commentId = String(item.comment);
+    const entry = map.get(commentId);
+    if (!entry) continue;
+    entry.visitorReaction = item.reaction as (typeof BLOG_REACTIONS)[number];
+  }
+
+  return map;
 };
 
 /**
@@ -118,7 +191,8 @@ export const getPublishedBySlug = asyncHandler(
     const [comments, reactions, visitorReaction] = await Promise.all([
       BlogComment.find({ post: post._id })
         .select('post name email content parentComment createdAt updatedAt')
-        .sort({ createdAt: 1 }),
+        .sort({ createdAt: 1 })
+        .lean(),
       summarizeReactions(String(post._id)),
       visitorKey
         ? BlogReaction.findOne({ post: post._id, visitorKey }).select(
@@ -127,14 +201,30 @@ export const getPublishedBySlug = asyncHandler(
         : null,
     ]);
 
+    const commentIds = comments.map((comment) => String(comment._id));
+    const commentReactionSummary = await summarizeCommentReactions(
+      String(post._id),
+      commentIds,
+      visitorKey
+    );
+    const enrichedComments = comments.map((comment) => {
+      const summary = commentReactionSummary.get(String(comment._id));
+      return {
+        ...comment,
+        reactions: summary?.reactions ?? [],
+        totalReactions: summary?.totalReactions ?? 0,
+        visitorReaction: summary?.visitorReaction ?? null,
+      };
+    });
+
     res.json({
       success: true,
       data: post,
       related,
       engagement: {
-        comments,
+        comments: enrichedComments,
         reactions: reactions.reactions,
-        totalComments: comments.length,
+        totalComments: enrichedComments.length,
         totalReactions: reactions.totalReactions,
         visitorReaction: visitorReaction?.reaction ?? null,
       },
@@ -169,6 +259,57 @@ export const reactToPost = asyncHandler(async (req: Request, res: Response) => {
     visitorReaction: saved?.reaction ?? null,
   });
 });
+
+/** Public — react to a specific blog comment. */
+export const reactToComment = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { reaction, visitorKey } = req.body as {
+      reaction: (typeof BLOG_REACTIONS)[number];
+      visitorKey: string;
+    };
+    const post = await BlogPost.findOne({
+      slug: req.params.slug,
+      ...publicVisibility(),
+    });
+    if (!post) throw ApiError.notFound('Post not found');
+
+    const comment = await BlogComment.findOne({
+      _id: req.params.commentId,
+      post: post._id,
+    });
+    if (!comment) throw ApiError.notFound('Comment not found');
+
+    const saved = await BlogCommentReaction.findOneAndUpdate(
+      {
+        post: post._id,
+        comment: comment._id,
+        visitorKey,
+      },
+      {
+        post: post._id,
+        comment: comment._id,
+        visitorKey,
+        reaction,
+      },
+      { new: true, upsert: true }
+    );
+
+    const summary = await summarizeCommentReactions(
+      String(post._id),
+      [String(comment._id)],
+      visitorKey
+    );
+    const item = summary.get(String(comment._id));
+
+    res.status(200).json({
+      success: true,
+      data: saved,
+      reactions: item?.reactions ?? [],
+      totalReactions: item?.totalReactions ?? 0,
+      visitorReaction: item?.visitorReaction ?? null,
+    });
+  }
+);
 
 /** Public — add a comment or reply to a blog post. */
 export const commentOnPost = asyncHandler(
@@ -207,6 +348,63 @@ export const commentOnPost = asyncHandler(
     });
 
     res.status(201).json({ success: true, data: comment });
+  }
+);
+
+/** Admin — update any blog comment or reply. */
+export const updateComment = asyncHandler(
+  async (req: Request, res: Response) => {
+    const comment = await BlogComment.findById(req.params.id);
+    if (!comment) throw ApiError.notFound('Comment not found');
+
+    const { name, email, content } = req.body as {
+      name?: string;
+      email?: string;
+      content?: string;
+    };
+
+    if (typeof name === 'string') comment.name = name.trim();
+    if (typeof email === 'string') comment.email = email.trim();
+    if (typeof content === 'string') comment.content = content.trim();
+
+    await comment.save();
+    res.json({ success: true, data: comment });
+  }
+);
+
+/** Admin — delete a blog comment/reply and all nested descendants. */
+export const removeComment = asyncHandler(
+  async (req: Request, res: Response) => {
+    const comment = await BlogComment.findById(req.params.id);
+    if (!comment) throw ApiError.notFound('Comment not found');
+
+    const descendants = await BlogComment.find({ post: comment.post })
+      .select('_id parentComment')
+      .lean();
+    const ids = new Set<string>([String(comment._id)]);
+
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (const item of descendants) {
+        const parentId = item.parentComment ? String(item.parentComment) : null;
+        if (parentId && ids.has(parentId)) {
+          const childId = String(item._id);
+          if (!ids.has(childId)) {
+            ids.add(childId);
+            changed = true;
+          }
+        }
+      }
+    }
+
+    const objectIds = [...ids].map((id) => new Types.ObjectId(id));
+    await Promise.all([
+      BlogCommentReaction.deleteMany({ comment: { $in: objectIds } }),
+      BlogComment.deleteMany({ _id: { $in: objectIds } }),
+    ]);
+
+    res.json({ success: true, message: 'Comment deleted' });
   }
 );
 

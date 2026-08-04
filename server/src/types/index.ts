@@ -529,6 +529,13 @@ export interface IBlogReaction {
   reaction: BlogReactionType;
 }
 
+export interface IBlogCommentReaction {
+  post: ID;
+  comment: ID;
+  visitorKey: string;
+  reaction: BlogReactionType;
+}
+
 export interface IBlogComment {
   post: ID;
   name: string;

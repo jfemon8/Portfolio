@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { body } from 'express-validator';
+import { body, param } from 'express-validator';
 import { protect, adminOnly } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import { blogEngagementLimiter } from '../middleware/rateLimit.js';
@@ -8,12 +8,15 @@ import {
   listPublished,
   getPublishedBySlug,
   reactToPost,
+  reactToComment,
   commentOnPost,
   listAll,
   getById,
   create,
   update,
   remove,
+  updateComment,
+  removeComment,
 } from '../controllers/blogController.js';
 
 const router = Router();
@@ -52,6 +55,17 @@ router.post(
   validate,
   commentOnPost
 );
+router.post(
+  '/slug/:slug/comments/:commentId/reactions',
+  blogEngagementLimiter,
+  [
+    param('commentId').isMongoId().withMessage('Comment id is required'),
+    body('reaction').isIn(BLOG_REACTIONS).withMessage('Reaction is required'),
+    body('visitorKey').trim().notEmpty().withMessage('Visitor key is required'),
+  ],
+  validate,
+  reactToComment
+);
 
 // Admin
 router.get('/admin/all', protect, adminOnly, listAll);
@@ -59,5 +73,7 @@ router.get('/admin/:id', protect, adminOnly, getById);
 router.post('/', protect, adminOnly, create);
 router.put('/:id', protect, adminOnly, update);
 router.delete('/:id', protect, adminOnly, remove);
+router.put('/admin/comments/:id', protect, adminOnly, updateComment);
+router.delete('/admin/comments/:id', protect, adminOnly, removeComment);
 
 export default router;

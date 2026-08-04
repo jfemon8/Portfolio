@@ -4,6 +4,7 @@ import { MessageSquareReply, Send } from 'lucide-react';
 import toast from 'react-hot-toast';
 import GlassCard from '@/components/shared/GlassCard';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/AuthContext';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/cn';
 import { formatDate } from '@/lib/date';
@@ -17,6 +18,30 @@ type CommentErrors = {
   email?: string;
   content?: string;
 };
+
+const validateCommentName = (value: string): string | undefined =>
+  value.trim() ? undefined : 'Please enter your name.';
+
+const validateCommentEmail = (value: string): string | undefined => {
+  const trimmed = value.trim();
+  if (!trimmed) return undefined;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)
+    ? undefined
+    : 'Please enter a valid email address.';
+};
+
+const validateCommentContent = (value: string): string | undefined =>
+  value.trim() ? undefined : 'Please enter a comment.';
+
+const validateCommentFields = (
+  name: string,
+  email: string,
+  content: string
+): CommentErrors => ({
+  name: validateCommentName(name),
+  email: validateCommentEmail(email),
+  content: validateCommentContent(content),
+});
 
 const buildTree = (comments: BlogCommentDoc[]): CommentNode[] => {
   const nodes = new Map<string, CommentNode>();
@@ -51,7 +76,9 @@ export default function BlogEngagement({
   visitorKey,
   engagement,
 }: BlogEngagementProps) {
+  const { user } = useAuth();
   const qc = useQueryClient();
+  const canModerate = user?.role === 'admin' || user?.role === 'superAdmin';
   const [activeReaction, setActiveReaction] = useState<BlogReactionType | null>(
     engagement.visitorReaction
   );
@@ -81,25 +108,8 @@ export default function BlogEngagement({
     [engagement.comments]
   );
 
-  const validateName = (value: string): string | undefined =>
-    value.trim() ? undefined : 'Please enter your name.';
-
-  const validateEmail = (value: string): string | undefined => {
-    const trimmed = value.trim();
-    if (!trimmed) return undefined;
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)
-      ? undefined
-      : 'Please enter a valid email address.';
-  };
-
-  const validateContent = (value: string): string | undefined =>
-    value.trim() ? undefined : 'Please enter a comment.';
-
-  const validateAll = (): CommentErrors => ({
-    name: validateName(name),
-    email: validateEmail(email),
-    content: validateContent(content),
-  });
+  const validateAll = (): CommentErrors =>
+    validateCommentFields(name, email, content);
 
   const clearError = (field: keyof CommentErrors): void => {
     setErrors((current) => {
@@ -243,7 +253,7 @@ export default function BlogEngagement({
                   onBlur={() => {
                     setErrors((current) => ({
                       ...current,
-                      name: validateName(name),
+                      name: validateCommentName(name),
                     }));
                   }}
                   placeholder="Your name"
@@ -264,7 +274,7 @@ export default function BlogEngagement({
                   onBlur={() => {
                     setErrors((current) => ({
                       ...current,
-                      email: validateEmail(email),
+                      email: validateCommentEmail(email),
                     }));
                   }}
                   placeholder="you@example.com"
@@ -290,7 +300,7 @@ export default function BlogEngagement({
                 onBlur={() => {
                   setErrors((current) => ({
                     ...current,
-                    content: validateContent(content),
+                    content: validateCommentContent(content),
                   }));
                 }}
                 placeholder={
@@ -346,8 +356,11 @@ export default function BlogEngagement({
             thread.map((comment) => (
               <CommentItem
                 key={comment._id}
+                slug={slug}
+                visitorKey={visitorKey}
                 comment={comment}
                 depth={0}
+                canModerate={canModerate}
                 onReply={(item) => {
                   setReplyTo(item);
                   focusComposer();
@@ -362,12 +375,133 @@ export default function BlogEngagement({
 }
 
 interface CommentItemProps {
+  slug: string;
+  visitorKey: string;
   comment: CommentNode;
   depth: number;
+  canModerate: boolean;
   onReply: (comment: BlogCommentDoc) => void;
 }
 
-function CommentItem({ comment, depth, onReply }: CommentItemProps) {
+function CommentItem({
+  slug,
+  visitorKey,
+  comment,
+  depth,
+  canModerate,
+  onReply,
+}: CommentItemProps) {
+  const qc = useQueryClient();
+  const [activeReaction, setActiveReaction] = useState<BlogReactionType | null>(
+    comment.visitorReaction ?? null
+  );
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState(comment.name);
+  const [editEmail, setEditEmail] = useState(comment.email ?? '');
+  const [editContent, setEditContent] = useState(comment.content);
+  const [editErrors, setEditErrors] = useState<CommentErrors>({});
+
+  useEffect(() => {
+    setActiveReaction(comment.visitorReaction ?? null);
+  }, [comment.visitorReaction]);
+
+  useEffect(() => {
+    setEditName(comment.name);
+    setEditEmail(comment.email ?? '');
+    setEditContent(comment.content);
+    setEditErrors({});
+    setIsEditing(false);
+  }, [comment._id, comment.name, comment.email, comment.content]);
+
+  const reactionCounts = useMemo(() => {
+    const counts = Object.fromEntries(
+      BLOG_REACTIONS.map((r) => [r, 0])
+    ) as Record<BlogReactionType, number>;
+    (comment.reactions ?? []).forEach((item) => {
+      counts[item._id] = item.count;
+    });
+    return counts;
+  }, [comment.reactions]);
+
+  const validateEditAll = (): CommentErrors =>
+    validateCommentFields(editName, editEmail, editContent);
+
+  const reactionMutation = useMutation({
+    mutationFn: async (reaction: BlogReactionType) =>
+      (
+        await api.post(`/blog/slug/${slug}/comments/${comment._id}/reactions`, {
+          reaction,
+          visitorKey,
+        })
+      ).data,
+    onSuccess: (_data, reaction) => {
+      setActiveReaction(reaction);
+      qc.invalidateQueries({ queryKey: ['blog', 'post', slug] });
+    },
+    onError: (err: unknown) => {
+      toast.error(
+        (err as { message?: string })?.message || 'Could not save reaction'
+      );
+    },
+  });
+
+  const editMutation = useMutation({
+    mutationFn: async () =>
+      (
+        await api.put(`/blog/admin/comments/${comment._id}`, {
+          name: editName,
+          email: editEmail.trim() || undefined,
+          content: editContent,
+        })
+      ).data,
+    onSuccess: () => {
+      toast.success('Comment updated');
+      setIsEditing(false);
+      qc.invalidateQueries({ queryKey: ['blog', 'post', slug] });
+    },
+    onError: (err: unknown) => {
+      toast.error(
+        (err as { message?: string })?.message || 'Could not update comment'
+      );
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async () =>
+      (await api.delete(`/blog/admin/comments/${comment._id}`)).data,
+    onSuccess: () => {
+      toast.success('Comment deleted');
+      qc.invalidateQueries({ queryKey: ['blog', 'post', slug] });
+    },
+    onError: (err: unknown) => {
+      toast.error(
+        (err as { message?: string })?.message || 'Could not delete comment'
+      );
+    },
+  });
+
+  const submitEdit = (e: FormEvent<HTMLFormElement>): void => {
+    e.preventDefault();
+    const nextErrors = validateEditAll();
+    setEditErrors(nextErrors);
+    if (nextErrors.name || nextErrors.email || nextErrors.content) return;
+    editMutation.mutate();
+  };
+
+  const cancelEdit = (): void => {
+    setEditName(comment.name);
+    setEditEmail(comment.email ?? '');
+    setEditContent(comment.content);
+    setEditErrors({});
+    setIsEditing(false);
+  };
+
+  const confirmDelete = (): void => {
+    if (window.confirm('Delete this comment and its replies?')) {
+      deleteMutation.mutate();
+    }
+  };
+
   return (
     <GlassCard
       className={cn('p-5', depth > 0 && 'ml-4 border-l-2 border-primary/20')}
@@ -380,24 +514,177 @@ function CommentItem({ comment, depth, onReply }: CommentItemProps) {
             {comment.email ? ` · ${comment.email}` : ''}
           </p>
         </div>
-        <button
-          type="button"
-          className="text-xs font-medium text-muted-foreground transition-colors hover:text-primary"
-          onClick={() => onReply(comment)}
-        >
-          Reply
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            className="text-xs font-medium text-muted-foreground transition-colors hover:text-primary"
+            onClick={() => onReply(comment)}
+          >
+            Reply
+          </button>
+          {canModerate && !isEditing && (
+            <>
+              <button
+                type="button"
+                className="text-xs font-medium text-muted-foreground transition-colors hover:text-primary"
+                onClick={() => setIsEditing(true)}
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                className="text-xs font-medium text-muted-foreground transition-colors hover:text-destructive"
+                onClick={confirmDelete}
+                disabled={deleteMutation.isPending}
+              >
+                Delete
+              </button>
+            </>
+          )}
+        </div>
       </div>
-      <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
-        {comment.content}
-      </p>
+
+      {isEditing ? (
+        <form className="mt-4 space-y-4" onSubmit={submitEdit} noValidate>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="label">Name</label>
+              <input
+                className="input"
+                value={editName}
+                onChange={(e) => {
+                  setEditName(e.target.value);
+                  if (editErrors.name) {
+                    setEditErrors((current) => ({
+                      ...current,
+                      name: undefined,
+                    }));
+                  }
+                }}
+                onBlur={() => {
+                  setEditErrors((current) => ({
+                    ...current,
+                    name: validateCommentName(editName),
+                  }));
+                }}
+                placeholder="Your name"
+              />
+              {editErrors.name && (
+                <p className="mt-1 text-xs text-destructive">
+                  {editErrors.name}
+                </p>
+              )}
+            </div>
+            <div>
+              <label className="label">Email</label>
+              <input
+                className="input"
+                value={editEmail}
+                onChange={(e) => {
+                  setEditEmail(e.target.value);
+                  if (editErrors.email) {
+                    setEditErrors((current) => ({
+                      ...current,
+                      email: undefined,
+                    }));
+                  }
+                }}
+                onBlur={() => {
+                  setEditErrors((current) => ({
+                    ...current,
+                    email: validateCommentEmail(editEmail),
+                  }));
+                }}
+                placeholder="you@example.com"
+                type="text"
+                inputMode="email"
+              />
+              {editErrors.email && (
+                <p className="mt-1 text-xs text-destructive">
+                  {editErrors.email}
+                </p>
+              )}
+            </div>
+          </div>
+          <div>
+            <label className="label">Comment</label>
+            <textarea
+              className="input min-h-32 resize-y"
+              value={editContent}
+              onChange={(e) => {
+                setEditContent(e.target.value);
+                if (editErrors.content) {
+                  setEditErrors((current) => ({
+                    ...current,
+                    content: undefined,
+                  }));
+                }
+              }}
+              onBlur={() => {
+                setEditErrors((current) => ({
+                  ...current,
+                  content: validateCommentContent(editContent),
+                }));
+              }}
+            />
+            {editErrors.content && (
+              <p className="mt-1 text-xs text-destructive">
+                {editErrors.content}
+              </p>
+            )}
+          </div>
+          <div className="flex flex-wrap justify-end gap-2">
+            <Button type="button" variant="ghost" onClick={cancelEdit}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={editMutation.isPending}>
+              Save changes
+            </Button>
+          </div>
+        </form>
+      ) : (
+        <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+          {comment.content}
+        </p>
+      )}
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        {BLOG_REACTIONS.map((reaction) => {
+          const meta = BLOG_REACTION_META[reaction];
+          const selected = activeReaction === reaction;
+          return (
+            <button
+              key={reaction}
+              type="button"
+              onClick={() => void reactionMutation.mutate(reaction)}
+              disabled={reactionMutation.isPending}
+              className={cn(
+                'inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs transition-colors',
+                selected
+                  ? 'border-primary/60 bg-primary/10 text-primary'
+                  : 'border-border/70 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground'
+              )}
+            >
+              <span>{meta.emoji}</span>
+              <span>{meta.label}</span>
+              <span className="text-[11px] text-muted-foreground/70">
+                {reactionCounts[reaction]}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
       {comment.replies.length > 0 && (
         <div className="mt-4 space-y-4">
           {comment.replies.map((reply) => (
             <CommentItem
               key={reply._id}
+              slug={slug}
+              visitorKey={visitorKey}
               comment={reply}
               depth={depth + 1}
+              canModerate={canModerate}
               onReply={onReply}
             />
           ))}

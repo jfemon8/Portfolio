@@ -234,12 +234,20 @@ export interface BlogReactionSummary {
   count: number;
 }
 
+export interface BlogCommentReactionSummary {
+  _id: BlogReactionType;
+  count: number;
+}
+
 export interface BlogComment {
   post: string;
   name: string;
   email?: string;
   content: string;
   parentComment?: string;
+  reactions?: BlogCommentReactionSummary[];
+  totalReactions?: number;
+  visitorReaction?: BlogReactionType | null;
 }
 
 export interface BlogEngagement {
