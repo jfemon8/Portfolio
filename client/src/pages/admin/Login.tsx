@@ -71,7 +71,7 @@ export default function Login() {
   return (
     <>
       <Seo title="Admin Login" noindex />
-      <div className="relative grid min-h-screen place-items-center bg-background px-5">
+      <div className="relative grid min-h-screen place-items-center bg-background mt-4 pt-4">
         <PremiumBackground />
         <motion.div
           initial={{ opacity: 0, y: 24 }}

@@ -71,7 +71,7 @@ export default function Blog() {
           ),
         ]}
       />
-      <Section id="blog-page" className="pt-16 sm:pt-24">
+      <Section id="blog-page" className="mt-4 pt-4">
         <SectionHeading
           index={copy.index}
           title={copy.title}

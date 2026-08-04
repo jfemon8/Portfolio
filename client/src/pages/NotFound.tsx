@@ -11,7 +11,7 @@ export default function NotFound() {
   return (
     <>
       <Seo title="404 — Not found" noindex />
-      <div className="container-x grid min-h-[70vh] place-items-center text-center">
+      <div className="container-x grid min-h-[70vh] place-items-center text-center mt-4 pt-4">
         <div>
           <p className="font-mono text-7xl font-extrabold gradient-text">404</p>
           <p className="mt-4 font-mono text-muted-foreground">
@@ -20,7 +20,7 @@ export default function NotFound() {
             <br />
             {c.notFoundError}
           </p>
-          <Link to="/" className="mt-8 inline-block">
+          <Link to="/" className="mt-4 inline-block">
             <Button>{c.notFoundHome}</Button>
           </Link>
         </div>

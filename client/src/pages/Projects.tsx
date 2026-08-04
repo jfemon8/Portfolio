@@ -69,7 +69,7 @@ export default function Projects() {
           ),
         ]}
       />
-      <Section id="projects-page" className="pt-16 sm:pt-24">
+      <Section id="projects-page" className="mt-4 pt-4">
         <SectionHeading
           index={copy.index}
           title={copy.title}
