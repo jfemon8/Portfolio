@@ -9,10 +9,7 @@ interface SectionProps {
   children: ReactNode;
 }
 
-/**
- * The canonical premium section frame — consistent rhythm + scroll-anchor.
- * Every public section uses this (project rule #3/#8).
- */
+/** Shared section frame. */
 export function Section({ id, className, children }: SectionProps) {
   return (
     <section
@@ -31,7 +28,7 @@ interface SectionHeadingProps {
   index?: string;
   title: ReactNode;
   subtitle?: string;
-  /** optional right-aligned slot (e.g. a "view all" link) */
+  /** Optional right-aligned slot. */
   action?: ReactNode;
   align?: 'left' | 'center';
 }

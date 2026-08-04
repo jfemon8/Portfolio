@@ -58,9 +58,7 @@ export default function MessagesManager() {
     }) => (await api.patch(`/messages/${id}`, body)).data,
     onSuccess: (_data, vars) => {
       qc.invalidateQueries({ queryKey: ['messages'] });
-      // Keep the open detail pane in sync — otherwise `active` is a stale copy
-      // and the star/read/archive toggles show the wrong state / only toggle
-      // one way.
+      // Keep the detail pane in sync.
       setActive((a) => (a && a._id === vars.id ? { ...a, ...vars.body } : a));
     },
   });

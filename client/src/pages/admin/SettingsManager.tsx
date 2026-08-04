@@ -155,9 +155,7 @@ export default function SettingsManager() {
         newPassword: v.newPassword,
       });
       reset();
-      // The server ends all sessions on a password change (revokes refresh
-      // tokens + invalidates prior access tokens), so log out and send the
-      // user back to sign in with the new password.
+      // Password changes invalidate all sessions.
       toast.success('Password updated — please log in again.');
       logout();
     } catch (err) {

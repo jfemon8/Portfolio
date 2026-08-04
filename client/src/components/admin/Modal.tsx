@@ -12,7 +12,7 @@ interface ModalProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-/** Shared premium modal (project rule #3) — glass, animated, reduced-motion safe. */
+/** Shared modal. */
 export default function Modal({
   open,
   title,

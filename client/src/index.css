@@ -2,9 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ShadCN/UI semantic tokens — drive the design system & theme presets.
-   Dark is the default (app is dark-first, <html class="dark">); `html.light`
-   holds the light overrides, consistent with the existing theme mechanism. */
+/* Semantic theme tokens. */
 @layer base {
   :root {
     --background: 240 24% 4%;
@@ -27,12 +25,12 @@
     --input: 240 18% 16%;
     --ring: 168 100% 50%;
     --radius: 0.85rem;
-    /* Brand neon — bright in dark mode (matches the original `#00ffd1`). */
+    /* Brand neon. */
     --neon: 168 100% 50%;
   }
 
   html.light {
-    /* Softened from pure white so the bright centre is easier on the eyes. */
+    /* Softer light-mode background. */
     --background: 0 0% 90%;
     --foreground: 240 24% 8%;
     --card: 0 0% 100%;
@@ -52,9 +50,7 @@
     --border: 240 12% 88%;
     --input: 240 12% 88%;
     --ring: 174 90% 36%;
-    /* Light-mode neon: darker teal so brand accents (stats, dots, badges,
-       section-title `.`, status labels) stay legible on the light bg
-       instead of washing out as `#00ffd1` did. */
+    /* Darker light-mode neon for contrast. */
     --neon: 174 90% 36%;
   }
 }
@@ -77,9 +73,7 @@
     @apply bg-bg bg-radial-fade bg-no-repeat font-sans text-ink antialiased;
   }
 
-  /* Premium display typeface for all headings (Satoshi → Inter fallback).
-     The app uses semantic h1–h4 everywhere, so this is the single,
-     consistent application point (project rule #3/#8). */
+  /* Display typeface for headings. */
   h1,
   h2,
   h3,
@@ -87,9 +81,7 @@
     @apply font-display;
   }
 
-  /* Light theme overrides (toggleable). `bg-background` resolves to the
-     shadcn token (`--background` = 95% lightness) instead of pure white,
-     so the centre oval reads as a subtle tinted area, not a bright blowout. */
+  /* Light theme overrides. */
   html.light body {
     @apply bg-background bg-radial-fade-light bg-no-repeat text-slate-800;
   }
@@ -101,11 +93,7 @@
     @apply bg-neon/30 text-white;
   }
 
-  /* Custom scrollbar — theme-aware. Track is transparent (so it blends
-     into whatever surface owns the scroll); thumb uses `bg-border` (light
-     gray in light mode, dark gray in dark mode) with a padding-clip so
-     the thumb floats inside the gutter. Hover uses `muted-foreground` for
-     a subtle darkening cue. Firefox gets `scrollbar-color` / `-width`. */
+  /* Theme-aware scrollbar. */
   ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
@@ -125,10 +113,7 @@
     scrollbar-color: hsl(var(--border)) transparent;
   }
 
-  /* A11y: one consistent keyboard-focus ring app-wide (matches the Button
-     primitive). Components with their own focus styles win via the cascade
-     layer order; this is the safety net for every other interactive element.
-     :focus-visible keeps mouse clicks ring-free. */
+  /* Global focus ring. */
   a:focus-visible,
   button:focus-visible,
   input:focus-visible,
@@ -138,10 +123,7 @@
     @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
 
-  /* A11y: honour prefers-reduced-motion. JS motion already guards via
-     useReducedMotion; this neutralises CSS keyframe/transition motion
-     (float, pulse, blink, ping, marquee, gradient-x, smooth scroll) that
-     isn't individually gated. No Tailwind utility can express this. */
+  /* Respect reduced-motion. */
   @media (prefers-reduced-motion: reduce) {
     *,
     ::before,
@@ -164,9 +146,7 @@
     @apply rounded-2xl border border-line bg-bg-card/70 backdrop-blur-xl shadow-card;
   }
 
-  /* Lifted-card hover effect — theme-aware (primary/*) + layered glow.
-     Wired into GlassCard's `interactive` variant so every premium card on
-     the site shares one polish definition. */
+  /* Shared card hover treatment. */
   .glass-hover {
     @apply transition-all duration-300
            hover:border-primary/40 hover:shadow-neon-glow;
@@ -193,27 +173,19 @@
            bg-bg-elevated px-3 py-1 text-xs font-medium text-ink-soft;
   }
 
-  /* Theme-aware input — shadcn tokens so the same class works in both
-     themes: dark mode keeps its dark card-color bg + light text; light
-     mode swaps to a pure-white bg (`--card` = 0 0% 100%) + dark text
-     (`--foreground` = 240 24% 8%) so inputs read as a clean white field
-     on the light page bg. Focus ring uses `primary` (theme-aware brand). */
+  /* Theme-aware input. */
   .input {
     @apply w-full min-h-11 rounded-xl border border-border bg-card px-4 py-2.5
            text-base text-foreground placeholder:text-muted-foreground
            transition-colors focus:border-primary/60 focus:outline-none
            focus:ring-1 focus:ring-primary/40;
   }
-  /* Theme-aware label — `text-muted-foreground` switches per theme
-     (light gray in dark mode, mid-dark gray in light mode) so labels
-     stay readable above the now-white inputs in light mode. */
+  /* Theme-aware label. */
   .label {
     @apply mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground;
   }
 
-  /* Animated brand gradient — the existing `gradient-x` keyframe (defined in
-     tailwind.config) sweeps the bg-position, and bg-clip-text shows it through
-     the text. Reduced-motion is neutralised globally above (CSS @media). */
+  /* Animated brand gradient. */
   .gradient-text {
     @apply bg-neon-gradient bg-clip-text text-transparent
            bg-[length:200%_auto] animate-gradient-x;
@@ -238,9 +210,7 @@
   }
 }
 
-/* Premium long-form typography for blog & project case-studies.
-   Code blocks/inline code are owned by <Markdown/> (syntax highlighter),
-   so no `code`/`pre` rules here. Tailwind @apply only (project rule #1). */
+/* Long-form typography. */
 .prose-neon {
   @apply text-[15px] leading-[1.85] text-muted-foreground;
 }
@@ -297,10 +267,7 @@
   @apply bg-card/60 font-semibold text-foreground;
 }
 
-/* Animated theme switch (View Transitions API): the new theme is revealed
-   as a circle expanding from the toggle click point (--vt-x/--vt-y set in
-   ThemeToggle). Unsupported browsers / reduced-motion fall back to instant
-   (guarded in JS). Not expressible as a Tailwind utility (root pseudo). */
+/* View-transitions theme reveal. */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;

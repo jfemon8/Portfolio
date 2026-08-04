@@ -61,8 +61,7 @@ export default function AnalyticsManager() {
   const a = data?.data;
   if (!a) return null;
 
-  // Defensive defaults — frontend & backend deploy as independent Vercel
-  // projects, so tolerate an old summary payload during a deploy gap.
+  // Defensive defaults for deploy gaps.
   const byBrowser = a.byBrowser ?? [];
   const byCountry = a.byCountry ?? [];
   const scrollDepth = a.scrollDepth ?? [];

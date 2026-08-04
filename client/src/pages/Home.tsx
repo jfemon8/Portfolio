@@ -57,8 +57,7 @@ export default function Home() {
     contact: <Contact profile={profile} />,
   };
 
-  // Single source of truth for keys/order is HOME_SECTIONS; the server only
-  // stores overrides. Loading / empty / error → default order (never breaks).
+  // HOME_SECTIONS remains the source of truth.
   const known = HOME_SECTIONS.map((s) => s.key);
   const cfg = (siteData?.data?.sections ?? []).filter((c) =>
     known.includes(c.key)
