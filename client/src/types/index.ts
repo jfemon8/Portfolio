@@ -227,6 +227,29 @@ export interface Publication {
 
 export type BlogStatus = 'draft' | 'scheduled' | 'published';
 
+export type BlogReactionType = 'like' | 'love' | 'clap' | 'insightful' | 'fire';
+
+export interface BlogReactionSummary {
+  _id: BlogReactionType;
+  count: number;
+}
+
+export interface BlogComment {
+  post: string;
+  name: string;
+  email?: string;
+  content: string;
+  parentComment?: string;
+}
+
+export interface BlogEngagement {
+  comments: BlogCommentDoc[];
+  reactions: BlogReactionSummary[];
+  totalComments: number;
+  totalReactions: number;
+  visitorReaction: BlogReactionType | null;
+}
+
 export interface BlogPost {
   title: string;
   slug: string;
@@ -276,6 +299,12 @@ export type EducationDoc = Entity<Education>;
 export type CertificationDoc = Entity<Certification>;
 export type PublicationDoc = Entity<Publication>;
 export type BlogPostDoc = Entity<BlogPost>;
+export type BlogCommentDoc = Entity<BlogComment>;
+export type BlogReactionDoc = Entity<{
+  post: string;
+  visitorKey: string;
+  reaction: BlogReactionType;
+}>;
 export type MessageDoc = Entity<Message>;
 export type CpStatsDoc = Entity<CpStats>;
 export type SeoSettingsDoc = Entity<SeoSettings>;
@@ -570,6 +599,7 @@ export interface PaginatedResponse<T> {
 export interface BlogDetailResponse {
   success: true;
   data: BlogPostDoc;
+  engagement: BlogEngagement;
   related: Pick<
     BlogPostDoc,
     | '_id'

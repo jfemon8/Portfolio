@@ -7,27 +7,31 @@ import RichText from '@/components/shared/RichText';
 import SmartImage from '@/components/shared/SmartImage';
 import GlassCard from '@/components/shared/GlassCard';
 import Reveal from '@/components/motion/Reveal';
+import BlogEngagement from '@/components/sections/BlogEngagement';
 import { Button } from '@/components/ui/button';
 import { Spinner, ErrorState } from '@/components/ui/States';
 import { useBlogPost, useProfile } from '@/hooks/usePortfolio';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
 import { formatDate } from '@/lib/date';
+import { getBlogVisitorKey } from '@/lib/blog';
+import { useState } from 'react';
 
 export default function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const { data, isLoading, isError, refetch } = useBlogPost(slug);
+  const [visitorKey] = useState(() => (slug ? getBlogVisitorKey(slug) : ''));
+  const { data, isLoading, isError, refetch } = useBlogPost(slug, visitorKey);
   const { data: profData } = useProfile();
   const post = data?.data;
   const related = data?.related ?? [];
-  const st = useSiteCopy('states', { postNotFound: 'Post not found.' });
+  const st = useSiteCopy('states', { postNotFound: 'Post Not Found.' });
   const lab = useSiteCopy('labels', {
     btnBack: 'Back',
-    backToBlog: 'Back to blog',
-    unitMinRead: 'min read',
-    unitViews: 'views',
+    backToBlog: 'Back To Blog',
+    unitMinRead: 'Min Read',
+    unitViews: 'Views',
     btnShare: 'Share',
-    headingRelated: 'Related posts',
+    headingRelated: 'Related Posts',
     toastLinkCopied: 'Link copied to clipboard',
     toastCopyFailed: 'Could not copy link',
   });
@@ -161,6 +165,14 @@ export default function BlogPostPage() {
               ))}
             </div>
           </div>
+        )}
+
+        {post && data?.engagement && (
+          <BlogEngagement
+            slug={post.slug}
+            visitorKey={visitorKey}
+            engagement={data.engagement}
+          />
         )}
       </article>
     </>

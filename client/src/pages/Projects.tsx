@@ -27,18 +27,18 @@ export default function Projects() {
     filter === 'all' ? all : all.filter((p) => p.category === filter);
   const copy = useSectionCopy('projects', {
     index: '~/projects',
-    title: "Things I've built",
+    title: "Things I've Built",
     subtitle:
-      'Full-stack platforms, front-ends and experiments — from MERN products to .NET e-commerce.',
+      'Full-Stack Platforms, Front-Ends And Experiments — From MERN Products To .NET E-Commerce.',
   });
   const st = useSiteCopy('states', {
-    projectsFilterEmpty: 'No projects in this category yet.',
+    projectsFilterEmpty: 'No Projects In This Category Yet.',
   });
   const lab = useSiteCopy('labels', {
     filterAll: 'All',
-    filterFullstack: 'Full-stack',
-    filterFrontend: 'Front-end',
-    filterBackend: 'Back-end',
+    filterFullstack: 'Full-Stack',
+    filterFrontend: 'Front-End',
+    filterBackend: 'Back-End',
   });
   const filterLabel: Record<string, string> = {
     all: lab.filterAll,
@@ -52,7 +52,7 @@ export default function Projects() {
       <Seo
         title="Projects"
         path="/projects"
-        description="Full-stack platforms, front-ends and experiments — from MERN products to .NET e-commerce."
+        description="Full-Stack Platforms, Front-Ends And Experiments — From MERN Products To .NET E-Commerce."
         jsonLd={[
           breadcrumbSchema([
             { name: 'Home', path: '/' },
@@ -65,7 +65,7 @@ export default function Projects() {
               name: p.title,
               path: `/projects/${p.slug}`,
             })),
-            'Full-stack platforms, front-ends and experiments — from MERN products to .NET e-commerce.'
+            'Full-Stack Platforms, Front-Ends And Experiments — From MERN Products To .NET E-Commerce.'
           ),
         ]}
       />

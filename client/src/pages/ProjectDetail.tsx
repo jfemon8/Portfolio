@@ -43,24 +43,24 @@ export default function ProjectDetail() {
   const { data: profData } = useProfile();
   const p = data?.data;
   const st = useSiteCopy('states', {
-    projectNotFound: 'Project not found.',
+    projectNotFound: 'Project Not Found.',
   });
   const lab = useSiteCopy('labels', {
-    caseProblem: 'Problem statement',
-    caseProcess: 'UI / UX process',
-    caseArchitecture: 'Technical architecture',
-    caseDatabase: 'Database design',
-    caseApi: 'API architecture',
-    caseChallenges: 'Challenges faced',
-    caseSolutions: 'Solutions implemented',
-    caseOptimization: 'Optimization strategy',
+    caseProblem: 'Problem Statement',
+    caseProcess: 'UI / UX Process',
+    caseArchitecture: 'Technical Architecture',
+    caseDatabase: 'Database Design',
+    caseApi: 'API Architecture',
+    caseChallenges: 'Challenges Faced',
+    caseSolutions: 'Solutions Implemented',
+    caseOptimization: 'Optimization Strategy',
     caseLearnings: 'Learnings',
     btnBack: 'Back',
-    backToProjects: 'Back to projects',
-    btnSourceCode: 'Source code',
-    btnLiveDemo: 'Live demo',
-    headingHighlights: 'Key highlights',
-    unitViews: 'views',
+    backToProjects: 'Back To Projects',
+    btnSourceCode: 'Source Code',
+    btnLiveDemo: 'Live Demo',
+    headingHighlights: 'Key Highlights',
+    unitViews: 'Views',
   });
 
   if (isLoading)

@@ -5,12 +5,12 @@ import { useSiteCopy } from '@/hooks/useSiteCopy';
 
 export default function NotFound() {
   const c = useSiteCopy('states', {
-    notFoundError: 'bash: no such file or directory',
-    notFoundHome: 'cd ~/home',
+    notFoundError: 'Bash: No Such File Or Directory',
+    notFoundHome: 'Cd ~/Home',
   });
   return (
     <>
-      <Seo title="404 — Not found" noindex />
+      <Seo title="404 — Not Found" noindex />
       <div className="container-x grid min-h-[70vh] place-items-center text-center mt-4 pt-4">
         <div>
           <p className="font-mono text-7xl font-extrabold gradient-text">404</p>

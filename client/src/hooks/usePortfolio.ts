@@ -137,10 +137,15 @@ export const useBlogInfinite = (query = '') =>
     staleTime: CONTENT,
   });
 
-export const useBlogPost = (slug?: string) =>
+export const useBlogPost = (slug?: string, visitorKey?: string) =>
   useQuery({
-    queryKey: ['blog', 'post', slug],
-    queryFn: () => get<BlogDetailResponse>(`/blog/slug/${slug}`),
+    queryKey: ['blog', 'post', slug, visitorKey],
+    queryFn: () => {
+      const qs = new URLSearchParams();
+      if (visitorKey) qs.set('visitorKey', visitorKey);
+      const suffix = qs.toString() ? `?${qs.toString()}` : '';
+      return get<BlogDetailResponse>(`/blog/slug/${slug}${suffix}`);
+    },
     enabled: !!slug,
     staleTime: CONTENT,
   });

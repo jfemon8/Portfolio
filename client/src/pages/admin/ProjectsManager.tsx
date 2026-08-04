@@ -7,7 +7,7 @@ import { capitalizeFirst } from '@/lib/text';
 const config: ResourceConfig<ProjectDoc> = {
   title: 'Projects',
   subtitle:
-    'Projects shown on the public /projects page (each one also gets a /projects/:slug detail page with the full case study). Mark a project as Featured to also show it in the Featured-projects strip on your homepage.',
+    'Projects Shown On The Public /projects Page (Each One Also Gets A /projects/:slug Detail Page With The Full Case Study). Mark A Project As Featured To Also Show It In The Featured-Projects Strip On Your Homepage.',
   singular: 'project',
   base: 'projects',
   modalSize: 'lg',
@@ -54,7 +54,7 @@ const config: ResourceConfig<ProjectDoc> = {
     },
     {
       name: 'description',
-      label: 'Overview / fallback (Rich text) — shown if no case study below',
+      label: 'Overview / Fallback (Rich Text) — Shown If No Case Study Below',
       type: 'textarea',
       editor: 'richtext',
       full: true,
@@ -62,7 +62,7 @@ const config: ResourceConfig<ProjectDoc> = {
     },
     {
       name: 'caseStudy.problem',
-      label: 'Case study · Problem statement (Rich text)',
+      label: 'Case Study · Problem Statement (Rich Text)',
       type: 'textarea',
       editor: 'richtext',
       full: true,
@@ -70,7 +70,7 @@ const config: ResourceConfig<ProjectDoc> = {
     },
     {
       name: 'caseStudy.process',
-      label: 'Case study · UI/UX process (Rich text)',
+      label: 'Case Study · UI/UX Process (Rich Text)',
       type: 'textarea',
       editor: 'richtext',
       full: true,
@@ -78,7 +78,7 @@ const config: ResourceConfig<ProjectDoc> = {
     },
     {
       name: 'caseStudy.architecture',
-      label: 'Case study · Technical architecture (Rich text)',
+      label: 'Case Study · Technical Architecture (Rich Text)',
       type: 'textarea',
       editor: 'richtext',
       full: true,
@@ -86,7 +86,7 @@ const config: ResourceConfig<ProjectDoc> = {
     },
     {
       name: 'caseStudy.database',
-      label: 'Case study · Database design (Rich text)',
+      label: 'Case Study · Database Design (Rich Text)',
       type: 'textarea',
       editor: 'richtext',
       full: true,
@@ -94,7 +94,7 @@ const config: ResourceConfig<ProjectDoc> = {
     },
     {
       name: 'caseStudy.api',
-      label: 'Case study · API architecture (Rich text)',
+      label: 'Case Study · API Architecture (Rich Text)',
       type: 'textarea',
       editor: 'richtext',
       full: true,
@@ -102,7 +102,7 @@ const config: ResourceConfig<ProjectDoc> = {
     },
     {
       name: 'caseStudy.challenges',
-      label: 'Case study · Challenges faced (Rich text)',
+      label: 'Case Study · Challenges Faced (Rich Text)',
       type: 'textarea',
       editor: 'richtext',
       full: true,
@@ -110,7 +110,7 @@ const config: ResourceConfig<ProjectDoc> = {
     },
     {
       name: 'caseStudy.solutions',
-      label: 'Case study · Solutions implemented (Rich text)',
+      label: 'Case Study · Solutions Implemented (Rich Text)',
       type: 'textarea',
       editor: 'richtext',
       full: true,
@@ -118,7 +118,7 @@ const config: ResourceConfig<ProjectDoc> = {
     },
     {
       name: 'caseStudy.optimization',
-      label: 'Case study · Optimization strategy (Rich text)',
+      label: 'Case Study · Optimization Strategy (Rich Text)',
       type: 'textarea',
       editor: 'richtext',
       full: true,
@@ -126,7 +126,7 @@ const config: ResourceConfig<ProjectDoc> = {
     },
     {
       name: 'caseStudy.learnings',
-      label: 'Case study · Learnings (Rich text)',
+      label: 'Case Study · Learnings (Rich Text)',
       type: 'textarea',
       editor: 'richtext',
       full: true,

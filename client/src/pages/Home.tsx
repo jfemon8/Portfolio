@@ -28,8 +28,8 @@ export default function Home() {
   const navigate = useNavigate();
   const profile = data?.data;
   const st = useSiteCopy('states', {
-    homeLoading: 'Loading portfolio…',
-    homeError: "Couldn't reach the API. Is the backend running?",
+    homeLoading: 'Loading Portfolio…',
+    homeError: "Couldn't Reach The API. Is The Backend Running?",
   });
 
   if (isLoading)

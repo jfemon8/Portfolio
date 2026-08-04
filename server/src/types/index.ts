@@ -521,6 +521,22 @@ export interface IBlogPost {
   scheduledFor?: Date;
 }
 
+export type BlogReactionType = 'like' | 'love' | 'clap' | 'insightful' | 'fire';
+
+export interface IBlogReaction {
+  post: ID;
+  visitorKey: string;
+  reaction: BlogReactionType;
+}
+
+export interface IBlogComment {
+  post: ID;
+  name: string;
+  email?: string;
+  content: string;
+  parentComment?: ID;
+}
+
 export interface IMessage {
   name: string;
   email: string;

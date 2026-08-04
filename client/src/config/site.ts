@@ -89,7 +89,7 @@ export const AUTHOR_KNOWS_ABOUT = [
 export const SITE_TITLE = `${AUTHOR_NAME} — Developer Portfolio`;
 
 export const DEFAULT_DESCRIPTION =
-  'Assistant Front-End Developer building responsive, dynamic MERN applications.';
+  'Assistant Front-End Developer Building Responsive, Dynamic MERN Applications.';
 
 /**
  * Default keywords meta when the admin SeoSettings has none: every name

@@ -20,3 +20,15 @@ export const strictLimiter = rateLimit({
     message: 'Too many attempts. Please try again in 15 minutes.',
   },
 });
+
+/** Moderate limit for public blog engagement actions. */
+export const blogEngagementLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: 'Too many attempts. Please try again in 15 minutes.',
+  },
+});

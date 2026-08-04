@@ -34,7 +34,7 @@ export default function Blog() {
   const posts = data?.pages.flatMap((p) => p.data) ?? [];
   const copy = useSectionCopy('blog', {
     index: '~/blog',
-    title: 'Writing & notes',
+    title: 'Writing & Notes',
     subtitle:
       'Thoughts on development, the MERN stack, .NET and competitive programming.',
   });
@@ -75,7 +75,7 @@ export default function Blog() {
         <SectionHeading
           index={copy.index}
           title={copy.title}
-          subtitle={copy.subtitle}
+          // subtitle={copy.subtitle}
           action={
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" />
@@ -84,7 +84,7 @@ export default function Blog() {
                 onChange={(e) => setQ(e.target.value)}
                 placeholder={lab.searchPlaceholder}
                 aria-label={lab.searchAria}
-                className="input w-full pl-9 sm:w-56"
+                className="input w-full pl-9 md:w-56"
               />
             </div>
           }
