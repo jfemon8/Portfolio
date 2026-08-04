@@ -4,6 +4,7 @@ import { MessageSquareReply, Send } from 'lucide-react';
 import toast from 'react-hot-toast';
 import GlassCard from '@/components/shared/GlassCard';
 import { Button } from '@/components/ui/button';
+import { useConfirm } from '@/components/admin/ConfirmModal';
 import { useAuth } from '@/context/AuthContext';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/cn';
@@ -391,6 +392,7 @@ function CommentItem({
   canModerate,
   onReply,
 }: CommentItemProps) {
+  const showConfirm = useConfirm();
   const qc = useQueryClient();
   const [activeReaction, setActiveReaction] = useState<BlogReactionType | null>(
     comment.visitorReaction ?? null
@@ -497,9 +499,17 @@ function CommentItem({
   };
 
   const confirmDelete = (): void => {
-    if (window.confirm('Delete this comment and its replies?')) {
-      deleteMutation.mutate();
-    }
+    void (async () => {
+      const ok = await showConfirm({
+        title: 'Delete comment?',
+        message:
+          'This comment and every nested reply will be permanently removed.',
+        confirmLabel: 'Delete',
+        cancelLabel: 'Cancel',
+        variant: 'danger',
+      });
+      if (ok) deleteMutation.mutate();
+    })();
   };
 
   return (

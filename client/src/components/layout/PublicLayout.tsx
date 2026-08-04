@@ -6,6 +6,7 @@ import FloatingDock from './FloatingDock';
 import ScrollProgress from './ScrollProgress';
 import PageTransition from './PageTransition';
 import SmoothScroll from './SmoothScroll';
+import { ConfirmProvider } from '@/components/admin/ConfirmModal';
 import { track } from '@/lib/api';
 import { useScrollDepth } from '@/hooks/useScrollDepth';
 import { initThemeSync } from '@/stores/theme';
@@ -50,28 +51,30 @@ export default function PublicLayout() {
   useScrollDepth(pathname);
 
   return (
-    <SmoothScroll>
-      <div className="relative flex min-h-screen flex-col">
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:border focus:border-border focus:bg-card focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-foreground focus:shadow-glow"
-        >
-          Skip to content
-        </a>
-        <PremiumBackground />
-        <ScrollProgress />
-        <FloatingDock />
-        <main
-          id="main-content"
-          tabIndex={-1}
-          className="flex-1 pb-28 outline-none"
-        >
-          <PageTransition>
-            <Outlet />
-          </PageTransition>
-        </main>
-        <Footer />
-      </div>
-    </SmoothScroll>
+    <ConfirmProvider>
+      <SmoothScroll>
+        <div className="relative flex min-h-screen flex-col">
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:border focus:border-border focus:bg-card focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-foreground focus:shadow-glow"
+          >
+            Skip to content
+          </a>
+          <PremiumBackground />
+          <ScrollProgress />
+          <FloatingDock />
+          <main
+            id="main-content"
+            tabIndex={-1}
+            className="flex-1 pb-28 outline-none"
+          >
+            <PageTransition>
+              <Outlet />
+            </PageTransition>
+          </main>
+          <Footer />
+        </div>
+      </SmoothScroll>
+    </ConfirmProvider>
   );
 }
