@@ -101,7 +101,7 @@ export default function BlogPostPage() {
             ))}
           </div>
 
-          <h1 className="mt-5 text-balance text-3xl font-extrabold leading-tight tracking-tight text-foreground sm:text-5xl">
+          <h1 className="mt-5 text-3xl font-extrabold leading-tight tracking-tight text-foreground sm:text-5xl">
             {post.title}
           </h1>
 

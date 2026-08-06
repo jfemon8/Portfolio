@@ -12,13 +12,7 @@ interface SectionProps {
 /** Shared section frame. */
 export function Section({ id, className, children }: SectionProps) {
   return (
-    <section
-      id={id}
-      className={cn(
-        'relative scroll-mt-24 py-12 xs:py-16 sm:py-20 lg:py-24 xl:py-28 3xl:py-36',
-        className
-      )}
-    >
+    <section id={id} className={cn('relative py-4', className)}>
       <div className="container-x">{children}</div>
     </section>
   );
