@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from 'motion/react';
-import { ArrowRight, Download, MapPin } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { useTypewriter } from '@/hooks/useTypewriter';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
 import { track } from '@/lib/api';
