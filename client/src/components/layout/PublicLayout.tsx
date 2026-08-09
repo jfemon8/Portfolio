@@ -12,6 +12,7 @@ import { useScrollDepth } from '@/hooks/useScrollDepth';
 import { initThemeSync } from '@/stores/theme';
 import { scrollToId, resetScroll, waitForElementId } from '@/lib/smoothScroll';
 import { queryClient } from '@/lib/queryClient';
+import { prefetchPublicRoutes } from '@/lib/prefetch';
 
 /** Sole authority that initialises the canonical theme engine for the public site. */
 export default function PublicLayout() {
@@ -23,6 +24,8 @@ export default function PublicLayout() {
   useEffect(() => {
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
   }, []);
+
+  useEffect(() => prefetchPublicRoutes(), []);
 
   // Waits for the `/#section` target to mount, lands on it, then keeps re-snapping while sections above are still fetching and reflowing taller.
   useEffect(() => {

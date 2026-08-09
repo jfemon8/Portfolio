@@ -28,6 +28,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useProfile } from '@/hooks/usePortfolio';
 import { useUIStore } from '@/stores/ui';
 import { initThemeSync } from '@/stores/theme';
+import { prefetchAdminRoutes } from '@/lib/prefetch';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import CommandPalette, {
   type CommandItem,
@@ -85,6 +86,7 @@ export default function AdminLayout() {
   const toggleCommand = useUIStore((s) => s.toggleCommand);
 
   useEffect(() => initThemeSync(), []);
+  useEffect(() => prefetchAdminRoutes(), []);
 
   // Global ⌘K / Ctrl+K
   useEffect(() => {
