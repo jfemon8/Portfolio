@@ -105,7 +105,7 @@ export default function BlogEditor() {
         </Button>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+      <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
         <GlassCard className="space-y-4 p-6">
           <div>
             <label className="label">Title</label>
@@ -168,7 +168,7 @@ export default function BlogEditor() {
                     )
                   }
                 />
-                <p className="mt-1 text-[11px] text-muted-foreground/70">
+                <p className="mt-1 text-2xs text-muted-foreground/70">
                   Goes public automatically at this time.
                 </p>
               </div>

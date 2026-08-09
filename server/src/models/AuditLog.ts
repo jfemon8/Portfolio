@@ -1,11 +1,7 @@
 import mongoose, { type Model } from 'mongoose';
 import type { IAuditLog } from '../types/index.js';
 
-/**
- * Append-only security/audit trail. Written for auth events and (from P4)
- * every privileged mutation. Readable only by super admins.
- * Auto-expires after 180 days to bound storage.
- */
+// Append-only audit trail (auth events + privileged mutations); super-admin-read-only, auto-expires after 180 days.
 const auditLogSchema = new mongoose.Schema<IAuditLog>(
   {
     actor: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

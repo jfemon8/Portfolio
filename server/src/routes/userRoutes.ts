@@ -9,11 +9,7 @@ import {
   deleteUser,
 } from '../controllers/userController.js';
 
-/**
- * User & role management — SUPER ADMIN ONLY.
- * Immutable super admins are protected at the service layer (cannot be
- * edited/deleted; `superAdmin` role is never assignable here).
- */
+// Super-admin only; immutable super admins are protected at the service layer and the superAdmin role is never assignable here.
 const router = Router();
 
 router.use(protect, requireSuperAdmin);

@@ -33,7 +33,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noreferrer"
                 aria-label={s.label}
-                className="rounded-xl border border-line bg-bg-card p-3 text-ink-soft transition-all hover:border-neon/50 hover:text-neon"
+                className="rounded-xl border border-border bg-card p-3 text-ink-soft transition-all hover:border-neon/50 hover:text-neon"
               >
                 <SocialIcon social={s} />
               </a>

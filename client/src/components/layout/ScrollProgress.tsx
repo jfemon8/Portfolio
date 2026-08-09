@@ -1,10 +1,7 @@
 import { motion, useScroll, useSpring } from 'motion/react';
 import { spring } from '@/config/animation';
 
-/**
- * Top scroll-progress bar (page reading progress). GPU-only scaleX,
- * spring-smoothed. A premium signature detail.
- */
+// GPU-only scaleX (not width) for a spring-smoothed scroll-progress bar.
 export default function ScrollProgress() {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, spring.gentle);

@@ -30,11 +30,7 @@ const fileSize = (b: number): string =>
     ? `${Math.round(b / 1024)} KB`
     : `${(b / 1048576).toFixed(1)} MB`;
 
-/**
- * Cloudinary media library — browse by folder, copy URL, delete. Admin only.
- * Cursor-paginated (mirrors AuditLogViewer); reuses the shared admin
- * primitives + SmartImage (project rule #3/#8).
- */
+// Cursor-paginated, mirroring AuditLogViewer's pagination pattern.
 export default function MediaLibrary() {
   const qc = useQueryClient();
   const confirm = useConfirm();
@@ -131,12 +127,12 @@ export default function MediaLibrary() {
             </div>
             <div className="space-y-2 p-3">
               <p
-                className="truncate font-mono text-[11px] text-muted-foreground"
+                className="truncate font-mono text-2xs text-muted-foreground"
                 title={a.publicId}
               >
                 {a.publicId}
               </p>
-              <p className="text-[11px] text-muted-foreground/60">
+              <p className="text-2xs text-muted-foreground/60">
                 {a.format?.toUpperCase()} · {a.width}×{a.height} ·{' '}
                 {fileSize(a.bytes)}
               </p>

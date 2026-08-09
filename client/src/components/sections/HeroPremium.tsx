@@ -70,13 +70,13 @@ export default function HeroPremium({
           className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-20"
         />
       )}
-      <Spotlight className="flex items-center lg:min-h-[100svh]">
+      <Spotlight className="flex items-center">
         <Particles count={28} />
 
-        <div className="container-x relative z-10 grid items-center gap-6 py-12 sm:gap-10 sm:py-20 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14 lg:py-24">
+        <div className="container-x relative z-10 grid items-center gap-6 py-4 md:gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14">
           {/* Left — identity */}
           <div className="min-w-0">
-            <motion.span
+            {/* <motion.span
               {...rise(0)}
               className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/50 px-3.5 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur"
             >
@@ -85,35 +85,35 @@ export default function HeroPremium({
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-neon" />
               </span>
               {profile?.available ? hero.availableBadge : hero.unavailableBadge}
-            </motion.span>
+            </motion.span> */}
 
             <motion.h1
               {...rise(0.06)}
-              className="mt-6 text-balance text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl"
+              className="mt-4 text-balance text-4xl font-extrabold leading-[1.05] tracking-tight md:text-6xl lg:text-7xl"
             >
               {hero.greeting}{' '}
               <span className="gradient-text">
-                {profile?.name || 'Md Jannatul Ferdhous Emon'}
+                {profile?.name || 'Md. Jannatul Ferdhous Emon'}
               </span>
             </motion.h1>
 
             <motion.div
               {...rise(0.12)}
-              className="mt-5 flex flex-wrap items-center gap-2 font-mono text-lg text-muted-foreground sm:text-2xl"
+              className="mt-4 flex flex-wrap items-center gap-2 font-mono text-base sm:text-lg md:text-2xl text-muted-foreground"
             >
               <span className="text-neon">&gt;</span>
               <span className="min-w-0 break-words text-foreground">
                 {typed}
               </span>
-              <span className="inline-block h-6 w-[3px] animate-blink bg-neon" />
+              <span className="inline-block h-6 w-[0.1875rem] animate-blink bg-neon" />
             </motion.div>
 
             <motion.p
               {...rise(0.18)}
-              className="mt-7 max-w-xl text-balance text-base leading-relaxed text-muted-foreground sm:text-lg"
+              className="mt-4 text-base leading-relaxed text-muted-foreground md:text-lg"
             >
               {profile?.tagline ||
-                'I build responsive, dynamic & scalable web apps with the MERN stack.'}
+                'I build responsive, dynamic & scalable web apps.'}
             </motion.p>
 
             {profile?.location && (
@@ -127,10 +127,10 @@ export default function HeroPremium({
 
             <motion.div
               {...rise(0.28)}
-              className="mt-9 flex flex-wrap items-center gap-3"
+              className="mt-4 flex flex-wrap items-center gap-3"
             >
-              <Button size="lg" onClick={onProjects}>
-                {hero.ctaProjects} <ArrowRight className="h-4 w-4" />
+              <Button size="md" onClick={onProjects}>
+                {hero.ctaProjects}
               </Button>
               {profile?.resumeUrl && (
                 <a
@@ -138,12 +138,10 @@ export default function HeroPremium({
                   download
                   onClick={() => track('resume_download', '/', 'hero')}
                 >
-                  <Button size="lg">
-                    <Download className="h-4 w-4" /> {hero.ctaResume}
-                  </Button>
+                  <Button size="md">{hero.ctaResume}</Button>
                 </a>
               )}
-              <Button size="lg" onClick={onContact}>
+              <Button size="md" onClick={onContact}>
                 {hero.ctaContact}
               </Button>
             </motion.div>
@@ -184,12 +182,12 @@ export default function HeroPremium({
                   {hero.terminalTitle}
                 </span>
               </div>
-              <pre className="whitespace-pre-wrap break-words p-5 font-mono text-[11px] leading-relaxed text-muted-foreground sm:text-[13px]">
+              <pre className="whitespace-pre-wrap break-words p-5 font-mono text-2xs leading-relaxed text-muted-foreground sm:text-[0.8125rem]">
                 <code>
                   <span className="text-neon">$</span> {hero.whoamiCmd}
                   {'\n'}
                   <span className="text-foreground">
-                    {profile?.name || 'Md Jannatul Ferdhous Emon'}
+                    {profile?.name || 'Md. Jannatul Ferdhous Emon'}
                   </span>
                   {'\n\n'}
                   <span className="text-neon">$</span> {hero.stackCmd}
@@ -224,7 +222,7 @@ export default function HeroPremium({
                       <div className="text-lg font-bold text-neon">
                         {s.value}
                       </div>
-                      <div className="mt-0.5 text-[11px] uppercase tracking-wide text-muted-foreground/70">
+                      <div className="mt-0.5 text-2xs uppercase tracking-wide text-muted-foreground/70">
                         {s.label}
                       </div>
                     </div>

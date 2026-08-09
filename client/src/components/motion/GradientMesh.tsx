@@ -5,11 +5,7 @@ interface GradientMeshProps {
   className?: string;
 }
 
-/**
- * Animated gradient-mesh backdrop — slow-drifting neon blobs. GPU-only
- * (transform/opacity), reduced-motion safe. Reusable scene backdrop
- * (project rule #3).
- */
+// GPU-only animation (transform/opacity), reduced-motion safe.
 export default function GradientMesh({ className }: GradientMeshProps) {
   const reduce = useReducedMotion();
 
@@ -38,7 +34,7 @@ export default function GradientMesh({ className }: GradientMeshProps) {
       {blobs.map((b, i) => (
         <motion.div
           key={i}
-          className={cn('absolute rounded-full blur-[120px]', b.c, b.s)}
+          className={cn('absolute rounded-full blur-[5.625rem]', b.c, b.s)}
           animate={
             reduce
               ? undefined

@@ -90,14 +90,14 @@ export default function AuditLogViewer() {
             <div className="flex flex-wrap items-center gap-3">
               <span
                 className={cn(
-                  'rounded-full border px-2.5 py-0.5 font-mono text-[11px]',
+                  'rounded-full border px-2.5 py-0.5 font-mono text-2xs',
                   tone(l.action)
                 )}
               >
                 {l.action}
               </span>
               <span className="text-sm text-foreground">{l.actorEmail}</span>
-              <span className="rounded-full border border-border/70 px-2 py-0.5 text-[11px] capitalize text-muted-foreground">
+              <span className="rounded-full border border-border/70 px-2 py-0.5 text-2xs capitalize text-muted-foreground">
                 {l.role}
               </span>
               {l.entity && (
@@ -106,7 +106,7 @@ export default function AuditLogViewer() {
                   {l.entityId ? `#${l.entityId.slice(-6)}` : ''}
                 </span>
               )}
-              <span className="flex items-center gap-3 text-[11px] text-muted-foreground/60 sm:ml-auto">
+              <span className="flex items-center gap-3 text-2xs text-muted-foreground/60 sm:ml-auto">
                 {l.ip && (
                   <span className="flex items-center gap-1">
                     <Globe className="h-3 w-3" /> {l.ip}
@@ -116,7 +116,7 @@ export default function AuditLogViewer() {
               </span>
             </div>
             {l.meta && Object.keys(l.meta).length > 0 && (
-              <pre className="mt-2 overflow-x-auto rounded-lg border border-border/50 bg-background/40 p-2 font-mono text-[11px] text-muted-foreground/80">
+              <pre className="mt-2 overflow-x-auto rounded-lg border border-border/50 bg-background/40 p-2 font-mono text-2xs text-muted-foreground/80">
                 {JSON.stringify(l.meta)}
               </pre>
             )}

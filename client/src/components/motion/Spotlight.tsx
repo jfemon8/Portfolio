@@ -15,11 +15,7 @@ interface SpotlightProps {
   color?: string;
 }
 
-/**
- * Mouse-follow spotlight surface — the cinematic hero / section backdrop
- * primitive (project rule #3). Pure compositor work (background only),
- * reduced-motion safe.
- */
+// Mouse-follow spotlight for hero/section backdrops; background-only compositor work keeps it cheap, reduced-motion safe.
 export default function Spotlight({
   children,
   className,

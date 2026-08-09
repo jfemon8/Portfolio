@@ -59,8 +59,7 @@ const projectSchema = new mongoose.Schema<IProject>(
 );
 
 projectSchema.pre('validate', function setSlug(next) {
-  // Guard on a present title so a missing one falls through to the `required`
-  // validator (clean 400) instead of throwing inside slugify (500).
+  // Guard on a present title so a missing one falls through to the required validator (400) instead of throwing inside slugify (500).
   if (this.title && (this.isModified('title') || !this.slug)) {
     this.slug = slugify(this.title, { lower: true, strict: true });
   }
@@ -68,6 +67,7 @@ projectSchema.pre('validate', function setSlug(next) {
 });
 
 projectSchema.index({ featured: -1, order: 1, createdAt: -1 });
+projectSchema.index({ category: 1 });
 
 export const Project =
   (mongoose.models.Project as Model<IProject>) ||

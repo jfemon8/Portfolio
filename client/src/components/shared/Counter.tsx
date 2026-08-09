@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { animate, useInView, useReducedMotion } from 'motion/react';
 
 interface CounterProps {
@@ -8,11 +8,6 @@ interface CounterProps {
   duration?: number;
 }
 
-/**
- * Animated count-up. Parses a leading number and counts to it when scrolled
- * into view; non-numeric values render as-is. Reduced-motion → instant.
- * Single reusable counter (project rule #3).
- */
 export default function Counter({
   value,
   className,
@@ -21,6 +16,14 @@ export default function Counter({
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: '-40px' });
   const reduce = useReducedMotion();
+  const [alreadyVisible, setAlreadyVisible] = useState(false);
+
+  useLayoutEffect(() => {
+    const rect = ref.current?.getBoundingClientRect();
+    if (rect && rect.top < window.innerHeight && rect.bottom > 0) {
+      setAlreadyVisible(true);
+    }
+  }, []);
 
   const match = value.match(/^(\d[\d,]*)(.*)$/);
   const target = match ? Number(match[1]!.replace(/,/g, '')) : null;
@@ -30,7 +33,7 @@ export default function Counter({
 
   useEffect(() => {
     if (target === null || !inView) return;
-    if (reduce) {
+    if (reduce || alreadyVisible) {
       setDisplay(String(target));
       return;
     }
@@ -40,7 +43,7 @@ export default function Counter({
       onUpdate: (v) => setDisplay(String(Math.round(v))),
     });
     return () => controls.stop();
-  }, [inView, target, reduce, duration]);
+  }, [inView, target, reduce, alreadyVisible, duration]);
 
   return (
     <span ref={ref} className={className}>

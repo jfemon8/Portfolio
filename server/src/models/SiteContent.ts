@@ -1,13 +1,7 @@
 import mongoose, { type Model } from 'mongoose';
 import type { ISiteContent } from '../types/index.js';
 
-/**
- * Admin-managed site copy / UI text (singleton, like SeoSettings/SiteSettings).
- * Every public string also has a hardcoded fallback in its component, so an
- * empty/missing doc renders the site identically (zero-risk dynamic copy).
- * Grows per P12 increment. Mongoose ESM-safe pattern (do NOT regress to
- * named runtime imports).
- */
+// Singleton site copy; every string has a component fallback so an empty/missing doc renders identically (zero-risk dynamic copy). Mongoose ESM-safe pattern, don't regress to named imports.
 const heroSchema = new mongoose.Schema(
   {
     availableBadge: { type: String, default: '' },

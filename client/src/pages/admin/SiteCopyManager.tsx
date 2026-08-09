@@ -42,7 +42,7 @@ function Panel({
   return (
     <details
       open={defaultOpen}
-      className="group relative overflow-hidden rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_24px_60px_-30px_rgba(0,0,0,0.7)]"
+      className="group relative overflow-hidden rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl"
     >
       <summary className="flex cursor-pointer select-none list-none items-center gap-2 p-4 font-semibold text-neon transition-colors hover:text-neon/80 sm:p-6 [&::-webkit-details-marker]:hidden">
         <Icon className="h-4 w-4 shrink-0" />

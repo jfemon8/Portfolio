@@ -6,14 +6,7 @@ export interface SectionCopy {
   subtitle: string;
 }
 
-/**
- * Resolve a section's heading copy from the admin-managed SiteContent
- * singleton, falling back to the component's hardcoded defaults (project
- * rule #3/#8 — one accessor reused by every section). An empty or missing
- * value reverts to the default, so the site renders identically when nothing
- * is set and clearing a field in the admin restores the original copy —
- * zero-risk dynamic copy (same defensive merge as Seo over config/site).
- */
+// Resolves section heading copy from the admin SiteContent singleton, falling back to hardcoded defaults — clearing a field in admin restores the original.
 export function useSectionCopy(
   key: string,
   defaults: SectionCopy

@@ -1,14 +1,7 @@
 import type { ImgHTMLAttributes } from 'react';
 import { cldUrl } from '@/lib/img';
 
-/**
- * The single optimized image element (project rule #3). Drop-in for `<img>`:
- * keeps the caller's exact markup/classes (no layout/CLS change) while adding
- * Cloudinary optimization, async decoding and the right loading priority.
- *
- * `priority` = above-the-fold hero/cover → eager + high fetch priority for a
- * better LCP. Everything else stays lazy.
- */
+// Drop-in <img> with Cloudinary optimization and async decoding; priority=true is for above-the-fold hero/cover images to improve LCP, everything else stays lazy.
 interface SmartImageProps extends Omit<
   ImgHTMLAttributes<HTMLImageElement>,
   'src' | 'loading'
@@ -33,10 +26,7 @@ export default function SmartImage({
       alt={alt}
       loading={priority ? 'eager' : 'lazy'}
       decoding="async"
-      // React 18 only maps the lowercase `fetchpriority` DOM attribute; the
-      // camelCase `fetchPriority` prop logs an "unknown prop" warning. `auto`
-      // is the browser default, so only the high-priority hint is worth
-      // emitting. (React 19 supports camelCase — drop the cast on upgrade.)
+      // React 18 only recognizes lowercase fetchpriority (camelCase warns); only emit for priority images since auto is the default — drop this cast on React 19.
       {...(priority
         ? ({ fetchpriority: 'high' } as Record<string, string>)
         : {})}

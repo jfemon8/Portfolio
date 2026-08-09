@@ -1,11 +1,4 @@
-/**
- * Single source of truth for site-level SEO identity (project rule #3/#8).
- * Both the `Seo` component and the structured-data builders read from here
- * so titles, canonical origin and social/JSON-LD identity never drift.
- *
- * `VITE_SITE_URL` is a PUBLIC value (the deployed site origin) — safe in the
- * bundle; no secrets here (rule #9).
- */
+// Single source of truth for SEO identity (Seo component + structured-data builders read from here so nothing drifts); VITE_SITE_URL is public, safe in the bundle.
 export const SITE_URL = (
   import.meta.env.VITE_SITE_URL || 'https://jfemon.vercel.app'
 ).replace(/\/$/, '');
@@ -14,11 +7,7 @@ export const AUTHOR_NAME = 'Md Jannatul Ferdhous Emon';
 
 export const AUTHOR_JOB_TITLE = 'Assistant Front-End Developer';
 
-/**
- * Name variants people actually type into Google. Powers `Person.alternateName`
- * (entity/knowledge-panel SEO) and the default keywords meta — one list so the
- * two never drift.
- */
+// Name variants people search for; powers both Person.alternateName and the default keywords meta from one list so they never drift.
 export const AUTHOR_ALTERNATE_NAMES = [
   'Jannatul Ferdhous Emon',
   'Md Jannatul Ferdhous',
@@ -40,11 +29,7 @@ export const AUTHOR_ALMA_MATER = 'University of Barishal';
 export const AUTHOR_NATIONALITY = 'Bangladesh';
 export const AUTHOR_CITY = 'Dhaka';
 
-/**
- * Canonical public profiles for `Person.sameAs` when the DB profile has no
- * socials yet — Google links these to build the entity behind a knowledge
- * panel, so the fallback must never be empty.
- */
+// Fallback Person.sameAs profiles when the DB has none — Google uses these to build the knowledge-panel entity, so this must never be empty.
 export const AUTHOR_SAME_AS = [
   'https://github.com/jfemon8',
   'https://www.linkedin.com/in/jfemon/',
@@ -91,11 +76,7 @@ export const SITE_TITLE = `${AUTHOR_NAME} — Developer Portfolio`;
 export const DEFAULT_DESCRIPTION =
   'Assistant Front-End Developer Building Responsive, Dynamic MERN Applications.';
 
-/**
- * Default keywords meta when the admin SeoSettings has none: every name
- * variant, the profession and adjacent professions, stack terms and
- * location-qualified variants people actually search with.
- */
+// Fallback keywords used only when admin SeoSettings has none: name variants, profession, stack terms, and location-qualified search terms.
 export const DEFAULT_KEYWORDS = [
   AUTHOR_NAME,
   ...AUTHOR_ALTERNATE_NAMES,
@@ -136,11 +117,7 @@ export const DEFAULT_KEYWORDS = [
   'Developer Portfolio',
 ] as const;
 
-/**
- * Default social-share image. Social scrapers don't execute JS, so this is a
- * static raster the owner supplies at `client/public/og.png` (1200×630) —
- * same "owner-supplied media" pattern as the avatar/resume placeholders.
- */
+// Static raster (not generated) because social scrapers don't execute JS; owner-supplied at client/public/og.png (1200×630), same pattern as avatar/resume placeholders.
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og.png`;
 
 /** Resolve a route path or an already-absolute URL to an absolute URL. */

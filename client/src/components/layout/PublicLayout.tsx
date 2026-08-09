@@ -10,39 +10,87 @@ import { ConfirmProvider } from '@/components/admin/ConfirmModal';
 import { track } from '@/lib/api';
 import { useScrollDepth } from '@/hooks/useScrollDepth';
 import { initThemeSync } from '@/stores/theme';
-import { scrollToId } from '@/lib/smoothScroll';
+import { scrollToId, resetScroll, waitForElementId } from '@/lib/smoothScroll';
+import { queryClient } from '@/lib/queryClient';
 
-/**
- * Premium public shell (P2): Lenis smooth-scroll · cinematic backdrop ·
- * scroll-progress · floating magnetic dock · animated route transitions.
- * The canonical theme engine is now the sole authority here.
- */
+/** Sole authority that initialises the canonical theme engine for the public site. */
 export default function PublicLayout() {
-  const { pathname, hash } = useLocation();
+  const { pathname, hash, state } = useLocation();
+  const instant = (state as { instant?: boolean } | null)?.instant === true;
 
   useEffect(() => initThemeSync(), []);
 
-  // Hash-aware scroll handling: when the URL carries `/#section`, poll
-  // briefly for the target's element (sections may mount async after the
-  // route changes), then smooth-scroll to it. Plain route changes still
-  // jump to the top instantly. This is what makes cross-page dock clicks
-  // (e.g. `/projects` → click "Skills") land on the right section.
   useEffect(() => {
-    if (hash) {
-      const id = hash.slice(1);
-      let attempts = 0;
-      const tryScroll = (): void => {
-        if (document.getElementById(id)) {
-          scrollToId(id);
-          return;
-        }
-        if (attempts++ < 30) setTimeout(tryScroll, 40);
-      };
-      tryScroll();
-    } else {
-      window.scrollTo({ top: 0, behavior: 'instant' });
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  }, []);
+
+  // Waits for the `/#section` target to mount, lands on it, then keeps re-snapping while sections above are still fetching and reflowing taller.
+  useEffect(() => {
+    if (!hash) {
+      resetScroll();
+      return;
     }
-  }, [pathname, hash]);
+    const id = hash.slice(1);
+    let cancelled = false;
+    let startTimer: ReturnType<typeof setTimeout>;
+    let rafId: number;
+
+    const abortChase = (): void => {
+      cancelled = true;
+    };
+
+    void waitForElementId(id).then((el) => {
+      if (cancelled || !el) return;
+      scrollToId(id, instant);
+      window.addEventListener('wheel', abortChase, {
+        passive: true,
+        once: true,
+      });
+      window.addEventListener('touchstart', abortChase, {
+        passive: true,
+        once: true,
+      });
+
+      // Lets the eased scroll finish, then chases: re-snaps whenever the target moves (siblings still fetching reflow the page) until queries settle and it holds still.
+      startTimer = setTimeout(
+        () => {
+          if (cancelled) return;
+          const deadline = performance.now() + 2000;
+          let prevTop = el.getBoundingClientRect().top;
+          let stableFrames = 0;
+          const chase = (): void => {
+            if (cancelled) return;
+            const top = el.getBoundingClientRect().top;
+            const stillFetching = queryClient.isFetching() > 0;
+            if (Math.abs(top - prevTop) > 0.5) {
+              scrollToId(id, true);
+              stableFrames = 0;
+              prevTop = el.getBoundingClientRect().top;
+            } else {
+              prevTop = top;
+              if (!stillFetching) stableFrames++;
+            }
+            if (
+              (stillFetching || stableFrames < 10) &&
+              performance.now() < deadline
+            ) {
+              rafId = requestAnimationFrame(chase);
+            }
+          };
+          rafId = requestAnimationFrame(chase);
+        },
+        instant ? 50 : 500
+      );
+    });
+
+    return () => {
+      cancelled = true;
+      clearTimeout(startTimer);
+      cancelAnimationFrame(rafId);
+      window.removeEventListener('wheel', abortChase);
+      window.removeEventListener('touchstart', abortChase);
+    };
+  }, [pathname, hash, instant]);
 
   useEffect(() => {
     track('pageview', pathname);

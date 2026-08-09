@@ -28,13 +28,16 @@ export const listCategories = asyncHandler(
   async (_req: Request, res: Response) => {
     const count = await Category.estimatedDocumentCount();
     if (count === 0) {
-      // Idempotent seed — uses `slug` unique index so a parallel insert
-      // can't create duplicates.
+      // Only swallow the expected duplicate-key race (11000); log the rest.
       await Category.insertMany(DEFAULT_CATEGORIES, { ordered: false }).catch(
-        () => undefined
+        (err: unknown) => {
+          if ((err as { code?: number })?.code !== 11000) {
+            console.warn('Category default-seed failed:', err);
+          }
+        }
       );
     }
-    const docs = await Category.find().sort({ order: 1, name: 1 });
+    const docs = await Category.find().sort({ order: 1, name: 1 }).lean();
     res.json({ success: true, count: docs.length, data: docs });
   }
 );

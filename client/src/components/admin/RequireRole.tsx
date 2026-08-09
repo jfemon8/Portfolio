@@ -4,10 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Spinner } from '@/components/ui/States';
 import type { UserRole } from '@/types';
 
-/**
- * Defence-in-depth RBAC route guard (the backend also enforces it).
- * Reusable (project rule #3) — wraps superAdmin-only admin routes.
- */
+// Defence-in-depth RBAC guard — the backend also enforces this.
 export default function RequireRole({
   roles,
   children,

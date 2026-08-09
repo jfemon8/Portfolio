@@ -19,6 +19,7 @@ const messageSchema = new mongoose.Schema<IMessage>(
 );
 
 messageSchema.index({ read: 1, createdAt: -1 });
+messageSchema.index({ archived: 1, createdAt: -1 });
 
 export const Message =
   (mongoose.models.Message as Model<IMessage>) ||

@@ -15,10 +15,6 @@ interface ProjectCardProps {
   className?: string;
 }
 
-/**
- * The single premium project card (project rule #3) — 3D tilt, glass,
- * magnetic links, tech badges, metrics. Adapts to normal & bento sizes.
- */
 export default function ProjectCard({
   project,
   featured = false,
@@ -54,7 +50,7 @@ export default function ProjectCard({
               className="h-full w-full object-cover"
             />
           ) : (
-            <div className="grid h-full place-items-center bg-grid [background-size:36px_36px]">
+            <div className="grid h-full place-items-center bg-grid [background-size:2.25rem_2.25rem]">
               <span className="font-mono text-3xl font-bold text-border">
                 {'<'}
                 {project.title?.slice(0, 2).toUpperCase()}
@@ -65,15 +61,15 @@ export default function ProjectCard({
           <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-70" />
 
           {project.featured && (
-            <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-[11px] font-semibold text-neon backdrop-blur">
+            <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-2xs font-semibold text-neon backdrop-blur">
               <Star className="h-3 w-3 fill-neon" /> {lab.badgeFeatured}
             </span>
           )}
-          <span className="absolute left-3 top-3 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-[11px] font-medium text-muted-foreground backdrop-blur">
+          <span className="absolute left-3 top-3 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-2xs font-medium text-muted-foreground backdrop-blur">
             {capitalizeFirst(project.category)}
           </span>
           {project.videoUrl && (
-            <span className="absolute bottom-3 left-3 flex items-center gap-1 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-[11px] font-medium text-neon backdrop-blur">
+            <span className="absolute bottom-3 left-3 flex items-center gap-1 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-2xs font-medium text-neon backdrop-blur">
               <Play className="h-3 w-3 fill-neon" /> {lab.badgeVideo}
             </span>
           )}
@@ -112,13 +108,13 @@ export default function ProjectCard({
             {(project.techStack ?? []).slice(0, featured ? 7 : 4).map((t) => (
               <span
                 key={t}
-                className="rounded-md border border-border/60 bg-card/60 px-2 py-0.5 font-mono text-[11px] text-muted-foreground"
+                className="rounded-md border border-border/60 bg-card/60 px-2 py-0.5 font-mono text-2xs text-muted-foreground"
               >
                 {t}
               </span>
             ))}
             {(project.techStack?.length ?? 0) > (featured ? 7 : 4) && (
-              <span className="rounded-md px-2 py-0.5 font-mono text-[11px] text-muted-foreground/60">
+              <span className="rounded-md px-2 py-0.5 font-mono text-2xs text-muted-foreground/60">
                 +{(project.techStack?.length ?? 0) - (featured ? 7 : 4)}
               </span>
             )}

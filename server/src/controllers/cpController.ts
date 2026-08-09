@@ -9,15 +9,9 @@ import {
   fetchCodeChef,
 } from '../services/cpService.js';
 
-/** Serve the cache for this long before hitting Codeforces again. */
 const TTL_MS = 6 * 60 * 60 * 1000; // 6h — respects CF rate limits, serverless-safe
 
-/**
- * Public competitive-programming stats. The handle is admin-managed on the
- * Profile (fully-dynamic — no redeploy to change). Returns the cached
- * snapshot, refetching only when stale; on a Codeforces outage it falls
- * back to the last good cache so the section never breaks.
- */
+// Public CP stats — handle is admin-managed (no redeploy to change); serves the cached snapshot, refetching only when stale, and falls back to the last good cache on a Codeforces outage.
 export const getCpStats = asyncHandler(async (_req: Request, res: Response) => {
   const profile = await Profile.findOne()
     .select('codeforcesHandle leetcodeHandle codechefHandle')
@@ -46,11 +40,7 @@ export const getCpStats = asyncHandler(async (_req: Request, res: Response) => {
     ]);
     const doc = await CpStats.findOneAndUpdate(
       { handle },
-      // Store the handle under the SAME key we look it up by. Codeforces
-      // returns a canonically-cased handle in `snap.handle` (e.g. 'tourist'
-      // for a configured 'Tourist'); persisting that would make the next
-      // case-sensitive findOne({ handle }) miss forever and collide on the
-      // unique index. Pin the stored handle to the admin-configured value.
+      // Pin the stored handle to the admin-configured value — Codeforces returns a canonically-cased handle (e.g. 'tourist' for 'Tourist'), and persisting that would make the case-sensitive findOne({ handle }) miss forever and collide on the unique index.
       { ...snap, handle, leetcode, codechef, fetchedAt: new Date() },
       { new: true, upsert: true, setDefaultsOnInsert: true }
     );

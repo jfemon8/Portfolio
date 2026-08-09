@@ -1,6 +1,5 @@
 import { type ReactNode } from 'react';
-import { motion, useReducedMotion } from 'motion/react';
-import { duration, ease, viewportOnce } from '@/config/animation';
+import Reveal from '@/components/motion/Reveal';
 import { cn } from '@/lib/cn';
 
 interface SectionProps {
@@ -34,7 +33,6 @@ export function SectionHeading({
   action,
   align = 'left',
 }: SectionHeadingProps) {
-  const reduce = useReducedMotion();
   const centered = align === 'center';
 
   return (
@@ -44,13 +42,7 @@ export function SectionHeading({
         centered ? 'flex-col text-center' : 'justify-between'
       )}
     >
-      <motion.div
-        initial={reduce ? false : { opacity: 0, y: 22 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={viewportOnce}
-        transition={{ duration: duration.slow, ease: ease.out }}
-        className={cn('max-w-2xl', centered && 'mx-auto')}
-      >
+      <Reveal className={cn('max-w-2xl', centered && 'mx-auto')}>
         {index && (
           <span className="font-mono text-sm font-medium text-neon">
             {index}
@@ -64,7 +56,7 @@ export function SectionHeading({
             {subtitle}
           </p>
         )}
-      </motion.div>
+      </Reveal>
       {action && <div className="mb-1 shrink-0">{action}</div>}
     </div>
   );

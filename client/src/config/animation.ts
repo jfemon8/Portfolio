@@ -1,8 +1,4 @@
-/**
- * Animation tokens — the single source of truth for motion across the app so
- * every transition feels part of ONE physics-based system (premium, cinematic,
- * consistent). Consumed by Motion.dev (`motion`) and React Spring.
- */
+// Single source of truth for motion tokens shared by Motion.dev and React Spring, so transitions feel like one physics system.
 import type { Transition, Variants } from 'motion/react';
 
 /** Signature easings (cubic-bezier) — premium, natural, never linear. */

@@ -16,11 +16,7 @@ interface Particle {
   drift: number;
 }
 
-/**
- * Lightweight floating particles — deterministic-per-mount, GPU-only,
- * pointer-transparent, hidden under reduced-motion. Reusable ambient
- * layer (project rule #3).
- */
+// Deterministic-per-mount, GPU-only floating particles; pointer-transparent, hidden under reduced-motion.
 export default function Particles({ count = 26, className }: ParticlesProps) {
   const reduce = useReducedMotion();
 

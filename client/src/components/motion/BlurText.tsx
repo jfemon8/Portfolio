@@ -44,12 +44,7 @@ const buildKeyframes = (
   return keyframes;
 };
 
-/**
- * Per-word / per-letter blur-in text animation (ported from RDSWA's
- * reactbits collection). Triggers when scrolled into view; reduced-motion
- * users see the final state instantly. Useful for hero greetings and
- * section headings where the existing `Reveal` block fade feels too plain.
- */
+// Per-word/letter blur-in reveal; reduced-motion shows the final state instantly. Use over Reveal for hero/heading moments that want more than a fade.
 export default function BlurText({
   text = '',
   delay = 200,

@@ -1,10 +1,7 @@
 import mongoose from 'mongoose';
 import { env } from './env.js';
 
-/**
- * Connection cache for serverless (Vercel) — each warm invocation reuses the
- * existing connection instead of opening a new pool.
- */
+// Connection cache for serverless (Vercel) — each warm invocation reuses the existing connection instead of opening a new pool.
 interface MongooseCache {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
@@ -26,7 +23,7 @@ export async function connectDB(): Promise<typeof mongoose> {
     cached.promise = mongoose
       .connect(env.mongoUri, {
         maxPoolSize: 10,
-        serverSelectionTimeoutMS: 10000,
+        serverSelectionTimeoutMS: 8000,
         socketTimeoutMS: 45000,
       })
       .then((m) => {

@@ -6,11 +6,7 @@ import { User } from '../models/User.js';
 import { recordAudit } from '../services/auditService.js';
 import type { UserRole } from '../types/index.js';
 
-/**
- * Requires a valid Bearer access token. Attaches `req.user`.
- * (The refresh token lives in an HttpOnly cookie scoped to /api/auth and is
- * never used for general request auth — only by /auth/refresh.)
- */
+// Requires a valid Bearer access token and attaches req.user; the refresh-token cookie (scoped to /api/auth) is never used for general request auth, only by /auth/refresh.
 export const protect = asyncHandler(
   async (req: Request, _res: Response, next: NextFunction) => {
     const header = req.headers.authorization || '';
@@ -32,9 +28,7 @@ export const protect = asyncHandler(
     if (user.status === 'disabled') {
       throw ApiError.forbidden('This account has been disabled.');
     }
-    // Reject access tokens issued before the last password change, so
-    // changing the password immediately invalidates any earlier (e.g.
-    // stolen) session — jwt `iat` is in seconds.
+    // Reject access tokens issued before the last password change, so a stolen/earlier session is invalidated immediately — jwt `iat` is in seconds.
     if (
       user.passwordChangedAt &&
       decoded.iat &&
@@ -74,9 +68,5 @@ export const requireRole =
 /** Super-admin only (user management, audit logs, security). */
 export const requireSuperAdmin = requireRole('superAdmin');
 
-/**
- * Back-compat alias used by all existing dashboard routes. Now also allows
- * superAdmin — critical, since the live admin (jfemon8) becomes superAdmin
- * after the role upgrade and must keep dashboard access.
- */
+// Back-compat alias for existing dashboard routes — now also allows superAdmin, critical since the live admin (jfemon8) becomes superAdmin after the role upgrade and must keep dashboard access.
 export const adminOnly = requireRole('admin', 'superAdmin');

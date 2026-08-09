@@ -27,11 +27,7 @@ function applyTheme(resolved: ResolvedTheme): void {
   root.style.colorScheme = resolved;
 }
 
-/**
- * Canonical theme engine (Zustand). Replaces the legacy useTheme hook as the
- * single source of truth once the new app shell is wired (P2). Supports
- * dark / light / system with live OS-preference sync.
- */
+// Canonical theme engine (Zustand); replaces the legacy useTheme hook as the single source of truth once the new app shell is wired (P2).
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set, get) => ({

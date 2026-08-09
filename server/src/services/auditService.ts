@@ -21,10 +21,7 @@ interface AuditInput {
   meta?: Record<string, unknown>;
 }
 
-/**
- * Append an audit entry. Fire-and-forget: a logging failure must never break
- * the request it is recording.
- */
+// Fire-and-forget: a logging failure must never break the request it's recording.
 export function recordAudit(input: AuditInput): void {
   const { ip, userAgent } = clientInfo(input.req);
   void AuditLog.create({

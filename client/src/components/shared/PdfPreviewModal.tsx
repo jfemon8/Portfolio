@@ -3,8 +3,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Loader2, ExternalLink } from 'lucide-react';
 
-// PdfViewer drags in react-pdf + its worker (~600 KB). Lazy-loading keeps
-// the main bundle weightless until a visitor actually opens a preview.
+// PdfViewer drags in react-pdf + its worker (~600 KB); lazy-load so the main bundle stays weightless until a preview is opened.
 const PdfViewer = lazy(() => import('./PdfViewer'));
 
 export interface PdfPreviewTarget {
@@ -18,12 +17,7 @@ export interface PdfPreviewAction {
   label: string;
 }
 
-/**
- * Project-wide PDF preview modal (ported from RDSWA). Wraps the
- * lazy-loaded PdfViewer in an animated dialog with backdrop blur,
- * click-outside / Escape / X to close, and a Suspense fallback while
- * the viewer chunk loads. Pass `null` to close.
- */
+// Ported from RDSWA; fully controlled by `target` — pass `null` to close.
 export default function PdfPreviewModal({
   target,
   action,
@@ -42,12 +36,7 @@ export default function PdfPreviewModal({
     return () => document.removeEventListener('keydown', handler);
   }, [target, onClose]);
 
-  // Portal to <body> so the fixed-positioned overlay escapes any ancestor
-  // that has a CSS `transform` (e.g. `<Reveal>` from About, motion.div
-  // wrappers anywhere). Without the portal, `position: fixed` is anchored
-  // to the nearest transformed ancestor — and on the About page that
-  // squeezed the modal into the right column instead of filling the
-  // viewport. The admin `<Modal>` already uses this same pattern.
+  // Portal to <body>: position:fixed anchors to the nearest transformed ancestor (e.g. Reveal/motion.div wrappers), else the modal gets squeezed into a page column.
   return createPortal(
     <AnimatePresence>
       {target && (
@@ -56,14 +45,7 @@ export default function PdfPreviewModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.18 }}
-          // `data-lenis-prevent` makes the smooth-scroll provider
-          // (PublicLayout wraps everything in <SmoothScroll>/Lenis) bypass
-          // wheel + touch events within this subtree, so the PDF
-          // container's native `overflow-auto` actually receives them and
-          // scrolls. Without this, Lenis swallows the wheel at the
-          // document level and moves the background page instead — which
-          // is what the admin shell never had (no Lenis there) and why
-          // the same modal worked perfectly inside /admin.
+          // data-lenis-prevent stops the Lenis smooth-scroll provider from swallowing wheel/touch here, so the PDF container's overflow-auto actually scrolls.
           data-lenis-prevent
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-3 backdrop-blur-sm sm:p-6"
           onClick={onClose}
@@ -73,13 +55,8 @@ export default function PdfPreviewModal({
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.96, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            // BOUNDED HEIGHT card — PdfViewer's `h-full` now fills exactly
-            // this. 92% of viewport height (capped at 960 px on huge
-            // monitors). Without this height bound, the viewer's
-            // `flex-1 min-h-0` scroll area would have no defined parent
-            // height and either collapse to zero or expand past the
-            // viewport (which is what blocked scrolling before).
-            className="relative flex h-[92vh] max-h-[960px] w-full max-w-5xl flex-col"
+            // Bounded height so PdfViewer's flex-1 min-h-0 scroll area has a defined parent height instead of collapsing or overflowing.
+            className="relative flex h-[92vh] max-h-[60rem] w-full max-w-5xl flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             <button

@@ -1,5 +1,7 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { queryClient } from '@/lib/queryClient';
+import { getBlogVisitorKey } from '@/lib/blog';
 import type {
   BlogDetailResponse,
   BlogPostDoc,
@@ -22,12 +24,7 @@ import type {
 
 const get = async <T>(url: string): Promise<T> => (await api.get<T>(url)).data;
 
-/**
- * Tiered cache (P10.1): portfolio content is admin-managed and changes
- * rarely, so a 5-min freshness window cuts redundant refetches/jank. The
- * global 60s default still applies to the admin managers' own queries,
- * keeping their data fresher.
- */
+// Portfolio content is admin-managed and rarely changes, so a 5-min staleTime cuts refetches; admin managers keep the global 60s default for fresher data.
 const CONTENT = 5 * 60 * 1000;
 
 export const useProfile = () =>
@@ -65,13 +62,19 @@ export const useProjects = (params = '') =>
     staleTime: CONTENT,
   });
 
+const projectQueryOptions = (slug: string) => ({
+  queryKey: ['project', slug],
+  queryFn: () => get<ItemResponse<ProjectDoc>>(`/projects/slug/${slug}`),
+  staleTime: CONTENT,
+});
+
 export const useProject = (slug?: string) =>
-  useQuery({
-    queryKey: ['project', slug],
-    queryFn: () => get<ItemResponse<ProjectDoc>>(`/projects/slug/${slug}`),
-    enabled: !!slug,
-    staleTime: CONTENT,
-  });
+  useQuery({ ...projectQueryOptions(slug ?? ''), enabled: !!slug });
+
+/** Warms the project-detail query cache — pairs with prefetchRoute on hover/focus. */
+export const prefetchProject = (slug: string): void => {
+  void queryClient.prefetchQuery(projectQueryOptions(slug));
+};
 
 export const useExperience = () =>
   useQuery({
@@ -115,11 +118,7 @@ export const usePublications = () =>
     staleTime: CONTENT,
   });
 
-/**
- * Paginated public blog list. Consumes the server `pagination` metadata so
- * posts beyond the first page stay reachable (via `fetchNextPage`). `query`
- * is the raw search term (encoded here).
- */
+/** Consumes the server `pagination` metadata so posts beyond the first page stay reachable via `fetchNextPage`. */
 export const useBlogInfinite = (query = '') =>
   useInfiniteQuery({
     queryKey: ['blog', 'list', query],
@@ -137,18 +136,29 @@ export const useBlogInfinite = (query = '') =>
     staleTime: CONTENT,
   });
 
+const blogPostQueryOptions = (slug: string, visitorKey?: string) => ({
+  queryKey: ['blog', 'post', slug, visitorKey],
+  queryFn: () => {
+    const qs = new URLSearchParams();
+    if (visitorKey) qs.set('visitorKey', visitorKey);
+    const suffix = qs.toString() ? `?${qs.toString()}` : '';
+    return get<BlogDetailResponse>(`/blog/slug/${slug}${suffix}`);
+  },
+  staleTime: CONTENT,
+});
+
 export const useBlogPost = (slug?: string, visitorKey?: string) =>
   useQuery({
-    queryKey: ['blog', 'post', slug, visitorKey],
-    queryFn: () => {
-      const qs = new URLSearchParams();
-      if (visitorKey) qs.set('visitorKey', visitorKey);
-      const suffix = qs.toString() ? `?${qs.toString()}` : '';
-      return get<BlogDetailResponse>(`/blog/slug/${slug}${suffix}`);
-    },
+    ...blogPostQueryOptions(slug ?? '', visitorKey),
     enabled: !!slug,
-    staleTime: CONTENT,
   });
+
+/** Warms the blog-post query cache with the same visitorKey the real page will use. */
+export const prefetchBlogPost = (slug: string): void => {
+  void queryClient.prefetchQuery(
+    blogPostQueryOptions(slug, getBlogVisitorKey(slug))
+  );
+};
 
 export const useCpStats = () =>
   useQuery({

@@ -1,9 +1,4 @@
-/**
- * Tiny immutable nested get/set by dot-path. Enables schema-driven admin
- * fields to target nested models (e.g. `caseStudy.problem`) while staying
- * fully backward-compatible with flat names (single-segment path).
- * Project rule #3/#8 — one shared helper, no lodash.
- */
+// Immutable nested get/set by dot-path — lets schema-driven admin fields target nested models (e.g. `caseStudy.problem`) while staying compatible with flat names.
 type Obj = Record<string, unknown>;
 
 export function getByPath(obj: unknown, path: string): unknown {

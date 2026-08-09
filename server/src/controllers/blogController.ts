@@ -102,11 +102,7 @@ const summarizeCommentReactions = async (
   return map;
 };
 
-/**
- * A post is publicly visible if it's published, OR scheduled with its time
- * already due (the model also auto-promotes scheduled→published on next save;
- * this query keeps it correct without a cron — Vercel serverless has none).
- */
+/** A post is public if published, or scheduled with its time due — the model only auto-promotes on save, and this query covers the rest since Vercel serverless has no cron. */
 export const publicVisibility = (): RootFilterQuery<IBlogPost> => ({
   $or: [
     { status: 'published' },
@@ -114,18 +110,14 @@ export const publicVisibility = (): RootFilterQuery<IBlogPost> => ({
   ],
 });
 
-/** Escape regex metacharacters so a search term is matched literally
- *  (prevents invalid-regex 500s on inputs like "C++" and closes the
- *  regex-injection / ReDoS surface on this public endpoint). */
+/** Escape regex metacharacters so a search term is matched literally — prevents invalid-regex 500s (e.g. "C++") and closes the regex-injection / ReDoS surface on this public endpoint. */
 const escapeRegex = (s: string): string =>
   s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 /** Public — visible posts only, paginated, with ?tag & ?q search. */
 export const listPublished = asyncHandler(
   async (req: Request, res: Response) => {
-    // Self-heal: promote any scheduled posts whose time has arrived so their
-    // publishedAt is set (Vercel serverless has no cron; the model otherwise
-    // only promotes on .save()). Keeps ordering + displayed dates correct.
+    // Self-heal: promote due scheduled posts here since Vercel serverless has no cron and the model otherwise only promotes on .save().
     await BlogPost.updateMany(
       { status: 'scheduled', scheduledFor: { $lte: new Date() } },
       [
@@ -158,7 +150,8 @@ export const listPublished = asyncHandler(
         .select('-content')
         .sort({ featured: -1, publishedAt: -1 })
         .skip((page - 1) * limit)
-        .limit(limit),
+        .limit(limit)
+        .lean(),
       BlogPost.countDocuments(filter),
     ]);
 
@@ -180,15 +173,16 @@ export const getPublishedBySlug = asyncHandler(
       { new: true }
     );
     if (!post) throw ApiError.notFound('Post not found');
-    const related = await BlogPost.find({
-      $and: [publicVisibility()],
-      _id: { $ne: post._id },
-      tags: { $in: post.tags },
-    })
-      .select('title slug excerpt coverImage readingTime publishedAt')
-      .limit(3);
 
-    const [comments, reactions, visitorReaction] = await Promise.all([
+    const [related, comments, reactions, visitorReaction] = await Promise.all([
+      BlogPost.find({
+        $and: [publicVisibility()],
+        _id: { $ne: post._id },
+        tags: { $in: post.tags },
+      })
+        .select('title slug excerpt coverImage readingTime publishedAt')
+        .limit(3)
+        .lean(),
       BlogComment.find({ post: post._id })
         .select('post name email content parentComment createdAt updatedAt')
         .sort({ createdAt: 1 })
@@ -410,7 +404,7 @@ export const removeComment = asyncHandler(
 
 /* ----- Admin ----- */
 export const listAll = asyncHandler(async (_req: Request, res: Response) => {
-  const posts = await BlogPost.find().sort({ createdAt: -1 });
+  const posts = await BlogPost.find().sort({ createdAt: -1 }).lean();
   res.json({ success: true, count: posts.length, data: posts });
 });
 

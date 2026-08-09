@@ -19,12 +19,7 @@ export const uploadImageHandler = asyncHandler(
   }
 );
 
-/** Admin — upload the resume PDF as a raw asset. The public_id is built
- *  with a `.pdf` suffix so Cloudinary's CDN URL ends with `.pdf` and the
- *  browser serves it as `application/pdf` (download lands as a usable
- *  resume.pdf file; in-tab preview opens the PDF viewer). Without the
- *  suffix the raw asset URL is extension-less and downloads as a
- *  type-less blob that looks corrupted. */
+// Admin — resume PDF upload; the public_id gets a .pdf suffix so the CDN URL ends in .pdf and browsers serve it as application/pdf — without it the raw asset URL is extension-less and downloads as a corrupted-looking blob.
 export const uploadResumeHandler = asyncHandler(
   async (req: Request, res: Response) => {
     if (!req.file) throw ApiError.badRequest('No PDF file provided.');
@@ -43,11 +38,7 @@ export const uploadResumeHandler = asyncHandler(
   }
 );
 
-/** Admin — upload a single media file that is EITHER an image OR a PDF.
- *  Images go through the normal image pipeline; PDFs are stored as `raw`
- *  assets with a `.pdf`-suffixed public_id (same trick as the resume upload)
- *  so the CDN URL ends in `.pdf` and the proxy can serve it inline.
- *  Returns { url, publicId, kind }. Optional `?folder=` query. */
+// Admin — upload an image or a PDF; PDFs get a .pdf-suffixed public_id (same trick as the resume upload) so the CDN URL ends in .pdf and the proxy can serve it inline.
 export const uploadMediaHandler = asyncHandler(
   async (req: Request, res: Response) => {
     if (!req.file) throw ApiError.badRequest('No file provided.');
@@ -77,17 +68,7 @@ export const uploadMediaHandler = asyncHandler(
   }
 );
 
-// ─────────────────────────────────────────────────────────────────────────────
-// GET /upload/proxy — Stream a Cloudinary file back to the browser with the
-// CORRECT Content-Type + a sensible Content-Disposition. Cloudinary's `raw`
-// storage class (used for PDFs / docs / archives) serves every asset with
-// `Content-Type: application/octet-stream`, which makes browsers download it
-// as an opaque blob with no extension — exactly the "corrupted file" symptom
-// the resume upload exhibited. This proxy fixes that for any file kind in
-// one place. Query: ?url=<cloudinaryUrl>&name=<filename>&inline=true|false
-// SSRF-guarded: only our own Cloudinary cloud host is reachable.
-// (Adopted from the RDSWA project's `/api/upload/proxy` — same strategy.)
-// ─────────────────────────────────────────────────────────────────────────────
+// GET /upload/proxy — streams a Cloudinary file back with the correct Content-Type + Content-Disposition; Cloudinary's raw storage serves everything as application/octet-stream, causing downloads to look corrupted, so this proxy fixes it in one place (SSRF-guarded to our own Cloudinary host).
 const MIME_BY_EXT: Record<string, string> = {
   pdf: 'application/pdf',
   doc: 'application/msword',
@@ -147,29 +128,17 @@ export const proxyFileHandler = (
       );
     }
 
-    // Derive Content-Type from the URL extension, fall back to octet-stream.
     const pathname = parsed.pathname.toLowerCase();
     const extMatch = pathname.match(/\.([a-z0-9]{1,8})(?:$|\?)/);
     const ext = extMatch?.[1] || '';
     const mime = MIME_BY_EXT[ext] || 'application/octet-stream';
 
-    // Sensible default filename: query.name wins, else the last URL segment.
     const lastSeg = decodeURIComponent(
       parsed.pathname.split('/').pop() || 'download'
     );
     const filename = downloadName || lastSeg;
 
-    // Extract publicId + resource/delivery type from the URL so we can ask
-    // Cloudinary's admin API for a signed download link.
-    //
-    // Cloudinary blocks bare delivery of `raw` PDF / ZIP assets by default
-    // (security policy: "Allow PDF and ZIP files delivery" is OFF) — those
-    // public `res.cloudinary.com` URLs return 401. The fix is to fetch the
-    // file via Cloudinary's admin endpoint instead, which authenticates
-    // with our API key/secret and bypasses the delivery restriction.
-    //
-    // URL shape: /{cloud}/{resource_type}/{type}/[v{version}/]{publicId…}
-    //   e.g. /dlggmm4a0/raw/upload/v1779294586/portfolio/resume/file.pdf
+    // Extracts publicId + resource/delivery type from the URL (shape: /{cloud}/{resource_type}/{type}/[v{version}/]{publicId…}) so we can request a signed download link — Cloudinary blocks bare delivery of raw PDF/ZIP assets by default (401), so we authenticate via the admin API instead.
     const segments = parsed.pathname.split('/').filter(Boolean);
     segments.shift(); // cloud
     const resourceType = segments.shift() ?? 'raw';
@@ -186,18 +155,7 @@ export const proxyFileHandler = (
       );
     }
 
-    // `private_download_url` returns a signed `api.cloudinary.com/v1_1/{cloud}/
-    // {resource_type}/download?...&api_key=...&signature=...` URL. The admin
-    // endpoint serves the file authenticated, regardless of the public
-    // PDF/ZIP delivery policy.
-    //
-    // IMPORTANT: this portfolio's resume uploader appends `.pdf` directly
-    // to the Cloudinary `public_id` so the CDN URL ends in `.pdf`. So the
-    // stored public_id is e.g. `portfolio/resume/resume_xxx-1234.pdf`
-    // (extension INCLUDED). When asking the admin API for a signed
-    // download URL we must pass that EXACT public_id and leave `format`
-    // empty — splitting on the last dot and passing format='pdf' would
-    // query Cloudinary for a different (non-existent) public_id and 404.
+    // private_download_url returns a signed admin-API download URL that serves the file authenticated regardless of the public PDF/ZIP delivery policy — our uploaders append .pdf directly to the public_id (e.g. portfolio/resume/resume_xxx-1234.pdf), so we must pass that exact public_id with format left empty, or Cloudinary 404s on a split, non-existent id.
     const upstreamUrl = cloudinary.utils.private_download_url(
       publicIdWithExt,
       '',
@@ -208,9 +166,7 @@ export const proxyFileHandler = (
       }
     );
 
-    // Cloudinary's admin download endpoint sometimes responds with a 302
-    // redirect to the actual file location — follow up to 3 hops. Direct
-    // hits also work and are taken on the first iteration.
+    // Cloudinary's admin download endpoint sometimes 302-redirects to the actual file location — follow up to 3 hops (direct hits work fine on the first iteration).
     const fetchUpstream = (urlToFetch: string, redirectsLeft: number): void => {
       https
         .get(urlToFetch, (upstream) => {

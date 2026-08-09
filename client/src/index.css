@@ -27,6 +27,8 @@
     --radius: 0.85rem;
     /* Brand neon. */
     --neon: 168 100% 50%;
+    --shadow-color: 0 0% 0%;
+    --shadow-strength: 0.7;
   }
 
   html.light {
@@ -52,6 +54,8 @@
     --ring: 174 90% 36%;
     /* Darker light-mode neon for contrast. */
     --neon: 174 90% 36%;
+    --shadow-color: 220 20% 30%;
+    --shadow-strength: 0.12;
   }
 }
 
@@ -65,8 +69,10 @@
   }
 
   html {
-    scroll-behavior: smooth;
+    /* No native scroll-behavior: smooth — it fights Lenis's own lerp. */
     -webkit-tap-highlight-color: transparent;
+    /* Stops the native rubber-band bounce from chaining past the page edge. */
+    overscroll-behavior-y: none;
   }
 
   body {
@@ -95,8 +101,8 @@
 
   /* Theme-aware scrollbar. */
   ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 0.625rem;
+    height: 0.625rem;
   }
   ::-webkit-scrollbar-track {
     background: transparent;
@@ -104,7 +110,7 @@
   ::-webkit-scrollbar-thumb {
     @apply rounded-full bg-border;
     background-clip: padding-box;
-    border: 2px solid transparent;
+    border: 0.125rem solid transparent;
   }
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-muted-foreground/40;
@@ -143,17 +149,15 @@
   }
 
   .glass {
-    @apply rounded-2xl border border-line bg-bg-card/70 backdrop-blur-xl shadow-card;
+    @apply rounded-2xl border border-line bg-bg-card/70 backdrop-blur-md;
   }
 
-  /* Shared card hover treatment. */
   .glass-hover {
-    @apply transition-all duration-300
-           hover:border-primary/40 hover:shadow-neon-glow;
+    @apply transition-all duration-300 hover:border-primary/40;
   }
 
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2
            text-sm font-semibold transition-all duration-200 disabled:opacity-50
            disabled:pointer-events-none focus:outline-none focus:ring-2
            focus:ring-neon/50 focus:ring-offset-2 focus:ring-offset-bg;
@@ -212,7 +216,7 @@
 
 /* Long-form typography. */
 .prose-neon {
-  @apply text-[15px] leading-[1.85] text-muted-foreground;
+  @apply text-[0.9375rem] leading-[1.85] text-muted-foreground;
 }
 .prose-neon h1,
 .prose-neon h2,

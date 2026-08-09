@@ -8,11 +8,6 @@ import { Education } from '../models/Education.js';
 import { Certification } from '../models/Certification.js';
 import { Publication } from '../models/Publication.js';
 
-/**
- * Mounts a standard public-read / admin-write resource:
- *   GET  /  ·  GET /:id  (public)
- *   POST /  ·  PUT /:id  ·  PATCH /reorder  ·  DELETE /:id  (admin)
- */
 function resourceRouter<T>(Model: Model<T>, opts?: CrudOptions): Router {
   const c = crudFactory(Model, opts);
   const r = Router();
@@ -31,8 +26,7 @@ router.use(
   '/skills',
   resourceRouter(Skill, {
     sort: { order: 1, level: -1 },
-    // Wipe the Cloudinary asset when a skill row is deleted so unreferenced
-    // icon images don't linger in the media library.
+    // Wipe the Cloudinary asset on delete so unreferenced icon images don't linger in the media library.
     imageFields: ['iconImagePublicId'],
   })
 );

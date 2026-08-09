@@ -2,11 +2,7 @@ import { useEffect, useRef, type ReactNode } from 'react';
 import Lenis from 'lenis';
 import { setLenis } from '@/lib/smoothScroll';
 
-/**
- * Lenis smooth-scroll provider. Disabled under reduced-motion (native
- * scrolling preserved). Single instance, cleaned up on unmount.
- * The instance is published via `@/lib/smoothScroll` for `scrollToId`.
- */
+// Disabled under reduced-motion; the single Lenis instance is published via @/lib/smoothScroll so scrollToId can reach it outside React.
 export default function SmoothScroll({ children }: { children: ReactNode }) {
   const rafRef = useRef<number>();
 

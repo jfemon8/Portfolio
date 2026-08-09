@@ -18,16 +18,10 @@ interface ImageUploadProps {
   onChange: (v: UploadValue) => void;
   label?: string;
   folder?: string;
-  /** `default` = full-width landscape (covers/og); `avatar` = circular 144 px
-   *  (profile photo); `compact` = full-width slim 96 px (social icons). */
+  /** `default` = full-width landscape (covers/og); `avatar` = circular 144px (profile photo); `compact` = full-width slim 96px (social icons). */
   variant?: ImageUploadVariant;
 }
 
-/**
- * Uploads an image to Cloudinary via the backend and reports back
- * { url, publicId } through onChange. Theme-aware (light + dark) and
- * variant-aware (default landscape / circular avatar / compact slim).
- */
 export default function ImageUpload({
   value,
   publicId,
@@ -116,7 +110,7 @@ export default function ImageUpload({
                 </span>
               )}
               {variant === 'compact' && (
-                <span className="text-center text-[11px]">
+                <span className="text-center text-2xs">
                   Upload icon (optional)
                 </span>
               )}
@@ -132,7 +126,7 @@ export default function ImageUpload({
         </label>
       )}
       {publicId && (
-        <p className="mt-1 truncate font-mono text-[11px] text-muted-foreground/70">
+        <p className="mt-1 truncate font-mono text-2xs text-muted-foreground/70">
           {publicId}
         </p>
       )}

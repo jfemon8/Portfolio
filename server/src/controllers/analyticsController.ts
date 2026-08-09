@@ -22,18 +22,13 @@ const browserFromUA = (ua = ''): string => {
   return 'unknown';
 };
 
-/**
- * Country code from Vercel's native geo header (edge-injected). We store
- * ONLY the 2-letter code — never the IP — so it stays privacy-friendly and
- * needs no GeoIP dependency. Empty locally / on non-Vercel hosts.
- */
+// Country code from Vercel's geo header — stores only the 2-letter code, never the IP, so it stays privacy-friendly with no GeoIP dependency; empty outside Vercel.
 const countryFromReq = (req: Request): string => {
   const h = req.headers['x-vercel-ip-country'];
   const raw = Array.isArray(h) ? h[0] : h;
   return (raw || '').toUpperCase().slice(0, 2);
 };
 
-/** Clamp a scroll-depth value to an integer 0–100. */
 const clampDepth = (v: unknown): number => {
   const n = Math.round(Number(v));
   return Number.isFinite(n) ? Math.min(100, Math.max(0, n)) : 0;
@@ -64,8 +59,7 @@ export const track = asyncHandler(async (req: Request, res: Response) => {
 
 /** Admin — aggregated dashboard summary. */
 export const summary = asyncHandler(async (req: Request, res: Response) => {
-  // Clamp both bounds — a negative ?days would otherwise make `since` a
-  // future date and zero out every aggregation.
+  // Clamp both bounds — a negative ?days would otherwise push `since` into the future and zero out every aggregation.
   const days = Math.min(
     90,
     Math.max(1, parseInt(String(req.query.days)) || 30)

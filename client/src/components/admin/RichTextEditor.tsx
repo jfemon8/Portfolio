@@ -147,7 +147,7 @@ export default function RichTextEditor({
   return (
     <div className="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm">
       <div className="flex flex-wrap items-center gap-1 border-b border-border/60 bg-muted/35 px-2.5 py-2">
-        <div className="mr-2 hidden items-center gap-2 rounded-full border border-border/60 bg-card px-3 py-1 text-[11px] font-medium text-muted-foreground sm:flex">
+        <div className="mr-2 hidden items-center gap-2 rounded-full border border-border/60 bg-card px-3 py-1 text-2xs font-medium text-muted-foreground sm:flex">
           <Pencil className="h-3 w-3" />
           Rich text editor
         </div>
@@ -198,7 +198,7 @@ export default function RichTextEditor({
           )}
           style={{ minHeight }}
         />
-        <div className="border-t border-border/60 bg-muted/20 px-4 py-2 text-[11px] text-muted-foreground">
+        <div className="border-t border-border/60 bg-muted/20 px-4 py-2 text-2xs text-muted-foreground">
           Format selected text, then keep typing. The editor stores HTML as the
           source of truth.
         </div>

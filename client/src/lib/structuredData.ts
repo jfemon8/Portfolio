@@ -1,8 +1,4 @@
-/**
- * Reusable schema.org JSON-LD builders (project rule #3/#8). Pages compose
- * these and pass them to `<Seo jsonLd={...} />`, which keeps `Seo` purely
- * presentational and structured data consistent across every route.
- */
+// Reusable schema.org JSON-LD builders; pages compose these and pass them to <Seo jsonLd={...} />, keeping Seo purely presentational.
 import {
   SITE_URL,
   AUTHOR_NAME,
@@ -22,11 +18,7 @@ import type { Profile, ProjectDoc, BlogPostDoc } from '@/types';
 
 type Json = Record<string, unknown>;
 
-/**
- * Stable node ids so the Person/WebSite/ProfilePage graphs (and the static
- * fallback copies in `index.html`) merge into ONE entity in Google's eyes —
- * the mechanism knowledge panels are built from.
- */
+// Stable node ids so the Person/WebSite/ProfilePage graphs (and the static fallback copies in index.html) merge into ONE entity — the mechanism knowledge panels are built from.
 export const PERSON_ID = `${SITE_URL}/#person`;
 export const WEBSITE_ID = `${SITE_URL}/#website`;
 
@@ -69,10 +61,7 @@ export const personSchema = (p?: Partial<Profile>): Json => ({
     : [...AUTHOR_SAME_AS],
 });
 
-/**
- * Marks the home page as the person's canonical profile page (Google's
- * ProfilePage rich result) — mainEntity points at the Person node by @id.
- */
+// Marks the home page as the canonical ProfilePage rich result; mainEntity points at the Person node by @id.
 export const profilePageSchema = (): Json => ({
   '@context': 'https://schema.org',
   '@type': 'ProfilePage',
@@ -85,11 +74,7 @@ export const profilePageSchema = (): Json => ({
   about: personRef,
 });
 
-/**
- * Marks a listing route (Projects/Blog) as a CollectionPage whose mainEntity
- * is an ItemList of the visible items — helps Google understand and surface
- * the child detail pages from the hub.
- */
+// Marks a listing route as a CollectionPage with an ItemList mainEntity, helping Google surface child detail pages from the hub.
 export const collectionPageSchema = (
   name: string,
   path: string,

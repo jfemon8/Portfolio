@@ -6,10 +6,6 @@ import GlassCard from '@/components/shared/GlassCard';
 import { Spinner, ErrorState } from '@/components/ui/States';
 import { useExperience } from '@/hooks/usePortfolio';
 
-/**
- * Cinematic vertical experience timeline — gradient rail, glowing nodes,
- * glass cards with staggered reveals.
- */
 export default function Experience() {
   const { data, isLoading, isError, refetch } = useExperience();
   const items = data?.data ?? [];
@@ -42,7 +38,7 @@ export default function Experience() {
             delay={i * 0.06}
             className="relative pb-10 last:pb-0"
           >
-            <span className="absolute -left-[41px] grid h-7 w-7 place-items-center rounded-full border border-primary/40 bg-background text-neon shadow-glow">
+            <span className="absolute -left-[2.5625rem] grid h-7 w-7 place-items-center rounded-full border border-primary/40 bg-background text-neon shadow-glow">
               <Briefcase className="h-3.5 w-3.5" />
             </span>
             <GlassCard interactive className="p-6">
@@ -84,7 +80,7 @@ export default function Experience() {
                   {e.tech.map((t) => (
                     <span
                       key={t}
-                      className="rounded-md border border-border/60 bg-card/60 px-2 py-0.5 font-mono text-[11px] text-muted-foreground"
+                      className="rounded-md border border-border/60 bg-card/60 px-2 py-0.5 font-mono text-2xs text-muted-foreground"
                     >
                       {t}
                     </span>

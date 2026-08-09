@@ -8,10 +8,7 @@ interface UIState {
   setMobileNavOpen: (open: boolean) => void;
 }
 
-/**
- * Ephemeral global UI state (command palette, mobile nav). Server data stays
- * in TanStack Query; this is strictly client-only UI — project rule #8.
- */
+// Ephemeral global UI state only (command palette, mobile nav) — server data stays in TanStack Query, not here.
 export const useUIStore = create<UIState>((set) => ({
   commandOpen: false,
   mobileNavOpen: false,

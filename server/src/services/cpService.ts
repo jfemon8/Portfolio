@@ -1,8 +1,4 @@
-/**
- * Codeforces integration. Uses two PUBLIC, unauthenticated endpoints
- * (no secrets, project rule #9): user.info (rating/rank) + user.rating
- * (contest count). Normalised into the shape the cache model stores.
- */
+// Codeforces integration — uses two public, unauthenticated endpoints (user.info for rating/rank, user.rating for contest count), normalised into the cache model's shape.
 const CF_API = 'https://codeforces.com/api';
 
 interface CfUserInfo {
@@ -81,11 +77,7 @@ export async function fetchCodeforces(handle: string): Promise<CpSnapshot> {
   };
 }
 
-/**
- * LeetCode integration via the public GraphQL endpoint (no auth/secrets).
- * Best-effort: any failure returns null so it never breaks the Codeforces
- * section it is nested under.
- */
+// LeetCode integration via the public GraphQL endpoint (no auth); best-effort — failures return null so it never breaks the Codeforces section it's nested under.
 export interface LeetCodeSnapshot {
   handle: string;
   totalSolved: number;
@@ -167,12 +159,7 @@ export async function fetchLeetCode(
   }
 }
 
-/**
- * CodeChef (option b — accepted-fragile). No official API: fetches the public
- * profile page and regex-extracts the rating; stars are computed from the
- * rating (robust, no scraping). Best-effort — any failure returns null so it
- * can never break the section. No secrets (rule #9).
- */
+// CodeChef has no official API — scrapes the public profile page and regex-extracts the rating (stars derived from it); best-effort, failures return null.
 export interface CodeChefSnapshot {
   handle: string;
   rating: number | null;

@@ -95,12 +95,7 @@ import { FaJava, FaCode, FaAws } from 'react-icons/fa';
 
 type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
 
-/** Brand/logo icons from the Simple Icons family. Each lookup key is the
- *  skill name in a normalised form (lowercased, alphanumerics only). We
- *  list aliases for the same icon to widen matches (e.g. "node" and
- *  "nodejs" both → SiNodedotjs). Skills with no match render a neutral
- *  `FaCode` placeholder via the caller — this map only contains the
- *  positive hits. */
+// Keys are normalised skill names (lowercased, alphanumerics only) with aliases (e.g. "node"/"nodejs") for wider matches; unmatched skills fall back to FaCode via the caller.
 const ICON_MAP: Record<string, IconComponent> = {
   // Web frameworks / runtimes
   react: SiReact,
@@ -172,8 +167,7 @@ const ICON_MAP: Record<string, IconComponent> = {
   prisma: SiPrisma,
   graphql: SiGraphql,
 
-  // Cloud / DevOps — AWS uses the FA glyph because react-icons v5 dropped
-  // the Si brand entry for it.
+  // Cloud / DevOps — AWS uses the FA glyph because react-icons v5 dropped the Si brand entry for it.
   aws: FaAws,
   amazonwebservices: FaAws,
   gcp: SiGooglecloud,
@@ -248,16 +242,12 @@ const ICON_MAP: Record<string, IconComponent> = {
 const normalise = (input: string): string =>
   input.toLowerCase().replace(/[^a-z0-9]+/g, '');
 
-/** Returns a react-icons component for a skill name, or null if no brand
- *  logo matches. Callers should render a neutral fallback (e.g. a generic
- *  code glyph or the skill's initial) when null is returned. */
+/** Returns a react-icons component for a skill name, or null if no brand match — callers should render a fallback themselves. */
 export function getSkillIcon(name: string): IconComponent | null {
   if (!name) return null;
   const key = normalise(name);
   return ICON_MAP[key] ?? null;
 }
 
-/** Neutral fallback glyph used by the public Skills renderer when neither
- *  an uploaded image nor a brand logo is available. Exported so consumers
- *  don't have to import it from `react-icons` themselves. */
+/** Fallback glyph for when no uploaded image or brand logo is available; re-exported so consumers don't need to import react-icons directly. */
 export const FallbackSkillIcon: IconComponent = FaCode;

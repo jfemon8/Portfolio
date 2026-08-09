@@ -16,12 +16,6 @@ const readRefreshCookie = (req: Request): string | undefined =>
     authConfig.refreshCookieName
   ];
 
-/**
- * POST /auth/login
- * Sets the HttpOnly refresh cookie AND returns the access token in the body
- * as `token` — backward compatible with the live frontend (localStorage
- * Bearer). Silent-refresh wiring is the P2 frontend cutover.
- */
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body as { email: string; password: string };
   const { user, accessToken, refreshToken } = await authService.login(
@@ -78,10 +72,7 @@ export const updatePassword = asyncHandler(
     user.password = newPassword;
     user.passwordChangedAt = new Date();
     await user.save();
-    // Revoke every outstanding refresh token for this user so a stolen
-    // refresh cookie can't mint new access tokens after the change. Combined
-    // with the passwordChangedAt check in `protect`, this fully ends all
-    // prior sessions (including this one — the user must log in again).
+    // Revoke every outstanding refresh token so a stolen one can't mint new access tokens; combined with the passwordChangedAt check in `protect`, this ends all prior sessions (including this one).
     await RefreshToken.updateMany(
       { user: user._id, revokedAt: { $exists: false } },
       { revokedAt: new Date() }

@@ -1,10 +1,7 @@
 import multer from 'multer';
 import { ApiError } from '../utils/ApiError.js';
 
-/**
- * Memory storage — files stream straight to Cloudinary, never to disk
- * (Vercel's serverless filesystem is read-only).
- */
+// Memory storage — files stream straight to Cloudinary, never to disk (Vercel's serverless filesystem is read-only).
 const storage = multer.memoryStorage();
 
 const ALLOWED_IMAGES = [
@@ -35,8 +32,7 @@ export const uploadDoc = multer({
   },
 });
 
-/** Accepts an image OR a PDF — used by the generic media uploader (credential
- *  certificates, publication papers, etc.). */
+// Accepts an image or a PDF — used by the generic media uploader (credential certificates, publication papers, etc.).
 export const uploadMedia = multer({
   storage,
   limits: { fileSize: 10 * 1024 * 1024 },

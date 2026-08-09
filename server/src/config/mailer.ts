@@ -35,10 +35,7 @@ const safe = (s: unknown): string =>
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 
-/**
- * Sends the contact-form notification to the owner and an auto-reply to the
- * sender. Failures are logged but never block the API response.
- */
+// Sends the contact-form notification to the owner and an auto-reply to the sender; failures are logged but never block the API response.
 export async function sendContactEmail({
   name,
   email,
@@ -148,11 +145,7 @@ export interface ReplyEmailInput {
   original: { name: string; message: string; createdAt?: Date };
 }
 
-/**
- * Sends an admin-composed reply to a contact-form sender, quoting the
- * original message. Never throws — the caller decides how to surface a
- * failure (the admin must know the reply did not go out).
- */
+// Sends an admin-composed reply, quoting the original message; never throws — the caller must surface failure so the admin knows it didn't go out.
 export async function sendReplyEmail({
   to,
   subject,

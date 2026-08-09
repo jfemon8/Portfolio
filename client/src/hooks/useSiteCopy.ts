@@ -15,13 +15,7 @@ const isEmpty = (v: unknown): boolean =>
   (typeof v === 'string' && v.trim() === '') ||
   (Array.isArray(v) && v.length === 0);
 
-/**
- * Resolve an admin-managed SiteContent group (hero/about/footer/nav — more in
- * later P12 increments) over the component's hardcoded defaults: any empty or
- * missing field reverts to the default, so the site renders identically until
- * copy is set and clearing a field restores the original (project rule #3/#8 —
- * one accessor reused everywhere; same defensive contract as useSectionCopy).
- */
+// Resolves an admin-managed SiteContent group over hardcoded defaults — empty/missing fields fall back to the default, so clearing a field restores the original; same contract as useSectionCopy.
 export function useSiteCopy<T extends Record<string, unknown>>(
   group: CopyGroup,
   defaults: T

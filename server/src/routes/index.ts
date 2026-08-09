@@ -15,7 +15,7 @@ import uploadRoutes from './uploadRoutes.js';
 import cpRoutes from './cpRoutes.js';
 import categoryRoutes from './categoryRoutes.js';
 import { getSitemap } from '../controllers/sitemapController.js';
-import { getManifest, getRobots } from '../controllers/siteMetaController.js';
+import { getRobots } from '../controllers/siteMetaController.js';
 
 const router = Router();
 
@@ -23,10 +23,8 @@ router.get('/health', (_req, res) => {
   res.json({ success: true, status: 'ok', time: new Date().toISOString() });
 });
 
-// Public, dynamic sitemap / manifest / robots (served at the site origin
-// via vercel.json rewrites — the static public/ copies were removed).
+// Dynamic sitemap / robots, served at the site origin via vercel.json rewrites.
 router.get('/sitemap.xml', getSitemap);
-router.get('/site.webmanifest', getManifest);
 router.get('/robots.txt', getRobots);
 
 router.use('/auth', authRoutes);

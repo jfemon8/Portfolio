@@ -11,6 +11,7 @@ import {
 import { Section, SectionHeading } from '@/components/shared/Section';
 import { useSectionCopy } from '@/hooks/useSectionCopy';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
+import { Spinner } from '@/components/ui/States';
 import GlassCard from '@/components/shared/GlassCard';
 import SparkArea from '@/components/shared/SparkArea';
 import Heatmap from '@/components/shared/Heatmap';
@@ -19,12 +20,7 @@ import Counter from '@/components/shared/Counter';
 import Reveal from '@/components/motion/Reveal';
 import { useCpStats } from '@/hooks/usePortfolio';
 
-/**
- * Live competitive-programming standing (Codeforces). Fully optional &
- * self-hiding: renders nothing until the API returns data (no handle set,
- * loading or error → the public page is unchanged). Reuses the shared
- * Section / GlassCard / Counter / Reveal primitives (project rule #3).
- */
+/** Self-hiding: renders nothing when there's no handle set, still loading, or on error. */
 export default function CpStats() {
   const { data, isLoading, isError } = useCpStats();
   const cp = data?.data;
@@ -52,7 +48,14 @@ export default function CpStats() {
     cpHighest: 'Highest',
     cpCcProfile: 'CodeChef profile',
   });
-  if (isLoading || isError || !cp) return null;
+  if (isLoading) {
+    return (
+      <div className="grid min-h-[40vh] place-items-center">
+        <Spinner />
+      </div>
+    );
+  }
+  if (isError || !cp) return null;
 
   const cards = [
     {
@@ -233,7 +236,7 @@ export default function CpStats() {
                     value={String(s.value)}
                     className="block text-2xl font-extrabold text-neon"
                   />
-                  <p className="mt-1 text-[11px] uppercase tracking-wide text-muted-foreground/70">
+                  <p className="mt-1 text-2xs uppercase tracking-wide text-muted-foreground/70">
                     {s.label}
                   </p>
                 </div>

@@ -25,8 +25,7 @@ router.post(
   login
 );
 
-// Rotation endpoints (refresh cookie is scoped to /api/auth).
-router.post('/refresh', refresh);
+router.post('/refresh', strictLimiter, refresh);
 router.post('/logout', logout);
 
 router.get('/me', protect, getMe);

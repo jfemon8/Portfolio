@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode, useEffect } from 'react';
+import { Fragment, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Seo from '@/components/ui/Seo';
@@ -38,33 +38,7 @@ export default function Home() {
     homeError: "Couldn't Reach The API. Is The Backend Running?",
   });
 
-  useEffect(() => {
-    // Don't try to scroll while data is still loading
-    if (isLoading || isError) return;
-
-    const hash = window.location.hash;
-
-    // No #section in URL
-    if (!hash) return;
-
-    const id = decodeURIComponent(hash.substring(1));
-
-    // Wait for animations/content to appear
-    const timer = window.setTimeout(() => {
-      const element = document.getElementById(id);
-
-      if (!element) return;
-
-      element.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
-    }, 1500);
-
-    return () => {
-      window.clearTimeout(timer);
-    };
-  }, [isLoading, isError, siteData]);
+  // Hash-scroll for `/#section` is handled centrally by PublicLayout.
 
   /*
    * Loading state

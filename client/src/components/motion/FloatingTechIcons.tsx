@@ -28,12 +28,7 @@ interface FloatingTechIconsProps {
   className?: string;
 }
 
-/**
- * Decorative floating tech-stack icons — gentle GPU float, pointer- and
- * screen-reader-transparent, hidden under reduced-motion. Deterministic
- * layout (no hydration shift). Reusable ambient accent (project rule #3);
- * Motion.dev only. Uses the muted token so it adapts to every theme preset.
- */
+// Deterministic layout avoids hydration shift; GPU-only float, pointer/screen-reader transparent, hidden under reduced-motion, muted token adapts to every theme.
 export default function FloatingTechIcons({
   className,
 }: FloatingTechIconsProps) {

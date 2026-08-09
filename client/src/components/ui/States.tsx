@@ -1,12 +1,32 @@
-import { Loader2, AlertTriangle, Inbox } from 'lucide-react';
+import { AlertTriangle, Inbox } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
+import BrandMark from '@/components/shared/BrandMark';
 
 export function Spinner({ label }: { label?: string }) {
   const c = useSiteCopy('states', { loading: 'Loading…' });
   return (
-    <div className="flex flex-col items-center justify-center gap-3 py-20 text-ink-soft">
-      <Loader2 className="h-7 w-7 animate-spin text-neon" />
+    <div className="flex flex-col items-center justify-center gap-4 py-20 text-ink-soft">
+      <div className="relative h-14 w-14">
+        <BrandMark className="h-14 w-14" />
+        <svg
+          viewBox="0 0 64 64"
+          className="absolute inset-0 h-14 w-14 animate-spin motion-reduce:animate-none"
+          style={{ animationDuration: '1.1s' }}
+          aria-hidden="true"
+        >
+          <circle
+            cx="32"
+            cy="32"
+            r="30"
+            fill="none"
+            className="stroke-neon"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeDasharray="46 142"
+          />
+        </svg>
+      </div>
       <span className="text-sm">{label ?? c.loading}</span>
     </div>
   );
@@ -45,10 +65,7 @@ export function EmptyState({ message }: { message?: string }) {
   );
 }
 
-/**
- * Base shimmer block (project rule #3/#5). `animate-pulse` is already
- * reduced-motion-safe via the global P5.3 safeguard.
- */
+/** animate-pulse is already reduced-motion-safe via the global safeguard. */
 export function Skeleton({ className }: { className?: string }) {
   return (
     <div className={cn('animate-pulse rounded-md bg-border/50', className)} />

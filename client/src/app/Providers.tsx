@@ -6,15 +6,7 @@ import { Toaster } from 'react-hot-toast';
 import { queryClient } from '@/lib/queryClient';
 import { AuthProvider } from '@/context/AuthContext';
 
-/**
- * Central app provider composition. Single place that wires data, routing,
- * auth and notifications — keeps `main.tsx` a thin entry point
- * (project rule #4/#8). Provider order is intentional and stable.
- *
- * Theme: the canonical Zustand engine (`@/stores/theme`) is initialised in
- * the premium shell (`PublicLayout` → `initThemeSync`); the legacy hook was
- * retired in P2. Kept out of here so it runs within the routed tree.
- */
+// Provider order is intentional and stable; theme init lives in PublicLayout (initThemeSync) instead, so it runs within the routed tree.
 export default function Providers({ children }: { children: ReactNode }) {
   return (
     <HelmetProvider>

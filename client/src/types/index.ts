@@ -1,8 +1,4 @@
-/**
- * Frontend DTOs — mirror the backend domain models so the whole app speaks
- * one consistent data structure (project rule #8). These represent the JSON
- * the API returns (ids/dates serialized to strings).
- */
+// Frontend DTOs mirror the backend domain models — one consistent shape; ids/dates are serialized to strings.
 
 export interface Timestamps {
   createdAt: string;
@@ -19,8 +15,7 @@ export type Entity<T> = T & WithId & Timestamps;
 export interface Social {
   label: string;
   url: string;
-  /** Built-in icon key (legacy: 'github' | 'linkedin' | 'mail' | 'code'). New
-   *  entries can leave empty — display logic auto-derives from `label`. */
+  /** Legacy built-in icon key ('github'|'linkedin'|'mail'|'code'); new entries can leave empty and let display logic auto-derive from `label`. */
   icon: string;
   /** Optional Cloudinary URL — when set, overrides the auto-derived icon. */
   iconImage?: string;
@@ -157,9 +152,7 @@ export interface Project {
   views: number;
 }
 
-/** Skill categories are managed via /categories CRUD (see Category). The
- *  alias stays for code that imports it as a type, but it's now an
- *  open-ended slug string rather than a strict enum. */
+/** Skill categories now live in /categories CRUD (see Category); this alias remains only so existing code can still import it as a type. */
 export type SkillCategory = string;
 
 export interface Skill {
@@ -167,9 +160,7 @@ export interface Skill {
   /** Slug ref into the Category collection (`Category.slug`). */
   category: SkillCategory;
   level: number;
-  /** Legacy free-text icon hint (name or URL). Retained for older rows;
-   *  new skills should use `iconImage` (uploaded) and let the public
-   *  renderer fall back to a matching react-icons logo. */
+  /** Legacy free-text icon hint, retained for older rows; new skills should use `iconImage` and let the public renderer fall back to a react-icons logo. */
   icon: string;
   /** Cloudinary-uploaded icon URL. Empty → react-icons fallback by name. */
   iconImage: string;

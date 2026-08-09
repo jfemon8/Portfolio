@@ -9,14 +9,7 @@ import {
 } from '@/config/site';
 import { useSeoSettings } from '@/hooks/usePortfolio';
 
-/**
- * Single, reusable SEO head manager (project rule #3/#8). Every route renders
- * one `<Seo />`; structured data is supplied via `jsonLd` from the reusable
- * builders in `@/lib/structuredData` so this component stays presentational.
- *
- * Backward-compatible: the original title/description/image/path props are
- * unchanged; type, noindex, the article fields and jsonLd are additive.
- */
+// Structured data comes in via `jsonLd` from @/lib/structuredData builders, keeping this component presentational.
 interface SeoProps {
   title?: string;
   description?: string;
@@ -62,8 +55,7 @@ export default function Seo({
     ', '
   );
   const twitter = s?.twitterHandle?.trim();
-  // `max-image-preview:large` lets Google show full-size image previews in
-  // search/Discover — required for strong image visibility on name queries.
+  // max-image-preview:large lets Google show full-size image previews in search/Discover.
   const robots = noindex
     ? 'noindex, nofollow'
     : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
@@ -114,8 +106,7 @@ export default function Seo({
 
       {schemas.map((s, i) => (
         <script key={i} type="application/ld+json">
-          {/* Escape '<' so admin-authored content can't break out of the
-              script tag (e.g. a "</script>" in a title) — defence in depth. */}
+          {/* Escapes '<' so admin-authored content (e.g. a title containing "</script>") can't break out of the script tag. */}
           {JSON.stringify(s).replace(/</g, '\\u003c')}
         </script>
       ))}

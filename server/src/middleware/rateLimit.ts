@@ -32,3 +32,12 @@ export const blogEngagementLimiter = rateLimit({
     message: 'Too many attempts. Please try again in 15 minutes.',
   },
 });
+
+/** Looser than strictLimiter — analytics beacons are bursty but bounded. */
+export const trackingLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 120,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many requests, please slow down.' },
+});

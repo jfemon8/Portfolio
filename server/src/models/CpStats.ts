@@ -1,12 +1,7 @@
 import mongoose, { type Model } from 'mongoose';
 import type { ICpStats } from '../types/index.js';
 
-/**
- * Server-side cache of a competitive-programming snapshot. Codeforces
- * rate-limits (and Vercel is serverless/stateless), so the controller
- * serves this doc and only refetches when it goes stale — one doc per
- * handle. Mongoose ESM-safe pattern (do NOT regress to named imports).
- */
+// Cached CP snapshot (one doc per handle); Codeforces rate-limits and Vercel is stateless, so refetch only when stale. Mongoose ESM-safe pattern, don't regress to named imports.
 const leetcodeSchema = new mongoose.Schema(
   {
     handle: String,

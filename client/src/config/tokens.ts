@@ -1,9 +1,4 @@
-/**
- * Design tokens — the single JS-side source of truth for brand values that
- * also need to be referenced outside CSS (charts, canvas, particles, OG
- * images). Visual theming lives in CSS variables (see index.css); this file
- * is for values consumed by TypeScript. Project rule #8: one shape everywhere.
- */
+// JS-side source of truth for brand values needed outside CSS (charts, canvas, particles, OG images); visual theming itself stays in CSS variables.
 
 export const brand = {
   cyan: '#00ffd1',

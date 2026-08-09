@@ -27,8 +27,7 @@ const blogSchema = new mongoose.Schema<IBlogPost>(
 );
 
 blogSchema.pre('validate', function prep(next) {
-  // Guard on a present title so a missing one falls through to the `required`
-  // validator (clean 400) instead of throwing inside slugify (500).
+  // Guard on a present title so a missing one falls through to the required validator (400) instead of throwing inside slugify (500).
   if (this.title && (this.isModified('title') || !this.slug)) {
     this.slug = slugify(this.title, { lower: true, strict: true });
   }
@@ -36,7 +35,6 @@ blogSchema.pre('validate', function prep(next) {
     const words = (this.content || '').trim().split(/\s+/).length;
     this.readingTime = Math.max(1, Math.round(words / 200));
   }
-  // A scheduled post whose time has arrived becomes published.
   if (
     this.status === 'scheduled' &&
     this.scheduledFor &&
@@ -51,6 +49,7 @@ blogSchema.pre('validate', function prep(next) {
 });
 
 blogSchema.index({ status: 1, publishedAt: -1 });
+blogSchema.index({ featured: -1, publishedAt: -1 });
 
 export const BlogPost =
   (mongoose.models.BlogPost as Model<IBlogPost>) ||

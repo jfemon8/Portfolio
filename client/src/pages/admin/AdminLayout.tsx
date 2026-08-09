@@ -74,14 +74,7 @@ const NAV: NavItem[] = [
   { to: '/admin/settings', label: 'Settings', icon: Settings },
 ];
 
-/**
- * Admin shell: a sticky top header + a TRULY fixed sidebar (mobile drawer +
- * desktop pinned) with its own internal scroll for the nav list, and an
- * always-visible account / logout card pinned to the sidebar bottom. The
- * main content scrolls independently — the chrome stays on screen at every
- * scroll position. Surfaces are solid `bg-card` so light + dark modes both
- * render clean panels (no washy backdrop-blur over the page bg).
- */
+// Header/sidebar use position: fixed with their own scroll regions so the chrome stays on screen while main scrolls; solid bg-card avoids a washy blur in either theme.
 export default function AdminLayout() {
   const { user, logout } = useAuth();
   const { data: profileData } = useProfile();
@@ -134,9 +127,7 @@ export default function AdminLayout() {
         <Seo title="Admin" noindex />
         <CommandPalette items={commandItems} />
 
-        {/* Sticky top header — full width above the sidebar. Solid `bg-card`
-          so the band reads as a clean white strip in light mode and a
-          dark card-tinted strip in dark mode (no see-through page bg). */}
+        {/* Solid bg-card keeps the header an opaque strip in both light and dark mode, not a see-through wash. */}
         <header className="sticky top-0 z-50 flex h-16 items-center gap-3 border-b border-border bg-card px-4">
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
@@ -156,12 +147,7 @@ export default function AdminLayout() {
             emon<span className="text-muted-foreground/60">/admin</span>
           </Link>
 
-          {/* All three icon affordances share the same `h-10 w-10` square
-              footprint on mobile so they read as a unified row. The Search
-              button only expands to a labelled chip on sm+ where there's
-              room for "Search…" + ⌘K hint. View Live Site is no longer
-              hidden on mobile — it sits next to the theme toggle. Icons
-              all standardised to `h-5 w-5` for visual consistency. */}
+          {/* Icons share a uniform h-10 w-10 footprint on mobile so they read as one row; Search only expands to a labelled chip at sm+ where there's room. */}
           <button
             onClick={toggleCommand}
             aria-label="Search"
@@ -170,7 +156,7 @@ export default function AdminLayout() {
           >
             <Command className="h-5 w-5 sm:h-3.5 sm:w-3.5" />
             <span className="hidden sm:inline">Search…</span>
-            <kbd className="hidden rounded border border-border px-1.5 font-mono text-[10px] sm:inline">
+            <kbd className="hidden rounded border border-border px-1.5 font-mono text-3xs sm:inline">
               ⌘K
             </kbd>
           </button>
@@ -187,11 +173,7 @@ export default function AdminLayout() {
           </a>
         </header>
 
-        {/* Sidebar — `position: fixed` at all breakpoints. Mobile slides off
-          via `-translate-x-full`; lg+ snaps in with `lg:translate-x-0`.
-          A `bottom-0 top-16` pair makes it span everything below the
-          header, so the inner `flex h-full flex-col` can host a scrollable
-          nav + a pinned profile-card foot. */}
+        {/* position: fixed at all breakpoints; bottom-0/top-16 spans below the header so the inner flex column can host a scrollable nav + pinned footer. */}
         <aside
           className={cn(
             'fixed bottom-0 left-0 top-16 z-40 w-64 transform border-r border-border bg-card transition-transform duration-200 ease-out lg:translate-x-0',
@@ -199,8 +181,7 @@ export default function AdminLayout() {
           )}
         >
           <div className="flex h-full flex-col">
-            {/* Scrollable nav region — only this part scrolls when the list
-              outgrows the viewport; the profile card below stays put. */}
+            {/* Only this region scrolls when the nav list outgrows the viewport — the profile card below stays put. */}
             <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
               {visibleNav.map((n) => (
                 <NavLink
@@ -238,10 +219,7 @@ export default function AdminLayout() {
               ))}
             </nav>
 
-            {/* Always-pinned account / logout card — outside the scroll area
-              so it's visible no matter how long the nav list gets. Avatar
-              comes from the Profile doc when set; otherwise a circular
-              initial-letter chip. */}
+            {/* Outside the scroll area so it stays visible regardless of nav list length. */}
             <div className="shrink-0 border-t border-border p-3">
               <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/40 px-3 py-2.5">
                 {avatarUrl ? (
@@ -259,7 +237,7 @@ export default function AdminLayout() {
                   <p className="truncate text-xs font-semibold text-foreground">
                     {user?.name}
                   </p>
-                  <p className="truncate text-[11px] capitalize text-muted-foreground/80">
+                  <p className="truncate text-2xs capitalize text-muted-foreground/80">
                     {user?.role}
                   </p>
                 </div>
@@ -276,8 +254,7 @@ export default function AdminLayout() {
           </div>
         </aside>
 
-        {/* Mobile scrim — only covers below the header so the topbar stays
-          interactable (you can still tap the close X to dismiss). */}
+        {/* Only covers below the header so the topbar (and its close X) stays interactable. */}
         {mobileOpen && (
           <div
             onClick={() => setMobileOpen(false)}
@@ -285,8 +262,7 @@ export default function AdminLayout() {
           />
         )}
 
-        {/* Main — left-padded by the sidebar's 16rem on lg+; spans full width
-          on mobile (sidebar overlays). */}
+        {/* ml-64 matches the sidebar's width on lg+; on mobile the sidebar overlays instead, so main stays full width. */}
         <main className="min-h-[calc(100vh-4rem)] p-4 sm:p-6 lg:ml-64 lg:p-8">
           <div className="mx-auto w-full max-w-screen-2xl">
             <Outlet />

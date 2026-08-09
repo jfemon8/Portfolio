@@ -11,10 +11,7 @@ import { Spinner, ErrorState, EmptyState } from '@/components/ui/States';
 import { useProjects } from '@/hooks/usePortfolio';
 import { cn } from '@/lib/cn';
 
-/**
- * Featured projects — premium bento: the first featured project gets the
- * hero slot, the rest tile around it.
- */
+// Bento layout: the first featured project gets the hero slot, the rest tile around it.
 export default function FeaturedProjects() {
   const { data, isLoading, isError, refetch } = useProjects('?featured=true');
   const projects = data?.data ?? [];

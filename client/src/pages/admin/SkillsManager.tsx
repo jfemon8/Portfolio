@@ -8,11 +8,7 @@ import { getSkillIcon, FallbackSkillIcon } from '@/lib/skillIcon';
 import { cn } from '@/lib/cn';
 import type { CategoryDoc, SkillDoc } from '@/types';
 
-/** Two-panel admin view for /admin/skills: the Skills CRUD (with image-
- *  upload icon + dynamic category dropdown) and a separate Categories CRUD,
- *  switchable via the tab strip up top. Both panels reuse `ResourceManager`
- *  so list rendering, modal form, validation, and confirm-delete come for
- *  free — the page just composes them. */
+// Two-panel /admin/skills view (Skills + Categories tabs), both built on ResourceManager for list rendering, forms, and delete.
 export default function SkillsManager() {
   const [tab, setTab] = useState<'skills' | 'categories'>('skills');
   const { data: categoriesData } = useCategories();
@@ -21,9 +17,7 @@ export default function SkillsManager() {
     [categoriesData]
   );
 
-  // Re-derive the Skill config whenever the categories list changes so the
-  // dropdown options stay in sync with the Categories tab. `useMemo` keeps
-  // the object stable across renders that don't actually need a refresh.
+  // Re-derived when categories change so the dropdown stays in sync; useMemo keeps the object stable otherwise.
   const skillConfig: ResourceConfig<SkillDoc> = useMemo(
     () => ({
       title: 'Skills',
@@ -40,11 +34,7 @@ export default function SkillsManager() {
         iconImagePublicId: '',
         order: 0,
       },
-      // Field order is intentional: name/category share row 1, level/order
-      // share row 2 (both half-width, no full-spanning field between them),
-      // then iconImage spans row 3 full-width. `featured` is no longer
-      // surfaced — every skill renders on the public grid regardless, so
-      // the toggle was a no-op on the UI.
+      // Field order matches the intended layout; `featured` is omitted since it was a no-op on the UI.
       fields: [
         { name: 'name', label: 'Name', type: 'text' },
         {
@@ -108,9 +98,7 @@ export default function SkillsManager() {
 
   return (
     <div>
-      {/* Tab strip — animated active indicator borrowed from the public
-          Skills section so the admin chrome stays visually consistent with
-          the surface it controls. */}
+      {/* Tab strip — active indicator style borrowed from the public Skills section. */}
       <div role="tablist" className="mb-6 flex gap-2">
         {(['skills', 'categories'] as const).map((key) => {
           const on = tab === key;
@@ -149,10 +137,7 @@ export default function SkillsManager() {
   );
 }
 
-/** A single skill's list row. Shows the uploaded icon if any, otherwise a
- *  brand logo matched from the skill name, and falls back to a neutral
- *  glyph when nothing matches — same precedence the public renderer uses,
- *  so the admin preview faithfully mirrors what visitors will see. */
+// Icon precedence (uploaded → brand-matched → neutral glyph) mirrors the public renderer so the preview matches what visitors see.
 function SkillRow({
   item,
   categories,

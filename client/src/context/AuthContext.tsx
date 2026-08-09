@@ -44,10 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     void loadMe();
   }, [loadMe]);
 
-  const login = async (
-    email: string,
-    password: string
-  ): Promise<AuthUser> => {
+  const login = async (email: string, password: string): Promise<AuthUser> => {
     const { data } = await api.post<AuthResponse>('/auth/login', {
       email,
       password,
@@ -58,6 +55,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = (): void => {
+    // Fire-and-forget server-side revoke; local logout doesn't wait on it.
+    void api.post('/auth/logout').catch(() => undefined);
     tokenStore.clear();
     setUser(null);
   };

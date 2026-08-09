@@ -158,8 +158,7 @@ export default function Field({ field, value, form, onChange }: FieldProps) {
           className="input"
           placeholder={placeholder}
           value={typeof value === 'number' ? value : ''}
-          // Empty input → unset (not 0), so an optional numeric field can be
-          // cleared and the server default applies instead of a forced 0.
+          // Empty input maps to undefined, not 0, so the field can clear and fall back to the server default.
           onChange={(e) =>
             set(e.target.value === '' ? undefined : Number(e.target.value))
           }
@@ -305,9 +304,7 @@ export default function Field({ field, value, form, onChange }: FieldProps) {
         />
       )}
 
-      {help && (
-        <p className="mt-1 text-[11px] text-muted-foreground/70">{help}</p>
-      )}
+      {help && <p className="mt-1 text-2xs text-muted-foreground/70">{help}</p>}
     </div>
   );
 }

@@ -1,14 +1,6 @@
 import { useEffect } from 'react';
 
-/**
- * Locks body scroll when `locked` is true. Preserves the current scroll
- * position so the page does not jump back to top when the lock is released
- * (iOS/Android). Use for modals, drawers, mobile nav menus, and any other
- * full-screen overlay.
- *
- * Ported from RDSWA; pairs with the new ConfirmModal + future drawer
- * primitives so every overlay shares one body-lock implementation.
- */
+// Locks body scroll while preserving scroll position so the page doesn't jump on unlock (iOS/Android); use for modals, drawers, overlays.
 export function useBodyScrollLock(locked: boolean): void {
   useEffect(() => {
     if (!locked) return;
@@ -39,10 +31,7 @@ export function useBodyScrollLock(locked: boolean): void {
       body.style.left = original.left;
       body.style.right = original.right;
       body.style.width = original.width;
-      // Only restore the previous scroll position if we're still on the same
-      // page. If the lock is released because the user navigated away (e.g.
-      // sidebar auto-closes on route change), restoring scrollY would apply
-      // the OLD page's offset to the NEW page.
+      // Only restore scroll position if still on the same page — otherwise a stale scrollY would apply the OLD page's offset to the NEW page.
       if (window.location.pathname === lockedOnPath) {
         window.scrollTo(0, scrollY);
       }

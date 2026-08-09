@@ -5,11 +5,7 @@ interface BeamsProps {
   className?: string;
 }
 
-/**
- * Animated light beams — slow diagonal sweeps, GPU-only (transform/opacity),
- * pointer-transparent, hidden under reduced-motion. Reusable ambient layer
- * (project rule #3); built with Motion.dev only (no new libs).
- */
+// Diagonal light-beam sweeps, GPU-only (transform/opacity), pointer-transparent, hidden under reduced-motion.
 export default function Beams({ className }: BeamsProps) {
   const reduce = useReducedMotion();
   if (reduce) return null;

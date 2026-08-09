@@ -9,16 +9,20 @@ export const listProjects = asyncHandler(
   async (req: Request, res: Response) => {
     const filter: Record<string, unknown> = {};
     if (req.query.featured === 'true') filter.featured = true;
-    // Coerce to a primitive string so a crafted object like
-    // ?category[$ne]=x can't inject a Mongo query operator.
+    // Coerce to a primitive string so a crafted object like ?category[$ne]=x can't inject a Mongo query operator.
     if (req.query.category && req.query.category !== 'all') {
       filter.category = String(req.query.category);
     }
-    const projects = await Project.find(filter).sort({
-      featured: -1,
-      order: 1,
-      createdAt: -1,
-    });
+    let query = Project.find(filter)
+      .sort({ featured: -1, order: 1, createdAt: -1 })
+      .lean();
+    // Pagination is opt-in via ?limit=.
+    const limit = Number(req.query.limit);
+    if (Number.isFinite(limit) && limit > 0) {
+      const page = Math.max(1, Number(req.query.page) || 1);
+      query = query.skip((page - 1) * limit).limit(Math.min(limit, 200));
+    }
+    const projects = await query;
     res.json({ success: true, count: projects.length, data: projects });
   }
 );
@@ -65,8 +69,10 @@ export const deleteProject = asyncHandler(
   async (req: Request, res: Response) => {
     const project = await Project.findById(req.params.id);
     if (!project) throw ApiError.notFound('Project not found');
-    if (project.coverPublicId) await destroyAsset(project.coverPublicId);
-    for (const g of project.gallery) await destroyAsset(g.publicId);
+    await Promise.all([
+      project.coverPublicId ? destroyAsset(project.coverPublicId) : undefined,
+      ...project.gallery.map((g) => destroyAsset(g.publicId)),
+    ]);
     await project.deleteOne();
     res.json({ success: true, message: 'Project deleted' });
   }

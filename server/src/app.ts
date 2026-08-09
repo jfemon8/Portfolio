@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import morgan from 'morgan';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import { env } from './config/env.js';
@@ -11,7 +10,7 @@ import routes from './routes/index.js';
 
 const app = express();
 
-app.set('trust proxy', 1); // correct client IPs behind Vercel/proxies
+app.set('trust proxy', 1);
 
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(compression());
@@ -19,7 +18,6 @@ app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// CORS — allow the configured client origin(s)
 app.use(
   cors({
     origin(origin, cb) {
@@ -30,7 +28,10 @@ app.use(
   })
 );
 
-if (!env.isProd) app.use(morgan('dev'));
+if (!env.isProd) {
+  const { default: morgan } = await import('morgan');
+  app.use(morgan('dev'));
+}
 
 app.get('/', (_req, res) => {
   res.json({ name: 'Portfolio API', status: 'running', docs: '/api/health' });

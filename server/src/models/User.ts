@@ -39,11 +39,7 @@ const userSchema = new mongoose.Schema<IUser, UserModel, IUserMethods>(
   { timestamps: true }
 );
 
-/**
- * Immutability guard — runs on EVERY save. The hardcoded super admins are
- * always re-asserted to a locked state regardless of what any
- * code/admin/API attempted, so they can never be demoted/disabled.
- */
+// Runs on every save; re-asserts hardcoded super admins to a locked state so they can never be demoted/disabled.
 userSchema.pre('save', function enforceImmutableSuperAdmin(next) {
   if (isImmutableSuperAdminEmail(this.email)) {
     this.role = 'superAdmin';

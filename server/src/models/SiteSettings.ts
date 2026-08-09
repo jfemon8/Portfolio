@@ -1,12 +1,7 @@
 import mongoose, { type Model } from 'mongoose';
 import type { ISiteSettings } from '../types/index.js';
 
-/**
- * Admin-managed homepage layout (singleton, like Profile/SeoSettings). The
- * canonical section catalogue lives on the client (single source); this only
- * stores the owner's order/visibility overrides + an optional hero image.
- * Mongoose ESM-safe pattern (do NOT regress to named runtime imports).
- */
+// Singleton homepage layout; canonical section catalogue lives on the client, this only stores order/visibility overrides + hero image. Mongoose ESM-safe pattern, don't regress to named imports.
 const siteSettingsSchema = new mongoose.Schema<ISiteSettings>(
   {
     heroBackground: { type: String, default: '' },

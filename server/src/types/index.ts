@@ -1,7 +1,4 @@
-/**
- * Shared domain types. The Mongoose models implement these interfaces so the
- * whole backend (and, mirrored, the frontend) speaks one data structure.
- */
+// Shared domain types; Mongoose models implement these interfaces and the frontend mirrors them, so the whole stack speaks one data structure.
 import type { Types } from 'mongoose';
 
 export type ID = Types.ObjectId;
@@ -19,9 +16,7 @@ export interface IUser {
   isImmutableSuperAdmin: boolean;
   avatar: string;
   lastLogin?: Date;
-  /** When the password was last changed — access tokens issued before this
-   *  instant are rejected by `protect`, so a password change locks out any
-   *  previously-issued (e.g. stolen) session. */
+  /** Tokens issued before this timestamp are rejected by `protect`, locking out stolen/old sessions after a password change. */
   passwordChangedAt?: Date;
 }
 
@@ -320,11 +315,7 @@ export interface LabelsCopy {
   searchAria: string;
 }
 
-/**
- * Contact-email copy (server-rendered in mailer.ts). Supports `{{name}}`,
- * `{{email}}`, `{{subject}}`, `{{message}}` tokens; each field falls back to
- * the current hardcoded template when empty.
- */
+// Contact-email copy (rendered in mailer.ts); supports {{name}}/{{email}}/{{subject}}/{{message}} tokens, falls back to the hardcoded template when empty.
 export interface EmailCopy {
   ownerSubjectPrefix: string;
   ownerHeading: string;
@@ -336,11 +327,7 @@ export interface EmailCopy {
   ackSignoff: string;
 }
 
-/**
- * Admin-managed site copy / UI text (singleton, like SeoSettings). Grows per
- * P12 increment; every string also has a hardcoded component fallback so an
- * empty/missing doc renders the site identically.
- */
+// Singleton site copy (like SeoSettings); every string has a hardcoded component fallback so an empty/missing doc renders identically.
 export interface ISiteContent {
   sections: ContentSection[];
   hero: HeroCopy;
@@ -389,8 +376,7 @@ export interface GalleryImage {
   caption: string;
 }
 
-/** Structured case study (all optional Markdown). Empty → page falls back
- *  to `description` for backward compatibility. */
+/** Structured case study (all optional Markdown); empty fields fall back to `description` for backward compatibility. */
 export interface CaseStudy {
   problem: string;
   process: string;
@@ -427,33 +413,24 @@ export interface IProject {
   views: number;
 }
 
-/** Skill categories are now a CRUD resource (see ICategory). `SkillCategory`
- *  remains as a string alias for backward-compat with code that imports it. */
+/** Skill categories moved to a CRUD resource (ICategory); kept as a string alias for backward-compat. */
 export type SkillCategory = string;
 
 export interface ISkill {
   name: string;
-  /** Slug reference to a Category document (`ICategory.slug`). Not enforced
-   *  as ObjectId so categories can be renamed/relabelled without breaking
-   *  skill rows, and so legacy enum values keep working when their slugs
-   *  match the seeded defaults. */
+  /** Slug reference to a Category (`ICategory.slug`), not an ObjectId, so categories can be renamed without breaking skill rows. */
   category: SkillCategory;
   level: number;
-  /** Legacy icon hint (free text — name or URL). Kept for backward-compat
-   *  with previously-saved values; new entries should leave this empty and
-   *  use `iconImage` (Cloudinary upload) + the react-icons fallback. */
+  /** Legacy free-text icon hint, kept for backward-compat; new entries should leave this empty and use `iconImage` instead. */
   icon: string;
-  /** Uploaded icon image URL (Cloudinary). When empty, the public renderer
-   *  falls back to a react-icons logo matched by skill name. */
+  /** Uploaded icon image URL (Cloudinary); falls back to a react-icons logo matched by skill name when empty. */
   iconImage: string;
   iconImagePublicId: string;
   order: number;
   featured: boolean;
 }
 
-/** Skill category, managed via /categories CRUD. `slug` is the stable id
- *  referenced by ISkill.category; `label` is the human-friendly display
- *  string shown in the public category tabs. */
+/** Skill category (/categories CRUD); `slug` is the stable id referenced by ISkill.category, `label` is the display string shown in the public tabs. */
 export interface ICategory {
   name: string;
   slug: string;

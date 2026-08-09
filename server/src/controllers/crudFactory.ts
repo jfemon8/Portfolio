@@ -15,10 +15,6 @@ interface ReorderItem {
   order: number;
 }
 
-/**
- * Generates standard list/get/create/update/delete handlers for a model.
- * Used by experience, skill, education, certification, publication.
- */
 export const crudFactory = <T>(Model: Model<T>, opts: CrudOptions = {}) => {
   const sort = opts.sort ?? { order: 1, createdAt: -1 };
   const imageFields = opts.imageFields ?? [];
@@ -26,10 +22,18 @@ export const crudFactory = <T>(Model: Model<T>, opts: CrudOptions = {}) => {
   const list = asyncHandler(async (req: Request, res: Response) => {
     const filter: Record<string, unknown> = {};
     if (req.query.featured === 'true') filter.featured = true;
-    // Coerce to a primitive string so a crafted object like
-    // ?category[$ne]=x can't inject a Mongo query operator.
+    // Coerce to a primitive string so a crafted object like ?category[$ne]=x can't inject a Mongo query operator.
     if (req.query.category) filter.category = String(req.query.category);
-    const docs = await Model.find(filter as RootFilterQuery<T>).sort(sort);
+
+    let query = Model.find(filter as RootFilterQuery<T>)
+      .sort(sort)
+      .lean();
+    const limit = Number(req.query.limit);
+    if (Number.isFinite(limit) && limit > 0) {
+      const page = Math.max(1, Number(req.query.page) || 1);
+      query = query.skip((page - 1) * limit).limit(Math.min(limit, 200));
+    }
+    const docs = await query;
     res.json({ success: true, count: docs.length, data: docs });
   });
 
@@ -56,10 +60,14 @@ export const crudFactory = <T>(Model: Model<T>, opts: CrudOptions = {}) => {
   const remove = asyncHandler(async (req: Request, res: Response) => {
     const doc = await Model.findById(req.params.id);
     if (!doc) throw ApiError.notFound(`${Model.modelName} not found`);
-    for (const f of imageFields) {
-      const publicId = doc.get(f) as unknown;
-      if (typeof publicId === 'string') await destroyAsset(publicId);
-    }
+    await Promise.all(
+      imageFields.map((f) => {
+        const publicId = doc.get(f) as unknown;
+        return typeof publicId === 'string'
+          ? destroyAsset(publicId)
+          : undefined;
+      })
+    );
     await doc.deleteOne();
     res.json({ success: true, message: `${Model.modelName} deleted` });
   });
@@ -68,9 +76,7 @@ export const crudFactory = <T>(Model: Model<T>, opts: CrudOptions = {}) => {
     const items = req.body.items as ReorderItem[] | undefined;
     if (!Array.isArray(items)) throw ApiError.badRequest('items[] required');
     if (items.length > 500) throw ApiError.badRequest('Too many items');
-    // Validate the whole payload up front so one bad entry can't leave the
-    // list half-reordered (the old parallel findByIdAndUpdate committed some
-    // writes before rejecting on a malformed id/order).
+    // Validate the whole payload up front — the old parallel findByIdAndUpdate could commit some writes before rejecting a malformed id/order, leaving the list half-reordered.
     for (const i of items) {
       if (
         !mongoose.isValidObjectId(i.id) ||
@@ -80,9 +86,7 @@ export const crudFactory = <T>(Model: Model<T>, opts: CrudOptions = {}) => {
       }
     }
     if (items.length) {
-      // One atomic round-trip instead of an N-way concurrent fan-out.
-      // Cast: the factory is generic over T, which has no statically-known
-      // `order` field, but every reorderable model does.
+      // One atomic bulkWrite round-trip; cast is safe since every reorderable model has an `order` field.
       const ops = items.map((i) => ({
         updateOne: {
           filter: { _id: i.id },

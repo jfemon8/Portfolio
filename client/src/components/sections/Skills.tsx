@@ -8,13 +8,7 @@ import { staggerContainer } from '@/config/animation';
 import { getSkillIcon, FallbackSkillIcon } from '@/lib/skillIcon';
 import { cn } from '@/lib/cn';
 
-/**
- * Interactive skill cloud — name + percentage bar per card, with an icon
- * resolved in this order: uploaded `iconImage` → react-icons brand match
- * by skill name → neutral `<code/>` glyph. Category tabs are now driven
- * by the /categories CRUD (with a seed-on-empty fallback for first-run),
- * so admins can add/rename/reorder them at runtime without a redeploy.
- */
+/** Icon resolves as uploaded `iconImage` → react-icons brand match → neutral glyph; category tabs are driven by the /categories CRUD. */
 export default function Skills() {
   const {
     data: skillsData,
@@ -32,9 +26,7 @@ export default function Skills() {
     [categoriesData]
   );
 
-  // Only show category tabs that actually contain at least one skill —
-  // keeps the strip tidy when an admin pre-creates categories they haven't
-  // populated yet.
+  // Only show category tabs that contain at least one skill.
   const available = useMemo(
     () => categories.filter((c) => skills.some((s) => s.category === c.slug)),
     [skills, categories]
@@ -107,10 +99,6 @@ export default function Skills() {
               className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
             >
               {items.map((s) => {
-                // Resolve icon: uploaded image > react-icons brand match >
-                // neutral fallback glyph. The fallback chain keeps each
-                // card visually anchored even when an admin hasn't filled
-                // in either field.
                 const BrandIcon = s.iconImage
                   ? null
                   : (getSkillIcon(s.name) ?? FallbackSkillIcon);
@@ -121,7 +109,7 @@ export default function Skills() {
                       hidden: { opacity: 0, y: 16, scale: 0.95 },
                       show: { opacity: 1, y: 0, scale: 1 },
                     }}
-                    className="group relative overflow-hidden rounded-2xl border border-border/70 bg-card/60 p-4 backdrop-blur-xl transition-all duration-300 hover:border-primary/40 hover:shadow-neon-glow"
+                    className="group relative overflow-hidden rounded-2xl border border-border/70 bg-card/60 p-4 backdrop-blur-md transition-all duration-300 hover:border-primary/40"
                   >
                     <span
                       aria-hidden
@@ -143,24 +131,25 @@ export default function Skills() {
                         <span className="truncate text-sm font-semibold text-foreground transition-colors group-hover:text-neon">
                           {s.name}
                         </span>
-                        <span className="font-mono text-[11px] text-muted-foreground/80 transition-colors group-hover:text-neon">
+                        <span className="font-mono text-2xs text-muted-foreground/80 transition-colors group-hover:text-neon">
                           {s.level}%
                         </span>
                       </div>
                     </div>
                     <div className="relative mt-3 h-1.5 overflow-hidden rounded-full bg-border/40">
+                      {/* scaleX, not width — width triggers layout on every tick. */}
                       <motion.span
                         initial={
-                          reduce ? { width: `${s.level}%` } : { width: 0 }
+                          reduce ? { scaleX: s.level / 100 } : { scaleX: 0 }
                         }
-                        whileInView={{ width: `${s.level}%` }}
+                        whileInView={{ scaleX: s.level / 100 }}
                         viewport={{ once: true }}
                         transition={{
                           duration: 0.9,
                           delay: 0.15,
                           ease: [0.22, 1, 0.36, 1],
                         }}
-                        className="block h-full rounded-full bg-gradient-to-r from-primary to-neon-blue"
+                        className="block h-full w-full origin-left rounded-full bg-gradient-to-r from-primary to-neon-blue"
                       />
                     </div>
                   </motion.li>

@@ -677,7 +677,7 @@ function CommentItem({
             >
               <span>{meta.emoji}</span>
               <span>{meta.label}</span>
-              <span className="text-[11px] text-muted-foreground/70">
+              <span className="text-2xs text-muted-foreground/70">
                 {reactionCounts[reaction]}
               </span>
             </button>

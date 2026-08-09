@@ -1,6 +1,7 @@
 import { motion, useReducedMotion } from 'motion/react';
 import GlassCard from '@/components/shared/GlassCard';
 import { ease } from '@/config/animation';
+import { useSkipEntranceIfVisible } from '@/hooks/useSkipEntranceIfVisible';
 import { cn } from '@/lib/cn';
 
 interface TerminalProps {
@@ -10,17 +11,15 @@ interface TerminalProps {
   className?: string;
 }
 
-/**
- * Reusable animated terminal window (project rule #3/#8). Lines reveal in
- * sequence with a trailing caret when scrolled into view; reduced-motion →
- * all lines instant, no caret. Matches the hero terminal aesthetic.
- */
 export default function Terminal({
   lines,
   title = 'emon@portfolio: ~',
   className,
 }: TerminalProps) {
   const reduce = useReducedMotion();
+  const { ref, skip: alreadyVisible } =
+    useSkipEntranceIfVisible<HTMLPreElement>();
+  const skip = reduce || alreadyVisible;
 
   return (
     <GlassCard className={cn('overflow-hidden', className)}>
@@ -32,7 +31,10 @@ export default function Terminal({
           {title}
         </span>
       </div>
-      <pre className="whitespace-pre-wrap break-words p-5 font-mono text-[11px] leading-relaxed text-muted-foreground sm:text-[13px]">
+      <pre
+        ref={ref}
+        className="whitespace-pre-wrap break-words p-5 font-mono text-2xs leading-relaxed text-muted-foreground sm:text-[0.8125rem]"
+      >
         <code>
           {lines.map((ln, i) => {
             const isCmd = ln.startsWith('$ ');
@@ -41,12 +43,12 @@ export default function Terminal({
               <motion.span
                 key={i}
                 className="block"
-                initial={reduce ? false : { opacity: 0 }}
+                initial={skip ? false : { opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{
                   duration: 0.25,
-                  delay: reduce ? 0 : i * 0.35,
+                  delay: skip ? 0 : i * 0.35,
                   ease: ease.out,
                 }}
               >

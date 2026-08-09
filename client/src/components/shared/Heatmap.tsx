@@ -20,11 +20,6 @@ const LEVELS = [
 const level = (c: number): number =>
   c <= 0 ? 0 : c < 3 ? 1 : c < 6 ? 2 : c < 10 ? 3 : 4;
 
-/**
- * GitHub-style activity heatmap (project rule #3/#5). Pure Tailwind grid —
- * no chart library; theme-token coloured so it adapts to every theme.
- * Static (perf) + an accessible summary label.
- */
 export default function Heatmap({
   data,
   weeks = 26,
@@ -65,7 +60,7 @@ export default function Heatmap({
               key={cell.key}
               title={formatDate(cell.key)}
               className={cn(
-                'h-2.5 w-2.5 shrink-0 rounded-[2px]',
+                'h-2.5 w-2.5 shrink-0 rounded-[0.125rem]',
                 LEVELS[cell.lvl]
               )}
             />

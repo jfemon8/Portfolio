@@ -1,14 +1,4 @@
-/**
- * Hardcoded, immutable super admins.
- *
- * These accounts can NEVER (via any API/UI):
- *  - be deleted, disabled, or demoted
- *  - lose super-admin permissions
- * They are always re-asserted as { role: 'superAdmin', status: 'active',
- * isImmutableSuperAdmin: true } on save and on seed. Admins cannot touch them.
- *
- * Source of truth — referenced by the User model guard, userService and seed.
- */
+// Hardcoded, immutable super admins — can never be deleted/disabled/demoted via any API/UI; re-asserted as { role: 'superAdmin', status: 'active', isImmutableSuperAdmin: true } on save/seed. Source of truth for the User model guard, userService and seed.
 export const IMMUTABLE_SUPER_ADMINS: readonly string[] = [
   'jfemon8@gmail.com',
   'emon.cse6.bu@gmail.com',

@@ -1,5 +1,4 @@
 import { Languages, Sparkles } from 'lucide-react';
-import { motion, useReducedMotion } from 'motion/react';
 import { Section, SectionHeading } from '@/components/shared/Section';
 import { useSectionCopy } from '@/hooks/useSectionCopy';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
@@ -20,7 +19,6 @@ const personalSkills = [
 ];
 
 export default function About({ profile }: { profile?: ProfileDoc }) {
-  const reduce = useReducedMotion();
   const stats = profile?.stats ?? [];
   const copy = useSectionCopy('about', {
     index: '01.',
@@ -55,7 +53,7 @@ export default function About({ profile }: { profile?: ProfileDoc }) {
                     value={s.value}
                     className="block text-2xl font-extrabold text-neon"
                   />
-                  <span className="mt-1 block text-[11px] uppercase tracking-wide text-muted-foreground/70">
+                  <span className="mt-1 block text-2xs uppercase tracking-wide text-muted-foreground/70">
                     {s.label}
                   </span>
                 </GlassCard>
@@ -88,18 +86,12 @@ export default function About({ profile }: { profile?: ProfileDoc }) {
                 ring + soft halo glow + pinging "available" dot give it the
                 eye-catching feel without going overboard. */}
             <GlassCard className="p-6 text-center">
-              <motion.div
-                initial={reduce ? false : { opacity: 0, scale: 0.92 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                className="relative mx-auto h-44 w-44 sm:h-48 sm:w-48"
-              >
+              <div className="relative mx-auto h-44 w-44 sm:h-48 sm:w-48">
                 <div
                   aria-hidden
                   className="absolute inset-0 -z-10 rounded-full bg-gradient-to-tr from-primary/30 via-neon-blue/30 to-neon-violet/30 blur-3xl"
                 />
-                <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-primary via-neon-blue to-neon-violet p-[3px] shadow-glow">
+                <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-primary via-neon-blue to-neon-violet p-[0.1875rem] shadow-glow">
                   <div className="h-full w-full overflow-hidden rounded-full bg-card">
                     {profile?.avatar ? (
                       <img
@@ -122,7 +114,7 @@ export default function About({ profile }: { profile?: ProfileDoc }) {
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-70" />
                   </span>
                 )}
-              </motion.div>
+              </div>
 
               <h3 className="mt-5 text-lg font-bold text-foreground">
                 {profile?.name}

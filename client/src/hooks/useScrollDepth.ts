@@ -3,13 +3,7 @@ import { track } from '@/lib/api';
 
 const THRESHOLDS = [25, 50, 75, 100] as const;
 
-/**
- * Fire a one-shot `scroll_depth` analytics beacon as the visitor passes the
- * 25 / 50 / 75 / 100% marks of a page (project rule #3/#5 — reusable, with a
- * passive + rAF-throttled listener so it never janks scrolling). Buckets
- * reset per `path` so a SPA route change re-measures the new page; a page
- * that isn't scrollable simply records nothing (the pageview already counts).
- */
+// Fires a one-shot scroll_depth beacon at the 25/50/75/100% marks via a passive + rAF-throttled listener; buckets reset per path for SPA navigation.
 export function useScrollDepth(path: string): void {
   const sent = useRef<Set<number>>(new Set());
 
@@ -22,8 +16,7 @@ export function useScrollDepth(path: string): void {
       const el = document.documentElement;
       const max = el.scrollHeight - el.clientHeight;
       if (max <= 0) return; // not scrollable — nothing to measure
-      // +2px tolerance so the true bottom reliably reads as 100 (subpixel /
-      // smooth-scroll can leave scrollY a fraction short of `max`).
+      // +2px tolerance so the true bottom reliably reads as 100 (subpixel/smooth-scroll can leave scrollY a fraction short of `max`).
       const pct = Math.min(100, ((window.scrollY + 2) / max) * 100);
       for (const t of THRESHOLDS) {
         if (pct >= t && !sent.current.has(t)) {

@@ -24,11 +24,7 @@ interface ShinyTextProps {
   delay?: number;
 }
 
-/**
- * Animated shine sweeping across text (ported from RDSWA's reactbits).
- * Useful for subtle "live" feel on small labels (e.g. "Available for
- * opportunities", "Live demo"). Auto-disabled under reduced-motion.
- */
+// Animated shine sweep for small "live" labels; auto-disabled under reduced-motion.
 export default function ShinyText({
   text,
   disabled = false,

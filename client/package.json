@@ -3,6 +3,14 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "browserslist": [
+    "> 0.4%",
+    "last 2 versions",
+    "Firefox ESR",
+    "iOS >= 14",
+    "not dead",
+    "not IE 11"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
@@ -27,12 +35,9 @@
     "react-hook-form": "^7.54.2",
     "react-hot-toast": "^2.4.1",
     "react-icons": "^5.4.0",
-    "react-markdown": "^9.0.1",
     "react-pdf": "^10.4.1",
     "react-router-dom": "^6.28.1",
-    "react-syntax-highlighter": "^15.6.1",
     "recharts": "^2.15.0",
-    "remark-gfm": "^4.0.0",
     "tailwind-merge": "^2.6.0",
     "zod": "^3.24.1",
     "zustand": "^5.0.2"
@@ -41,7 +46,6 @@
     "@types/node": "^22.10.5",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
-    "@types/react-syntax-highlighter": "^15.5.13",
     "@typescript-eslint/eslint-plugin": "^8.19.1",
     "@typescript-eslint/parser": "^8.19.1",
     "@vitejs/plugin-react": "^4.3.4",

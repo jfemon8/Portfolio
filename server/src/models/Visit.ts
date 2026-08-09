@@ -1,10 +1,7 @@
 import mongoose, { type Model } from 'mongoose';
 import type { IVisit } from '../types/index.js';
 
-/**
- * Lightweight, privacy-friendly analytics event — no cookies, no personal
- * identifiers; just a path, event type and a day bucket.
- */
+/** Lightweight, privacy-friendly analytics event — no cookies, no personal identifiers; just a path, event type and a day bucket. */
 const visitSchema = new mongoose.Schema<IVisit>(
   {
     type: {
@@ -38,6 +35,7 @@ visitSchema.pre('validate', function bucket(next) {
 });
 
 visitSchema.index({ type: 1, createdAt: -1 });
+visitSchema.index({ createdAt: 1 }, { expireAfterSeconds: 400 * 24 * 60 * 60 });
 
 export const Visit =
   (mongoose.models.Visit as Model<IVisit>) ||

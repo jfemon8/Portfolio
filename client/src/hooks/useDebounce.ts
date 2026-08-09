@@ -1,9 +1,6 @@
 import { useEffect, useState } from 'react';
 
-/**
- * Debounce a rapidly-changing value (project rule #3/#5). Reusable — used
- * for live search so keystrokes don't fire a request each time.
- */
+// Debounces a value so callers (e.g. live search) don't fire a request on every keystroke.
 export function useDebounce<T>(value: T, delay = 300): T {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {

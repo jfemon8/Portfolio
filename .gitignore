@@ -54,6 +54,7 @@ docs/
 
 # ===== Misc =====
 *.local
+settings.local.json
 tmp/
 temp/
 uploads/

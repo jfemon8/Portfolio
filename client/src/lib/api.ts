@@ -1,4 +1,8 @@
-import axios, { AxiosError, type AxiosInstance } from 'axios';
+import axios, {
+  AxiosError,
+  type AxiosInstance,
+  type InternalAxiosRequestConfig,
+} from 'axios';
 import type { ApiError, VisitType } from '@/types';
 
 const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -7,6 +11,8 @@ export const api: AxiosInstance = axios.create({
   baseURL,
   headers: { 'Content-Type': 'application/json' },
   timeout: 20000,
+  // Sends the httpOnly refresh cookie.
+  withCredentials: true,
 });
 
 const TOKEN_KEY = 'portfolio_token';
@@ -29,27 +35,74 @@ interface ErrorBody {
   details?: ApiError['details'];
 }
 
-// Normalise errors + auto-logout on 401
+interface RetriableConfig extends InternalAxiosRequestConfig {
+  _retried?: boolean;
+}
+
+/** Shared in-flight refresh call, so concurrent 401s share one /auth/refresh. */
+let refreshPromise: Promise<string> | null = null;
+
+const refreshAccessToken = (): Promise<string> => {
+  if (!refreshPromise) {
+    refreshPromise = axios
+      .post<{ token: string }>(
+        `${baseURL}/auth/refresh`,
+        {},
+        { withCredentials: true }
+      )
+      .then((res) => {
+        tokenStore.set(res.data.token);
+        return res.data.token;
+      })
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+  return refreshPromise;
+};
+
+const forceLogout = (): void => {
+  tokenStore.clear();
+  // Only bounce to login within the admin area; on public pages a stale token must not yank the visitor off, so we just drop it.
+  const path = window.location.pathname;
+  if (path.startsWith('/admin') && !path.startsWith('/admin/login')) {
+    window.location.href = '/admin/login';
+  }
+};
+
+// On 401, silently refresh via cookie and retry once; else auto-logout.
 api.interceptors.response.use(
   (res) => res,
-  (error: AxiosError<ErrorBody>) => {
+  async (error: AxiosError<ErrorBody>) => {
     const status = error.response?.status;
+    const original = error.config as RetriableConfig | undefined;
+    const url = original?.url || '';
+    const isAuthEndpoint =
+      url.includes('/auth/refresh') || url.includes('/auth/login');
+
+    if (
+      status === 401 &&
+      original &&
+      !original._retried &&
+      !isAuthEndpoint &&
+      tokenStore.get()
+    ) {
+      original._retried = true;
+      try {
+        const token = await refreshAccessToken();
+        original.headers.Authorization = `Bearer ${token}`;
+        return api(original);
+      } catch {
+        forceLogout();
+      }
+    } else if (status === 401 && tokenStore.get()) {
+      forceLogout();
+    }
+
     const message =
       error.response?.data?.message ||
       error.message ||
       'Something went wrong. Please try again.';
-
-    if (status === 401 && tokenStore.get()) {
-      tokenStore.clear();
-      // Only bounce to the login screen from within the admin area. On public
-      // pages a stale token must not yank the visitor off the site — just drop
-      // it and let AuthContext reset state.
-      const path = window.location.pathname;
-      if (path.startsWith('/admin') && !path.startsWith('/admin/login')) {
-        window.location.href = '/admin/login';
-      }
-    }
-
     const normalised: ApiError = {
       status,
       message,
@@ -59,13 +112,7 @@ api.interceptors.response.use(
   }
 );
 
-/**
- * Opaque, cookie-less session id — an ephemeral random token kept in
- * `sessionStorage` (NOT a cookie): it dies when the tab/session closes, is
- * never sent cross-site and carries no personal data, so it lets us count
- * distinct sessions while staying privacy-friendly. Storage failures
- * (private mode) degrade silently to no session id.
- */
+// Opaque sessionStorage id (not a cookie): dies with the tab, privacy-friendly, degrades silently to no id if storage fails (e.g. private mode).
 const SID_KEY = 'portfolio_sid';
 const sessionId = (): string => {
   try {

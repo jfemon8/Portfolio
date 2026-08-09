@@ -2,13 +2,7 @@ import { forwardRef, useState, type InputHTMLAttributes } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/cn';
 
-/**
- * Password field with a built-in show/hide toggle — the single password input
- * for the whole app (project rule #3). A drop-in for `<input>`: forwards its
- * ref and spreads all props, so it works with plain controlled state and with
- * react-hook-form's `register`. `type` is owned by the toggle, so any `type`
- * passed by the caller is ignored.
- */
+// Drop-in for <input> (forwards ref, spreads props) but owns `type` itself — any `type` passed in is ignored.
 const PasswordInput = forwardRef<
   HTMLInputElement,
   InputHTMLAttributes<HTMLInputElement>

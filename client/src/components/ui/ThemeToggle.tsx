@@ -4,22 +4,14 @@ import { Sun, Moon } from 'lucide-react';
 import { useThemeStore } from '@/stores/theme';
 import { cn } from '@/lib/cn';
 
-/**
- * Premium animated theme toggle — the single theme control (project rule
- * #3), driven by the canonical Zustand theme engine (P0). Replaces the
- * legacy useTheme hook in the new shell.
- */
+// Single canonical theme toggle (project rule #3) — driven by the Zustand theme engine; don't duplicate this UI elsewhere.
 export default function ThemeToggle({ className }: { className?: string }) {
   const resolved = useThemeStore((s) => s.resolved);
   const toggle = useThemeStore((s) => s.toggle);
   const reduce = useReducedMotion();
   const isDark = resolved === 'dark';
 
-  /**
-   * Premium animated theme switch via the View Transitions API — a circular
-   * reveal from the click point. Graceful fallback (instant) when the API is
-   * unsupported or the user prefers reduced motion.
-   */
+  // Circular reveal via the View Transitions API from the click point; falls back to an instant toggle when unsupported or reduced-motion is on.
   const onToggle = (e: ReactMouseEvent): void => {
     const start = (
       document as unknown as {

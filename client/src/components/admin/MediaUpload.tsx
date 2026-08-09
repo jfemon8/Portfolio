@@ -20,12 +20,6 @@ interface MediaUploadProps {
   folder?: string;
 }
 
-/**
- * Uploads a single media file — an image OR a PDF — to Cloudinary via the
- * backend `/upload/media` endpoint and reports back { url, publicId } through
- * onChange. Images render as a preview; PDFs render as a chip linking to the
- * proxied (inline) file. Both are optional everywhere this is used.
- */
 export default function MediaUpload({
   value,
   publicId,
@@ -123,7 +117,7 @@ export default function MediaUpload({
         </label>
       )}
       {publicId && (
-        <p className="mt-1 truncate font-mono text-[11px] text-muted-foreground/70">
+        <p className="mt-1 truncate font-mono text-2xs text-muted-foreground/70">
           {publicId}
         </p>
       )}

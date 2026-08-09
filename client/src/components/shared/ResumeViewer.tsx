@@ -5,26 +5,18 @@ import PdfPreviewModal from '@/components/shared/PdfPreviewModal';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
 
 interface ResumeViewerProps {
-  /** Cloudinary URL of the resume PDF; pass profile.resumeUrl. Returns null
-   *  when empty so callers can spread it conditionally without a guard. */
+  /** Cloudinary URL of the resume PDF (profile.resumeUrl); component renders null when empty so callers can use it unconditionally. */
   url?: string;
-  /** Overrides the button label (defaults to site-copy `hero.ctaViewResume`,
-   *  falling back to "View Resume"). */
+  /** Overrides the button label; defaults to site-copy hero.ctaViewResume, falling back to "View Resume". */
   label?: string;
   variant?: 'default' | 'outline' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   className?: string;
-  /** Reserved for future analytics — not wired right now since the
-   *  `VisitType` union doesn't yet include a "resume_view" event. */
+  /** Reserved for future analytics; not wired yet since VisitType doesn't include a "resume_view" event. */
   trackSource?: string;
 }
 
-/**
- * Public-side "View Resume" affordance — opens the lazy `PdfPreviewModal`
- * with the full PDF viewer (zoom, page jump, fullscreen, download from the
- * toolbar). Returns nothing when `url` is empty, so callers can render it
- * unconditionally and it self-hides until the admin uploads a resume.
- */
+// Renders nothing when url is empty, so it self-hides until the admin uploads a resume.
 export default function ResumeViewer({
   url,
   label,

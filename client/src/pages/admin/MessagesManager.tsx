@@ -135,7 +135,7 @@ export default function MessagesManager() {
         <EmptyState message="No messages here." />
       )}
 
-      <div className="grid gap-4 lg:grid-cols-[380px_1fr]">
+      <div className="grid gap-4 lg:grid-cols-[23.75rem_1fr]">
         <div className={cn('space-y-2', active && 'hidden lg:block')}>
           {messages.map((m) => (
             <button
@@ -154,7 +154,7 @@ export default function MessagesManager() {
                   <span className="truncate font-semibold text-foreground">
                     {m.name}
                   </span>
-                  <span className="shrink-0 text-[11px] text-muted-foreground/60">
+                  <span className="shrink-0 text-2xs text-muted-foreground/60">
                     {formatDate(m.createdAt)}
                   </span>
                 </div>
@@ -294,7 +294,7 @@ export default function MessagesManager() {
                       }
                     />
                   </div>
-                  <p className="text-[11px] text-muted-foreground/70">
+                  <p className="text-2xs text-muted-foreground/70">
                     Sent by email to {active.email}, with the original message
                     quoted below your reply.
                   </p>

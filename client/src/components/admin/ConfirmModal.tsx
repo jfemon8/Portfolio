@@ -24,8 +24,7 @@ interface ConfirmOptions {
   confirmLabel?: string;
   cancelLabel?: string;
   variant?: 'danger' | 'warning' | 'info';
-  /** Ask the user to type this exact text to enable Confirm. Good for
-   *  bulk or irreversible actions. */
+  /** Text the user must type to enable Confirm — for bulk or irreversible actions. */
   requireTypeToConfirm?: string;
 }
 
@@ -46,7 +45,7 @@ const variantStyles = {
   danger: {
     iconBg: 'bg-gradient-to-br from-red-500 to-rose-600 text-white',
     iconRing: 'ring-red-500/20 dark:ring-red-500/30',
-    iconGlow: 'shadow-[0_0_40px_-8px_rgba(239,68,68,0.6)]',
+    iconGlow: 'shadow-[0_0_2.5rem_-0.5rem_rgba(239,68,68,0.6)]',
     button:
       'bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white shadow-lg shadow-red-600/25',
     accent: 'from-red-500/10 via-rose-500/5 to-transparent',
@@ -56,7 +55,7 @@ const variantStyles = {
   warning: {
     iconBg: 'bg-gradient-to-br from-amber-500 to-orange-600 text-white',
     iconRing: 'ring-amber-500/20 dark:ring-amber-500/30',
-    iconGlow: 'shadow-[0_0_40px_-8px_rgba(245,158,11,0.6)]',
+    iconGlow: 'shadow-[0_0_2.5rem_-0.5rem_rgba(245,158,11,0.6)]',
     button:
       'bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white shadow-lg shadow-amber-600/25',
     accent: 'from-amber-500/10 via-orange-500/5 to-transparent',
@@ -66,7 +65,7 @@ const variantStyles = {
   info: {
     iconBg: 'bg-gradient-to-br from-sky-500 to-blue-600 text-white',
     iconRing: 'ring-sky-500/20 dark:ring-sky-500/30',
-    iconGlow: 'shadow-[0_0_40px_-8px_rgba(14,165,233,0.6)]',
+    iconGlow: 'shadow-[0_0_2.5rem_-0.5rem_rgba(14,165,233,0.6)]',
     button:
       'bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white shadow-lg shadow-sky-600/25',
     accent: 'from-sky-500/10 via-blue-500/5 to-transparent',
@@ -81,16 +80,7 @@ const variantIconFallback = {
   info: Info,
 } as const;
 
-/**
- * Project-wide confirmation modal (ported from RDSWA). Provides a
- * `useConfirm()` hook that returns a Promise-based `confirm()` — far
- * better UX than the native `window.confirm()`. Variants (`danger` /
- * `warning` / `info`) drive colour + icon; `requireTypeToConfirm` adds
- * a type-to-confirm gate for high-stakes deletes (super-admin etc.).
- *
- *   const confirm = useConfirm();
- *   if (await confirm({ message: 'Delete?', variant: 'danger' })) { … }
- */
+// Promise-based useConfirm() hook standing in for window.confirm(); variant drives icon/colour, requireTypeToConfirm gates high-stakes deletes.
 export function ConfirmProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<{
     options: ConfirmOptions;
@@ -289,13 +279,7 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
                         value={typedText}
                         onChange={(e) => setTypedText(e.target.value)}
                         autoFocus
-                        // `focus-visible:ring-0 focus-visible:ring-offset-0`
-                        // suppresses the global 4-px-out ring (defined in
-                        // index.css) so it doesn't compound with this
-                        // input's own `focus:ring-2 focus:ring-*/30`
-                        // colour-coded ring and visually leak through the
-                        // modal's `backdrop-blur-xl` stacking context.
-                        // Same pattern as the CommandPalette search input.
+                        // Suppresses the global ring so it doesn't stack with this input's own colour-coded ring (same pattern as CommandPalette).
                         className={cn(
                           'w-full rounded-lg border bg-background px-3 py-2 font-mono text-sm transition-colors focus:outline-none focus:ring-2 focus-visible:ring-offset-0',
                           typeMatches && typedText

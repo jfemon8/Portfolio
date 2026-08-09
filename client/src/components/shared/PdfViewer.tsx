@@ -30,15 +30,7 @@ interface PdfViewerProps {
   allowFullscreen?: boolean;
 }
 
-/**
- * Continuous-scroll PDF viewer (ported from RDSWA). All pages stack
- * vertically; scroll to navigate. Desktop-optimized with keyboard
- * shortcuts (Ctrl + / − / 0), spacious toolbar, page separators, and
- * fit-to-width rendering. Mobile gets pinch-to-zoom and a 60dvh height
- * cap. Uses the PDF URL directly — the portfolio's resume upload now
- * stores Cloudinary `.pdf` public_ids, so the CDN serves with the
- * correct `application/pdf` Content-Type without needing a proxy.
- */
+// Loads the PDF URL directly since Cloudinary serves `.pdf` public_ids with the correct `application/pdf` Content-Type.
 export default function PdfViewer({
   url,
   fileName,
@@ -57,20 +49,11 @@ export default function PdfViewer({
   const [pageInput, setPageInput] = useState('');
   const pageInputRef = useRef<HTMLInputElement>(null);
 
-  // Route both view and download via the backend proxy: Cloudinary raw
-  // assets serve `application/octet-stream` directly, which breaks both
-  // inline preview (react-pdf can't render the blob) and filename-keeping
-  // downloads. The proxy re-streams with `application/pdf` + a proper
-  // `Content-Disposition` filename. Strategy adopted from RDSWA.
+  // Proxied because Cloudinary raw assets serve `application/octet-stream`, breaking inline preview and filename-keeping downloads.
   const displayName =
     fileName || url.split('/').pop()?.split('?')[0] || 'document.pdf';
 
-  // The toolbar shows `displayName` (e.g. "Resume" reads cleaner than
-  // "Resume.pdf"), but the DOWNLOAD filename must keep an extension —
-  // otherwise the browser saves it as `Resume` with no ext, the OS can't
-  // identify the file type, and opening fails. Derive: keep displayName
-  // if it already has an extension; otherwise inherit the URL's
-  // extension (falling back to `.pdf` since this viewer is PDF-only).
+  // Downloads need an extension for the OS to identify the file type, so keep displayName's if present, else fall back to the URL's (or `.pdf`).
   const urlExtMatch = url.match(/\.([a-z0-9]{1,8})(?:$|\?)/i);
   const urlExt = urlExtMatch ? `.${urlExtMatch[1]}` : '.pdf';
   const downloadName = /\.[a-z0-9]{1,8}$/i.test(displayName)
@@ -241,11 +224,7 @@ export default function PdfViewer({
     <div
       ref={wrapperRef}
       tabIndex={-1}
-      // Flex-column wrapper: the toolbar is `shrink-0`, the scrollable
-      // document area is `flex-1 min-h-0` so it can shrink below its
-      // content size (mandatory for nested overflow:auto to actually
-      // scroll). The parent (PdfPreviewModal card / fullscreen frame /
-      // any caller) sets the wrapper's HEIGHT; the inner panes share it.
+      // `flex-1 min-h-0` lets the pane shrink below its content size, which nested `overflow-auto` needs to actually scroll.
       className={`flex h-full select-none flex-col overflow-hidden rounded-xl border border-border bg-card outline-none ${
         fullscreen ? 'fixed inset-0 z-[100] rounded-none border-0' : ''
       }`}
@@ -255,7 +234,7 @@ export default function PdfViewer({
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <FileText className="hidden h-4 w-4 shrink-0 text-red-500 sm:block" />
           <span
-            className="hidden max-w-[120px] truncate text-xs font-medium text-foreground sm:block sm:max-w-[200px] sm:text-sm lg:max-w-[300px]"
+            className="hidden max-w-[7.5rem] truncate text-xs font-medium text-foreground sm:block sm:max-w-[12.5rem] sm:text-sm lg:max-w-[18.75rem]"
             title={displayName}
           >
             {displayName}
@@ -284,13 +263,7 @@ export default function PdfViewer({
                     setPageInput('');
                   }
                 }}
-                // `focus-visible:ring-offset-0` cancels the global 2-px
-                // ring-offset gap (index.css :focus-visible base rule) so
-                // it doesn't compound with this input's own
-                // `focus:ring-2 focus:ring-primary/40` ring when the
-                // viewer is rendered inside the PdfPreviewModal's
-                // backdrop-blurred overlay (or any modal). Same pattern
-                // as the ConfirmModal type-to-confirm input.
+                // `focus-visible:ring-offset-0` cancels the global ring-offset (index.css) so it doesn't compound with this input's own focus ring.
                 className="w-14 rounded-md border border-border bg-background px-2 py-1 text-center text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus-visible:ring-offset-0"
               />
               <span className="text-xs text-muted-foreground">
@@ -354,7 +327,7 @@ export default function PdfViewer({
           <button
             type="button"
             onClick={resetZoom}
-            className="min-w-[40px] rounded-md px-1.5 py-1 text-center text-[11px] tabular-nums text-muted-foreground hover:bg-accent"
+            className="min-w-[2.5rem] rounded-md px-1.5 py-1 text-center text-2xs tabular-nums text-muted-foreground hover:bg-accent"
             title="Reset zoom (Ctrl+0)"
           >
             {Math.round(scale * 100)}%
@@ -468,7 +441,7 @@ export default function PdfViewer({
                   </div>
                   {numPages > 1 && (
                     <div className="mt-2 flex justify-center sm:mt-3">
-                      <span className="text-[10px] tabular-nums text-muted-foreground/50 sm:text-[11px]">
+                      <span className="text-3xs tabular-nums text-muted-foreground/50 sm:text-2xs">
                         {pageNum}
                       </span>
                     </div>

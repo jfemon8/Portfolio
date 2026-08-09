@@ -16,7 +16,7 @@ function Pipeline({ stages }: { stages: string[] }) {
   return (
     <div
       aria-hidden
-      className="mb-12 flex flex-wrap items-center gap-2 font-mono text-[11px] text-muted-foreground"
+      className="mb-12 flex flex-wrap items-center gap-2 font-mono text-2xs text-muted-foreground"
     >
       {stages.map((s, i) => (
         <div key={s} className="flex items-center gap-2">
@@ -41,11 +41,7 @@ function Pipeline({ stages }: { stages: string[] }) {
   );
 }
 
-/**
- * Dedicated research showcase — premium publication cards + a decorative
- * pipeline motif. Self-hides when there are no publications (admin-managed).
- * Reuses Section/GlassCard/Reveal (project rule #3/#8).
- */
+// Self-hides when there are no publications (admin-managed content).
 export default function Research() {
   const { data } = usePublications();
   const pubs = data?.data ?? [];

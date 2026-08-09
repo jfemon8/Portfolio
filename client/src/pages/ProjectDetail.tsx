@@ -71,7 +71,7 @@ export default function ProjectDetail() {
     );
   if (isError || !p)
     return (
-      <div className="container-x py-32 text-center">
+      <div className="container-x py-4 text-center">
         <ErrorState
           message={st.projectNotFound}
           onRetry={() => void refetch()}
@@ -196,7 +196,7 @@ export default function ProjectDetail() {
                     value={m.value}
                     className="block text-2xl font-extrabold text-neon"
                   />
-                  <p className="mt-1 text-[11px] uppercase tracking-wide text-muted-foreground/70">
+                  <p className="mt-1 text-2xs uppercase tracking-wide text-muted-foreground/70">
                     {m.label}
                   </p>
                 </GlassCard>

@@ -1,5 +1,6 @@
 import { useId } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
+import { useSkipEntranceIfVisible } from '@/hooks/useSkipEntranceIfVisible';
 import { cn } from '@/lib/cn';
 
 interface SparkAreaProps {
@@ -9,17 +10,16 @@ interface SparkAreaProps {
   ariaLabel?: string;
 }
 
-/**
- * Lightweight SVG area+line chart (project rule #3/#5). No chart library —
- * keeps the public bundle lean (recharts stays admin-only/lazy). Theme-token
- * coloured via `currentColor`; Motion.dev path-draw, reduced-motion-safe.
- */
+/** Hand-rolled SVG chart, no library, to keep the public bundle lean — recharts stays admin-only/lazy. */
 export default function SparkArea({
   data,
   className,
   ariaLabel,
 }: SparkAreaProps) {
   const reduce = useReducedMotion();
+  const { ref, skip: alreadyVisible } =
+    useSkipEntranceIfVisible<SVGSVGElement>();
+  const skip = reduce || alreadyVisible;
   const gid = useId();
   if (data.length < 2) return null;
 
@@ -38,6 +38,7 @@ export default function SparkArea({
 
   return (
     <svg
+      ref={ref}
       viewBox={`0 0 ${W} ${H}`}
       preserveAspectRatio="none"
       role="img"
@@ -59,7 +60,7 @@ export default function SparkArea({
         strokeLinecap="round"
         strokeLinejoin="round"
         vectorEffect="non-scaling-stroke"
-        initial={reduce ? false : { pathLength: 0 }}
+        initial={skip ? false : { pathLength: 0 }}
         whileInView={{ pathLength: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}

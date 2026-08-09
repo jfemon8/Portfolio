@@ -35,11 +35,21 @@ export default function ProfileManager() {
   const [rolesText, setRolesText] = useState('');
   const [resumeBusy, setResumeBusy] = useState(false);
   const [resumeViewerOpen, setResumeViewerOpen] = useState(false);
+  const [arrKeys, setArrKeys] = useState<Record<FlatArrayKey, string[]>>({
+    stats: [],
+    languages: [],
+  });
+  const [socialKeys, setSocialKeys] = useState<string[]>([]);
 
   useEffect(() => {
     if (!data?.data) return;
     setF(data.data);
     setRolesText((data.data.roles ?? []).join('\n'));
+    setArrKeys({
+      stats: (data.data.stats ?? []).map(() => crypto.randomUUID()),
+      languages: (data.data.languages ?? []).map(() => crypto.randomUUID()),
+    });
+    setSocialKeys((data.data.socials ?? []).map(() => crypto.randomUUID()));
   }, [data]);
 
   const save = useMutation({
@@ -71,13 +81,20 @@ export default function ProfileManager() {
       return { ...p, [key]: arr };
     });
 
-  const addArr = (key: FlatArrayKey, obj: Record<string, string>): void =>
+  const addArr = (key: FlatArrayKey, obj: Record<string, string>): void => {
     setF((p) => (p ? { ...p, [key]: [...(p[key] as unknown[]), obj] } : p));
+    setArrKeys((k) => ({ ...k, [key]: [...k[key], crypto.randomUUID()] }));
+  };
 
-  const delArr = (key: FlatArrayKey, idx: number): void =>
+  const delArr = (key: FlatArrayKey, idx: number): void => {
     setF((p) =>
       p ? { ...p, [key]: (p[key] as unknown[]).filter((_, i) => i !== idx) } : p
     );
+    setArrKeys((k) => ({
+      ...k,
+      [key]: k[key].filter((_, i) => i !== idx),
+    }));
+  };
 
   /** Socials get their own setters — they carry image-upload fields too,
    *  so the generic `Record<string,string>` setArr doesn't fit cleanly. */
@@ -95,7 +112,7 @@ export default function ProfileManager() {
       return { ...p, socials: arr };
     });
 
-  const addSocial = (): void =>
+  const addSocial = (): void => {
     setF((p) =>
       p
         ? {
@@ -113,11 +130,15 @@ export default function ProfileManager() {
           }
         : p
     );
+    setSocialKeys((k) => [...k, crypto.randomUUID()]);
+  };
 
-  const delSocial = (idx: number): void =>
+  const delSocial = (idx: number): void => {
     setF((p) =>
       p ? { ...p, socials: p.socials.filter((_, i) => i !== idx) } : p
     );
+    setSocialKeys((k) => k.filter((_, i) => i !== idx));
+  };
 
   const uploadResume = async (file?: File): Promise<void> => {
     if (!file) return;
@@ -223,7 +244,7 @@ export default function ProfileManager() {
             <div className="space-y-2">
               {(f.stats ?? []).map((s, i) => (
                 <div
-                  key={i}
+                  key={arrKeys.stats[i] ?? i}
                   className="flex flex-col gap-2 sm:flex-row sm:items-center"
                 >
                   <input
@@ -275,7 +296,7 @@ export default function ProfileManager() {
             <div className="space-y-2">
               {(f.languages ?? []).map((l, i) => (
                 <div
-                  key={i}
+                  key={arrKeys.languages[i] ?? i}
                   className="flex flex-col gap-2 sm:flex-row sm:items-center"
                 >
                   <input
@@ -390,14 +411,14 @@ export default function ProfileManager() {
                 <Plus className="h-4 w-4" /> Add
               </Button>
             </div>
-            <p className="mb-4 text-[11px] text-muted-foreground/70">
+            <p className="mb-4 text-2xs text-muted-foreground/70">
               Icon is auto-picked from the Label (e.g. GitHub, LinkedIn, Email).
               Upload an image only if you want to override it.
             </p>
             <div className="space-y-4">
               {f.socials.map((s, i) => (
                 <div
-                  key={i}
+                  key={socialKeys[i] ?? i}
                   className="rounded-xl border border-border bg-muted/30 p-4"
                 >
                   <div className="grid gap-3 sm:grid-cols-2">

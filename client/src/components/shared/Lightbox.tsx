@@ -22,11 +22,6 @@ interface LightboxProps {
   onClose: () => void;
 }
 
-/**
- * Accessible image lightbox (project rule #3). Esc / backdrop / × close,
- * ← / → (or on-screen arrows) navigate, body scroll-locked while open.
- * Motion.dev only; reduced-motion-safe.
- */
 export default function Lightbox({
   images,
   open,
@@ -72,12 +67,7 @@ export default function Lightbox({
           exit={reduce ? undefined : { opacity: 0 }}
           transition={{ duration: 0.2 }}
           onClick={onClose}
-          // `data-lenis-prevent` — Lightbox is opened from public routes
-          // (e.g. ProjectDetail gallery) where PublicLayout wraps everything
-          // in <SmoothScroll>/Lenis. Without this, wheel + touch events on
-          // the overlay bubble to the document, and Lenis hijacks them to
-          // scroll the page beneath instead of staying contained. Same
-          // pattern as PdfPreviewModal.
+          // Without data-lenis-prevent, wheel/touch on the overlay bubbles to the document and Lenis scrolls the page beneath instead.
           data-lenis-prevent
           className="fixed inset-0 z-[70] grid place-items-center bg-background/90 p-4 backdrop-blur-xl sm:p-8"
         >

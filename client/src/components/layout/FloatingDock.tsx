@@ -46,11 +46,7 @@ export default function FloatingDock() {
     items: [] as { key: string; label: string }[],
   });
 
-  // Scroll-spy: rAF-throttled scroll listener — works regardless of when
-  // section elements actually mount (the previous IntersectionObserver
-  // attached once on mount, so it silently observed nothing if Home was
-  // still showing its loading spinner at that moment, leaving the dock
-  // permanently stuck on "Home").
+  // rAF-throttled scroll listener — IntersectionObserver missed late-mounting sections.
   useEffect(() => {
     if (pathname !== '/') {
       // Drop stale activeSection so the next visit to Home starts fresh.
@@ -60,8 +56,7 @@ export default function FloatingDock() {
     let raf = 0;
     const update = (): void => {
       raf = 0;
-      // The "active line" sits ~30% from the top of the viewport: a section
-      // becomes active once its TOP crosses above this line.
+      // A section becomes active once its top crosses ~30% down the viewport.
       const anchor = window.innerHeight * 0.3;
       let current = SECTION_IDS[0] ?? 'hero';
       for (const id of SECTION_IDS) {
@@ -89,11 +84,10 @@ export default function FloatingDock() {
     if (target.startsWith('#')) {
       const id = target.slice(1);
       if (pathname !== '/') {
-        // Use the URL hash so PublicLayout's hash-aware effect performs the
-        // scroll (it polls for late-mounting sections). Avoids the race
-        // between navigate() and a fixed setTimeout(scrollToId).
-        // Hero = top of home; navigate without hash to keep the URL clean.
-        navigate(id === 'hero' ? '/' : `/${target}`);
+        // instant: skip the smooth-scroll-through, land directly on the target.
+        navigate(id === 'hero' ? '/' : `/${target}`, {
+          state: { instant: true },
+        });
       } else {
         scrollToId(id);
       }
@@ -112,9 +106,10 @@ export default function FloatingDock() {
       initial={{ y: 80, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: 0.4, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed inset-x-0 bottom-5 z-50 flex justify-center px-4"
+      // Adds the safe-area inset so the dock clears the home-indicator on notched phones.
+      className="fixed inset-x-0 bottom-[calc(1.25rem+env(safe-area-inset-bottom))] z-50 flex justify-center px-4"
     >
-      <div className="no-scrollbar flex max-w-full items-center gap-1 overflow-x-auto rounded-2xl border border-border/70 bg-card/80 p-1.5 backdrop-blur-xl shadow-[0_24px_70px_-25px_rgba(0,0,0,0.85)] sm:p-2">
+      <div className="no-scrollbar flex max-w-full items-center gap-1 overflow-x-auto rounded-2xl border border-border/70 bg-card/80 p-1.5 backdrop-blur-xl shadow-[0_1.5rem_4.375rem_-1.5625rem_hsl(var(--shadow-color)/var(--shadow-strength))] sm:p-2">
         {ITEMS.map((item) => {
           const active = isActive(item.target);
           const label =
@@ -133,7 +128,7 @@ export default function FloatingDock() {
               aria-current={active ? 'page' : undefined}
               title={label}
               className={cn(
-                'group relative flex items-center gap-2 rounded-xl px-2.5 py-2 text-sm transition-colors sm:px-3',
+                'group relative flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl px-2.5 py-2 text-sm transition-colors sm:min-h-9 sm:min-w-0 sm:px-3',
                 active
                   ? 'text-primary'
                   : 'text-muted-foreground hover:text-foreground'
@@ -152,7 +147,7 @@ export default function FloatingDock() {
           );
         })}
         <span className="mx-1 h-6 w-px shrink-0 bg-border/70" />
-        <ThemeToggle className="h-9 w-9 shrink-0 border-0 bg-transparent" />
+        <ThemeToggle className="h-11 w-11 shrink-0 border-0 bg-transparent sm:h-9 sm:w-9" />
       </div>
     </motion.nav>
   );

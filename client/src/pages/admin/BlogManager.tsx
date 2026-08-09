@@ -73,7 +73,7 @@ export default function BlogManager() {
                 {p.title}
                 <span
                   className={cn(
-                    'ml-2 align-middle text-[11px]',
+                    'ml-2 align-middle text-2xs',
                     p.status === 'published'
                       ? 'text-neon'
                       : p.status === 'scheduled'

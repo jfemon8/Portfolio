@@ -7,10 +7,6 @@ interface PageHeaderProps {
   action?: ReactNode;
 }
 
-/**
- * Shared premium admin page header (same API — instant cohesion across every
- * manager; project rule #3/#8). Token-driven + subtle reveal.
- */
 export default function PageHeader({
   title,
   subtitle,

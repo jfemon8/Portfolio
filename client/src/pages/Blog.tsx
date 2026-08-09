@@ -113,7 +113,7 @@ export default function Blog() {
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <div className="grid h-full place-items-center bg-grid [background-size:34px_34px] font-mono text-2xl text-border">
+                      <div className="grid h-full place-items-center bg-grid [background-size:2.125rem_2.125rem] font-mono text-2xl text-border">
                         {'{ }'}
                       </div>
                     )}
@@ -124,7 +124,7 @@ export default function Blog() {
                       {post.tags.slice(0, 3).map((t) => (
                         <span
                           key={t}
-                          className="rounded-full border border-border/60 bg-card/60 px-2.5 py-0.5 text-[11px] text-muted-foreground"
+                          className="rounded-full border border-border/60 bg-card/60 px-2.5 py-0.5 text-2xs text-muted-foreground"
                         >
                           #{t}
                         </span>

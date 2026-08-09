@@ -34,11 +34,7 @@ const empty: FormState = {
 type FieldKey = 'name' | 'email' | 'password';
 type FieldErrors = Partial<Record<FieldKey, string>>;
 
-/**
- * App-styled validation — returns a per-field message map (empty = valid) so
- * errors render as inline copy instead of the browser's native bubbles. Email
- * and password only apply on create (both are locked/hidden while editing).
- */
+// Per-field message map (empty = valid) renders as inline copy instead of native bubbles; email/password only apply on create.
 const validate = (f: FormState, editing: boolean): FieldErrors => {
   const e: FieldErrors = {};
   if (!f.name.trim()) e.name = "Please enter the user's name.";
@@ -113,8 +109,7 @@ export default function UsersManager() {
     if (Object.keys(errs).length) return;
     (editing ? update : create).mutate(form);
   };
-  // Update a field and clear its error so the message disappears as the user
-  // fixes it (matches the inline-validation feel of the Login form).
+  // Clears the field's error on change, matching the Login form's inline-validation feel.
   const setField = (key: FieldKey, value: string): void => {
     setForm((f) => (f ? { ...f, [key]: value } : f));
     setErrors((x) => ({ ...x, [key]: undefined }));
@@ -138,7 +133,7 @@ export default function UsersManager() {
 
   const badge = (tone: 'neon' | 'muted' | 'warn') =>
     cn(
-      'rounded-full px-0.5 md:px-2.5 py-0.5 text-[11px] font-medium capitalize',
+      'rounded-full px-0.5 md:px-2.5 py-0.5 text-2xs font-medium capitalize',
       tone === 'neon' && 'border border-primary/40 bg-primary/10 text-primary',
       tone === 'muted' && 'border border-border/70 text-muted-foreground',
       tone === 'warn' &&

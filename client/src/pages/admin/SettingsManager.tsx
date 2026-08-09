@@ -426,7 +426,7 @@ export default function SettingsManager() {
                     </li>
                   ))}
                 </ul>
-                <p className="mt-2 text-[11px] text-muted-foreground/70">
+                <p className="mt-2 text-2xs text-muted-foreground/70">
                   The hero section always shows first.
                 </p>
               </div>

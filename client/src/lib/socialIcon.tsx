@@ -23,8 +23,7 @@ const iconMap: Record<string, LucideIcon> = {
   code: Code2,
 };
 
-/** Best-effort iconKey match from an arbitrary string (a url or a label).
- *  Returns null when nothing matches so callers can fall through. */
+// Best-effort iconKey match from an arbitrary string; null when nothing matches.
 const matchIconKey = (s: string): string | null => {
   const l = s.toLowerCase();
   for (const key of Object.keys(iconMap)) {
@@ -43,12 +42,7 @@ const matchIconKey = (s: string): string | null => {
   return null;
 };
 
-/** Derive a built-in iconKey for a social link. The `url` (the real
- *  destination) is checked FIRST so the icon always matches where the link
- *  actually goes — even if the label was mistyped or the label/url pair was
- *  entered swapped (which showed e.g. a GitHub icon opening LinkedIn). Falls
- *  back to the label, then a neutral `code` glyph. Internal to this file so
- *  the module stays component-only for react-refresh. */
+// Checks url before label so a mistyped/swapped label can't show the wrong icon.
 const deriveIconKey = (social: Social): string =>
   matchIconKey(social.url ?? '') ?? matchIconKey(social.label ?? '') ?? 'code';
 
@@ -57,15 +51,7 @@ interface SocialIconProps {
   className?: string;
 }
 
-/**
- * Renders a social-link icon with this priority chain:
- *   1. `social.iconImage`  — admin-uploaded Cloudinary URL (wins outright)
- *   2. auto-derive         — match on the `url` first, then the `label`
- *
- * The url is the destination, so matching it first keeps the icon truthful to
- * where the link goes. Legacy `social.icon` values are intentionally ignored
- * so old saved rows cannot drift out of sync with the current label/url pair.
- */
+// social.iconImage wins if set, else auto-derive; legacy social.icon is intentionally ignored.
 export function SocialIcon({ social, className = 'h-5 w-5' }: SocialIconProps) {
   if (social.iconImage) {
     return (

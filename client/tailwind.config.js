@@ -6,22 +6,16 @@ export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
     extend: {
-      // P13.1 — small-phone + ultrawide tiers (merge with the defaults
-      // sm/md/lg/xl/2xl; Tailwind sorts by min-width so order is correct).
+      // Small-phone + ultrawide tiers, merged with the sm/md/lg/xl/2xl defaults.
       screens: {
         xs: '400px',
         '3xl': '1920px',
       },
-      /**
-       * P13.1 — fluid type scale. Display steps (2xl→7xl) interpolate
-       * MIN@360px → MAX@1280px: headings shrink to fit phones and are
-       * pixel-identical to the previous fixed Tailwind defaults at ≥1280px
-       * (desktop design 100% unchanged). Body steps (xs/sm/base/lg/xl) are
-       * intentionally left at the Tailwind defaults (legibility — no fluid
-       * body reflow). Line-heights mirror the Tailwind defaults so ≥1280px
-       * renders byte-identical.
-       */
+      // Fluid display type (2xl-7xl): interpolates 360px->1280px, then matches
+      // the fixed Tailwind default above 1280px. Body sizes stay fixed.
       fontSize: {
+        '2xs': ['0.6875rem', { lineHeight: '1rem' }],
+        '3xs': ['0.625rem', { lineHeight: '0.875rem' }],
         '2xl': [
           'clamp(1.25rem, 1.152rem + 0.435vw, 1.5rem)',
           { lineHeight: '2rem' },
@@ -34,10 +28,7 @@ export default {
           'clamp(1.6875rem, 1.467rem + 0.978vw, 2.25rem)',
           { lineHeight: '2.5rem' },
         ],
-        '5xl': [
-          'clamp(2rem, 1.609rem + 1.739vw, 3rem)',
-          { lineHeight: '1' },
-        ],
+        '5xl': ['clamp(2rem, 1.609rem + 1.739vw, 3rem)', { lineHeight: '1' }],
         '6xl': [
           'clamp(2.375rem, 1.837rem + 2.391vw, 3.75rem)',
           { lineHeight: '1' },
@@ -109,10 +100,10 @@ export default {
         },
       },
       borderRadius: {
-        xl: 'calc(var(--radius) + 4px)',
+        xl: 'calc(var(--radius) + 0.25rem)',
         lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+        md: 'calc(var(--radius) - 0.125rem)',
+        sm: 'calc(var(--radius) - 0.25rem)',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'Segoe UI', 'sans-serif'],
@@ -120,18 +111,13 @@ export default {
         mono: ['"JetBrains Mono"', '"Fira Code"', 'ui-monospace', 'monospace'],
       },
       boxShadow: {
-        neon: '0 0 0 1px rgba(0,255,209,.15), 0 8px 40px -8px rgba(0,255,209,.35)',
+        neon: '0 0 0 0.0625rem rgba(0,255,209,.15), 0 0.5rem 2.5rem -0.5rem rgba(0,255,209,.35)',
         'neon-violet':
-          '0 0 0 1px rgba(168,85,247,.18), 0 8px 40px -8px rgba(168,85,247,.4)',
-        card: '0 1px 0 0 rgba(255,255,255,.04) inset, 0 12px 40px -16px rgba(0,0,0,.8)',
-        glow: '0 0 60px -12px hsl(var(--ring) / 0.55)',
-        // P13.5 — theme-aware lifted-card glow (hairline + directional drop).
-        // Used by .glass-hover + GlassCard interactive.
-        'neon-glow':
-          '0 0 0 1px hsl(var(--primary) / 0.18), 0 28px 60px -20px hsl(var(--primary) / 0.4)',
+          '0 0 0 0.0625rem rgba(168,85,247,.18), 0 0.5rem 2.5rem -0.5rem rgba(168,85,247,.4)',
+        glow: '0 0 3.75rem -0.75rem hsl(var(--ring) / 0.55)',
       },
       backgroundImage: {
-        grid: 'linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px)',
+        grid: 'linear-gradient(rgba(255,255,255,.035) 0.0625rem,transparent 0.0625rem),linear-gradient(90deg,rgba(255,255,255,.035) 0.0625rem,transparent 0.0625rem)',
         'neon-gradient':
           'linear-gradient(135deg,#00ffd1 0%,#38bdf8 45%,#a855f7 100%)',
         'radial-fade':
@@ -141,15 +127,15 @@ export default {
         'radial-fade-light':
           'radial-gradient(ellipse 80% 60% at 50% -10%,rgba(0,191,163,.18),transparent 60%)',
       },
-      backgroundSize: { grid: '40px 40px' },
+      backgroundSize: { grid: '2.5rem 2.5rem' },
       keyframes: {
         'fade-up': {
-          '0%': { opacity: 0, transform: 'translateY(20px)' },
+          '0%': { opacity: 0, transform: 'translateY(1.25rem)' },
           '100%': { opacity: 1, transform: 'translateY(0)' },
         },
         float: {
           '0%,100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-12px)' },
+          '50%': { transform: 'translateY(-0.75rem)' },
         },
         'pulse-slow': {
           '0%,100%': { opacity: 0.4 },

@@ -6,10 +6,7 @@ type AsyncFn = (
   next: NextFunction
 ) => Promise<unknown>;
 
-/**
- * Wraps an async route handler so rejected promises are forwarded to the
- * Express error middleware instead of crashing the process.
- */
+// Forwards rejected promises to Express's error middleware instead of crashing the process.
 export const asyncHandler =
   (fn: AsyncFn): RequestHandler =>
   (req, res, next) =>

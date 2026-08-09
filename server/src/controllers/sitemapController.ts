@@ -6,12 +6,7 @@ import { Profile } from '../models/Profile.js';
 import { publicVisibility } from './blogController.js';
 import { env } from '../config/env.js';
 
-/**
- * Dynamic XML sitemap. Generated per-request (Vercel serverless has no cron),
- * reusing the SAME public-visibility filter as the blog API so a sitemap URL
- * is never out of step with what is actually reachable (project rule #3/#8).
- * The frontend exposes it at the canonical origin via a `vercel.json` rewrite.
- */
+// Dynamic XML sitemap, generated per-request (Vercel has no cron) — reuses the blog API's public-visibility filter so URLs never outpace what's reachable; exposed via a vercel.json rewrite.
 const SITE = env.clientOrigins[0] ?? 'http://localhost:5173';
 
 const XML_ENTITIES: Record<string, string> = {

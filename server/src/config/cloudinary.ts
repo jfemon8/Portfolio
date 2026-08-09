@@ -1,18 +1,23 @@
 import { v2 as cloudinary } from 'cloudinary';
 import { env } from './env.js';
 
-if (env.cloudinary.configured) {
-  cloudinary.config({
-    cloud_name: env.cloudinary.cloudName,
-    api_key: env.cloudinary.apiKey,
-    api_secret: env.cloudinary.apiSecret,
-    secure: true,
-  });
-} else {
-  console.warn(
-    '⚠️  Cloudinary is not configured — image uploads will be disabled. ' +
-      'See docs/02-CLOUDINARY-SETUP.md'
-  );
+let configured = false;
+function ensureConfigured(): void {
+  if (configured) return;
+  configured = true;
+  if (env.cloudinary.configured) {
+    cloudinary.config({
+      cloud_name: env.cloudinary.cloudName,
+      api_key: env.cloudinary.apiKey,
+      api_secret: env.cloudinary.apiSecret,
+      secure: true,
+    });
+  } else {
+    console.warn(
+      '⚠️  Cloudinary is not configured — image uploads will be disabled. ' +
+        'See docs/02-CLOUDINARY-SETUP.md'
+    );
+  }
 }
 
 export type CloudinaryResourceType = 'image' | 'raw' | 'auto';
@@ -29,11 +34,11 @@ export interface UploadResult {
   resourceType: string;
 }
 
-/** Upload an in-memory file buffer (from multer) to Cloudinary. */
 export function uploadBuffer(
   buffer: Buffer,
   { folder, publicId, resourceType = 'image' }: UploadOptions = {}
 ): Promise<UploadResult> {
+  ensureConfigured();
   return new Promise((resolve, reject) => {
     if (!env.cloudinary.configured) {
       return reject(new Error('Cloudinary is not configured on the server.'));
@@ -68,10 +73,10 @@ export async function destroyAsset(
   publicId?: string,
   resourceType?: CloudinaryResourceType
 ): Promise<void> {
-  if (!publicId || !env.cloudinary.configured) return;
-  // The SDK defaults resource_type to 'image', which never matches a `raw`
-  // asset — so PDFs (stored with a `.pdf`-suffixed public_id) would never be
-  // deleted. Honour an explicit type, else infer 'raw' from the .pdf suffix.
+  if (!publicId) return;
+  ensureConfigured();
+  if (!env.cloudinary.configured) return;
+  // The SDK defaults resource_type to 'image', which never matches a raw asset — PDFs would never be deleted, so honour an explicit type or infer 'raw' from the .pdf suffix.
   const type: CloudinaryResourceType =
     resourceType ?? (/\.pdf$/i.test(publicId) ? 'raw' : 'image');
   try {

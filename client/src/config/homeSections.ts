@@ -1,10 +1,4 @@
-/**
- * Canonical homepage section catalogue — the SINGLE source of truth for
- * section keys, labels and default order (project rule #3/#8). `Home` maps
- * each key to its component; `SettingsManager` uses the labels for the
- * reorder/visibility UI; the server only stores order/visibility overrides.
- * Hero is intentionally excluded (it is the fixed identity, always first).
- */
+// Single source of truth for section keys/labels/order: Home maps keys to components, SettingsManager uses labels for the reorder UI, server stores only overrides; Hero is excluded (fixed, always first).
 export interface HomeSectionMeta {
   key: string;
   label: string;

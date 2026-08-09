@@ -3,11 +3,6 @@ import toast from 'react-hot-toast';
 import { api } from '@/lib/api';
 import type { ApiError, ListResponse, WithId } from '@/types';
 
-/**
- * Generic admin CRUD for a REST resource at `/<base>`.
- *   list GET /<base> · create POST /<base>
- *   update PUT /<base>/:id · remove DELETE /<base>/:id
- */
 export function useCrud<T extends WithId>(
   base: string,
   queryKey: string = base

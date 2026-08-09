@@ -52,9 +52,7 @@ function Column({
         </h3>
         <ul className="space-y-4">
           {items.map((it) => {
-            // Title interaction: media → open the image/PDF viewer; otherwise a
-            // bare Credential URL → open the verification page in a new tab;
-            // nothing attached → plain, non-interactive text.
+            // Title priority: media opens the viewer, credential URL opens in a new tab, otherwise plain text.
             const titleClass =
               'group/title inline-flex items-start gap-1.5 text-left text-sm font-medium text-foreground transition-colors hover:text-neon';
             const iconClass =
@@ -121,11 +119,9 @@ export default function Credentials() {
     caption?: string;
   } | null>(null);
   const [pdfTarget, setPdfTarget] = useState<PdfPreviewTarget | null>(null);
-  // Credential URL of the item whose viewer is currently open — surfaced as a
-  // "Verify" action inside the modal when present.
+  // Credential URL of the open item, surfaced as a "Verify" action in the modal.
   const [verifyUrl, setVerifyUrl] = useState<string | null>(null);
-  // Element that opened the viewer — focus is returned here on close so
-  // keyboard / screen-reader users keep their place (WCAG 2.4.3).
+  // Element that opened the viewer — focus returns here on close (WCAG 2.4.3).
   const triggerRef = useRef<HTMLElement | null>(null);
 
   const openMedia = (item: ColumnItem, trigger: HTMLElement): void => {

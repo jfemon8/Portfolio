@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { memo, useCallback, useState, type ReactNode } from 'react';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCrud } from '@/hooks/useCrud';
@@ -11,6 +11,45 @@ import Modal from './Modal';
 import Field, { type FieldSchema, type FormState } from './Field';
 import { useConfirm } from './ConfirmModal';
 import { getByPath, setByPath } from '@/lib/object';
+
+function ResourceRowInner<T extends WithId>({
+  item,
+  renderItem,
+  onEdit,
+  onDelete,
+}: {
+  item: T;
+  renderItem: (item: T) => ReactNode;
+  onEdit: (item: T) => void;
+  onDelete: (item: T) => void;
+}) {
+  return (
+    <GlassCard
+      interactive
+      className="flex items-center justify-between gap-4 p-4"
+    >
+      <div className="min-w-0">{renderItem(item)}</div>
+      <div className="flex shrink-0 gap-2">
+        <button
+          onClick={() => onEdit(item)}
+          aria-label="Edit"
+          className="rounded-lg border border-border/70 p-2.5 text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon"
+        >
+          <Pencil className="h-4 w-4" />
+        </button>
+        <button
+          onClick={() => onDelete(item)}
+          aria-label="Delete"
+          className="rounded-lg border border-border/70 p-2.5 text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
+        >
+          <Trash2 className="h-4 w-4" />
+        </button>
+      </div>
+    </GlassCard>
+  );
+}
+/** Skips re-rendering every row when unrelated state (e.g. the edit-modal form) changes. */
+const ResourceRow = memo(ResourceRowInner) as typeof ResourceRowInner;
 
 export interface ResourceConfig<T extends WithId> {
   title: string;
@@ -25,7 +64,7 @@ export interface ResourceConfig<T extends WithId> {
   renderItem: (item: T) => ReactNode;
 }
 
-/** Schema-driven CRUD screen reused by every simple resource (rule #3/#8). */
+/** Schema-driven CRUD screen reused by every simple resource. */
 export default function ResourceManager<T extends WithId>({
   config,
 }: {
@@ -103,11 +142,14 @@ export default function ResourceManager<T extends WithId>({
     setEditing({});
     setFieldErrors({});
   };
-  const openEdit = (item: T): void => {
-    setForm({ ...(config.defaults as FormState), ...item });
-    setEditing(item);
-    setFieldErrors({});
-  };
+  const openEdit = useCallback(
+    (item: T): void => {
+      setForm({ ...(config.defaults as FormState), ...item });
+      setEditing(item);
+      setFieldErrors({});
+    },
+    [config]
+  );
   const close = (): void => {
     setEditing(null);
     setFieldErrors({});
@@ -180,16 +222,19 @@ export default function ResourceManager<T extends WithId>({
     close();
   };
 
-  const del = async (item: T): Promise<void> => {
-    const label = config.labelOf?.(item) ?? 'this item';
-    const ok = await confirm({
-      title: `Delete ${config.singular}?`,
-      message: `"${label}" will be permanently removed. This cannot be undone.`,
-      confirmLabel: 'Delete',
-      variant: 'danger',
-    });
-    if (ok) await remove.mutateAsync(item._id);
-  };
+  const del = useCallback(
+    async (item: T): Promise<void> => {
+      const label = config.labelOf?.(item) ?? 'this item';
+      const ok = await confirm({
+        title: `Delete ${config.singular}?`,
+        message: `"${label}" will be permanently removed. This cannot be undone.`,
+        confirmLabel: 'Delete',
+        variant: 'danger',
+      });
+      if (ok) await remove.mutateAsync(item._id);
+    },
+    [config, confirm, remove]
+  );
 
   return (
     <div>
@@ -211,29 +256,13 @@ export default function ResourceManager<T extends WithId>({
 
       <div className="space-y-3">
         {items.map((item) => (
-          <GlassCard
+          <ResourceRow
             key={item._id}
-            interactive
-            className="flex items-center justify-between gap-4 p-4"
-          >
-            <div className="min-w-0">{config.renderItem(item)}</div>
-            <div className="flex shrink-0 gap-2">
-              <button
-                onClick={() => openEdit(item)}
-                aria-label="Edit"
-                className="rounded-lg border border-border/70 p-2.5 text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon"
-              >
-                <Pencil className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => void del(item)}
-                aria-label="Delete"
-                className="rounded-lg border border-border/70 p-2.5 text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
-            </div>
-          </GlassCard>
+            item={item}
+            renderItem={config.renderItem}
+            onEdit={openEdit}
+            onDelete={del}
+          />
         ))}
       </div>
 

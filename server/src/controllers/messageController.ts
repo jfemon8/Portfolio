@@ -21,17 +21,21 @@ export const submitMessage = asyncHandler(
       req.ip ||
       '';
 
-    const doc = await Message.create({
-      name,
-      email,
-      subject,
-      message,
-      ip,
-      userAgent: req.headers['user-agent'] || '',
-    });
+    const [doc, mail] = await Promise.all([
+      Message.create({
+        name,
+        email,
+        subject,
+        message,
+        ip,
+        userAgent: req.headers['user-agent'] || '',
+      }),
+      sendContactEmail({ name, email, subject, message }),
+    ]);
 
-    Visit.create({ type: 'contact_submit', path: '/contact' }).catch(() => {});
-    const mail = await sendContactEmail({ name, email, subject, message });
+    Visit.create({ type: 'contact_submit', path: '/contact' }).catch((err) =>
+      console.warn('contact_submit Visit log failed:', err)
+    );
 
     res.status(201).json({
       success: true,
@@ -51,8 +55,10 @@ export const listMessages = asyncHandler(
     else if (req.query.filter === 'archived') filter.archived = true;
     else if (req.query.filter !== 'all') filter.archived = { $ne: true };
 
-    const messages = await Message.find(filter).sort({ createdAt: -1 });
-    const unread = await Message.countDocuments({ read: false });
+    const [messages, unread] = await Promise.all([
+      Message.find(filter).sort({ createdAt: -1 }).lean(),
+      Message.countDocuments({ read: false }),
+    ]);
     res.json({ success: true, count: messages.length, unread, data: messages });
   }
 );

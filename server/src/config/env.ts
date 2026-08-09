@@ -3,11 +3,7 @@ import { z } from 'zod';
 
 dotenv.config();
 
-/**
- * Type-safe, fail-fast environment validation (Zod).
- * The exported `env` object keeps the exact same shape used across the app,
- * so this is a hardening change with zero behavioural impact.
- */
+// Fail-fast Zod validation; env keeps the exact shape the app already expects, so this adds safety with zero behavioural impact.
 const boolish = z
   .string()
   .optional()
@@ -22,8 +18,10 @@ const envSchema = z.object({
 
   MONGODB_URI: z.string().min(1, 'MONGODB_URI is required'),
 
-  JWT_SECRET: z.string().min(16, 'JWT_SECRET must be a long random string'),
-  JWT_EXPIRES_IN: z.string().default('7d'),
+  JWT_SECRET: z
+    .string()
+    .min(32, 'JWT_SECRET must be a long random string (32+ chars)'),
+  JWT_EXPIRES_IN: z.string().default('15m'),
 
   ADMIN_NAME: z.string().default('Site Admin'),
   ADMIN_EMAIL: z.string().default('admin@example.com'),
@@ -124,8 +122,7 @@ export const env: Env = {
   smtp: {
     host: e.SMTP_HOST,
     port: e.SMTP_PORT ?? 465,
-    // Implicit TLS only on 465; ports 587/25 use STARTTLS (secure:false).
-    // Defaulting to true regardless of port breaks 587 setups.
+    // Implicit TLS only applies to port 465; ports 587/25 use STARTTLS, so defaulting secure to true regardless of port would break those setups.
     secure: e.SMTP_SECURE ?? (e.SMTP_PORT ?? 465) === 465,
     user: e.SMTP_USER,
     pass: e.SMTP_PASS,
