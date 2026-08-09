@@ -9,6 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/cn';
 import { formatDate } from '@/lib/date';
+import { formatCount } from '@/lib/number';
 import { BLOG_REACTION_META, BLOG_REACTIONS } from '@/lib/blog';
 import type { BlogCommentDoc, BlogEngagement, BlogReactionType } from '@/types';
 
@@ -183,8 +184,8 @@ export default function BlogEngagement({
           Reactions & Comments
         </h2>
         <span className="rounded-full border border-border/60 bg-card/50 px-3 py-1 text-xs text-muted-foreground">
-          {engagement.totalReactions} Reactions · {engagement.totalComments}{' '}
-          Comments
+          {formatCount(engagement.totalReactions)} Reactions ·{' '}
+          {formatCount(engagement.totalComments)} Comments
         </span>
       </div>
 
@@ -209,7 +210,7 @@ export default function BlogEngagement({
                 <span>{meta.emoji}</span>
                 <span>{meta.label}</span>
                 <span className="text-xs text-muted-foreground/70">
-                  {reactionCounts[reaction]}
+                  {formatCount(reactionCounts[reaction])}
                 </span>
               </button>
             );
@@ -678,7 +679,7 @@ function CommentItem({
               <span>{meta.emoji}</span>
               <span>{meta.label}</span>
               <span className="text-2xs text-muted-foreground/70">
-                {reactionCounts[reaction]}
+                {formatCount(reactionCounts[reaction])}
               </span>
             </button>
           );
