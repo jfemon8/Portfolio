@@ -239,10 +239,11 @@ export interface BlogComment {
   reactions?: BlogCommentReactionSummary[];
   totalReactions?: number;
   visitorReaction?: BlogReactionType | null;
+  /** Only populated on top-level comments — the API nests each thread's replies (already newest-first) inline. */
+  replies?: BlogCommentDoc[];
 }
 
 export interface BlogEngagement {
-  comments: BlogCommentDoc[];
   reactions: BlogReactionSummary[];
   totalComments: number;
   totalReactions: number;
@@ -593,6 +594,7 @@ export interface PaginatedResponse<T> {
   data: T[];
   pagination: Pagination;
 }
+export type BlogCommentsPageResponse = PaginatedResponse<BlogCommentDoc>;
 export interface BlogDetailResponse {
   success: true;
   data: BlogPostDoc;

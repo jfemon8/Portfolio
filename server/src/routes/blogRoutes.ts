@@ -7,6 +7,7 @@ import {
   BLOG_REACTIONS,
   listPublished,
   getPublishedBySlug,
+  getPostComments,
   reactToPost,
   reactToComment,
   commentOnPost,
@@ -24,6 +25,7 @@ const router = Router();
 // Public
 router.get('/', listPublished);
 router.get('/slug/:slug', getPublishedBySlug);
+router.get('/slug/:slug/comments', getPostComments);
 router.post(
   '/slug/:slug/reactions',
   blogEngagementLimiter,

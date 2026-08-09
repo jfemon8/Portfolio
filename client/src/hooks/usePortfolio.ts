@@ -3,6 +3,7 @@ import { api } from '@/lib/api';
 import { queryClient } from '@/lib/queryClient';
 import { getBlogVisitorKey } from '@/lib/blog';
 import type {
+  BlogCommentsPageResponse,
   BlogDetailResponse,
   BlogPostDoc,
   CpStatsDoc,
@@ -159,6 +160,32 @@ export const prefetchBlogPost = (slug: string): void => {
     blogPostQueryOptions(slug, getBlogVisitorKey(slug))
   );
 };
+
+// A post's comments can run into the thousands, so they load 20 at a time and accumulate as the user scrolls, instead of shipping the whole list up front.
+export const usePostCommentsInfinite = (
+  slug: string,
+  visitorKey?: string,
+  limit = 20
+) =>
+  useInfiniteQuery({
+    queryKey: ['blog', 'comments', slug, limit, visitorKey],
+    queryFn: ({ pageParam }) => {
+      const qs = new URLSearchParams({
+        page: String(pageParam),
+        limit: String(limit),
+      });
+      if (visitorKey) qs.set('visitorKey', visitorKey);
+      return get<BlogCommentsPageResponse>(
+        `/blog/slug/${slug}/comments?${qs.toString()}`
+      );
+    },
+    initialPageParam: 1,
+    getNextPageParam: (last) =>
+      last.pagination.page < last.pagination.pages
+        ? last.pagination.page + 1
+        : undefined,
+    enabled: !!slug,
+  });
 
 export const useCpStats = () =>
   useQuery({

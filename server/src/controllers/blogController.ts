@@ -163,7 +163,7 @@ export const listPublished = asyncHandler(
   }
 );
 
-/** Public — single published post by slug (increments views). */
+/** Public — single published post by slug (increments views). Comments are fetched separately (paginated) since a post can carry thousands. */
 export const getPublishedBySlug = asyncHandler(
   async (req: Request, res: Response) => {
     const visitorKey = String(req.query.visitorKey || '').trim();
@@ -174,34 +174,92 @@ export const getPublishedBySlug = asyncHandler(
     );
     if (!post) throw ApiError.notFound('Post not found');
 
-    const [related, comments, reactions, visitorReaction] = await Promise.all([
-      BlogPost.find({
-        $and: [publicVisibility()],
-        _id: { $ne: post._id },
-        tags: { $in: post.tags },
-      })
-        .select('title slug excerpt coverImage readingTime publishedAt')
-        .limit(3)
+    const [related, totalComments, reactions, visitorReaction] =
+      await Promise.all([
+        BlogPost.find({
+          $and: [publicVisibility()],
+          _id: { $ne: post._id },
+          tags: { $in: post.tags },
+        })
+          .select('title slug excerpt coverImage readingTime publishedAt')
+          .limit(3)
+          .lean(),
+        BlogComment.countDocuments({ post: post._id }),
+        summarizeReactions(String(post._id)),
+        visitorKey
+          ? BlogReaction.findOne({ post: post._id, visitorKey }).select(
+              'reaction'
+            )
+          : null,
+      ]);
+
+    res.json({
+      success: true,
+      data: post,
+      related,
+      engagement: {
+        reactions: reactions.reactions,
+        totalComments,
+        totalReactions: reactions.totalReactions,
+        visitorReaction: visitorReaction?.reaction ?? null,
+      },
+    });
+  }
+);
+
+/** Public — a page of a post's top-level comments (newest first), each carrying its full reply thread (also newest first) nested inline, Facebook-style. Replies never nest more than one level deep — replying to a reply still attaches to that reply's top-level ancestor. */
+export const getPostComments = asyncHandler(
+  async (req: Request, res: Response) => {
+    const post = await BlogPost.findOne({
+      slug: req.params.slug,
+      ...publicVisibility(),
+    }).select('_id');
+    if (!post) throw ApiError.notFound('Post not found');
+
+    const visitorKey = String(req.query.visitorKey || '').trim();
+    const page = Math.max(1, parseInt(String(req.query.page)) || 1);
+    const limit = Math.min(
+      50,
+      Math.max(1, parseInt(String(req.query.limit)) || 20)
+    );
+    const select = 'post name email content parentComment createdAt updatedAt';
+
+    const [topLevel, total] = await Promise.all([
+      BlogComment.find({ post: post._id, parentComment: null })
+        .select(select)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
         .lean(),
-      BlogComment.find({ post: post._id })
-        .select('post name email content parentComment createdAt updatedAt')
-        .sort({ createdAt: 1 })
-        .lean(),
-      summarizeReactions(String(post._id)),
-      visitorKey
-        ? BlogReaction.findOne({ post: post._id, visitorKey }).select(
-            'reaction'
-          )
-        : null,
+      BlogComment.countDocuments({ post: post._id, parentComment: null }),
     ]);
 
-    const commentIds = comments.map((comment) => String(comment._id));
+    const topLevelIds = topLevel.map((c) => String(c._id));
+    const replies = topLevelIds.length
+      ? await BlogComment.find({
+          post: post._id,
+          parentComment: { $in: topLevelIds },
+        })
+          .select(select)
+          .sort({ createdAt: -1 })
+          .lean()
+      : [];
+
+    const repliesByParent = new Map<string, typeof replies>();
+    replies.forEach((reply) => {
+      const key = String(reply.parentComment);
+      const bucket = repliesByParent.get(key);
+      if (bucket) bucket.push(reply);
+      else repliesByParent.set(key, [reply]);
+    });
+
+    const allIds = [...topLevelIds, ...replies.map((r) => String(r._id))];
     const commentReactionSummary = await summarizeCommentReactions(
       String(post._id),
-      commentIds,
+      allIds,
       visitorKey
     );
-    const enrichedComments = comments.map((comment) => {
+    const enrich = (comment: (typeof topLevel)[number]) => {
       const summary = commentReactionSummary.get(String(comment._id));
       return {
         ...comment,
@@ -209,19 +267,17 @@ export const getPublishedBySlug = asyncHandler(
         totalReactions: summary?.totalReactions ?? 0,
         visitorReaction: summary?.visitorReaction ?? null,
       };
-    });
+    };
+
+    const data = topLevel.map((comment) => ({
+      ...enrich(comment),
+      replies: (repliesByParent.get(String(comment._id)) ?? []).map(enrich),
+    }));
 
     res.json({
       success: true,
-      data: post,
-      related,
-      engagement: {
-        comments: enrichedComments,
-        reactions: reactions.reactions,
-        totalComments: enrichedComments.length,
-        totalReactions: reactions.totalReactions,
-        visitorReaction: visitorReaction?.reaction ?? null,
-      },
+      data,
+      pagination: { page, limit, total, pages: Math.ceil(total / limit) },
     });
   }
 );

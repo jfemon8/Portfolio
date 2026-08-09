@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
-import { Calendar, Clock, ArrowUpRight, Search } from 'lucide-react';
+import { Calendar, Clock, ArrowUpRight, Loader2, Search } from 'lucide-react';
 import SmartImage from '@/components/shared/SmartImage';
 import PrefetchLink from '@/components/shared/PrefetchLink';
 import Seo from '@/components/ui/Seo';
@@ -10,7 +10,6 @@ import { useSectionCopy } from '@/hooks/useSectionCopy';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
 import Reveal from '@/components/motion/Reveal';
 import GlassCard from '@/components/shared/GlassCard';
-import { Button } from '@/components/ui/button';
 import {
   ErrorState,
   EmptyState,
@@ -18,6 +17,7 @@ import {
 } from '@/components/ui/States';
 import { useBlogInfinite } from '@/hooks/usePortfolio';
 import { formatDate, formatTime } from '@/lib/date';
+import { formatCount } from '@/lib/number';
 
 export default function Blog() {
   const [q, setQ] = useState('');
@@ -32,6 +32,8 @@ export default function Blog() {
     isFetchingNextPage,
   } = useBlogInfinite(query);
   const posts = data?.pages.flatMap((p) => p.data) ?? [];
+  const total = data?.pages[0]?.pagination.total ?? 0;
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
   const copy = useSectionCopy('blog', {
     index: '~/blog',
     title: 'Writing & Notes',
@@ -45,8 +47,23 @@ export default function Blog() {
   const lab = useSiteCopy('labels', {
     searchPlaceholder: 'Search articles…',
     searchAria: 'Search articles',
-    loadMore: 'Load more',
   });
+
+  // Auto-loads the next page once the sentinel below the grid scrolls into view.
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || !hasNextPage) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting && !isFetchingNextPage) {
+          void fetchNextPage();
+        }
+      },
+      { rootMargin: '400px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
     <>
@@ -153,15 +170,21 @@ export default function Blog() {
           ))}
         </div>
 
-        {hasNextPage && (
-          <div className="mt-10 flex justify-center">
-            <Button
-              variant="ghost"
-              onClick={() => void fetchNextPage()}
-              disabled={isFetchingNextPage}
-            >
-              {isFetchingNextPage ? 'Loading…' : lab.loadMore}
-            </Button>
+        {posts.length > 0 && (
+          <div className="mt-10 text-center text-xs text-muted-foreground">
+            {hasNextPage ? (
+              <div
+                ref={sentinelRef}
+                className="flex items-center justify-center gap-2 py-2"
+              >
+                {isFetchingNextPage && (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                )}
+                Showing {posts.length} of {formatCount(total)} articles
+              </div>
+            ) : (
+              <span>All {formatCount(posts.length)} articles loaded.</span>
+            )}
           </div>
         )}
       </Section>

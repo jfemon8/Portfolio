@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { MessageSquareReply, Send } from 'lucide-react';
+import { Loader2, MessageSquareReply, Send } from 'lucide-react';
 import toast from 'react-hot-toast';
 import GlassCard from '@/components/shared/GlassCard';
 import { Button } from '@/components/ui/button';
@@ -8,12 +8,13 @@ import { useConfirm } from '@/components/admin/ConfirmModal';
 import { useAuth } from '@/context/AuthContext';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/cn';
-import { formatDate } from '@/lib/date';
+import { formatDate, formatTime } from '@/lib/date';
 import { formatCount } from '@/lib/number';
 import { BLOG_REACTION_META, BLOG_REACTIONS } from '@/lib/blog';
+import { usePostCommentsInfinite } from '@/hooks/usePortfolio';
 import type { BlogCommentDoc, BlogEngagement, BlogReactionType } from '@/types';
 
-type CommentNode = BlogCommentDoc & { replies: CommentNode[] };
+const COMMENTS_PER_PAGE = 20;
 
 type CommentErrors = {
   name?: string;
@@ -45,28 +46,6 @@ const validateCommentFields = (
   content: validateCommentContent(content),
 });
 
-const buildTree = (comments: BlogCommentDoc[]): CommentNode[] => {
-  const nodes = new Map<string, CommentNode>();
-  const roots: CommentNode[] = [];
-
-  comments.forEach((comment) => {
-    nodes.set(comment._id, { ...comment, replies: [] });
-  });
-
-  comments.forEach((comment) => {
-    const node = nodes.get(comment._id);
-    if (!node) return;
-    const parentId = comment.parentComment;
-    if (parentId && nodes.has(parentId)) {
-      nodes.get(parentId)!.replies.push(node);
-      return;
-    }
-    roots.push(node);
-  });
-
-  return roots;
-};
-
 interface BlogEngagementProps {
   slug: string;
   visitorKey: string;
@@ -90,6 +69,39 @@ export default function BlogEngagement({
   const [content, setContent] = useState('');
   const [errors, setErrors] = useState<CommentErrors>({});
   const formRef = useRef<HTMLDivElement | null>(null);
+  const listTopRef = useRef<HTMLDivElement | null>(null);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  const commentsQuery = usePostCommentsInfinite(
+    slug,
+    visitorKey,
+    COMMENTS_PER_PAGE
+  );
+  const comments = useMemo(
+    () => commentsQuery.data?.pages.flatMap((p) => p.data) ?? [],
+    [commentsQuery.data]
+  );
+  const totalLoaded = commentsQuery.data?.pages[0]?.pagination.total ?? 0;
+
+  // Auto-loads the next 20 top-level comments once the sentinel below the list scrolls into view.
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || !commentsQuery.hasNextPage) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting && !commentsQuery.isFetchingNextPage) {
+          void commentsQuery.fetchNextPage();
+        }
+      },
+      { rootMargin: '400px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [
+    commentsQuery.hasNextPage,
+    commentsQuery.isFetchingNextPage,
+    commentsQuery,
+  ]);
 
   useEffect(() => {
     setActiveReaction(engagement.visitorReaction);
@@ -104,11 +116,6 @@ export default function BlogEngagement({
     });
     return counts;
   }, [engagement.reactions]);
-
-  const thread = useMemo(
-    () => buildTree(engagement.comments),
-    [engagement.comments]
-  );
 
   const validateAll = (): CommentErrors =>
     validateCommentFields(name, email, content);
@@ -144,7 +151,8 @@ export default function BlogEngagement({
           name,
           email: email.trim() || undefined,
           content,
-          parentCommentId: replyTo?._id,
+          // Replying to a reply still attaches to ITS top-level ancestor — threads never nest more than one level, Facebook-style.
+          parentCommentId: replyTo && (replyTo.parentComment ?? replyTo._id),
         })
       ).data,
     onSuccess: () => {
@@ -155,6 +163,14 @@ export default function BlogEngagement({
       setErrors({});
       setReplyTo(null);
       qc.invalidateQueries({ queryKey: ['blog', 'post', slug] });
+      void qc
+        .resetQueries({ queryKey: ['blog', 'comments', slug] })
+        .then(() =>
+          listTopRef.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+          })
+        );
     },
     onError: (err: unknown) => {
       toast.error(
@@ -349,19 +365,18 @@ export default function BlogEngagement({
           </form>
         </GlassCard>
 
-        <div className="w-full space-y-4">
-          {thread.length === 0 ? (
+        <div ref={listTopRef} className="w-full space-y-4">
+          {comments.length === 0 && !commentsQuery.isLoading ? (
             <GlassCard className="p-6 text-sm text-muted-foreground">
               No comments yet. Start the conversation.
             </GlassCard>
           ) : (
-            thread.map((comment) => (
+            comments.map((comment) => (
               <CommentItem
                 key={comment._id}
                 slug={slug}
                 visitorKey={visitorKey}
                 comment={comment}
-                depth={0}
                 canModerate={canModerate}
                 onReply={(item) => {
                   setReplyTo(item);
@@ -369,6 +384,25 @@ export default function BlogEngagement({
                 }}
               />
             ))
+          )}
+
+          {comments.length > 0 && (
+            <div className="pt-2 text-center text-xs text-muted-foreground">
+              {commentsQuery.hasNextPage ? (
+                <div
+                  ref={sentinelRef}
+                  className="flex items-center justify-center gap-2 py-2"
+                >
+                  {commentsQuery.isFetchingNextPage && (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  )}
+                  Showing {comments.length} of {formatCount(totalLoaded)}{' '}
+                  comments
+                </div>
+              ) : (
+                <span>All {formatCount(comments.length)} comments loaded.</span>
+              )}
+            </div>
           )}
         </div>
       </div>
@@ -379,8 +413,8 @@ export default function BlogEngagement({
 interface CommentItemProps {
   slug: string;
   visitorKey: string;
-  comment: CommentNode;
-  depth: number;
+  comment: BlogCommentDoc;
+  isReply?: boolean;
   canModerate: boolean;
   onReply: (comment: BlogCommentDoc) => void;
 }
@@ -389,7 +423,7 @@ function CommentItem({
   slug,
   visitorKey,
   comment,
-  depth,
+  isReply = false,
   canModerate,
   onReply,
 }: CommentItemProps) {
@@ -439,7 +473,7 @@ function CommentItem({
       ).data,
     onSuccess: (_data, reaction) => {
       setActiveReaction(reaction);
-      qc.invalidateQueries({ queryKey: ['blog', 'post', slug] });
+      qc.invalidateQueries({ queryKey: ['blog', 'comments', slug] });
     },
     onError: (err: unknown) => {
       toast.error(
@@ -460,7 +494,7 @@ function CommentItem({
     onSuccess: () => {
       toast.success('Comment updated');
       setIsEditing(false);
-      qc.invalidateQueries({ queryKey: ['blog', 'post', slug] });
+      qc.invalidateQueries({ queryKey: ['blog', 'comments', slug] });
     },
     onError: (err: unknown) => {
       toast.error(
@@ -474,6 +508,7 @@ function CommentItem({
       (await api.delete(`/blog/admin/comments/${comment._id}`)).data,
     onSuccess: () => {
       toast.success('Comment deleted');
+      qc.invalidateQueries({ queryKey: ['blog', 'comments', slug] });
       qc.invalidateQueries({ queryKey: ['blog', 'post', slug] });
     },
     onError: (err: unknown) => {
@@ -514,14 +549,12 @@ function CommentItem({
   };
 
   return (
-    <GlassCard
-      className={cn('p-5', depth > 0 && 'ml-4 border-l-2 border-primary/20')}
-    >
+    <GlassCard className={cn('p-5', isReply && 'border-primary/20')}>
       <div className="flex items-start justify-between gap-3">
         <div>
           <h4 className="font-semibold text-foreground">{comment.name}</h4>
           <p className="text-xs text-muted-foreground/70">
-            {formatDate(comment.createdAt)}
+            {formatDate(comment.createdAt)}, {formatTime(comment.createdAt)}
             {comment.email ? ` · ${comment.email}` : ''}
           </p>
         </div>
@@ -686,15 +719,15 @@ function CommentItem({
         })}
       </div>
 
-      {comment.replies.length > 0 && (
-        <div className="mt-4 space-y-4">
+      {!isReply && comment.replies && comment.replies.length > 0 && (
+        <div className="mt-4 space-y-3 border-l-2 border-border/60 pl-4">
           {comment.replies.map((reply) => (
             <CommentItem
               key={reply._id}
               slug={slug}
               visitorKey={visitorKey}
               comment={reply}
-              depth={depth + 1}
+              isReply
               canModerate={canModerate}
               onReply={onReply}
             />
