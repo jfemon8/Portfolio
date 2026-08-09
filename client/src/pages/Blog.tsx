@@ -17,7 +17,7 @@ import {
   CardGridSkeleton,
 } from '@/components/ui/States';
 import { useBlogInfinite } from '@/hooks/usePortfolio';
-import { formatDate } from '@/lib/date';
+import { formatDate, formatTime } from '@/lib/date';
 
 export default function Blog() {
   const [q, setQ] = useState('');
@@ -45,7 +45,6 @@ export default function Blog() {
   const lab = useSiteCopy('labels', {
     searchPlaceholder: 'Search articles…',
     searchAria: 'Search articles',
-    unitMin: 'min',
     loadMore: 'Load more',
   });
 
@@ -142,8 +141,8 @@ export default function Blog() {
                         {formatDate(post.publishedAt || post.createdAt)}
                       </span>
                       <span className="flex items-center gap-1.5">
-                        <Clock className="h-3.5 w-3.5" /> {post.readingTime}{' '}
-                        {lab.unitMin}
+                        <Clock className="h-3.5 w-3.5" />{' '}
+                        {formatTime(post.updatedAt)}
                         <ArrowUpRight className="ml-1 h-4 w-4 text-neon" />
                       </span>
                     </div>

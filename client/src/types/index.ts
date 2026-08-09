@@ -524,8 +524,6 @@ export interface LabelsCopy {
   badgeVideo: string;
   btnShare: string;
   unitViews: string;
-  unitMinRead: string;
-  unitMin: string;
   headingHighlights: string;
   headingRelated: string;
   toastLinkCopied: string;

@@ -29,6 +29,19 @@ export function formatDate(value?: string): string {
   return value;
 }
 
+// Time-of-day only, with seconds — e.g. blog card/post metadata showing the exact create/update moment.
+export function formatTime(value?: string): string {
+  if (!value) return '';
+  const dt = new Date(value);
+  if (Number.isNaN(dt.getTime())) return '';
+  return dt.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true,
+  });
+}
+
 // Adds time-of-day to formatDate's output, for contexts where the exact time matters (audit log, message detail).
 export function formatDateTime(value?: string): string {
   if (!value) return '';

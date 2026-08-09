@@ -264,8 +264,6 @@ const LABELS_FIELDS: FieldSchema[] = [
   { name: 'labels.badgeVideo', label: 'Badge · Video', type: 'text' },
   { name: 'labels.btnShare', label: 'Button · Share', type: 'text' },
   { name: 'labels.unitViews', label: 'Unit · Views', type: 'text' },
-  { name: 'labels.unitMinRead', label: 'Unit · Min Read', type: 'text' },
-  { name: 'labels.unitMin', label: 'Unit · Min', type: 'text' },
   {
     name: 'labels.headingHighlights',
     label: 'Heading · Key highlights',

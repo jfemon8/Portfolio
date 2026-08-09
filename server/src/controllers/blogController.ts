@@ -170,7 +170,7 @@ export const getPublishedBySlug = asyncHandler(
     const post = await BlogPost.findOneAndUpdate(
       { slug: req.params.slug, ...publicVisibility() },
       { $inc: { views: 1 } },
-      { new: true }
+      { new: true, timestamps: false }
     );
     if (!post) throw ApiError.notFound('Post not found');
 

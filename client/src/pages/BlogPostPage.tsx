@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Spinner, ErrorState } from '@/components/ui/States';
 import { useBlogPost, useProfile } from '@/hooks/usePortfolio';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
-import { formatDate } from '@/lib/date';
+import { formatDate, formatTime } from '@/lib/date';
 import { getBlogVisitorKey } from '@/lib/blog';
 import { useState } from 'react';
 
@@ -28,7 +28,6 @@ export default function BlogPostPage() {
   const lab = useSiteCopy('labels', {
     btnBack: 'Back',
     backToBlog: 'Back To Blog',
-    unitMinRead: 'Min Read',
     unitViews: 'Views',
     btnShare: 'Share',
     headingRelated: 'Related Posts',
@@ -111,8 +110,7 @@ export default function BlogPostPage() {
               {formatDate(post.publishedAt || post.createdAt)}
             </span>
             <span className="flex items-center gap-1.5">
-              <Clock className="h-3.5 w-3.5" /> {post.readingTime}{' '}
-              {lab.unitMinRead}
+              <Clock className="h-3.5 w-3.5" /> {formatTime(post.updatedAt)}
             </span>
             <span className="flex items-center gap-1.5">
               <Eye className="h-3.5 w-3.5" /> {post.views} {lab.unitViews}

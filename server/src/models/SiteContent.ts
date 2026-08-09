@@ -163,8 +163,6 @@ const labelsSchema = new mongoose.Schema(
     badgeVideo: { type: String, default: '' },
     btnShare: { type: String, default: '' },
     unitViews: { type: String, default: '' },
-    unitMinRead: { type: String, default: '' },
-    unitMin: { type: String, default: '' },
     headingHighlights: { type: String, default: '' },
     headingRelated: { type: String, default: '' },
     toastLinkCopied: { type: String, default: '' },
