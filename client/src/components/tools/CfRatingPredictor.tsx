@@ -1,9 +1,12 @@
 import { useState } from 'react';
+import { motion } from 'motion/react';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import GlassCard from '@/components/shared/GlassCard';
+import Counter from '@/components/shared/Counter';
 import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/States';
+import { Skeleton } from '@/components/ui/States';
 import { api } from '@/lib/api';
+import type { ApiError } from '@/types';
 
 interface PredictResponse {
   success: boolean;
@@ -15,6 +18,15 @@ interface PredictResponse {
     predictedNewRating: number;
     contestantsConsidered: number;
   };
+}
+
+function StatSkeleton() {
+  return (
+    <GlassCard className="p-5 text-center">
+      <Skeleton className="mx-auto h-3 w-16" />
+      <Skeleton className="mx-auto mt-2 h-7 w-14" />
+    </GlassCard>
+  );
 }
 
 export default function CfRatingPredictor() {
@@ -35,10 +47,11 @@ export default function CfRatingPredictor() {
       });
       setResult(res.data.data);
     } catch (e) {
-      const msg =
-        (e as { response?: { data?: { message?: string } } })?.response?.data
-          ?.message ?? 'Could not predict a delta for this contest/handle.';
-      setError(msg);
+      // api.ts's response interceptor already normalizes every rejection to ApiError ({status, message, details}) — not a raw AxiosError, so the message is read directly, not via .response.data.message.
+      setError(
+        (e as ApiError)?.message ??
+          'Could not predict a delta for this contest/handle.'
+      );
     } finally {
       setLoading(false);
     }
@@ -92,20 +105,27 @@ export default function CfRatingPredictor() {
       </p>
 
       {loading && (
-        <div className="mt-6">
-          <Spinner />
+        <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          <StatSkeleton />
+          <StatSkeleton />
+          <StatSkeleton />
         </div>
       )}
       {error && <p className="mt-4 text-sm text-neon-pink">{error}</p>}
 
       {result && !loading && (
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+          className="mt-6 grid gap-4 sm:grid-cols-3"
+        >
           <GlassCard className="p-5 text-center">
             <p className="text-2xs uppercase tracking-wide text-muted-foreground">
               Rank
             </p>
             <p className="mt-1 text-2xl font-extrabold text-foreground">
-              #{result.rank}
+              #<Counter value={String(result.rank)} />
             </p>
           </GlassCard>
           <GlassCard className="p-5 text-center">
@@ -116,8 +136,12 @@ export default function CfRatingPredictor() {
               className={`mt-1 flex items-center justify-center gap-1 text-2xl font-extrabold ${deltaColor}`}
             >
               <DeltaIcon className="h-5 w-5" />
-              {result.predictedDelta > 0 ? '+' : ''}
-              {result.predictedDelta}
+              {result.predictedDelta > 0
+                ? '+'
+                : result.predictedDelta < 0
+                  ? '-'
+                  : ''}
+              <Counter value={String(Math.abs(result.predictedDelta))} />
             </p>
           </GlassCard>
           <GlassCard className="p-5 text-center">
@@ -125,10 +149,10 @@ export default function CfRatingPredictor() {
               {result.currentRating} → New rating
             </p>
             <p className="mt-1 text-2xl font-extrabold text-neon">
-              {result.predictedNewRating}
+              <Counter value={String(result.predictedNewRating)} />
             </p>
           </GlassCard>
-        </div>
+        </motion.div>
       )}
     </GlassCard>
   );

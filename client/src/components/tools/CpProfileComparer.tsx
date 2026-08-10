@@ -1,9 +1,12 @@
 import { useState } from 'react';
+import { motion } from 'motion/react';
 import { Trophy, Swords } from 'lucide-react';
 import GlassCard from '@/components/shared/GlassCard';
+import Counter from '@/components/shared/Counter';
 import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/States';
+import { Skeleton } from '@/components/ui/States';
 import { api } from '@/lib/api';
+import type { ApiError } from '@/types';
 
 interface CpEntry {
   handle: string;
@@ -18,6 +21,20 @@ interface CpEntry {
 interface CompareResponse {
   success: boolean;
   data: { a: CpEntry; b: CpEntry };
+}
+
+function StatSkeleton() {
+  return (
+    <GlassCard className="p-5 text-center">
+      <Skeleton className="mx-auto h-4 w-24" />
+      <Skeleton className="mx-auto mt-3 h-8 w-16" />
+      <Skeleton className="mx-auto mt-2 h-3 w-14" />
+      <div className="mt-3 grid grid-cols-2 gap-2 border-t border-border/60 pt-3">
+        <Skeleton className="mx-auto h-4 w-10" />
+        <Skeleton className="mx-auto h-4 w-10" />
+      </div>
+    </GlassCard>
+  );
 }
 
 function StatCard({ entry, winner }: { entry: CpEntry; winner: boolean }) {
@@ -42,7 +59,7 @@ function StatCard({ entry, winner }: { entry: CpEntry; winner: boolean }) {
         {entry.handle}
       </p>
       <p className="mt-1 text-3xl font-extrabold text-neon">
-        {entry.rating ?? '—'}
+        {entry.rating != null ? <Counter value={String(entry.rating)} /> : '—'}
       </p>
       <p className="text-xs capitalize text-muted-foreground">
         {entry.rank || 'unrated'}
@@ -50,12 +67,18 @@ function StatCard({ entry, winner }: { entry: CpEntry; winner: boolean }) {
       <div className="mt-3 grid grid-cols-2 gap-2 border-t border-border/60 pt-3 text-xs text-muted-foreground">
         <div>
           <p className="font-semibold text-foreground">
-            {entry.maxRating ?? '—'}
+            {entry.maxRating != null ? (
+              <Counter value={String(entry.maxRating)} />
+            ) : (
+              '—'
+            )}
           </p>
           <p>Max rating</p>
         </div>
         <div>
-          <p className="font-semibold text-foreground">{entry.contests}</p>
+          <p className="font-semibold text-foreground">
+            <Counter value={String(entry.contests)} />
+          </p>
           <p>Contests</p>
         </div>
       </div>
@@ -81,10 +104,10 @@ export default function CpProfileComparer() {
       });
       setResult(res.data.data);
     } catch (e) {
-      const msg =
-        (e as { response?: { data?: { message?: string } } })?.response?.data
-          ?.message ?? 'Could not compare these handles right now.';
-      setError(msg);
+      // api.ts's response interceptor already normalizes every rejection to ApiError ({status, message, details}) — not a raw AxiosError, so the message is read directly, not via .response.data.message.
+      setError(
+        (e as ApiError)?.message ?? 'Could not compare these handles right now.'
+      );
     } finally {
       setLoading(false);
     }
@@ -125,17 +148,23 @@ export default function CpProfileComparer() {
       </div>
 
       {loading && (
-        <div className="mt-6">
-          <Spinner />
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <StatSkeleton />
+          <StatSkeleton />
         </div>
       )}
       {error && <p className="mt-4 text-sm text-neon-pink">{error}</p>}
 
       {result && !loading && (
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+          className="mt-6 grid gap-4 sm:grid-cols-2"
+        >
           <StatCard entry={result.a} winner={winnerSide === 'a'} />
           <StatCard entry={result.b} winner={winnerSide === 'b'} />
-        </div>
+        </motion.div>
       )}
     </GlassCard>
   );

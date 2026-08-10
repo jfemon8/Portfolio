@@ -1,10 +1,106 @@
 import { useMemo, useState, Fragment } from 'react';
+import { motion } from 'motion/react';
+import { Sparkles } from 'lucide-react';
 import GlassCard from '@/components/shared/GlassCard';
 import AutoTextarea from '@/components/shared/AutoTextarea';
+import { cn } from '@/lib/cn';
 
 interface Segment {
   text: string;
-  matched: boolean;
+  /** null = unmatched · 0 = matched but outside any capturing group · N = inside capture group N */
+  groupIndex: number | null;
+}
+
+const GROUP_COLORS = [
+  'bg-primary/30 text-primary',
+  'bg-neon/25 text-neon',
+  'bg-neon-blue/25 text-neon-blue',
+  'bg-neon-violet/25 text-neon-violet',
+  'bg-neon-pink/25 text-neon-pink',
+  'bg-neon-dim/25 text-neon-dim',
+];
+
+const PRESETS = [
+  {
+    label: 'Email',
+    pattern: '[\\w.+-]+@[\\w-]+\\.[a-zA-Z]{2,}',
+    flags: 'g',
+    sample: 'Contact us at hello@example.com or support@test.co',
+  },
+  {
+    label: 'URL',
+    pattern: 'https?:\\/\\/[^\\s]+',
+    flags: 'g',
+    sample: 'Visit https://example.com or http://test.dev/path?q=1',
+  },
+  {
+    label: 'IPv4 address',
+    pattern: '\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b',
+    flags: 'g',
+    sample: 'Server at 192.168.1.1, backup at 10.0.0.254',
+  },
+  {
+    label: 'Hex color',
+    pattern: '#[0-9a-fA-F]{3,6}\\b',
+    flags: 'g',
+    sample: 'Brand colors: #00ffd1, #a855f7, and #fff',
+  },
+  {
+    label: 'Date (YYYY-MM-DD)',
+    pattern: '(\\d{4})-(\\d{2})-(\\d{2})',
+    flags: 'g',
+    sample: 'Sprint runs 2024-01-15 through 2024-01-29',
+  },
+  {
+    label: 'Phone (US)',
+    pattern: '\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}',
+    flags: 'g',
+    sample: 'Call (555) 123-4567 or 555.987.6543',
+  },
+];
+
+type IndexedMatch = RegExpMatchArray & {
+  indices?: (readonly [number, number] | undefined)[];
+};
+
+// Splits each match into runs owned by whichever capturing group covers them (innermost/highest-numbered wins on overlap), so `(\d{4})-(\d{2})` highlights each group in a distinct color instead of one flat block — needs the 'd' flag for per-group character offsets.
+function buildSegments(text: string, matches: IndexedMatch[]): Segment[] {
+  const segments: Segment[] = [];
+  let cursor = 0;
+  for (const m of matches) {
+    const indices = m.indices;
+    if (m.index == null || m[0] === '' || !indices?.[0]) continue;
+    const [matchStart, matchEnd] = indices[0];
+    if (matchStart > cursor) {
+      segments.push({ text: text.slice(cursor, matchStart), groupIndex: null });
+    }
+
+    const len = matchEnd - matchStart;
+    const owner = new Array<number>(len).fill(0);
+    for (let g = 1; g < indices.length; g++) {
+      const span = indices[g];
+      if (!span) continue;
+      const [gs, ge] = span;
+      for (let p = Math.max(gs, matchStart); p < Math.min(ge, matchEnd); p++) {
+        owner[p - matchStart] = g;
+      }
+    }
+    let runStart = 0;
+    for (let i = 1; i <= len; i++) {
+      if (i === len || owner[i] !== owner[runStart]) {
+        segments.push({
+          text: text.slice(matchStart + runStart, matchStart + i),
+          groupIndex: owner[runStart]!,
+        });
+        runStart = i;
+      }
+    }
+    cursor = matchEnd;
+  }
+  if (cursor < text.length) {
+    segments.push({ text: text.slice(cursor), groupIndex: null });
+  }
+  return segments;
 }
 
 export default function RegexTester() {
@@ -12,27 +108,24 @@ export default function RegexTester() {
   const [flags, setFlags] = useState('gi');
   const [text, setText] = useState('');
 
+  const loadPreset = (index: number): void => {
+    const p = PRESETS[Number(index)];
+    if (!p) return;
+    setPattern(p.pattern);
+    setFlags(p.flags);
+    setText(p.sample);
+  };
+
   const result = useMemo(() => {
     if (!pattern) return null;
     try {
-      // matchAll requires the global flag — added transparently so a user-typed "i" alone still works.
-      const globalFlags = flags.includes('g') ? flags : `${flags}g`;
-      const re = new RegExp(pattern, globalFlags);
-      const matches = [...text.matchAll(re)];
-
-      const segments: Segment[] = [];
-      let cursor = 0;
-      for (const m of matches) {
-        if (m.index == null || m[0] === '') continue;
-        if (m.index > cursor) {
-          segments.push({ text: text.slice(cursor, m.index), matched: false });
-        }
-        segments.push({ text: m[0], matched: true });
-        cursor = m.index + m[0].length;
-      }
-      if (cursor < text.length) {
-        segments.push({ text: text.slice(cursor), matched: false });
-      }
+      // matchAll needs 'g'; per-group offsets need 'd' — both added transparently regardless of what the user typed.
+      let f = flags;
+      if (!f.includes('g')) f += 'g';
+      if (!f.includes('d')) f += 'd';
+      const re = new RegExp(pattern, f);
+      const matches = [...text.matchAll(re)] as IndexedMatch[];
+      const segments = buildSegments(text, matches);
 
       return { segments, matches, error: null as string | null };
     } catch (e) {
@@ -44,9 +137,32 @@ export default function RegexTester() {
     }
   }, [pattern, flags, text]);
 
+  const groupCount = Math.max(
+    0,
+    ...(result?.matches?.map((m) => m.length - 1) ?? [0])
+  );
+
   return (
     <GlassCard className="p-6">
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="flex items-center justify-between">
+        <span className="label mb-0">Common patterns</span>
+        <select
+          className="input min-h-0 w-auto py-1 text-xs"
+          defaultValue=""
+          onChange={(e) => loadPreset(Number(e.target.value))}
+        >
+          <option value="" disabled>
+            Load a preset…
+          </option>
+          {PRESETS.map((p, i) => (
+            <option key={p.label} value={i}>
+              {p.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="mt-3 flex flex-col gap-3 sm:flex-row">
         <div className="flex-1">
           <label className="label" htmlFor="regex-pattern">
             Pattern
@@ -82,12 +198,21 @@ export default function RegexTester() {
       )}
 
       <div className="mt-4">
-        <label className="label" htmlFor="regex-test-text">
-          Test string
-        </label>
+        <div className="flex items-center justify-between">
+          <label className="label mb-0" htmlFor="regex-test-text">
+            Test string
+          </label>
+          <button
+            type="button"
+            onClick={() => loadPreset(0)}
+            className="flex items-center gap-1 text-2xs text-muted-foreground transition-colors hover:text-neon"
+          >
+            <Sparkles className="h-3.5 w-3.5" /> Load example
+          </button>
+        </div>
         <AutoTextarea
           id="regex-test-text"
-          className="input min-h-32 font-mono text-xs"
+          className="input mt-1.5 min-h-32 font-mono text-xs"
           placeholder="Paste text to test against…"
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -95,15 +220,43 @@ export default function RegexTester() {
       </div>
 
       {result?.segments && text && (
-        <div className="mt-4">
-          <span className="label">
-            Highlighted matches ({result.matches?.length ?? 0})
-          </span>
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+          className="mt-4"
+        >
+          <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
+            <span className="label mb-0">
+              Highlighted matches ({result.matches?.length ?? 0})
+            </span>
+            {groupCount > 0 && (
+              <div className="flex flex-wrap items-center gap-2">
+                {Array.from({ length: groupCount }, (_, i) => (
+                  <span
+                    key={i}
+                    className={cn(
+                      'flex items-center gap-1 rounded-full px-2 py-0.5 text-2xs',
+                      GROUP_COLORS[(i + 1) % GROUP_COLORS.length]
+                    )}
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                    Group {i + 1}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
           <div className="glass-thin whitespace-pre-wrap break-words rounded-xl p-4 font-mono text-xs text-foreground">
             {result.segments.map((seg, i) => (
               <Fragment key={i}>
-                {seg.matched ? (
-                  <mark className="rounded bg-primary/30 px-0.5 text-primary">
+                {seg.groupIndex !== null ? (
+                  <mark
+                    className={cn(
+                      'rounded px-0.5',
+                      GROUP_COLORS[seg.groupIndex % GROUP_COLORS.length]
+                    )}
+                  >
                     {seg.text}
                   </mark>
                 ) : (
@@ -112,12 +265,12 @@ export default function RegexTester() {
               </Fragment>
             ))}
           </div>
-        </div>
+        </motion.div>
       )}
 
       {result?.matches && result.matches.length > 0 && (
         <div className="mt-4 space-y-2">
-          <span className="label">Groups</span>
+          <span className="label">Matches</span>
           {result.matches.map((m, i) => (
             <div
               key={i}
