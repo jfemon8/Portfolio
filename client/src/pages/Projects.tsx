@@ -76,7 +76,7 @@ export default function Projects() {
           subtitle={copy.subtitle}
         />
 
-        <div className="mb-12 flex flex-wrap gap-2">
+        <div className="mb-4 flex flex-wrap gap-2">
           {FILTERS.map((f) => (
             <button
               key={f}

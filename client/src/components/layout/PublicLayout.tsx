@@ -117,7 +117,7 @@ export default function PublicLayout() {
           <main
             id="main-content"
             tabIndex={-1}
-            className="flex-1 pb-28 outline-none"
+            className="flex-1 pb-8 outline-none"
           >
             <PageTransition>
               <Outlet />

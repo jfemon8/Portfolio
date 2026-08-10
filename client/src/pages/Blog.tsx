@@ -93,7 +93,7 @@ export default function Blog() {
           title={copy.title}
           // subtitle={copy.subtitle}
           action={
-            <div className="relative">
+            <div className="relative w-full md:w-auto">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" />
               <input
                 value={q}

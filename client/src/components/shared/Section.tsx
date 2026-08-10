@@ -38,7 +38,7 @@ export function SectionHeading({
   return (
     <div
       className={cn(
-        'mb-10 flex flex-wrap items-end gap-6 sm:mb-14 3xl:mb-20',
+        'mb-4 flex flex-wrap items-end gap-4',
         centered ? 'flex-col text-center' : 'justify-between'
       )}
     >
@@ -57,7 +57,7 @@ export function SectionHeading({
           </p>
         )}
       </Reveal>
-      {action && <div className="mb-1 shrink-0">{action}</div>}
+      {action && <div className="mb-1 w-full shrink-0 md:w-auto">{action}</div>}
     </div>
   );
 }
