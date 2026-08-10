@@ -491,7 +491,7 @@ export default function SiteCopyManager() {
       />
 
       {form && (
-        <div className="grid max-w-4xl gap-3">
+        <div className="grid gap-4">
           <Panel
             icon={LayoutList}
             title='Section headings — the title, sub-title and tiny "index" tag above each public section'

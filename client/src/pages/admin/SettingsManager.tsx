@@ -187,7 +187,7 @@ export default function SettingsManager() {
         subtitle="Your admin account password, SEO metadata (browser tab title + social-share preview shown when someone shares your link), and the homepage section order & visibility."
       />
 
-      <div className="grid max-w-3xl gap-6">
+      <div className="grid gap-4">
         <GlassCard className="p-6">
           <h3 className="mb-5 flex items-center gap-2 font-semibold text-neon">
             <User className="h-4 w-4" /> Account
