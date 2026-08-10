@@ -169,9 +169,12 @@ export interface Skill {
   featured: boolean;
 }
 
+export type CategoryScope = 'skill' | 'tool';
+
 export interface Category {
   name: string;
   slug: string;
+  scope: CategoryScope;
   order: number;
 }
 
@@ -184,6 +187,34 @@ export interface Education {
   endYear: string;
   grade: string;
   description: string;
+  order: number;
+}
+
+/** Ties a Tool doc to its implementation under components/tools, resolved via toolRegistry.tsx. */
+export type ToolKey =
+  | 'jwt-decoder'
+  | 'json-formatter'
+  | 'regex-tester'
+  | 'cp-profile-comparer'
+  | 'cf-rating-predictor';
+
+export type ToolIcon =
+  | 'KeyRound'
+  | 'Braces'
+  | 'Regex'
+  | 'GitCompare'
+  | 'TrendingUp'
+  | 'Wrench'
+  | 'Terminal'
+  | 'Sparkles';
+
+export interface Tool {
+  name: string;
+  slug: string;
+  description: string;
+  category: string;
+  icon: ToolIcon;
+  key: ToolKey;
   order: number;
 }
 
@@ -296,6 +327,7 @@ export type ProjectDoc = Entity<Project>;
 export type SkillDoc = Entity<Skill>;
 export type CategoryDoc = Entity<Category>;
 export type EducationDoc = Entity<Education>;
+export type ToolDoc = Entity<Tool>;
 export type CertificationDoc = Entity<Certification>;
 export type PublicationDoc = Entity<Publication>;
 export type BlogPostDoc = Entity<BlogPost>;

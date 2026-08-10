@@ -9,6 +9,7 @@
  * Messages & analytics are NEVER wiped.
  */
 import type { Model } from 'mongoose';
+import slugify from 'slugify';
 import { connectDB } from '../src/config/db.js';
 import { env } from '../src/config/env.js';
 import { User } from '../src/models/User.js';
@@ -21,6 +22,7 @@ import { Education } from '../src/models/Education.js';
 import { Certification } from '../src/models/Certification.js';
 import { Publication } from '../src/models/Publication.js';
 import { BlogPost } from '../src/models/BlogPost.js';
+import { Tool } from '../src/models/Tool.js';
 import type {
   IBlogPost,
   ICertification,
@@ -30,6 +32,7 @@ import type {
   IProject,
   IPublication,
   ISkill,
+  ITool,
   SkillCategory,
 } from '../src/types/index.js';
 
@@ -401,6 +404,60 @@ const publications: Partial<IPublication>[] = [
   },
 ];
 
+// upsertMany() goes through findOneAndUpdate, which — unlike Model.create() — never fires the Tool schema's slug-derive pre('validate') hook, so slugs are computed here instead of left blank (blank would collide on the unique index after the 2nd upsert).
+const toolsRaw: Omit<ITool, 'slug'>[] = [
+  {
+    name: 'JWT Decoder',
+    description:
+      'Decode a JWT to see its header and payload — entirely in your browser, nothing is sent anywhere.',
+    category: 'developer-utilities',
+    icon: 'KeyRound',
+    key: 'jwt-decoder',
+    order: 0,
+  },
+  {
+    name: 'JSON Formatter',
+    description:
+      'Paste JSON and get it pretty-printed, minified, or validated with clear error messages.',
+    category: 'developer-utilities',
+    icon: 'Braces',
+    key: 'json-formatter',
+    order: 1,
+  },
+  {
+    name: 'Regex Tester',
+    description:
+      'Test a regular expression against sample text with live match highlighting and capture groups.',
+    category: 'developer-utilities',
+    icon: 'Regex',
+    key: 'regex-tester',
+    order: 2,
+  },
+  {
+    name: 'CP Profile Comparer',
+    description:
+      'Compare two Codeforces handles side by side — rating, max rating, rank, and contest count.',
+    category: 'competitive-programming',
+    icon: 'GitCompare',
+    key: 'cp-profile-comparer',
+    order: 3,
+  },
+  {
+    name: 'Codeforces Rating Predictor',
+    description:
+      'Get an unofficial predicted rating delta for a Codeforces contest, right after it finishes.',
+    category: 'competitive-programming',
+    icon: 'TrendingUp',
+    key: 'cf-rating-predictor',
+    order: 4,
+  },
+];
+
+const tools: ITool[] = toolsRaw.map((t) => ({
+  ...t,
+  slug: slugify(t.name, { lower: true, strict: true }),
+}));
+
 const sampleBlog: Partial<IBlogPost> = {
   title: 'Welcome to My Developer Journey',
   excerpt:
@@ -467,6 +524,7 @@ async function seedContent(): Promise<void> {
       Education.deleteMany({}),
       Certification.deleteMany({}),
       Publication.deleteMany({}),
+      Tool.deleteMany({}),
     ]);
   }
 
@@ -485,6 +543,7 @@ async function seedContent(): Promise<void> {
   await upsertMany(Education, education, 'institution');
   await upsertMany(Certification, certifications, 'title');
   await upsertMany(Publication, publications, 'title');
+  await upsertMany(Tool, tools, 'key');
 
   if (!(await BlogPost.findOne({ title: sampleBlog.title }))) {
     await BlogPost.create(sampleBlog);

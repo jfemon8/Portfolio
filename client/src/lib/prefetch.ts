@@ -6,12 +6,15 @@ const importers = {
   projectDetail: () => import('@/pages/ProjectDetail'),
   blog: () => import('@/pages/Blog'),
   blogPost: () => import('@/pages/BlogPostPage'),
+  tools: () => import('@/pages/Tools'),
+  toolDetail: () => import('@/pages/ToolDetail'),
 };
 
 /** Warm the chunk (and, for detail pages, the data) a path will render. */
 export function prefetchRoute(path: string): void {
   const projectSlug = /^\/projects\/([^/]+)/.exec(path)?.[1];
   const blogSlug = /^\/blog\/([^/]+)/.exec(path)?.[1];
+  const toolSlug = /^\/tools\/([^/]+)/.exec(path)?.[1];
 
   if (projectSlug) {
     void importers.projectDetail();
@@ -23,6 +26,10 @@ export function prefetchRoute(path: string): void {
     prefetchBlogPost(blogSlug);
   } else if (path === '/blog') {
     void importers.blog();
+  } else if (toolSlug) {
+    void importers.toolDetail();
+  } else if (path === '/tools') {
+    void importers.tools();
   }
 }
 
@@ -34,6 +41,8 @@ const PUBLIC_ROUTE_IMPORTERS: ChunkImporter[] = [
   importers.projectDetail,
   importers.blog,
   importers.blogPost,
+  importers.tools,
+  importers.toolDetail,
 ];
 
 // Mirrors the admin lazy() list in App.tsx — only ever runs once an admin has already reached AdminLayout, so visitors never trigger it.
@@ -53,6 +62,7 @@ const ADMIN_ROUTE_IMPORTERS: ChunkImporter[] = [
   () => import('@/pages/admin/UsersManager'),
   () => import('@/pages/admin/AuditLogViewer'),
   () => import('@/pages/admin/SiteCopyManager'),
+  () => import('@/pages/admin/ToolsManager'),
   () => import('@/pages/admin/SettingsManager'),
 ];
 

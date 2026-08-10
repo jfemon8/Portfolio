@@ -77,6 +77,90 @@ export async function fetchCodeforces(handle: string): Promise<CpSnapshot> {
   };
 }
 
+interface CfParty {
+  members: { handle: string }[];
+  participantType:
+    | 'CONTESTANT'
+    | 'PRACTICE'
+    | 'VIRTUAL'
+    | 'MANAGER'
+    | 'OUT_OF_COMPETITION';
+}
+
+interface CfStandingsRow {
+  party: CfParty;
+  rank: number;
+}
+
+interface CfStandings {
+  rows: CfStandingsRow[];
+}
+
+export interface StandingsEntry {
+  handle: string;
+  rank: number;
+}
+
+// Codeforces rejects any extra query param (count/from/showUnofficial) on this endpoint for anonymous callers — confirmed live: it 400s with "available only via anonymous GET requests with no extra parameters" the moment one is added. So the full field always comes back in one response (a large round can be 10k+ rows); callers that need to bound it (see ratingPredictor.ts's sampleStandings) do so themselves, since naively truncating here would silently bias every caller.
+/** Rated contestants (excludes practice/virtual/out-of-competition rows) for a contest, ranked, full field. */
+export async function fetchContestStandings(
+  contestId: number
+): Promise<StandingsEntry[]> {
+  const res = await j<CfStandings>(
+    `${CF_API}/contest.standings?contestId=${contestId}`
+  );
+  if (res.status !== 'OK' || !res.result) {
+    throw new Error(res.comment || 'Could not load contest standings');
+  }
+  return res.result.rows
+    .filter((r) => r.party.participantType === 'CONTESTANT')
+    .map((r) => ({ handle: r.party.members[0]?.handle ?? '', rank: r.rank }))
+    .filter((r) => r.handle);
+}
+
+// Confirmed live: Codeforces 400s a `;`-joined handles param past ~5-10k URL chars (a ~1000-handle request fails, 500 succeeds) — chunked well under that so a large contest's full field doesn't break the request.
+const RATING_BATCH_SIZE = 400;
+
+const chunk = <T>(items: T[], size: number): T[][] =>
+  Array.from({ length: Math.ceil(items.length / size) }, (_, i) =>
+    items.slice(i * size, i * size + size)
+  );
+
+async function fetchUserInfoBatch(handles: string[]): Promise<CfUserInfo[]> {
+  if (handles.length === 0) return [];
+  const res = await j<CfUserInfo[]>(
+    `${CF_API}/user.info?handles=${handles.map(encodeURIComponent).join(';')}`
+  ).catch(() => null);
+  if (res && res.status === 'OK' && res.result) return res.result;
+
+  // Codeforces fails the WHOLE batch if even one handle is invalid (renamed/deleted account) — confirmed live: "handles: User with handle X not found" with no partial results. Bisect to isolate and drop just the bad handle(s) instead of losing the entire batch's ratings.
+  if (handles.length === 1) return [];
+  const mid = Math.ceil(handles.length / 2);
+  const [left, right] = await Promise.all([
+    fetchUserInfoBatch(handles.slice(0, mid)),
+    fetchUserInfoBatch(handles.slice(mid)),
+  ]);
+  return [...left, ...right];
+}
+
+/** Bulk current ratings for a set of handles via Codeforces' `;`-separated handles param, batched to stay under its URL-length limit. Unrated (or unresolvable) handles are simply absent from the result. */
+export async function fetchRatingsBulk(
+  handles: string[]
+): Promise<Map<string, number>> {
+  const map = new Map<string, number>();
+  if (handles.length === 0) return map;
+
+  const batches = await Promise.all(
+    chunk(handles, RATING_BATCH_SIZE).map(fetchUserInfoBatch)
+  );
+  for (const users of batches) {
+    for (const u of users) {
+      if (typeof u.rating === 'number') map.set(u.handle, u.rating);
+    }
+  }
+  return map;
+}
+
 // LeetCode integration via the public GraphQL endpoint (no auth); best-effort — failures return null so it never breaks the Codeforces section it's nested under.
 export interface LeetCodeSnapshot {
   handle: string;

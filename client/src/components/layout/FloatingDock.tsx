@@ -8,6 +8,7 @@ import {
   Briefcase,
   FolderGit2,
   Newspaper,
+  Wrench,
   Mail,
   type LucideIcon,
 } from 'lucide-react';
@@ -31,6 +32,7 @@ const ITEMS: DockItem[] = [
   { label: 'Work', icon: Briefcase, target: '#experience' },
   { label: 'Projects', icon: FolderGit2, target: '/projects' },
   { label: 'Blog', icon: Newspaper, target: '/blog' },
+  { label: 'Tools', icon: Wrench, target: '/tools' },
   { label: 'Contact', icon: Mail, target: '#contact' },
 ];
 

@@ -8,6 +8,7 @@ import { Skill } from '../models/Skill.js';
 import { Education } from '../models/Education.js';
 import { Certification } from '../models/Certification.js';
 import { Publication } from '../models/Publication.js';
+import { Tool } from '../models/Tool.js';
 
 function resourceRouter<T>(Model: Model<T>, opts?: CrudOptions): Router {
   const c = crudFactory(Model, opts);
@@ -40,5 +41,6 @@ router.use(
   '/publications',
   resourceRouter(Publication, { imageFields: ['mediaPublicId'] })
 );
+router.use('/tools', resourceRouter(Tool)); // icon is a fixed select, not an upload — no imageFields
 
 export default router;

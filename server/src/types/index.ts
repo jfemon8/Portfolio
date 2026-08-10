@@ -429,9 +429,12 @@ export interface ISkill {
 }
 
 /** Skill category (/categories CRUD); `slug` is the stable id referenced by ISkill.category, `label` is the display string shown in the public tabs. */
+export type CategoryScope = 'skill' | 'tool';
+
 export interface ICategory {
   name: string;
   slug: string;
+  scope: CategoryScope;
   order: number;
 }
 
@@ -444,6 +447,35 @@ export interface IEducation {
   endYear: string;
   grade: string;
   description: string;
+  order: number;
+}
+
+/** Ties a Tool doc to its implementation — the client resolves this to a lazy-loaded component; there is no code for a key that isn't in this list. */
+export type ToolKey =
+  | 'jwt-decoder'
+  | 'json-formatter'
+  | 'regex-tester'
+  | 'cp-profile-comparer'
+  | 'cf-rating-predictor';
+
+export type ToolIcon =
+  | 'KeyRound'
+  | 'Braces'
+  | 'Regex'
+  | 'GitCompare'
+  | 'TrendingUp'
+  | 'Wrench'
+  | 'Terminal'
+  | 'Sparkles';
+
+/** Admin-editable metadata for a public /tools entry; the tool's actual behavior lives in code under client/src/components/tools, keyed by `key`. */
+export interface ITool {
+  name: string;
+  slug: string;
+  description: string;
+  category: string;
+  icon: ToolIcon;
+  key: ToolKey;
   order: number;
 }
 

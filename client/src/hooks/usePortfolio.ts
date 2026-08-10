@@ -21,6 +21,7 @@ import type {
   PublicationDoc,
   SkillDoc,
   CategoryDoc,
+  ToolDoc,
 } from '@/types';
 
 const get = async <T>(url: string): Promise<T> => (await api.get<T>(url)).data;
@@ -101,10 +102,10 @@ export const useSkills = () =>
     gcTime: CONTENT_GC,
   });
 
-export const useCategories = () =>
+export const useCategories = (scope: 'skill' | 'tool' = 'skill') =>
   useQuery({
-    queryKey: ['categories'],
-    queryFn: () => get<ListResponse<CategoryDoc>>('/categories'),
+    queryKey: ['categories', scope],
+    queryFn: () => get<ListResponse<CategoryDoc>>(`/categories?scope=${scope}`),
     staleTime: CONTENT,
     gcTime: CONTENT_GC,
   });
@@ -129,6 +130,14 @@ export const usePublications = () =>
   useQuery({
     queryKey: ['publications'],
     queryFn: () => get<ListResponse<PublicationDoc>>('/publications'),
+    staleTime: CONTENT,
+    gcTime: CONTENT_GC,
+  });
+
+export const useTools = () =>
+  useQuery({
+    queryKey: ['tools'],
+    queryFn: () => get<ListResponse<ToolDoc>>('/tools'),
     staleTime: CONTENT,
     gcTime: CONTENT_GC,
   });

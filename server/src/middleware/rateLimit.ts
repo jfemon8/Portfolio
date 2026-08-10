@@ -41,3 +41,15 @@ export const trackingLimiter = rateLimit({
   legacyHeaders: false,
   message: { success: false, message: 'Too many requests, please slow down.' },
 });
+
+/** Tight limit for visitor-triggered CP tools that fan out to live external APIs on every request (uncacheable, can't be shielded by CDN caching like /api/cp). */
+export const cpToolLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: 'Too many requests. Please try again in a few minutes.',
+  },
+});
