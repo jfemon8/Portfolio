@@ -26,6 +26,12 @@ export function resetScroll(): void {
   else window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
+/** Jump to an arbitrary Y instantly — used to restore a remembered scroll position on back/forward nav. */
+export function scrollToY(y: number): void {
+  if (lenis) lenis.scrollTo(y, { immediate: true });
+  else window.scrollTo({ top: y, behavior: 'instant' });
+}
+
 /** Resolves once an element with this id exists in the DOM, or null after `timeoutMs`. */
 export function waitForElementId(
   id: string,

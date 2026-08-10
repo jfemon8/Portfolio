@@ -7,6 +7,7 @@ import GlassCard from '@/components/shared/GlassCard';
 import Counter from '@/components/shared/Counter';
 import ResumeViewer from '@/components/shared/ResumeViewer';
 import FloatingTechIcons from '@/components/motion/FloatingTechIcons';
+import SmartImage from '@/components/shared/SmartImage';
 import type { ProfileDoc } from '@/types';
 
 const personalSkills = [
@@ -94,9 +95,10 @@ export default function About({ profile }: { profile?: ProfileDoc }) {
                 <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-primary via-neon-blue to-neon-violet p-[0.1875rem] shadow-[inset_0_0.0625rem_0_var(--glass-highlight),0_0_3.75rem_-0.75rem_hsl(var(--ring)/0.55)]">
                   <div className="h-full w-full overflow-hidden rounded-full bg-card">
                     {profile?.avatar ? (
-                      <img
+                      <SmartImage
                         src={profile.avatar}
                         alt={profile?.name || 'Avatar'}
+                        imgWidth={400}
                         className="h-full w-full object-cover"
                       />
                     ) : (

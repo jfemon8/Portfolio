@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { protect, adminOnly } from '../middleware/auth.js';
+import { cacheControl } from '../middleware/cacheControl.js';
 import {
   listCategories,
   createCategory,
@@ -9,7 +10,7 @@ import {
 
 const router = Router();
 
-router.get('/', listCategories); // public read (seeds defaults on first hit)
+router.get('/', cacheControl(120), listCategories); // public read (seeds defaults on first hit)
 router.post('/', protect, adminOnly, createCategory);
 router.put('/:id', protect, adminOnly, updateCategory);
 router.delete('/:id', protect, adminOnly, deleteCategory);

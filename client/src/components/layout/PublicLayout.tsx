@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useNavigationType } from 'react-router-dom';
 import Footer from './Footer';
 import PremiumBackground from './PremiumBackground';
 import FloatingDock from './FloatingDock';
@@ -10,13 +10,20 @@ import { ConfirmProvider } from '@/components/admin/ConfirmModal';
 import { track } from '@/lib/api';
 import { useScrollDepth } from '@/hooks/useScrollDepth';
 import { initThemeSync } from '@/stores/theme';
-import { scrollToId, resetScroll, waitForElementId } from '@/lib/smoothScroll';
+import {
+  scrollToId,
+  resetScroll,
+  scrollToY,
+  waitForElementId,
+} from '@/lib/smoothScroll';
+import { saveScroll, getScroll } from '@/lib/scrollMemory';
 import { queryClient } from '@/lib/queryClient';
 import { prefetchPublicRoutes } from '@/lib/prefetch';
 
 /** Sole authority that initialises the canonical theme engine for the public site. */
 export default function PublicLayout() {
   const { pathname, hash, state } = useLocation();
+  const navigationType = useNavigationType();
   const instant = (state as { instant?: boolean } | null)?.instant === true;
 
   useEffect(() => initThemeSync(), []);
@@ -27,11 +34,36 @@ export default function PublicLayout() {
 
   useEffect(() => prefetchPublicRoutes(), []);
 
+  // Continuously remembers this route's scroll offset (rAF-throttled) so a back/forward nav back to it can restore where the visitor left off.
+  useEffect(() => {
+    let raf = 0;
+    const onScroll = (): void => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => saveScroll(pathname, window.scrollY));
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, [pathname]);
+
   // Waits for the `/#section` target to mount, lands on it, then keeps re-snapping while sections above are still fetching and reflowing taller.
   useEffect(() => {
     if (!hash) {
-      resetScroll();
-      return;
+      // Only restore on browser back/forward (POP) — a fresh link click (PUSH) always lands at the top like a new page should.
+      const saved = navigationType === 'POP' ? getScroll(pathname) : undefined;
+      if (saved == null) {
+        resetScroll();
+        return;
+      }
+      // One frame to let the route's content commit, then a short follow-up in case images/fonts are still reflowing the page.
+      const raf = requestAnimationFrame(() => scrollToY(saved));
+      const settle = setTimeout(() => scrollToY(saved), 150);
+      return () => {
+        cancelAnimationFrame(raf);
+        clearTimeout(settle);
+      };
     }
     const id = hash.slice(1);
     let cancelled = false;
@@ -93,7 +125,7 @@ export default function PublicLayout() {
       window.removeEventListener('wheel', abortChase);
       window.removeEventListener('touchstart', abortChase);
     };
-  }, [pathname, hash, instant]);
+  }, [pathname, hash, instant, navigationType]);
 
   useEffect(() => {
     track('pageview', pathname);

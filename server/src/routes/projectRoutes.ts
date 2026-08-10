@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { protect, adminOnly } from '../middleware/auth.js';
+import { cacheControl } from '../middleware/cacheControl.js';
 import {
   listProjects,
   getProjectBySlug,
@@ -11,7 +12,7 @@ import {
 
 const router = Router();
 
-router.get('/', listProjects); // public
+router.get('/', cacheControl(60), listProjects); // public
 router.get('/slug/:slug', getProjectBySlug); // public detail
 router.get('/:id', protect, adminOnly, getProjectById); // admin edit
 router.post('/', protect, adminOnly, createProject);

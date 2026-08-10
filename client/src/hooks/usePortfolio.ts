@@ -27,12 +27,15 @@ const get = async <T>(url: string): Promise<T> => (await api.get<T>(url)).data;
 
 // Portfolio content is admin-managed and rarely changes, so a 5-min staleTime cuts refetches; admin managers keep the global 60s default for fresher data.
 const CONTENT = 5 * 60 * 1000;
+// Kept well above staleTime so a page revisited within 30min still paints instantly from cache (then silently revalidates in the background) instead of blocking on a refetch.
+const CONTENT_GC = 30 * 60 * 1000;
 
 export const useProfile = () =>
   useQuery({
     queryKey: ['profile'],
     queryFn: () => get<ItemResponse<ProfileDoc>>('/profile'),
     staleTime: CONTENT,
+    gcTime: CONTENT_GC,
   });
 
 export const useSeoSettings = () =>
@@ -40,6 +43,7 @@ export const useSeoSettings = () =>
     queryKey: ['seo'],
     queryFn: () => get<ItemResponse<SeoSettingsDoc>>('/seo'),
     staleTime: CONTENT,
+    gcTime: CONTENT_GC,
   });
 
 export const useSiteSettings = () =>
@@ -47,6 +51,7 @@ export const useSiteSettings = () =>
     queryKey: ['site'],
     queryFn: () => get<ItemResponse<SiteSettingsDoc>>('/site'),
     staleTime: CONTENT,
+    gcTime: CONTENT_GC,
   });
 
 export const useSiteContent = () =>
@@ -54,6 +59,7 @@ export const useSiteContent = () =>
     queryKey: ['siteContent'],
     queryFn: () => get<ItemResponse<SiteContentDoc>>('/site-content'),
     staleTime: CONTENT,
+    gcTime: CONTENT_GC,
   });
 
 export const useProjects = (params = '') =>
@@ -61,12 +67,14 @@ export const useProjects = (params = '') =>
     queryKey: ['projects', params],
     queryFn: () => get<ListResponse<ProjectDoc>>(`/projects${params}`),
     staleTime: CONTENT,
+    gcTime: CONTENT_GC,
   });
 
 const projectQueryOptions = (slug: string) => ({
   queryKey: ['project', slug],
   queryFn: () => get<ItemResponse<ProjectDoc>>(`/projects/slug/${slug}`),
   staleTime: CONTENT,
+  gcTime: CONTENT_GC,
 });
 
 export const useProject = (slug?: string) =>
@@ -82,6 +90,7 @@ export const useExperience = () =>
     queryKey: ['experience'],
     queryFn: () => get<ListResponse<ExperienceDoc>>('/experience'),
     staleTime: CONTENT,
+    gcTime: CONTENT_GC,
   });
 
 export const useSkills = () =>
@@ -89,6 +98,7 @@ export const useSkills = () =>
     queryKey: ['skills'],
     queryFn: () => get<ListResponse<SkillDoc>>('/skills'),
     staleTime: CONTENT,
+    gcTime: CONTENT_GC,
   });
 
 export const useCategories = () =>
@@ -96,6 +106,7 @@ export const useCategories = () =>
     queryKey: ['categories'],
     queryFn: () => get<ListResponse<CategoryDoc>>('/categories'),
     staleTime: CONTENT,
+    gcTime: CONTENT_GC,
   });
 
 export const useEducation = () =>
@@ -103,6 +114,7 @@ export const useEducation = () =>
     queryKey: ['education'],
     queryFn: () => get<ListResponse<EducationDoc>>('/education'),
     staleTime: CONTENT,
+    gcTime: CONTENT_GC,
   });
 
 export const useCertifications = () =>
@@ -110,6 +122,7 @@ export const useCertifications = () =>
     queryKey: ['certifications'],
     queryFn: () => get<ListResponse<CertificationDoc>>('/certifications'),
     staleTime: CONTENT,
+    gcTime: CONTENT_GC,
   });
 
 export const usePublications = () =>
@@ -117,6 +130,7 @@ export const usePublications = () =>
     queryKey: ['publications'],
     queryFn: () => get<ListResponse<PublicationDoc>>('/publications'),
     staleTime: CONTENT,
+    gcTime: CONTENT_GC,
   });
 
 /** Consumes the server `pagination` metadata so posts beyond the first page stay reachable via `fetchNextPage`. */
@@ -135,6 +149,7 @@ export const useBlogInfinite = (query = '') =>
         ? last.pagination.page + 1
         : undefined,
     staleTime: CONTENT,
+    gcTime: CONTENT_GC,
   });
 
 const blogPostQueryOptions = (slug: string, visitorKey?: string) => ({
@@ -146,6 +161,7 @@ const blogPostQueryOptions = (slug: string, visitorKey?: string) => ({
     return get<BlogDetailResponse>(`/blog/slug/${slug}${suffix}`);
   },
   staleTime: CONTENT,
+  gcTime: CONTENT_GC,
 });
 
 export const useBlogPost = (slug?: string, visitorKey?: string) =>
@@ -194,4 +210,5 @@ export const useCpStats = () =>
     retry: false,
     // server caches 6h; no need to refetch client-side often
     staleTime: 30 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
   });

@@ -7,6 +7,7 @@ import { useSkills, useCategories } from '@/hooks/usePortfolio';
 import { staggerContainer } from '@/config/animation';
 import { getSkillIcon, FallbackSkillIcon } from '@/lib/skillIcon';
 import { cn } from '@/lib/cn';
+import SmartImage from '@/components/shared/SmartImage';
 
 /** Icon resolves as uploaded `iconImage` → react-icons brand match → neutral glyph; category tabs are driven by the /categories CRUD. */
 export default function Skills() {
@@ -118,9 +119,10 @@ export default function Skills() {
                     <div className="relative flex items-center gap-3">
                       <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-border/60 bg-background/40">
                         {s.iconImage ? (
-                          <img
+                          <SmartImage
                             src={s.iconImage}
                             alt=""
+                            imgWidth={64}
                             className="h-6 w-6 object-contain"
                           />
                         ) : BrandIcon ? (

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import type { Model } from 'mongoose';
 import { protect, adminOnly } from '../middleware/auth.js';
+import { cacheControl } from '../middleware/cacheControl.js';
 import { crudFactory, type CrudOptions } from '../controllers/crudFactory.js';
 import { Experience } from '../models/Experience.js';
 import { Skill } from '../models/Skill.js';
@@ -11,8 +12,8 @@ import { Publication } from '../models/Publication.js';
 function resourceRouter<T>(Model: Model<T>, opts?: CrudOptions): Router {
   const c = crudFactory(Model, opts);
   const r = Router();
-  r.get('/', c.list);
-  r.get('/:id', c.getOne);
+  r.get('/', cacheControl(120), c.list);
+  r.get('/:id', cacheControl(120), c.getOne);
   r.post('/', protect, adminOnly, c.create);
   r.patch('/reorder', protect, adminOnly, c.reorder);
   r.put('/:id', protect, adminOnly, c.update);

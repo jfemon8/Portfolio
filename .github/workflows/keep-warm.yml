@@ -1,0 +1,17 @@
+name: Keep API Warm
+
+# Pings the health endpoint every 10 minutes so the Vercel serverless
+# function stays warm and avoids a cold-start on the next real visitor request.
+# Update the URL below if the API later moves to a custom domain.
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping /api/health
+        continue-on-error: true
+        run: curl -sf --max-time 15 --retry 2 https://emon-api.vercel.app/api/health
