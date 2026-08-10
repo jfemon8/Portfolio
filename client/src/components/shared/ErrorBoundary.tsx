@@ -39,7 +39,10 @@ export class ErrorBoundary extends Component<Props, State> {
     return (
       <div className="grid min-h-screen place-items-center bg-background px-4 text-center">
         <div className="flex flex-col items-center gap-4">
-          <AlertTriangle className="h-10 w-10 text-destructive" />
+          <AlertTriangle
+            className="h-10 w-10 text-destructive"
+            strokeWidth={2.25}
+          />
           <div>
             <p className="text-lg font-semibold text-foreground">
               Something went wrong.

@@ -59,7 +59,10 @@ export default function MediaUpload({
       {value ? (
         isPdfUrl(value) ? (
           <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
-            <FileText className="h-7 w-7 shrink-0 text-primary" />
+            <FileText
+              className="h-7 w-7 shrink-0 text-primary"
+              strokeWidth={2.25}
+            />
             <a
               href={proxyFileUrl(value, 'document.pdf')}
               target="_blank"
@@ -72,7 +75,7 @@ export default function MediaUpload({
               type="button"
               onClick={remove}
               aria-label="Remove file"
-              className="shrink-0 rounded-lg border border-border bg-background/85 p-2 text-destructive shadow-sm transition-colors hover:border-destructive/40"
+              className="glass-thin shrink-0 rounded-lg p-2 text-destructive shadow-sm transition-colors hover:border-destructive/40"
             >
               <X className="h-4 w-4" />
             </button>
@@ -85,7 +88,7 @@ export default function MediaUpload({
               onClick={remove}
               aria-label="Remove image"
               className={cn(
-                'absolute right-2 top-2 rounded-lg border border-border bg-background/85 p-2 text-destructive shadow-sm backdrop-blur transition-opacity',
+                'glass-thin absolute right-2 top-2 rounded-lg p-2 text-destructive shadow-sm transition-opacity',
                 'opacity-100 sm:opacity-0 sm:group-hover:opacity-100'
               )}
             >
@@ -99,7 +102,7 @@ export default function MediaUpload({
             <Loader2 className="h-7 w-7 animate-spin" />
           ) : (
             <>
-              <UploadCloud className="h-7 w-7" />
+              <UploadCloud className="h-7 w-7" strokeWidth={2.25} />
               <span className="text-center text-xs leading-tight">
                 Click to upload image or PDF
                 <br />

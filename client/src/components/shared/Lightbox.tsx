@@ -69,13 +69,13 @@ export default function Lightbox({
           onClick={onClose}
           // Without data-lenis-prevent, wheel/touch on the overlay bubbles to the document and Lenis scrolls the page beneath instead.
           data-lenis-prevent
-          className="fixed inset-0 z-[70] grid place-items-center bg-background/90 p-4 backdrop-blur-xl sm:p-8"
+          className="fixed inset-0 z-[70] grid place-items-center bg-background/90 p-4 backdrop-blur-[1.875rem] backdrop-saturate-150 backdrop-brightness-105 sm:p-8"
         >
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-xl border border-border/70 bg-card/60 text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
+            className="glass-thin absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-xl text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
           >
             <X className="h-5 w-5" />
           </button>
@@ -86,7 +86,7 @@ export default function Lightbox({
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="absolute left-4 top-4 inline-flex h-11 items-center gap-1.5 rounded-xl border border-border/70 bg-card/60 px-4 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
+              className="glass-thin absolute left-4 top-4 inline-flex h-11 items-center gap-1.5 rounded-xl px-4 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
             >
               {action.label} <ExternalLink className="h-4 w-4" />
             </a>
@@ -101,7 +101,7 @@ export default function Lightbox({
                   e.stopPropagation();
                   setI((v) => (v - 1 + images.length) % images.length);
                 }}
-                className="absolute left-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-border/70 bg-card/60 text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary sm:left-6"
+                className="glass-thin absolute left-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary sm:left-6"
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
@@ -112,7 +112,7 @@ export default function Lightbox({
                   e.stopPropagation();
                   setI((v) => (v + 1) % images.length);
                 }}
-                className="absolute right-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-border/70 bg-card/60 text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary sm:right-6"
+                className="glass-thin absolute right-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary sm:right-6"
               >
                 <ChevronRight className="h-5 w-5" />
               </button>

@@ -28,7 +28,10 @@ export default function Education() {
           <Reveal key={e._id} delay={i * 0.07}>
             <div className="group relative h-full rounded-2xl">
               <GlassCard interactive className="h-full p-6">
-                <GraduationCap className="mb-4 h-7 w-7 text-neon" />
+                <GraduationCap
+                  className="mb-4 h-7 w-7 text-neon"
+                  strokeWidth={2.25}
+                />
                 <h3 className="font-bold text-foreground">{e.institution}</h3>
                 <p className="mt-1 text-sm font-medium text-neon">
                   {e.degree}

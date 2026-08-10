@@ -5,6 +5,7 @@
 /* Semantic theme tokens. */
 @layer base {
   :root {
+    color-scheme: dark;
     --background: 240 24% 4%;
     --foreground: 240 20% 92%;
     --card: 240 24% 9%;
@@ -39,6 +40,7 @@
   }
 
   html.light {
+    color-scheme: light;
     /* Softer light-mode background. */
     --background: 0 0% 90%;
     --foreground: 240 24% 8%;
@@ -162,9 +164,9 @@
            2xl:max-w-7xl 3xl:max-w-[88rem];
   }
 
-  /* iOS 26 Liquid Glass material; corner-shape is a no-op fallback where unsupported. */
+  /* iOS 26 Liquid Glass material. */
   .glass {
-    @apply relative rounded-[1.5rem] border backdrop-blur-[1.875rem] backdrop-saturate-150 backdrop-brightness-105;
+    @apply relative rounded-3xl border backdrop-blur-[1.875rem] backdrop-saturate-150 backdrop-brightness-105;
     background-color: var(--glass-bg);
     border-color: var(--glass-border);
     box-shadow:
@@ -175,9 +177,10 @@
 
   .glass-hover {
     @apply transition-all duration-300 hover:border-primary/40;
+    transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
-  /* Lighter-blur glass tier for small/inline controls — buttons, badges, inputs, icon tiles. */
+  /* Lighter-blur glass tier for small controls. */
   .glass-thin {
     @apply border backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105;
     background-color: var(--glass-bg-strong);
@@ -211,6 +214,10 @@
            text-base text-foreground placeholder:text-muted-foreground
            transition-colors focus:border-primary/60 focus:outline-none
            focus:ring-1 focus:ring-primary/40;
+  }
+  /* Native <select> popups can't composite backdrop-filter, so options need an opaque theme-matched fallback instead of the glass tint. */
+  select.input option {
+    @apply bg-popover text-popover-foreground;
   }
   /* Theme-aware label. */
   .label {

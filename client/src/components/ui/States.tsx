@@ -44,7 +44,7 @@ export function ErrorState({ message, onRetry }: ErrorStateProps) {
   });
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-      <AlertTriangle className="h-8 w-8 text-neon-pink" />
+      <AlertTriangle className="h-8 w-8 text-neon-pink" strokeWidth={2.25} />
       <p className="text-ink-soft">{message ?? c.error}</p>
       {onRetry && (
         <button onClick={onRetry} className="btn-outline mt-1">
@@ -59,7 +59,7 @@ export function EmptyState({ message }: { message?: string }) {
   const c = useSiteCopy('states', { empty: 'Nothing here yet.' });
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-16 text-ink-dim">
-      <Inbox className="h-8 w-8" />
+      <Inbox className="h-8 w-8" strokeWidth={2.25} />
       <p className="text-sm">{message ?? c.empty}</p>
     </div>
   );

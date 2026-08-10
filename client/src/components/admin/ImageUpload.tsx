@@ -81,7 +81,7 @@ export default function ImageUpload({
             onClick={() => onChange({ url: '', publicId: '' })}
             aria-label="Remove image"
             className={cn(
-              'absolute right-2 top-2 rounded-lg border border-border bg-background/85 p-2 text-destructive shadow-sm backdrop-blur transition-opacity',
+              'glass-thin absolute right-2 top-2 rounded-lg p-2 text-destructive shadow-sm transition-opacity',
               'opacity-100 sm:opacity-0 sm:group-hover:opacity-100'
             )}
           >
@@ -101,6 +101,7 @@ export default function ImageUpload({
             <>
               <UploadCloud
                 className={cn(variant === 'compact' ? 'h-5 w-5' : 'h-7 w-7')}
+                strokeWidth={variant === 'compact' ? 2 : 2.25}
               />
               {variant !== 'compact' && (
                 <span className="text-center text-xs leading-tight">

@@ -99,16 +99,24 @@ export default {
           foreground: 'hsl(var(--card-foreground) / <alpha-value>)',
         },
       },
+      // Concentric scale, derived from --radius.
       borderRadius: {
-        xl: 'calc(var(--radius) + 0.25rem)',
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 0.125rem)',
         sm: 'calc(var(--radius) - 0.25rem)',
+        md: 'calc(var(--radius) - 0.125rem)',
+        lg: 'var(--radius)',
+        xl: 'calc(var(--radius) + 0.15rem)',
+        '2xl': 'calc(var(--radius) + 0.4rem)',
+        '3xl': 'calc(var(--radius) + 0.65rem)',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'Segoe UI', 'sans-serif'],
-        display: ['Inter', 'system-ui', 'Segoe UI', 'sans-serif'],
+        // Resolves to real SF Pro on Apple devices, Inter elsewhere.
+        sans: ['-apple-system', 'BlinkMacSystemFont', 'Inter', 'system-ui', 'Segoe UI', 'sans-serif'],
+        display: ['-apple-system', 'BlinkMacSystemFont', 'Inter', 'system-ui', 'Segoe UI', 'sans-serif'],
         mono: ['"JetBrains Mono"', '"Fira Code"', 'ui-monospace', 'monospace'],
+      },
+      transitionTimingFunction: {
+        // iOS-style spring overshoot.
+        spring: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
       },
       boxShadow: {
         neon: '0 0 0 0.0625rem rgba(0,255,209,.15), 0 0.5rem 2.5rem -0.5rem rgba(0,255,209,.35)',

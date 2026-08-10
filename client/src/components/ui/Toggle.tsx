@@ -24,7 +24,7 @@ export default function Toggle({ checked, onChange, label, id }: ToggleProps) {
     >
       <span
         className={cn(
-          'pointer-events-none block h-5 w-5 rounded-full bg-white shadow-[0_0.0625rem_0.1875rem_rgba(0,0,0,0.3),inset_0_0.0625rem_0_rgba(255,255,255,0.8)] ring-0 transition-transform',
+          'pointer-events-none block h-5 w-5 rounded-full bg-white shadow-[0_0.0625rem_0.1875rem_rgba(0,0,0,0.3),inset_0_0.0625rem_0_rgba(255,255,255,0.8)] ring-0 transition-transform duration-300 ease-spring',
           checked ? 'translate-x-5' : 'translate-x-0'
         )}
       />

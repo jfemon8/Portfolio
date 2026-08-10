@@ -47,7 +47,7 @@ export default function PdfPreviewModal({
           transition={{ duration: 0.18 }}
           // data-lenis-prevent stops the Lenis smooth-scroll provider from swallowing wheel/touch here, so the PDF container's overflow-auto actually scrolls.
           data-lenis-prevent
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-3 backdrop-blur-sm sm:p-6"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-3 backdrop-blur-[1.875rem] backdrop-saturate-150 backdrop-brightness-105 sm:p-6"
           onClick={onClose}
         >
           <motion.div
@@ -62,7 +62,7 @@ export default function PdfPreviewModal({
             <button
               type="button"
               onClick={onClose}
-              className="absolute -right-3 -top-3 z-10 rounded-full border border-border bg-background p-2 text-foreground shadow-lg hover:bg-accent sm:-right-4 sm:-top-4"
+              className="glass-thin absolute -right-3 -top-3 z-10 rounded-full p-2 text-foreground shadow-lg hover:bg-accent sm:-right-4 sm:-top-4"
               aria-label="Close preview"
             >
               <X className="h-4 w-4" />
@@ -72,7 +72,7 @@ export default function PdfPreviewModal({
                 href={action.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="absolute -left-3 -top-3 z-10 inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-2 text-xs font-medium text-foreground shadow-lg hover:bg-accent sm:-left-4 sm:-top-4"
+                className="glass-thin absolute -left-3 -top-3 z-10 inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-medium text-foreground shadow-lg hover:bg-accent sm:-left-4 sm:-top-4"
               >
                 {action.label} <ExternalLink className="h-3.5 w-3.5" />
               </a>

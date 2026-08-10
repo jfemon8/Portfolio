@@ -173,7 +173,7 @@ export default function Contact({ profile }: { profile?: ProfileDoc }) {
                     }}
                     className="mb-5 grid h-16 w-16 place-items-center rounded-full border border-primary/30 bg-primary/15 text-neon backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105"
                   >
-                    <CheckCircle2 className="h-8 w-8" />
+                    <CheckCircle2 className="h-8 w-8" strokeWidth={2.25} />
                   </motion.span>
                   <h3 className="text-xl font-bold text-foreground">
                     {f.sentTitle}
