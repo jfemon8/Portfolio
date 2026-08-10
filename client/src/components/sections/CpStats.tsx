@@ -155,7 +155,7 @@ export default function CpStats() {
       <Reveal delay={0.2}>
         <GlassCard className="mt-5 flex flex-wrap items-center justify-between gap-4 p-5">
           <div className="flex items-center gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-full bg-primary/15 text-neon">
+            <span className="grid h-10 w-10 place-items-center rounded-full border border-primary/30 bg-primary/15 text-neon backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
               <Trophy className="h-5 w-5" />
             </span>
             <div>
@@ -261,7 +261,7 @@ export default function CpStats() {
         <Reveal delay={0.32}>
           <GlassCard className="mt-5 flex flex-wrap items-center justify-between gap-4 p-5">
             <div className="flex items-center gap-3">
-              <span className="grid h-10 w-10 place-items-center rounded-full bg-primary/15 text-neon">
+              <span className="grid h-10 w-10 place-items-center rounded-full border border-primary/30 bg-primary/15 text-neon backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
                 <Star className="h-5 w-5" />
               </span>
               <div>

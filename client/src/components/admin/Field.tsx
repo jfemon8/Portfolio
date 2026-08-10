@@ -225,7 +225,7 @@ export default function Field({ field, value, form, onChange }: FieldProps) {
                 type="button"
                 onClick={() => set(pairList.filter((_, j) => j !== i))}
                 aria-label="Remove"
-                className="shrink-0 rounded-lg border border-border/70 p-2.5 text-muted-foreground/70 transition-colors hover:border-destructive/40 hover:text-destructive"
+                className="glass-thin shrink-0 rounded-lg p-2.5 text-muted-foreground/70 transition-colors hover:border-destructive/40 hover:text-destructive"
               >
                 <Trash2 className="h-4 w-4" />
               </button>
@@ -234,7 +234,7 @@ export default function Field({ field, value, form, onChange }: FieldProps) {
           <button
             type="button"
             onClick={() => set([...pairList, { label: '', value: '' }])}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-border/70 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon"
+            className="glass-thin inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon"
           >
             <Plus className="h-3.5 w-3.5" /> Add
           </button>
@@ -275,7 +275,7 @@ export default function Field({ field, value, form, onChange }: FieldProps) {
                   type="button"
                   onClick={() => set(galleryList.filter((_, j) => j !== i))}
                   aria-label="Remove image"
-                  className="shrink-0 rounded-lg border border-border/70 p-2.5 text-muted-foreground/70 transition-colors hover:border-destructive/40 hover:text-destructive"
+                  className="glass-thin shrink-0 rounded-lg p-2.5 text-muted-foreground/70 transition-colors hover:border-destructive/40 hover:text-destructive"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -287,7 +287,7 @@ export default function Field({ field, value, form, onChange }: FieldProps) {
             onClick={() =>
               set([...galleryList, { url: '', publicId: '', caption: '' }])
             }
-            className="inline-flex items-center gap-1.5 rounded-lg border border-border/70 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon"
+            className="glass-thin inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon"
           >
             <Plus className="h-3.5 w-3.5" /> Add image
           </button>

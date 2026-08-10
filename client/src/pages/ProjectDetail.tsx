@@ -108,7 +108,7 @@ export default function ProjectDetail() {
           </button>
 
           <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground/70">
-            <span className="rounded-full border border-border/60 bg-card/60 px-3 py-1 capitalize text-muted-foreground">
+            <span className="rounded-full border border-border/60 bg-card/60 px-3 py-1 capitalize text-muted-foreground backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
               {capitalizeFirst(p.category)}
             </span>
             {p.year && (

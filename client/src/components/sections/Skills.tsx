@@ -75,7 +75,7 @@ export default function Skills() {
                   {on && (
                     <motion.span
                       layoutId="skill-tab"
-                      className="absolute inset-0 rounded-full border border-primary/40 bg-primary/10"
+                      className="absolute inset-0 rounded-full border border-primary/40 bg-primary/10 backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105"
                       transition={{
                         type: 'spring',
                         stiffness: 320,

@@ -134,7 +134,7 @@ export default function Contact({ profile }: { profile?: ProfileDoc }) {
             {info.map((c) => (
               <a key={c.id} href={c.href || undefined} className="block">
                 <GlassCard interactive className="flex items-center gap-4 p-5">
-                  <span className="grid h-11 w-11 place-items-center rounded-xl border border-primary/30 bg-card/60 text-neon">
+                  <span className="grid h-11 w-11 place-items-center rounded-xl border border-primary/30 bg-card/60 text-neon backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
                     <c.icon className="h-5 w-5" />
                   </span>
                   <div className="min-w-0">
@@ -171,7 +171,7 @@ export default function Contact({ profile }: { profile?: ProfileDoc }) {
                       stiffness: 260,
                       damping: 18,
                     }}
-                    className="mb-5 grid h-16 w-16 place-items-center rounded-full bg-primary/15 text-neon"
+                    className="mb-5 grid h-16 w-16 place-items-center rounded-full border border-primary/30 bg-primary/15 text-neon backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105"
                   >
                     <CheckCircle2 className="h-8 w-8" />
                   </motion.span>

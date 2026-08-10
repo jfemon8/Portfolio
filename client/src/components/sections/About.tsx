@@ -69,7 +69,7 @@ export default function About({ profile }: { profile?: ProfileDoc }) {
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               {about.strengths.map((s, i) => (
                 <Reveal key={s} delay={i * 0.04}>
-                  <div className="flex items-center gap-2 rounded-lg border border-border/70 bg-card/50 px-3 py-2 text-sm text-muted-foreground backdrop-blur">
+                  <div className="flex items-center gap-2 rounded-lg border border-border/70 bg-card/50 px-3 py-2 text-sm text-muted-foreground backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
                     <span className="text-neon">▹</span>
                     {s}
                   </div>
@@ -91,7 +91,7 @@ export default function About({ profile }: { profile?: ProfileDoc }) {
                   aria-hidden
                   className="absolute inset-0 -z-10 rounded-full bg-gradient-to-tr from-primary/30 via-neon-blue/30 to-neon-violet/30 blur-3xl"
                 />
-                <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-primary via-neon-blue to-neon-violet p-[0.1875rem] shadow-glow">
+                <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-primary via-neon-blue to-neon-violet p-[0.1875rem] shadow-[inset_0_0.0625rem_0_var(--glass-highlight),0_0_3.75rem_-0.75rem_hsl(var(--ring)/0.55)]">
                   <div className="h-full w-full overflow-hidden rounded-full bg-card">
                     {profile?.avatar ? (
                       <img
@@ -148,7 +148,7 @@ export default function About({ profile }: { profile?: ProfileDoc }) {
                       <span className="text-sm text-muted-foreground">
                         {l.name}
                       </span>
-                      <span className="rounded-full border border-border/70 bg-card/60 px-3 py-1 text-xs text-muted-foreground">
+                      <span className="rounded-full border border-border/70 bg-card/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
                         {l.level}
                       </span>
                     </div>

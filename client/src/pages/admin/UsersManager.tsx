@@ -133,7 +133,7 @@ export default function UsersManager() {
 
   const badge = (tone: 'neon' | 'muted' | 'warn') =>
     cn(
-      'rounded-full px-0.5 md:px-2.5 py-0.5 text-2xs font-medium capitalize',
+      'rounded-full px-0.5 md:px-2.5 py-0.5 text-2xs font-medium capitalize backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105',
       tone === 'neon' && 'border border-primary/40 bg-primary/10 text-primary',
       tone === 'muted' && 'border border-border/70 text-muted-foreground',
       tone === 'warn' &&
@@ -168,7 +168,7 @@ export default function UsersManager() {
               className="flex flex-wrap items-center justify-between gap-4 p-4"
             >
               <div className="flex min-w-0 items-center gap-3">
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary/15 text-sm font-bold text-neon">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-primary/30 bg-primary/15 text-sm font-bold text-neon backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
                   {u.name?.[0]?.toUpperCase() || '?'}
                 </span>
                 <div className="min-w-0">

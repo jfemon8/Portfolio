@@ -93,7 +93,7 @@ export default function BlogPostPage() {
             {post.tags.map((t) => (
               <span
                 key={t}
-                className="rounded-full border border-border/60 bg-card/60 px-3 py-1 text-xs text-muted-foreground"
+                className="rounded-full border border-border/60 bg-card/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105"
               >
                 #{t}
               </span>

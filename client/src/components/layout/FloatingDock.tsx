@@ -107,9 +107,14 @@ export default function FloatingDock() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: 0.4, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       // Adds the safe-area inset so the dock clears the home-indicator on notched phones.
-      className="fixed inset-x-0 bottom-[calc(1.25rem+env(safe-area-inset-bottom))] z-50 flex justify-center px-4"
+      className="fixed inset-x-0 bottom-[calc(0.5rem+env(safe-area-inset-bottom))] z-50 flex justify-center"
     >
-      <div className="no-scrollbar flex max-w-full items-center gap-1 overflow-x-auto rounded-2xl border border-border/70 bg-card/80 p-1.5 backdrop-blur-xl shadow-[0_1.5rem_4.375rem_-1.5625rem_hsl(var(--shadow-color)/var(--shadow-strength))] sm:p-2">
+      <div className="glass no-scrollbar relative flex max-w-full items-center gap-1 overflow-x-auto bg-[var(--glass-bg-strong)] p-1 md:p-2">
+        {/* Gloss overlay: fakes a glossy top-to-bottom light falloff on top of the blur/tint, iOS-style. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[var(--glass-sheen-from)] via-transparent to-transparent"
+        />
         {ITEMS.map((item) => {
           const active = isActive(item.target);
           const label =
@@ -128,7 +133,7 @@ export default function FloatingDock() {
               aria-current={active ? 'page' : undefined}
               title={label}
               className={cn(
-                'group relative flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl px-2.5 py-2 text-sm transition-colors sm:min-h-9 sm:min-w-0 sm:px-3',
+                'group relative flex min-h-8 min-w-8 items-center justify-center gap-2 rounded-xl p-1 md:p-2 text-sm transition-colors sm:min-h-9 sm:min-w-0 sm:px-2',
                 active
                   ? 'text-primary'
                   : 'text-muted-foreground hover:text-foreground'
@@ -147,7 +152,7 @@ export default function FloatingDock() {
           );
         })}
         <span className="mx-1 h-6 w-px shrink-0 bg-border/70" />
-        <ThemeToggle className="h-11 w-11 shrink-0 border-0 bg-transparent sm:h-9 sm:w-9" />
+        <ThemeToggle className="h-8 w-8 shrink-0 border-0 bg-transparent sm:h-9 sm:w-9" />
       </div>
     </motion.nav>
   );

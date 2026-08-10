@@ -29,6 +29,13 @@
     --neon: 168 100% 50%;
     --shadow-color: 0 0% 0%;
     --shadow-strength: 0.7;
+    /* Liquid Glass tokens — dark. */
+    --glass-bg: rgba(255, 255, 255, 0.07);
+    --glass-bg-strong: rgba(255, 255, 255, 0.12);
+    --glass-border: rgba(255, 255, 255, 0.16);
+    --glass-highlight: rgba(255, 255, 255, 0.22);
+    --glass-shadow: rgba(0, 0, 0, 0.5);
+    --glass-sheen-from: rgba(255, 255, 255, 0.1);
   }
 
   html.light {
@@ -56,6 +63,13 @@
     --neon: 174 90% 36%;
     --shadow-color: 220 20% 30%;
     --shadow-strength: 0.12;
+    /* Liquid Glass tokens — light. */
+    --glass-bg: rgba(255, 255, 255, 0.55);
+    --glass-bg-strong: rgba(255, 255, 255, 0.72);
+    --glass-border: rgba(255, 255, 255, 0.75);
+    --glass-highlight: rgba(255, 255, 255, 0.85);
+    --glass-shadow: rgba(30, 30, 60, 0.14);
+    --glass-sheen-from: rgba(255, 255, 255, 0.4);
   }
 }
 
@@ -148,12 +162,26 @@
            2xl:max-w-7xl 3xl:max-w-[88rem];
   }
 
+  /* iOS 26 Liquid Glass material; corner-shape is a no-op fallback where unsupported. */
   .glass {
-    @apply rounded-2xl border border-line bg-bg-card/70 backdrop-blur-md;
+    @apply relative rounded-[1.5rem] border backdrop-blur-[1.875rem] backdrop-saturate-150 backdrop-brightness-105;
+    background-color: var(--glass-bg);
+    border-color: var(--glass-border);
+    box-shadow:
+      inset 0 0.0625rem 0 var(--glass-highlight),
+      0 1.25rem 3rem -0.75rem var(--glass-shadow);
+    corner-shape: superellipse(2);
   }
 
   .glass-hover {
     @apply transition-all duration-300 hover:border-primary/40;
+  }
+
+  /* Lighter-blur glass tier for small/inline controls — buttons, badges, inputs, icon tiles. */
+  .glass-thin {
+    @apply border backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105;
+    background-color: var(--glass-bg-strong);
+    border-color: var(--glass-border);
   }
 
   .btn {
@@ -173,13 +201,13 @@
   }
 
   .chip {
-    @apply inline-flex items-center gap-1.5 rounded-full border border-line
-           bg-bg-elevated px-3 py-1 text-xs font-medium text-ink-soft;
+    @apply glass-thin inline-flex items-center gap-1.5 rounded-full
+           px-3 py-1 text-xs font-medium text-ink-soft;
   }
 
-  /* Theme-aware input. */
+  /* Theme-aware input, glass material. */
   .input {
-    @apply w-full min-h-11 rounded-xl border border-border bg-card px-4 py-2.5
+    @apply glass-thin w-full min-h-11 rounded-xl px-4 py-2.5
            text-base text-foreground placeholder:text-muted-foreground
            transition-colors focus:border-primary/60 focus:outline-none
            focus:ring-1 focus:ring-primary/40;

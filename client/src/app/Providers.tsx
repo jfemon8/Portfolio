@@ -20,9 +20,16 @@ export default function Providers({ children }: { children: ReactNode }) {
               position="bottom-right"
               toastOptions={{
                 style: {
-                  background: 'hsl(var(--card))',
+                  background: 'var(--glass-bg-strong)',
                   color: 'hsl(var(--foreground))',
-                  border: '1px solid hsl(var(--border))',
+                  border: '1px solid var(--glass-border)',
+                  borderRadius: '1.5rem',
+                  boxShadow:
+                    'inset 0 0.0625rem 0 var(--glass-highlight), 0 1.25rem 3rem -0.75rem var(--glass-shadow)',
+                  backdropFilter:
+                    'blur(1.875rem) saturate(150%) brightness(105%)',
+                  WebkitBackdropFilter:
+                    'blur(1.875rem) saturate(150%) brightness(105%)',
                   fontSize: '14px',
                 },
                 success: {

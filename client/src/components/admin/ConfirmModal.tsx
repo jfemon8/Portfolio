@@ -172,7 +172,7 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
                 exit={{ y: '100%', opacity: 0, scale: 0.94 }}
                 transition={{ type: 'spring', stiffness: 380, damping: 34 }}
                 className={cn(
-                  'pointer-events-auto relative max-h-[90vh] w-full overflow-y-auto rounded-t-3xl border border-border/60 bg-card/95 shadow-2xl ring-1 backdrop-blur-xl sm:max-w-md sm:rounded-3xl',
+                  'pointer-events-auto relative max-h-[90vh] w-full overflow-y-auto rounded-t-3xl border border-border/60 bg-card/95 shadow-[inset_0_0.0625rem_0_var(--glass-highlight),0_1.25rem_3rem_-0.75rem_var(--glass-shadow)] ring-1 backdrop-blur-[1.875rem] backdrop-saturate-150 backdrop-brightness-105 sm:max-w-md sm:rounded-3xl',
                   styles.ring
                 )}
                 style={{

@@ -88,9 +88,9 @@ export default function CommandPalette({ items }: { items: CommandItem[] }) {
           transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
           onClick={(e) => e.stopPropagation()}
           onKeyDown={onKey}
-          className="w-full max-w-xl overflow-hidden rounded-2xl border border-border/70 bg-card/80 shadow-glow backdrop-blur-2xl"
+          className="w-full max-w-xl overflow-hidden rounded-2xl border border-border/70 bg-card/90 shadow-[inset_0_0.0625rem_0_var(--glass-highlight),0_1.25rem_3rem_-0.75rem_var(--glass-shadow)] backdrop-blur-[1.875rem] backdrop-saturate-150 backdrop-brightness-105"
         >
-          {/* `backdrop-blur-2xl` creates a stacking context that leaks the global focus ring above the modal, so we suppress it and use `focus-within:border-primary` instead. */}
+          {/* backdrop-filter creates a stacking context that leaks the global focus ring above the modal, so we suppress it and use `focus-within:border-primary` instead. */}
           <div className="flex items-center gap-3 border-b border-border/60 px-4 transition-colors focus-within:border-primary">
             <Search className="h-4 w-4 text-muted-foreground/70" />
             <input

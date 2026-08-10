@@ -38,7 +38,7 @@ export default function Experience() {
             delay={i * 0.06}
             className="relative pb-10 last:pb-0"
           >
-            <span className="absolute -left-[2.5625rem] grid h-7 w-7 place-items-center rounded-full border border-primary/40 bg-background text-neon shadow-glow">
+            <span className="absolute -left-[2.5625rem] grid h-7 w-7 place-items-center rounded-full border border-primary/40 bg-background text-neon shadow-[inset_0_0.0625rem_0_var(--glass-highlight),0_0_3.75rem_-0.75rem_hsl(var(--ring)/0.55)]">
               <Briefcase className="h-3.5 w-3.5" />
             </span>
             <GlassCard interactive className="p-6">

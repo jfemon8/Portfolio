@@ -137,7 +137,7 @@ export default function CredentialsManager() {
           <button
             key={t.k}
             onClick={() => setTab(t.k)}
-            className={`rounded-full border px-4 py-1.5 text-sm transition-all ${
+            className={`rounded-full border px-4 py-1.5 text-sm backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105 transition-all ${
               tab === t.k
                 ? 'border-primary/50 bg-primary/10 text-primary shadow-glow'
                 : 'border-border/70 text-muted-foreground hover:text-foreground'

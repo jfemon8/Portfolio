@@ -153,7 +153,7 @@ function SkillRow({
 
   return (
     <div className="flex items-center gap-3">
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-border/70 bg-card/60">
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-border/70 bg-card/60 backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
         {item.iconImage ? (
           <img src={item.iconImage} alt="" className="h-7 w-7 object-contain" />
         ) : Icon ? (

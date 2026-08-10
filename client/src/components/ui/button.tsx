@@ -8,14 +8,15 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-primary text-primary-foreground hover:brightness-110 hover:shadow-glow',
+          'bg-primary text-primary-foreground shadow-[inset_0_0.0625rem_0_var(--glass-highlight)] hover:brightness-110 hover:shadow-[inset_0_0.0625rem_0_var(--glass-highlight),0_0_3.75rem_-0.75rem_hsl(var(--ring)/0.55)]',
         secondary:
-          'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+          'glass-thin text-secondary-foreground hover:border-primary/40',
         outline:
-          'border border-border bg-transparent text-foreground hover:border-primary/60 hover:text-primary',
-        ghost: 'text-muted-foreground hover:bg-secondary hover:text-foreground',
+          'glass-thin text-foreground hover:border-primary/60 hover:text-primary',
+        ghost:
+          'border border-transparent text-muted-foreground hover:border-[var(--glass-border)] hover:bg-[var(--glass-bg)] hover:text-foreground hover:backdrop-blur-md hover:backdrop-saturate-150 hover:backdrop-brightness-105',
         destructive:
-          'bg-destructive text-destructive-foreground hover:brightness-110',
+          'bg-destructive text-destructive-foreground shadow-[inset_0_0.0625rem_0_var(--glass-highlight)] hover:brightness-110 hover:shadow-[inset_0_0.0625rem_0_var(--glass-highlight),0_0_3.75rem_-0.75rem_hsl(var(--destructive)/0.5)]',
         link: 'text-primary underline-offset-4 hover:underline',
       },
       // Mobile heights meet the ~44px touch-target minimum; sm: (640px+) steps back to the compact size.

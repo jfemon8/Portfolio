@@ -61,15 +61,15 @@ export default function ProjectCard({
           <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-70" />
 
           {project.featured && (
-            <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-2xs font-semibold text-neon backdrop-blur">
+            <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-2xs font-semibold text-neon backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
               <Star className="h-3 w-3 fill-neon" /> {lab.badgeFeatured}
             </span>
           )}
-          <span className="absolute left-3 top-3 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-2xs font-medium text-muted-foreground backdrop-blur">
+          <span className="absolute left-3 top-3 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-2xs font-medium text-muted-foreground backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
             {capitalizeFirst(project.category)}
           </span>
           {project.videoUrl && (
-            <span className="absolute bottom-3 left-3 flex items-center gap-1 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-2xs font-medium text-neon backdrop-blur">
+            <span className="absolute bottom-3 left-3 flex items-center gap-1 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-2xs font-medium text-neon backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
               <Play className="h-3 w-3 fill-neon" /> {lab.badgeVideo}
             </span>
           )}

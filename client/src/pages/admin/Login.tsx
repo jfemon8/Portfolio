@@ -90,7 +90,7 @@ export default function Login() {
 
           <GlassCard className="p-7">
             <div className="mb-6 flex items-center gap-3">
-              <span className="grid h-10 w-10 place-items-center rounded-xl border border-primary/30 bg-card/60 text-neon">
+              <span className="grid h-10 w-10 place-items-center rounded-xl border border-primary/30 bg-card/60 text-neon backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
                 <Lock className="h-5 w-5" />
               </span>
               <div>

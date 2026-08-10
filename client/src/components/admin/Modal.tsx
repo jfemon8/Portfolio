@@ -56,7 +56,7 @@ export default function Modal({
             transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
             onClick={(e) => e.stopPropagation()}
             className={cn(
-              'my-4 flex max-h-[90dvh] w-full flex-col rounded-2xl border border-border/70 bg-card/80 shadow-glow backdrop-blur-2xl sm:my-8 sm:max-h-[85dvh]',
+              'my-4 flex max-h-[90dvh] w-full flex-col rounded-2xl border border-border/70 bg-card/90 shadow-[inset_0_0.0625rem_0_var(--glass-highlight),0_1.25rem_3rem_-0.75rem_var(--glass-shadow)] backdrop-blur-[1.875rem] backdrop-saturate-150 backdrop-brightness-105 sm:my-8 sm:max-h-[85dvh]',
               max
             )}
           >

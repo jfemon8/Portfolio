@@ -90,14 +90,14 @@ export default function AuditLogViewer() {
             <div className="flex flex-wrap items-center gap-3">
               <span
                 className={cn(
-                  'rounded-full border px-2.5 py-0.5 font-mono text-2xs',
+                  'rounded-full border px-2.5 py-0.5 font-mono text-2xs backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105',
                   tone(l.action)
                 )}
               >
                 {l.action}
               </span>
               <span className="text-sm text-foreground">{l.actorEmail}</span>
-              <span className="rounded-full border border-border/70 px-2 py-0.5 text-2xs capitalize text-muted-foreground">
+              <span className="rounded-full border border-border/70 px-2 py-0.5 text-2xs capitalize text-muted-foreground backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
                 {l.role}
               </span>
               {l.entity && (

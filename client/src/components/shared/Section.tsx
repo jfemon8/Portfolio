@@ -42,7 +42,7 @@ export function SectionHeading({
         centered ? 'flex-col text-center' : 'justify-between'
       )}
     >
-      <Reveal className={cn('max-w-2xl', centered && 'mx-auto')}>
+      <Reveal className={cn(centered && 'mx-auto')}>
         {index && (
           <span className="font-mono text-sm font-medium text-neon">
             {index}

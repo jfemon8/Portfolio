@@ -140,7 +140,7 @@ export default function Blog() {
                       {post.tags.slice(0, 3).map((t) => (
                         <span
                           key={t}
-                          className="rounded-full border border-border/60 bg-card/60 px-2.5 py-0.5 text-2xs text-muted-foreground"
+                          className="rounded-full border border-border/60 bg-card/60 px-2.5 py-0.5 text-2xs text-muted-foreground backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105"
                         >
                           #{t}
                         </span>

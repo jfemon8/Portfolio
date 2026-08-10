@@ -119,7 +119,7 @@ export default function MessagesManager() {
             key={ff.k}
             onClick={() => setFilter(ff.k)}
             className={cn(
-              'rounded-full border px-4 py-1.5 text-sm transition-all',
+              'rounded-full border px-4 py-1.5 text-sm backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105 transition-all',
               filter === ff.k
                 ? 'border-primary/50 bg-primary/10 text-primary shadow-glow'
                 : 'border-border/70 text-muted-foreground hover:text-foreground'
