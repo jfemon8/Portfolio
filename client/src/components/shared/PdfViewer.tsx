@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { usePinch } from '@use-gesture/react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import {
   ZoomIn,
@@ -105,39 +106,62 @@ export default function PdfViewer({
     return () => observer.disconnect();
   }, [numPages]);
 
-  // ── Pinch-to-zoom (touch devices) ──
+  // ── Pinch-to-zoom (touch devices) ── scaleRef keeps each new pinch in sync with the toolbar/keyboard.
+  const scaleRef = useRef(scale);
+  useEffect(() => {
+    scaleRef.current = scale;
+  }, [scale]);
+  usePinch(({ offset: [s] }) => setScale(+s.toFixed(2)), {
+    target: containerRef,
+    eventOptions: { passive: false },
+    scaleBounds: { min: 0.5, max: 2.5 },
+    rubberband: true,
+    from: () => [scaleRef.current, 0],
+  });
+
+  // ── Click-and-hold to pan (mouse) ── plain mouse events, not Pointer Events, which Chromium cancels mid-drag.
+  const [dragging, setDragging] = useState(false);
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    let initialDistance = 0;
-    let initialScale = 1;
-    const dist = (a: Touch, b: Touch): number =>
-      Math.sqrt((a.clientX - b.clientX) ** 2 + (a.clientY - b.clientY) ** 2);
-    const onStart = (e: TouchEvent): void => {
-      if (e.touches.length === 2 && e.touches[0] && e.touches[1]) {
-        initialDistance = dist(e.touches[0], e.touches[1]);
-        initialScale = scale;
-      }
+    let active = false;
+    let startX = 0;
+    let startY = 0;
+    let startScrollLeft = 0;
+    let startScrollTop = 0;
+    const onMouseDown = (e: MouseEvent): void => {
+      if (e.button !== 0) return;
+      active = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      startScrollLeft = el.scrollLeft;
+      startScrollTop = el.scrollTop;
+      setDragging(true);
+      e.preventDefault();
     };
-    const onMove = (e: TouchEvent): void => {
-      if (e.touches.length === 2 && e.touches[0] && e.touches[1]) {
-        const d = dist(e.touches[0], e.touches[1]);
-        setScale(
-          Math.max(
-            0.5,
-            Math.min(2.5, +((initialScale * d) / initialDistance).toFixed(2))
-          )
-        );
-        e.preventDefault();
-      }
+    // Recomputed from the fixed start reference each tick so it self-corrects once react-pdf's post-zoom re-render catches up.
+    const onMouseMove = (e: MouseEvent): void => {
+      if (!active) return;
+      el.scrollLeft = startScrollLeft - (e.clientX - startX);
+      el.scrollTop = startScrollTop - (e.clientY - startY);
     };
-    el.addEventListener('touchstart', onStart, { passive: true });
-    el.addEventListener('touchmove', onMove, { passive: false });
+    const onMouseUp = (): void => {
+      if (!active) return;
+      active = false;
+      setDragging(false);
+    };
+    const onDragStart = (e: DragEvent): void => e.preventDefault();
+    el.addEventListener('mousedown', onMouseDown);
+    el.addEventListener('dragstart', onDragStart);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
     return () => {
-      el.removeEventListener('touchstart', onStart);
-      el.removeEventListener('touchmove', onMove);
+      el.removeEventListener('mousedown', onMouseDown);
+      el.removeEventListener('dragstart', onDragStart);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
     };
-  }, [scale]);
+  }, []);
 
   // ── Keyboard shortcuts ──
   useEffect(() => {
@@ -383,9 +407,14 @@ export default function PdfViewer({
       </div>
 
       {/* ── Scrollable document ── */}
+      {/* pointer-events-none on the text/annotation layers while dragging stops native text selection from fighting the pan. */}
       <div
         ref={containerRef}
-        className="min-h-0 flex-1 overflow-auto overscroll-contain bg-muted/20"
+        className={`min-h-0 flex-1 touch-pan-y overflow-auto overscroll-contain bg-muted/20 ${
+          dragging
+            ? 'cursor-grabbing [&_.annotationLayer]:pointer-events-none [&_.textLayer]:pointer-events-none'
+            : 'cursor-grab'
+        }`}
       >
         {error ? (
           <div className="flex h-full flex-col items-center justify-center gap-3 p-8 text-sm text-muted-foreground">
@@ -409,17 +438,17 @@ export default function PdfViewer({
             onLoadSuccess={onDocumentLoadSuccess}
             onLoadError={onDocumentLoadError}
             loading={
-              <div className="flex h-full flex-col items-center justify-center gap-3">
+              <div className="flex h-full flex-col items-center justify-center gap-2">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 <p className="text-sm text-muted-foreground">Loading PDF...</p>
               </div>
             }
             error={
-              <div className="flex h-full items-center justify-center p-6 text-sm text-muted-foreground">
+              <div className="flex h-full items-center justify-center p-4 text-sm text-muted-foreground">
                 Failed to load PDF.
               </div>
             }
-            className="flex flex-col items-center py-6 sm:py-8"
+            className="py-2"
           >
             {Array.from({ length: numPages }, (_, i) => i + 1).map(
               (pageNum) => (
@@ -429,7 +458,7 @@ export default function PdfViewer({
                   ref={(el) => {
                     if (el) pageRefs.current.set(pageNum, el);
                   }}
-                  className="relative mb-4 last:mb-0 sm:mb-6"
+                  className="relative mx-auto mb-4 w-fit last:mb-0"
                 >
                   <div className="overflow-hidden rounded-sm shadow-lg ring-1 ring-black/5 dark:ring-white/5 sm:shadow-xl">
                     <Page
@@ -440,7 +469,7 @@ export default function PdfViewer({
                     />
                   </div>
                   {numPages > 1 && (
-                    <div className="mt-2 flex justify-center sm:mt-3">
+                    <div className="mt-2 flex justify-center">
                       <span className="text-3xs tabular-nums text-muted-foreground/50 sm:text-2xs">
                         {pageNum}
                       </span>

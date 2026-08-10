@@ -306,6 +306,12 @@
   @apply bg-card/60 font-semibold text-foreground;
 }
 
+/* Links are natively draggable by default, which fights click-and-hold panning in PdfViewer. */
+.annotationLayer a {
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+
 /* View-transitions theme reveal. */
 ::view-transition-old(root),
 ::view-transition-new(root) {
