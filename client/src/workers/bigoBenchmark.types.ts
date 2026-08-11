@@ -16,6 +16,8 @@ export interface RunRequest {
 export interface ProgressMessage {
   type: 'progress';
   n: number;
+  /** The measurement that just completed at this N — lets the UI plot and re-fit live as the run progresses, instead of only once at the very end. */
+  timeMs: number;
   done: number;
   total: number;
 }
@@ -24,7 +26,7 @@ export interface ResultMessage {
   type: 'result';
   measurements: { n: number; timeMs: number }[];
   stoppedEarly: boolean;
-  /** Accumulated fold of every call's return value — not shown in the UI. Its only purpose is forcing a genuine data-flow dependency from each timed call out to postMessage, so the JIT can't prove the call's result is unused and dead-code-eliminate the whole thing (confirmed live: without this, a trivial function measured in single-digit nanoseconds — faster than a JIT-compiled array read can plausibly execute). */
+  /** Accumulated fold of every call's return value — not shown in the UI. Its only purpose is forcing a genuine data-flow dependency from each timed call out to postMessage, so the JIT can't prove the call's result is unused and dead-code-eliminate it entirely. */
   checksum: number;
 }
 

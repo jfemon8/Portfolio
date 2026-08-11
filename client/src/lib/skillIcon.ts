@@ -1,4 +1,5 @@
-import type { ComponentType, SVGProps } from 'react';
+import type { ComponentType } from 'react';
+import { Binary, Component as OopIcon } from 'lucide-react';
 import {
   SiReact,
   SiTypescript,
@@ -52,7 +53,6 @@ import {
   SiCanva,
   SiNotion,
   SiSlack,
-  SiVscodium,
   SiJetbrains,
   SiIntellijidea,
   SiWebpack,
@@ -90,10 +90,19 @@ import {
   SiCodeforces,
   SiLeetcode,
   SiCodechef,
+  SiDjango,
+  SiJquery,
+  SiDaisyui,
+  SiShopify,
+  SiCloudinary,
 } from 'react-icons/si';
 import { FaJava, FaCode, FaAws } from 'react-icons/fa';
+import { DiVisualstudio, DiMsqlServer } from 'react-icons/di';
+import { VscVscode } from 'react-icons/vsc';
+import { GiTortoise } from 'react-icons/gi';
 
-type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
+// Widened (not react-icons' own IconType) so lucide-react icons (Binary, OopIcon) can share this map — both libs accept `className`, which is all callers pass.
+type IconComponent = ComponentType<{ className?: string }>;
 
 // Keys are normalised skill names (lowercased, alphanumerics only) with aliases (e.g. "node"/"nodejs") for wider matches; unmatched skills fall back to FaCode via the caller.
 const ICON_MAP: Record<string, IconComponent> = {
@@ -127,13 +136,18 @@ const ICON_MAP: Record<string, IconComponent> = {
   py: SiPython,
   java: FaJava,
   c: SiC,
+  cc: SiCplusplus,
   cpp: SiCplusplus,
   cplusplus: SiCplusplus,
   csharp: SiSharp,
   cs: SiSharp,
   dotnet: SiDotnet,
   net: SiDotnet,
+  netcore: SiDotnet,
   aspnet: SiDotnet,
+  aspnetcore: SiDotnet,
+  django: SiDjango,
+  jquery: SiJquery,
   go: SiGo,
   golang: SiGo,
   rust: SiRust,
@@ -153,6 +167,8 @@ const ICON_MAP: Record<string, IconComponent> = {
   tailwind: SiTailwindcss,
   tailwindcss: SiTailwindcss,
   bootstrap: SiBootstrap,
+  daisyui: SiDaisyui,
+  htmlcss: SiHtml5,
 
   // Databases / data
   mongodb: SiMongodb,
@@ -166,6 +182,9 @@ const ICON_MAP: Record<string, IconComponent> = {
   supabase: SiSupabase,
   prisma: SiPrisma,
   graphql: SiGraphql,
+  sql: SiMysql,
+  sqlmysql: SiMysql,
+  sqlserver: DiMsqlServer,
 
   // Cloud / DevOps — AWS uses the FA glyph because react-icons v5 dropped the Si brand entry for it.
   aws: FaAws,
@@ -187,6 +206,7 @@ const ICON_MAP: Record<string, IconComponent> = {
   // Tools
   git: SiGit,
   github: SiGithub,
+  gitgithub: SiGithub,
   gitlab: SiGitlab,
   bitbucket: SiBitbucket,
   postman: SiPostman,
@@ -195,7 +215,11 @@ const ICON_MAP: Record<string, IconComponent> = {
   canva: SiCanva,
   notion: SiNotion,
   slack: SiSlack,
-  vscode: SiVscodium,
+  vscode: VscVscode,
+  visualstudio: DiVisualstudio,
+  tortoisegit: GiTortoise,
+  shopify: SiShopify,
+  cloudinary: SiCloudinary,
   jetbrains: SiJetbrains,
   intellij: SiIntellijidea,
   webpack: SiWebpack,
@@ -237,10 +261,20 @@ const ICON_MAP: Record<string, IconComponent> = {
   codeforces: SiCodeforces,
   leetcode: SiLeetcode,
   codechef: SiCodechef,
+
+  // CS concepts — no brand exists, so these use a representative lucide glyph instead of a react-icons logo.
+  dsa: Binary,
+  datastructuresalgorithms: Binary,
+  oop: OopIcon,
+  objectorientedprogramming: OopIcon,
 };
 
+// "#" is spelled out before stripping punctuation so "C#" normalises to "csharp" instead of colliding with plain "C".
 const normalise = (input: string): string =>
-  input.toLowerCase().replace(/[^a-z0-9]+/g, '');
+  input
+    .toLowerCase()
+    .replace(/#/g, 'sharp')
+    .replace(/[^a-z0-9]+/g, '');
 
 /** Returns a react-icons component for a skill name, or null if no brand match — callers should render a fallback themselves. */
 export function getSkillIcon(name: string): IconComponent | null {
