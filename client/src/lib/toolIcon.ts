@@ -7,6 +7,7 @@ import {
   Wrench,
   Terminal,
   Sparkles,
+  Gauge,
   type LucideIcon,
 } from 'lucide-react';
 import type { ToolIcon } from '@/types';
@@ -21,6 +22,7 @@ export const TOOL_ICONS: Record<ToolIcon, LucideIcon> = {
   Wrench,
   Terminal,
   Sparkles,
+  Gauge,
 };
 
 export const TOOL_ICON_OPTIONS: { value: ToolIcon; label: string }[] =

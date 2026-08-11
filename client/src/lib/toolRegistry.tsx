@@ -12,4 +12,5 @@ export const TOOL_COMPONENTS: Record<ToolKey, ComponentType> = {
   'cf-rating-predictor': lazy(
     () => import('@/components/tools/CfRatingPredictor')
   ),
+  'bigo-benchmark': lazy(() => import('@/components/tools/BigOBenchmark')),
 };

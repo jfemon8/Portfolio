@@ -29,7 +29,12 @@ module.exports = {
   overrides: [
     {
       // Build/config files run in Node, not the browser.
-      files: ['vite.config.ts', '*.cjs', 'postcss.config.js', 'tailwind.config.js'],
+      files: [
+        'vite.config.ts',
+        '*.cjs',
+        'postcss.config.js',
+        'tailwind.config.js',
+      ],
       env: { node: true, browser: false },
     },
     {
@@ -37,6 +42,11 @@ module.exports = {
       // (cva) with the component — standard ShadCN convention.
       files: ['src/components/ui/**/*.{ts,tsx}'],
       rules: { 'react-refresh/only-export-components': 'off' },
+    },
+    {
+      // Web Worker scope — no `window`/DOM, has `self`/`postMessage` instead.
+      files: ['src/workers/**/*.ts'],
+      env: { worker: true, browser: false },
     },
   ],
   ignorePatterns: [

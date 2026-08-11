@@ -14,6 +14,7 @@ const KEY_OPTIONS = [
   { value: 'regex-tester', label: 'Regex Tester' },
   { value: 'cp-profile-comparer', label: 'CP Profile Comparer' },
   { value: 'cf-rating-predictor', label: 'Codeforces Rating Predictor' },
+  { value: 'bigo-benchmark', label: 'Big-O Benchmark' },
 ];
 
 // Two-panel /admin/tools view (Tools + Categories tabs), mirroring SkillsManager's Skills/Categories split.

@@ -7,12 +7,15 @@ import {
   Mail,
   Twitter,
   Youtube,
-  type LucideIcon,
 } from 'lucide-react';
+import { SiCodechef, SiCodeforces, SiLeetcode } from 'react-icons/si';
 import { cn } from '@/lib/cn';
+import type { ComponentType } from 'react';
 import type { Social } from '@/types';
 
-const iconMap: Record<string, LucideIcon> = {
+// Order matters: matchIconKey does substring checks, so more specific keys
+// (e.g. "leetcode") must precede substrings they contain (e.g. "code").
+const iconMap: Record<string, ComponentType<{ className?: string }>> = {
   github: Github,
   linkedin: Linkedin,
   mail: Mail,
@@ -20,6 +23,9 @@ const iconMap: Record<string, LucideIcon> = {
   youtube: Youtube,
   instagram: Instagram,
   facebook: Facebook,
+  leetcode: SiLeetcode,
+  codeforces: SiCodeforces,
+  codechef: SiCodechef,
   code: Code2,
 };
 
@@ -31,14 +37,7 @@ const matchIconKey = (s: string): string | null => {
   }
   if (l.includes('mailto') || l.includes('email')) return 'mail';
   if (l.includes('x.com')) return 'twitter';
-  if (
-    l.includes('leetcode') ||
-    l.includes('codeforces') ||
-    l.includes('codechef') ||
-    l.includes('hackerrank') ||
-    l.includes('hackerearth')
-  )
-    return 'code';
+  if (l.includes('hackerrank') || l.includes('hackerearth')) return 'code';
   return null;
 };
 

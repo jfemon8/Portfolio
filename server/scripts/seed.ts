@@ -451,6 +451,15 @@ const toolsRaw: Omit<ITool, 'slug'>[] = [
     key: 'cf-rating-predictor',
     order: 4,
   },
+  {
+    name: 'Big-O Benchmark',
+    description:
+      'Paste a JavaScript or Python function and get its actual Big-O — measured by real execution, not AI guesswork.',
+    category: 'competitive-programming',
+    icon: 'Gauge',
+    key: 'bigo-benchmark',
+    order: 5,
+  },
 ];
 
 const tools: ITool[] = toolsRaw.map((t) => ({
@@ -528,11 +537,14 @@ async function seedContent(): Promise<void> {
     ]);
   }
 
-  await Profile.findOneAndUpdate({}, profile, {
-    upsert: true,
-    setDefaultsOnInsert: true,
-  });
-  console.log('✅ Profile seeded');
+  if (await Profile.findOne({})) {
+    console.log(
+      '⏭️  Profile already exists — skipping (use --fresh to reset to defaults)'
+    );
+  } else {
+    await Profile.create(profile);
+    console.log('✅ Profile seeded');
+  }
 
   await upsertMany(Experience, experiences, 'company');
   for (const p of projects) {

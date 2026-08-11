@@ -1,0 +1,34 @@
+// Message contract shared between the worker and the UI thread — kept in its own file, free of any
+// `self`/WebWorker-global-dependent code, so it type-checks identically whichever tsconfig (main app vs
+// worker-scoped) transitively pulls it in.
+import type { InputGeneratorId } from '@/lib/inputGenerators';
+
+export type Language = 'javascript' | 'python';
+
+export interface RunRequest {
+  type: 'run';
+  language: Language;
+  source: string;
+  entryName?: string;
+  inputGenerator: InputGeneratorId;
+}
+
+export interface ProgressMessage {
+  type: 'progress';
+  n: number;
+  done: number;
+  total: number;
+}
+
+export interface ResultMessage {
+  type: 'result';
+  measurements: { n: number; timeMs: number }[];
+  stoppedEarly: boolean;
+  /** Accumulated fold of every call's return value — not shown in the UI. Its only purpose is forcing a genuine data-flow dependency from each timed call out to postMessage, so the JIT can't prove the call's result is unused and dead-code-eliminate the whole thing (confirmed live: without this, a trivial function measured in single-digit nanoseconds — faster than a JIT-compiled array read can plausibly execute). */
+  checksum: number;
+}
+
+export interface ErrorMessage {
+  type: 'error';
+  message: string;
+}

@@ -456,7 +456,8 @@ export type ToolKey =
   | 'json-formatter'
   | 'regex-tester'
   | 'cp-profile-comparer'
-  | 'cf-rating-predictor';
+  | 'cf-rating-predictor'
+  | 'bigo-benchmark';
 
 export type ToolIcon =
   | 'KeyRound'
@@ -466,7 +467,8 @@ export type ToolIcon =
   | 'TrendingUp'
   | 'Wrench'
   | 'Terminal'
-  | 'Sparkles';
+  | 'Sparkles'
+  | 'Gauge';
 
 /** Admin-editable metadata for a public /tools entry; the tool's actual behavior lives in code under client/src/components/tools, keyed by `key`. */
 export interface ITool {

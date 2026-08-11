@@ -196,7 +196,8 @@ export type ToolKey =
   | 'json-formatter'
   | 'regex-tester'
   | 'cp-profile-comparer'
-  | 'cf-rating-predictor';
+  | 'cf-rating-predictor'
+  | 'bigo-benchmark';
 
 export type ToolIcon =
   | 'KeyRound'
@@ -206,7 +207,8 @@ export type ToolIcon =
   | 'TrendingUp'
   | 'Wrench'
   | 'Terminal'
-  | 'Sparkles';
+  | 'Sparkles'
+  | 'Gauge';
 
 export interface Tool {
   name: string;
