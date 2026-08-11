@@ -10,13 +10,15 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, AlertTriangle } from 'lucide-react';
 import GlassCard from '@/components/shared/GlassCard';
 import AutoTextarea from '@/components/shared/AutoTextarea';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/cn';
 import {
   INPUT_GENERATOR_OPTIONS,
+  detectInputGenerator,
+  isSameInputShape,
   type InputGeneratorId,
 } from '@/lib/inputGenerators';
 import {
@@ -45,19 +47,27 @@ const tooltipStyle = {
 // Beyond the worker's own ~12s cooperative budget — only fires for a genuine infinite loop, which the worker can never catch itself since it never regains control.
 const WATCHDOG_MS = 20_000;
 
-const EXAMPLES: Record<
-  Language,
-  { source: string; inputGenerator: InputGeneratorId }
-> = {
+// One matching, illustrative example per input type (not just per language) — each showcases a different complexity class, so switching "Input your function receives" always has working, relevant code behind it rather than one function that only ever fit a single input shape.
+const EXAMPLES: Record<Language, Record<InputGeneratorId, string>> = {
   javascript: {
-    source:
+    number:
+      'function fib(n) {\n  if (n <= 1) return n;\n  return fib(n - 1) + fib(n - 2);\n}',
+    randomArray:
       'function bubbleSort(arr) {\n  const a = arr.slice();\n  for (let i = 0; i < a.length; i++) {\n    for (let j = 0; j < a.length - i - 1; j++) {\n      if (a[j] > a[j + 1]) {\n        const tmp = a[j];\n        a[j] = a[j + 1];\n        a[j + 1] = tmp;\n      }\n    }\n  }\n  return a;\n}',
-    inputGenerator: 'randomArray',
+    sortedArray:
+      'function binarySearch(arr) {\n  let lo = 0;\n  let hi = arr.length - 1;\n  let steps = 0;\n  while (lo <= hi) {\n    steps++;\n    const mid = (lo + hi) >> 1;\n    if (arr[mid] === -1) return steps;\n    if (arr[mid] < -1) lo = mid + 1;\n    else hi = mid - 1;\n  }\n  return steps;\n}',
+    randomString:
+      "function countVowels(str) {\n  let count = 0;\n  for (let i = 0; i < str.length; i++) {\n    if ('aeiou'.includes(str[i])) count++;\n  }\n  return count;\n}",
   },
   python: {
-    source:
+    number:
+      'def fib(n):\n    if n <= 1:\n        return n\n    return fib(n - 1) + fib(n - 2)',
+    randomArray:
       'def bubble_sort(arr):\n    a = list(arr)\n    n = len(a)\n    for i in range(n):\n        for j in range(n - i - 1):\n            if a[j] > a[j + 1]:\n                a[j], a[j + 1] = a[j + 1], a[j]\n    return a',
-    inputGenerator: 'randomArray',
+    sortedArray:
+      'def binary_search(arr):\n    lo, hi, steps = 0, len(arr) - 1, 0\n    while lo <= hi:\n        steps += 1\n        mid = (lo + hi) // 2\n        if arr[mid] == -1:\n            return steps\n        if arr[mid] < -1:\n            lo = mid + 1\n        else:\n            hi = mid - 1\n    return steps',
+    randomString:
+      "def count_vowels(s):\n    count = 0\n    for ch in s:\n        if ch in 'aeiou':\n            count += 1\n    return count",
   },
 };
 
@@ -114,7 +124,7 @@ function CandidateRow({
 
 export default function BigOBenchmark() {
   const [language, setLanguage] = useState<Language>('javascript');
-  const [source, setSource] = useState(EXAMPLES.javascript.source);
+  const [source, setSource] = useState(EXAMPLES.javascript.randomArray);
   const [entryName, setEntryName] = useState('');
   const [inputGenerator, setInputGenerator] =
     useState<InputGeneratorId>('randomArray');
@@ -127,6 +137,22 @@ export default function BigOBenchmark() {
   const [pyodideLoading, setPyodideLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [measurements, setMeasurements] = useState<Measurement[] | null>(null);
+
+  // Best-effort suggestion only, never auto-applied — a mismatched input type is the most common cause of an immediate run error, so surface it before the user hits Run rather than only after a crash.
+  const suggestedInputGenerator = useMemo(
+    () => detectInputGenerator(source, language),
+    [source, language]
+  );
+  const inputMismatch = !isSameInputShape(
+    suggestedInputGenerator,
+    inputGenerator
+  )
+    ? INPUT_GENERATOR_OPTIONS.find((o) => o.id === suggestedInputGenerator)
+    : null;
+  // Whether the editor still holds one of the stock examples (untouched) — used to decide whether switching input type may safely swap in the matching example, versus a custom snippet the user is actively editing.
+  const isUnmodifiedExample = Object.values(EXAMPLES[language]).includes(
+    source
+  );
 
   const workerRef = useRef<Worker | null>(null);
   const watchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -146,19 +172,26 @@ export default function BigOBenchmark() {
     []
   );
 
-  const applyLanguageDefaults = (next: Language): void => {
-    setSource(EXAMPLES[next].source);
-    setInputGenerator(EXAMPLES[next].inputGenerator);
+  const resetRunState = (): void => {
     setEntryName('');
     setStatus('idle');
     setError(null);
     setMeasurements(null);
   };
 
-  const onLoadExample = (): void => applyLanguageDefaults(language);
+  const onLoadExample = (): void => {
+    setSource(EXAMPLES[language][inputGenerator]);
+    resetRunState();
+  };
   const onLanguageChange = (next: Language): void => {
     setLanguage(next);
-    applyLanguageDefaults(next);
+    setSource(EXAMPLES[next][inputGenerator]);
+    resetRunState();
+  };
+  const onInputGeneratorChange = (next: InputGeneratorId): void => {
+    setInputGenerator(next);
+    // Only swap the code when the editor still holds an unmodified example — never overwrite a snippet the user is actively writing.
+    if (isUnmodifiedExample) setSource(EXAMPLES[language][next]);
   };
 
   const run = (): void => {
@@ -240,6 +273,18 @@ export default function BigOBenchmark() {
       return { n, fit: result.winner.predict(n) };
     });
   }, [result, measurements]);
+  // Explicit ticks at the actual measured N values, rather than Recharts' auto-generated log-scale ticks — those can round two nearby "nice" values to the same displayed label on a wide range, producing a duplicate-key warning. Thinned to a readable count for runs with many points; always unique since N strictly increases every step.
+  const xTicks = useMemo(() => {
+    if (!measurements || measurements.length === 0) return undefined;
+    const ns = measurements.map((m) => m.n);
+    const maxTicks = 8;
+    if (ns.length <= maxTicks) return ns;
+    const step = (ns.length - 1) / (maxTicks - 1);
+    return Array.from(
+      { length: maxTicks },
+      (_, i) => ns[Math.round(i * step)]!
+    );
+  }, [measurements]);
 
   return (
     <GlassCard className="p-6">
@@ -295,7 +340,7 @@ export default function BigOBenchmark() {
             value={inputGenerator}
             disabled={status === 'running'}
             onChange={(e) =>
-              setInputGenerator(e.target.value as InputGeneratorId)
+              onInputGeneratorChange(e.target.value as InputGeneratorId)
             }
           >
             {INPUT_GENERATOR_OPTIONS.map((opt) => (
@@ -304,6 +349,19 @@ export default function BigOBenchmark() {
               </option>
             ))}
           </select>
+          {inputMismatch && status !== 'running' && (
+            <p className="mt-1.5 text-2xs text-amber-400">
+              Your code looks like it expects{' '}
+              {inputMismatch.label.toLowerCase()}.{' '}
+              <button
+                type="button"
+                onClick={() => setInputGenerator(inputMismatch.id)}
+                className="underline underline-offset-2 hover:text-amber-300"
+              >
+                Switch to match
+              </button>
+            </p>
+          )}
         </div>
         <div>
           <label className="label" htmlFor="bigo-entry-name">
@@ -361,7 +419,14 @@ export default function BigOBenchmark() {
         </div>
       )}
 
-      {error && <p className="mt-4 text-sm text-neon-pink">{error}</p>}
+      {error && (
+        <div className="mt-4 flex gap-2.5 rounded-xl border border-destructive/40 bg-destructive/10 p-3.5">
+          <AlertTriangle className="h-4 w-4 shrink-0 translate-y-0.5 text-destructive" />
+          <p className="whitespace-pre-wrap text-sm text-destructive">
+            {error}
+          </p>
+        </div>
+      )}
 
       {status === 'done' && result && (
         <motion.div
@@ -378,6 +443,7 @@ export default function BigOBenchmark() {
                 type="number"
                 scale="log"
                 domain={['auto', 'auto']}
+                ticks={xTicks}
                 stroke={axisStroke}
                 fontSize={11}
                 label={{

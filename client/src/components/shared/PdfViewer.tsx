@@ -106,18 +106,31 @@ export default function PdfViewer({
     return () => observer.disconnect();
   }, [numPages]);
 
-  // ── Pinch-to-zoom (touch devices) ── scaleRef keeps each new pinch in sync with the toolbar/keyboard.
+  // ── Pinch-to-zoom + 2-finger pan (touch devices) ── scaleRef keeps each new pinch in sync with the toolbar/keyboard.
   const scaleRef = useRef(scale);
   useEffect(() => {
     scaleRef.current = scale;
   }, [scale]);
-  usePinch(({ offset: [s] }) => setScale(+s.toFixed(2)), {
-    target: containerRef,
-    eventOptions: { passive: false },
-    scaleBounds: { min: 0.5, max: 2.5 },
-    rubberband: true,
-    from: () => [scaleRef.current, 0],
-  });
+  // Tracks the pinch midpoint so a 2-finger drag scrolls the container by the same amount the fingers moved.
+  const pinchOriginRef = useRef<{ x: number; y: number } | null>(null);
+  usePinch(
+    ({ origin: [ox, oy], offset: [s], first, last }) => {
+      setScale(+s.toFixed(2));
+      const el = containerRef.current;
+      if (el && !first && pinchOriginRef.current) {
+        el.scrollLeft -= ox - pinchOriginRef.current.x;
+        el.scrollTop -= oy - pinchOriginRef.current.y;
+      }
+      pinchOriginRef.current = last ? null : { x: ox, y: oy };
+    },
+    {
+      target: containerRef,
+      eventOptions: { passive: false },
+      scaleBounds: { min: 0.5, max: 2.5 },
+      rubberband: true,
+      from: () => [scaleRef.current, 0],
+    }
+  );
 
   // ── Click-and-hold to pan (mouse) ── plain mouse events, not Pointer Events, which Chromium cancels mid-drag.
   const [dragging, setDragging] = useState(false);

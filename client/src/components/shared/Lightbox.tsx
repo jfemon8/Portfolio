@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { X, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import SmartImage from '@/components/shared/SmartImage';
 
 export interface LightboxImage {
@@ -69,6 +70,11 @@ export default function Lightbox({
           onClick={onClose}
           // Without data-lenis-prevent, wheel/touch on the overlay bubbles to the document and Lenis scrolls the page beneath instead.
           data-lenis-prevent
+          // Own compositing layer: without it, TransformComponent's transform makes Chromium paint the blur over the image.
+          style={{
+            willChange: 'backdrop-filter, transform',
+            transform: 'translateZ(0)',
+          }}
           className="fixed inset-0 z-[70] grid place-items-center bg-background/90 p-4 backdrop-blur-[1.875rem] backdrop-saturate-150 backdrop-brightness-105 sm:p-8"
         >
           <button
@@ -127,13 +133,29 @@ export default function Lightbox({
             onClick={(e) => e.stopPropagation()}
             className="max-w-5xl"
           >
-            <SmartImage
-              src={img.url}
-              alt={img.caption || `Image ${i + 1}`}
-              priority
-              imgWidth={1600}
-              className="mx-auto max-h-[80vh] w-auto rounded-xl border border-border/70 object-contain"
-            />
+            <TransformWrapper
+              initialScale={1}
+              minScale={1}
+              maxScale={4}
+              centerOnInit
+              doubleClick={{ mode: 'toggle' }}
+              panning={{ velocityDisabled: true }}
+              wheel={{ step: 0.2 }}
+              pinch={{ step: 5 }}
+            >
+              <TransformComponent
+                wrapperStyle={{ maxHeight: '80vh', maxWidth: '100%' }}
+                contentStyle={{ justifyContent: 'center' }}
+              >
+                <SmartImage
+                  src={img.url}
+                  alt={img.caption || `Image ${i + 1}`}
+                  priority
+                  imgWidth={1600}
+                  className="mx-auto max-h-[80vh] w-auto rounded-xl border border-border/70 object-contain"
+                />
+              </TransformComponent>
+            </TransformWrapper>
             {img.caption && (
               <figcaption className="mt-3 text-center text-sm text-muted-foreground/80">
                 {img.caption}
