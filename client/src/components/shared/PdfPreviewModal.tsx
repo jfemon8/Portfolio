@@ -56,7 +56,7 @@ export default function PdfPreviewModal({
             exit={{ scale: 0.96, opacity: 0 }}
             transition={{ duration: 0.2 }}
             // Bounded height so PdfViewer's flex-1 min-h-0 scroll area has a defined parent height instead of collapsing or overflowing.
-            className="relative flex h-[92vh] max-h-[60rem] w-full max-w-5xl flex-col"
+            className="relative flex h-[80vh] w-full max-w-5xl flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             <button
