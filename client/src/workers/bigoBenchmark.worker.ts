@@ -426,6 +426,7 @@ async function runBenchmark(req: RunRequest): Promise<void> {
     self.postMessage({
       type: 'progress',
       n,
+      timeMs: floored,
       done: measurements.length,
       total: PROGRESS_TOTAL_ESTIMATE,
     } satisfies ProgressMessage);

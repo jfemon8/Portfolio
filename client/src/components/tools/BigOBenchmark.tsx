@@ -56,6 +56,8 @@ const EXAMPLES: Record<Language, Record<InputGeneratorId, string>> = {
       'function bubbleSort(arr) {\n  const a = arr.slice();\n  for (let i = 0; i < a.length; i++) {\n    for (let j = 0; j < a.length - i - 1; j++) {\n      if (a[j] > a[j + 1]) {\n        const tmp = a[j];\n        a[j] = a[j + 1];\n        a[j + 1] = tmp;\n      }\n    }\n  }\n  return a;\n}',
     sortedArray:
       'function binarySearch(arr) {\n  let lo = 0;\n  let hi = arr.length - 1;\n  let steps = 0;\n  while (lo <= hi) {\n    steps++;\n    const mid = (lo + hi) >> 1;\n    if (arr[mid] === -1) return steps;\n    if (arr[mid] < -1) lo = mid + 1;\n    else hi = mid - 1;\n  }\n  return steps;\n}',
+    nearlySortedArray:
+      'function insertionSort(arr) {\n  const a = arr.slice();\n  for (let i = 1; i < a.length; i++) {\n    const key = a[i];\n    let j = i - 1;\n    while (j >= 0 && a[j] > key) {\n      a[j + 1] = a[j];\n      j--;\n    }\n    a[j + 1] = key;\n  }\n  return a;\n}',
     randomString:
       "function countVowels(str) {\n  let count = 0;\n  for (let i = 0; i < str.length; i++) {\n    if ('aeiou'.includes(str[i])) count++;\n  }\n  return count;\n}",
   },
@@ -66,6 +68,8 @@ const EXAMPLES: Record<Language, Record<InputGeneratorId, string>> = {
       'def bubble_sort(arr):\n    a = list(arr)\n    n = len(a)\n    for i in range(n):\n        for j in range(n - i - 1):\n            if a[j] > a[j + 1]:\n                a[j], a[j + 1] = a[j + 1], a[j]\n    return a',
     sortedArray:
       'def binary_search(arr):\n    lo, hi, steps = 0, len(arr) - 1, 0\n    while lo <= hi:\n        steps += 1\n        mid = (lo + hi) // 2\n        if arr[mid] == -1:\n            return steps\n        if arr[mid] < -1:\n            lo = mid + 1\n        else:\n            hi = mid - 1\n    return steps',
+    nearlySortedArray:
+      'def insertion_sort(arr):\n    a = list(arr)\n    for i in range(1, len(a)):\n        key = a[i]\n        j = i - 1\n        while j >= 0 and a[j] > key:\n            a[j + 1] = a[j]\n            j -= 1\n        a[j + 1] = key\n    return a',
     randomString:
       "def count_vowels(s):\n    count = 0\n    for ch in s:\n        if ch in 'aeiou':\n            count += 1\n    return count",
   },
@@ -88,37 +92,82 @@ type WorkerMessage = ProgressMessage | ResultMessage | ErrorMessage;
 function CandidateRow({
   fit,
   isWinner,
+  isLive,
+  index,
 }: {
   fit: CandidateFit;
   isWinner: boolean;
+  isLive: boolean;
+  index: number;
 }) {
   const showR2 = fit.complexityClass !== 'O(1)';
+  const fitPercent = Math.max(0, Math.min(100, fit.r2 * 100));
   return (
-    <GlassCard className={cn('p-4', isWinner && 'ring-1 ring-neon/60')}>
-      <div className="flex items-center justify-between gap-2">
-        <span
-          className={cn(
-            'font-mono text-base font-bold',
-            isWinner ? 'text-neon' : 'text-foreground'
-          )}
-        >
-          {fit.complexityClass}
-        </span>
-        {isWinner && (
-          <span className="rounded-full bg-neon/10 px-2 py-0.5 text-2xs font-semibold text-neon">
-            Best fit
-          </span>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: index * 0.06, ease: 'easeOut' }}
+    >
+      <GlassCard
+        className={cn(
+          'p-4 transition-colors duration-300',
+          isWinner &&
+            (isLive ? 'ring-1 ring-amber-400/60' : 'ring-1 ring-neon/60')
         )}
-      </div>
-      <p className="mt-1 text-xs text-muted-foreground">
-        {CLASS_HINT[fit.complexityClass]}
-      </p>
-      {showR2 && (
-        <p className="mt-2 text-2xs text-muted-foreground/70">
-          Fit quality: {(fit.r2 * 100).toFixed(1)}%
+      >
+        <div className="flex items-center justify-between gap-2">
+          <span
+            className={cn(
+              'font-mono text-base font-bold transition-colors duration-300',
+              isWinner
+                ? isLive
+                  ? 'text-amber-400'
+                  : 'text-neon'
+                : 'text-foreground'
+            )}
+          >
+            {fit.complexityClass}
+          </span>
+          {isWinner && (
+            <span
+              className={cn(
+                'rounded-full px-2 py-0.5 text-2xs font-semibold transition-colors duration-300',
+                isLive
+                  ? 'bg-amber-400/10 text-amber-400'
+                  : 'bg-neon/10 text-neon'
+              )}
+            >
+              {isLive ? 'Leading' : 'Best fit'}
+            </span>
+          )}
+        </div>
+        <p className="mt-1 text-xs text-muted-foreground">
+          {CLASS_HINT[fit.complexityClass]}
         </p>
-      )}
-    </GlassCard>
+        {showR2 && (
+          <div className="mt-2.5">
+            <div className="h-1 w-full overflow-hidden rounded-full bg-bg-elevated">
+              <motion.div
+                className={cn(
+                  'h-full rounded-full',
+                  isWinner
+                    ? isLive
+                      ? 'bg-amber-400'
+                      : 'bg-neon-gradient'
+                    : 'bg-muted-foreground/40'
+                )}
+                initial={{ width: 0 }}
+                animate={{ width: `${fitPercent}%` }}
+                transition={{ duration: 0.4, ease: 'easeOut' }}
+              />
+            </div>
+            <p className="mt-1 text-2xs text-muted-foreground/70">
+              Fit quality: {fitPercent.toFixed(1)}%
+            </p>
+          </div>
+        )}
+      </GlassCard>
+    </motion.div>
   );
 }
 
@@ -136,7 +185,8 @@ export default function BigOBenchmark() {
   } | null>(null);
   const [pyodideLoading, setPyodideLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [measurements, setMeasurements] = useState<Measurement[] | null>(null);
+  // Accumulates live, one point per progress message — the chart and complexity estimate below are reactive to this the whole run, not just once a final result arrives, so the actual empirical curve visibly builds in real time.
+  const [measurements, setMeasurements] = useState<Measurement[]>([]);
 
   // Best-effort suggestion only, never auto-applied — a mismatched input type is the most common cause of an immediate run error, so surface it before the user hits Run rather than only after a crash.
   const suggestedInputGenerator = useMemo(
@@ -176,7 +226,7 @@ export default function BigOBenchmark() {
     setEntryName('');
     setStatus('idle');
     setError(null);
-    setMeasurements(null);
+    setMeasurements([]);
   };
 
   const onLoadExample = (): void => {
@@ -198,7 +248,7 @@ export default function BigOBenchmark() {
     if (!source.trim() || status === 'running') return;
     setStatus('running');
     setError(null);
-    setMeasurements(null);
+    setMeasurements([]);
     setProgress(null);
     setPyodideLoading(language === 'python');
 
@@ -214,6 +264,7 @@ export default function BigOBenchmark() {
       const msg = e.data;
       if (msg.type === 'progress') {
         setProgress({ done: msg.done, total: msg.total, n: msg.n });
+        setMeasurements((prev) => [...prev, { n: msg.n, timeMs: msg.timeMs }]);
         setPyodideLoading(false);
       } else if (msg.type === 'result') {
         clearWatchdog();
@@ -249,8 +300,9 @@ export default function BigOBenchmark() {
     worker.postMessage(req);
   };
 
+  // Recomputed on every new point, live — cheap closed-form regression, so re-fitting on each of the ~10-20 progress messages in a run is not a performance concern, and it's what makes the estimate below visibly refine itself in real time.
   const result: ComplexityResult | null = useMemo(() => {
-    if (!measurements || measurements.length < 4) return null;
+    if (measurements.length < 4) return null;
     try {
       return fitComplexity(measurements);
     } catch {
@@ -259,11 +311,11 @@ export default function BigOBenchmark() {
   }, [measurements]);
 
   const chartData = useMemo(
-    () => measurements?.map((m) => ({ n: m.n, timeMs: m.timeMs })) ?? [],
+    () => measurements.map((m) => ({ n: m.n, timeMs: m.timeMs })),
     [measurements]
   );
   const fitLine = useMemo(() => {
-    if (!result || !measurements || measurements.length === 0) return [];
+    if (!result || measurements.length === 0) return [];
     const ns = measurements.map((m) => m.n);
     const minN = Math.min(...ns);
     const maxN = Math.max(...ns);
@@ -275,7 +327,7 @@ export default function BigOBenchmark() {
   }, [result, measurements]);
   // Explicit ticks at the actual measured N values, rather than Recharts' auto-generated log-scale ticks — those can round two nearby "nice" values to the same displayed label on a wide range, producing a duplicate-key warning. Thinned to a readable count for runs with many points; always unique since N strictly increases every step.
   const xTicks = useMemo(() => {
-    if (!measurements || measurements.length === 0) return undefined;
+    if (measurements.length === 0) return undefined;
     const ns = measurements.map((m) => m.n);
     const maxTicks = 8;
     if (ns.length <= maxTicks) return ns;
@@ -428,13 +480,34 @@ export default function BigOBenchmark() {
         </div>
       )}
 
-      {status === 'done' && result && (
+      {result && (
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
           className="mt-6"
         >
+          <div className="mb-2 flex items-center gap-2">
+            {status === 'running' ? (
+              <>
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-400" />
+                </span>
+                <span className="text-2xs font-medium text-amber-400">
+                  Measuring live — estimate refines as more data arrives
+                </span>
+              </>
+            ) : status === 'error' ? (
+              <span className="text-2xs font-medium text-muted-foreground">
+                Stopped early — showing data measured before the error
+              </span>
+            ) : (
+              <span className="text-2xs font-medium text-neon">
+                Measurement complete
+              </span>
+            )}
+          </div>
           <ResponsiveContainer width="100%" height={300}>
             <ComposedChart margin={{ top: 10, right: 20, left: 0, bottom: 20 }}>
               <CartesianGrid stroke="hsl(var(--border))" strokeOpacity={0.4} />
@@ -491,11 +564,13 @@ export default function BigOBenchmark() {
           </p>
 
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {result.contenders.map((fit) => (
+            {result.contenders.map((fit, index) => (
               <CandidateRow
                 key={fit.complexityClass}
                 fit={fit}
                 isWinner={fit === result.winner}
+                isLive={status === 'running'}
+                index={index}
               />
             ))}
           </div>

@@ -39,6 +39,7 @@ export default function PdfViewer({
 }: PdfViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const pageRefs = useRef<Map<number, HTMLDivElement>>(new Map());
   const [numPages, setNumPages] = useState(0);
   const [visiblePage, setVisiblePage] = useState(1);
@@ -111,17 +112,57 @@ export default function PdfViewer({
   useEffect(() => {
     scaleRef.current = scale;
   }, [scale]);
-  // Tracks the pinch midpoint so a 2-finger drag scrolls the container by the same amount the fingers moved.
-  const pinchOriginRef = useRef<{ x: number; y: number } | null>(null);
+  // Live-preview zoom/pan via CSS transform on contentRef during the gesture, commit to real setScale + scroll only on release — calling setScale() per pinch tick raced react-pdf's async re-rasterization against scrollLeft/scrollTop writes, which is what broke post-pinch scrolling.
+  interface PinchMemo {
+    startScale: number;
+    originX: number;
+    originY: number;
+    lastOx: number;
+    lastOy: number;
+    panX: number;
+    panY: number;
+  }
   usePinch(
-    ({ origin: [ox, oy], offset: [s], first, last }) => {
-      setScale(+s.toFixed(2));
+    (state) => {
+      const { origin, first, last } = state;
+      const [ox, oy] = origin;
+      const [s] = state.offset;
       const el = containerRef.current;
-      if (el && !first && pinchOriginRef.current) {
-        el.scrollLeft -= ox - pinchOriginRef.current.x;
-        el.scrollTop -= oy - pinchOriginRef.current.y;
+      const content = contentRef.current;
+      if (!el || !content) return state.memo as PinchMemo | undefined;
+
+      const m: PinchMemo = first
+        ? {
+            startScale: scaleRef.current,
+            // Content-local (scroll-adjusted) coordinates so transform-origin stays anchored under the fingers.
+            originX: ox - el.getBoundingClientRect().left + el.scrollLeft,
+            originY: oy - el.getBoundingClientRect().top + el.scrollTop,
+            lastOx: ox,
+            lastOy: oy,
+            panX: 0,
+            panY: 0,
+          }
+        : (state.memo as PinchMemo);
+
+      m.panX += ox - m.lastOx;
+      m.panY += oy - m.lastOy;
+      m.lastOx = ox;
+      m.lastOy = oy;
+
+      const liveFactor = s / m.startScale;
+      content.style.transformOrigin = `${m.originX}px ${m.originY}px`;
+      content.style.transform = `translate(${m.panX}px, ${m.panY}px) scale(${liveFactor})`;
+
+      if (last) {
+        // Clear before setScale — the real re-render is async, so a brief un-zoomed flash beats double-scaling.
+        content.style.transform = 'none';
+        content.style.transformOrigin = '';
+        el.scrollLeft -= m.panX;
+        el.scrollTop -= m.panY;
+        setScale(+Math.min(2.5, Math.max(0.5, s)).toFixed(2));
       }
-      pinchOriginRef.current = last ? null : { x: ox, y: oy };
+
+      return m;
     },
     {
       target: containerRef,
@@ -446,52 +487,57 @@ export default function PdfViewer({
             </a>
           </div>
         ) : (
-          <Document
-            file={viewUrl}
-            onLoadSuccess={onDocumentLoadSuccess}
-            onLoadError={onDocumentLoadError}
-            loading={
-              <div className="flex h-full flex-col items-center justify-center gap-2">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p className="text-sm text-muted-foreground">Loading PDF...</p>
-              </div>
-            }
-            error={
-              <div className="flex h-full items-center justify-center p-4 text-sm text-muted-foreground">
-                Failed to load PDF.
-              </div>
-            }
-            className="py-2"
-          >
-            {Array.from({ length: numPages }, (_, i) => i + 1).map(
-              (pageNum) => (
-                <div
-                  key={pageNum}
-                  data-page={pageNum}
-                  ref={(el) => {
-                    if (el) pageRefs.current.set(pageNum, el);
-                  }}
-                  className="relative mx-auto mb-4 w-fit last:mb-0"
-                >
-                  <div className="overflow-hidden rounded-sm shadow-lg ring-1 ring-black/5 dark:ring-white/5 sm:shadow-xl">
-                    <Page
-                      pageNumber={pageNum}
-                      width={pageWidth}
-                      renderAnnotationLayer={true}
-                      renderTextLayer={true}
-                    />
-                  </div>
-                  {numPages > 1 && (
-                    <div className="mt-2 flex justify-center">
-                      <span className="text-3xs tabular-nums text-muted-foreground/50 sm:text-2xs">
-                        {pageNum}
-                      </span>
-                    </div>
-                  )}
+          // Live pinch transform target — kept separate from containerRef so it never fights the container's own scroll/overflow.
+          <div ref={contentRef}>
+            <Document
+              file={viewUrl}
+              onLoadSuccess={onDocumentLoadSuccess}
+              onLoadError={onDocumentLoadError}
+              loading={
+                <div className="flex h-full flex-col items-center justify-center gap-2">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <p className="text-sm text-muted-foreground">
+                    Loading PDF...
+                  </p>
                 </div>
-              )
-            )}
-          </Document>
+              }
+              error={
+                <div className="flex h-full items-center justify-center p-4 text-sm text-muted-foreground">
+                  Failed to load PDF.
+                </div>
+              }
+              className="py-2"
+            >
+              {Array.from({ length: numPages }, (_, i) => i + 1).map(
+                (pageNum) => (
+                  <div
+                    key={pageNum}
+                    data-page={pageNum}
+                    ref={(el) => {
+                      if (el) pageRefs.current.set(pageNum, el);
+                    }}
+                    className="relative mx-auto mb-4 w-fit last:mb-0"
+                  >
+                    <div className="overflow-hidden rounded-sm shadow-lg ring-1 ring-black/5 dark:ring-white/5 sm:shadow-xl">
+                      <Page
+                        pageNumber={pageNum}
+                        width={pageWidth}
+                        renderAnnotationLayer={true}
+                        renderTextLayer={true}
+                      />
+                    </div>
+                    {numPages > 1 && (
+                      <div className="mt-2 flex justify-center">
+                        <span className="text-3xs tabular-nums text-muted-foreground/50 sm:text-2xs">
+                          {pageNum}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )
+              )}
+            </Document>
+          </div>
         )}
       </div>
     </div>

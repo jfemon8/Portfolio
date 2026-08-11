@@ -4,6 +4,7 @@ export type InputGeneratorId =
   | 'number'
   | 'randomArray'
   | 'sortedArray'
+  | 'nearlySortedArray'
   | 'randomString';
 
 export interface InputGeneratorOption {
@@ -23,6 +24,11 @@ export const INPUT_GENERATOR_OPTIONS: InputGeneratorOption[] = [
   {
     id: 'sortedArray',
     label: 'Array of N random integers (pre-sorted)',
+    signatureHint: 'fn(arr)',
+  },
+  {
+    id: 'nearlySortedArray',
+    label: 'Array of N random integers (nearly sorted)',
     signatureHint: 'fn(arr)',
   },
   {
@@ -73,12 +79,16 @@ export function detectInputGenerator(
   return 'number';
 }
 
-// 'randomArray' and 'sortedArray' both produce a number[] and are interchangeable for crash-avoidance purposes (sortedness only affects whether the *measured complexity* is meaningful for sort-dependent code, e.g. binary search — never whether the call throws) — so they should never trigger a mismatch warning against each other.
+// All three array variants produce a number[] and are interchangeable for crash-avoidance purposes (sortedness only affects whether the *measured complexity* is meaningful for sort-dependent code, e.g. binary search — never whether the call throws) — so they should never trigger a mismatch warning against each other.
 export function isSameInputShape(
   a: InputGeneratorId,
   b: InputGeneratorId
 ): boolean {
-  const arrayLike: InputGeneratorId[] = ['randomArray', 'sortedArray'];
+  const arrayLike: InputGeneratorId[] = [
+    'randomArray',
+    'sortedArray',
+    'nearlySortedArray',
+  ];
   return a === b || (arrayLike.includes(a) && arrayLike.includes(b));
 }
 
@@ -100,6 +110,25 @@ export function generateInput(
       return Array.from({ length: n }, () =>
         Math.floor(Math.random() * n * 10)
       ).sort((a, b) => a - b);
+    case 'nearlySortedArray': {
+      const arr = Array.from({ length: n }, () =>
+        Math.floor(Math.random() * n * 10)
+      ).sort((a, b) => a - b);
+      // ~5% of positions swapped with a *nearby* partner (within a few slots), not anywhere in the array — a handful of long-range swaps would each displace an element by up to n positions, creating just as many inversions as fully random data. Bounding the swap distance is what actually keeps this adaptive-algorithm-friendly: each element needs only a small, constant number of shifts to reach its sorted position.
+      const swaps = Math.max(1, Math.round(n * 0.05));
+      const maxOffset = Math.max(1, Math.min(5, n - 1));
+      for (let i = 0; i < swaps; i++) {
+        const p = Math.floor(Math.random() * n);
+        const q = Math.min(
+          n - 1,
+          p + 1 + Math.floor(Math.random() * maxOffset)
+        );
+        const tmp = arr[p]!;
+        arr[p] = arr[q]!;
+        arr[q] = tmp;
+      }
+      return arr;
+    }
     case 'randomString': {
       let s = '';
       for (let i = 0; i < n; i++) {
