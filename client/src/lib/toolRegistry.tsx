@@ -13,4 +13,10 @@ export const TOOL_COMPONENTS: Record<ToolKey, ComponentType> = {
     () => import('@/components/tools/CfRatingPredictor')
   ),
   'bigo-benchmark': lazy(() => import('@/components/tools/BigOBenchmark')),
+  'password-crack-time': lazy(
+    () => import('@/components/tools/PasswordCrackTime')
+  ),
+  'resume-ats-xray': lazy(() => import('@/components/tools/ResumeAtsXray')),
+  'pdf-power-tools': lazy(() => import('@/components/tools/PdfPowerTools')),
+  'music-remover': lazy(() => import('@/components/tools/MusicRemover')),
 };

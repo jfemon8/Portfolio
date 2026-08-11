@@ -197,7 +197,11 @@ export type ToolKey =
   | 'regex-tester'
   | 'cp-profile-comparer'
   | 'cf-rating-predictor'
-  | 'bigo-benchmark';
+  | 'bigo-benchmark'
+  | 'password-crack-time'
+  | 'resume-ats-xray'
+  | 'pdf-power-tools'
+  | 'music-remover';
 
 export type ToolIcon =
   | 'KeyRound'
@@ -208,7 +212,11 @@ export type ToolIcon =
   | 'Wrench'
   | 'Terminal'
   | 'Sparkles'
-  | 'Gauge';
+  | 'Gauge'
+  | 'Lock'
+  | 'FileSearch'
+  | 'FileStack'
+  | 'Mic2';
 
 export interface Tool {
   name: string;

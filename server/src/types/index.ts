@@ -457,7 +457,11 @@ export type ToolKey =
   | 'regex-tester'
   | 'cp-profile-comparer'
   | 'cf-rating-predictor'
-  | 'bigo-benchmark';
+  | 'bigo-benchmark'
+  | 'password-crack-time'
+  | 'resume-ats-xray'
+  | 'pdf-power-tools'
+  | 'music-remover';
 
 export type ToolIcon =
   | 'KeyRound'
@@ -468,7 +472,11 @@ export type ToolIcon =
   | 'Wrench'
   | 'Terminal'
   | 'Sparkles'
-  | 'Gauge';
+  | 'Gauge'
+  | 'Lock'
+  | 'FileSearch'
+  | 'FileStack'
+  | 'Mic2';
 
 /** Admin-editable metadata for a public /tools entry; the tool's actual behavior lives in code under client/src/components/tools, keyed by `key`. */
 export interface ITool {

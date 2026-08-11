@@ -15,6 +15,10 @@ const KEY_OPTIONS = [
   { value: 'cp-profile-comparer', label: 'CP Profile Comparer' },
   { value: 'cf-rating-predictor', label: 'Codeforces Rating Predictor' },
   { value: 'bigo-benchmark', label: 'Big-O Benchmark' },
+  { value: 'password-crack-time', label: 'Password Crack-Time Benchmark' },
+  { value: 'resume-ats-xray', label: 'Resume ATS X-Ray' },
+  { value: 'pdf-power-tools', label: 'PDF Power-Tools' },
+  { value: 'music-remover', label: 'Music Remover' },
 ];
 
 // Two-panel /admin/tools view (Tools + Categories tabs), mirroring SkillsManager's Skills/Categories split.

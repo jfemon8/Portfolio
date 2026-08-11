@@ -22,5 +22,5 @@
     "baseUrl": ".",
     "paths": { "@/*": ["src/*"] }
   },
-  "include": ["src/workers"]
+  "include": ["src/workers", "src/types/kissfft-js.d.ts"]
 }

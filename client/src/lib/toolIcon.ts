@@ -8,6 +8,10 @@ import {
   Terminal,
   Sparkles,
   Gauge,
+  Lock,
+  FileSearch,
+  FileStack,
+  Mic2,
   type LucideIcon,
 } from 'lucide-react';
 import type { ToolIcon } from '@/types';
@@ -23,6 +27,10 @@ export const TOOL_ICONS: Record<ToolIcon, LucideIcon> = {
   Terminal,
   Sparkles,
   Gauge,
+  Lock,
+  FileSearch,
+  FileStack,
+  Mic2,
 };
 
 export const TOOL_ICON_OPTIONS: { value: ToolIcon; label: string }[] =

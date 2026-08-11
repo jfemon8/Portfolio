@@ -460,6 +460,42 @@ const toolsRaw: Omit<ITool, 'slug'>[] = [
     key: 'bigo-benchmark',
     order: 5,
   },
+  {
+    name: 'Password Crack-Time Benchmark',
+    description:
+      "See how long your password would really take to crack — benchmarked live against this device's actual hashing speed, not a generic lookup table.",
+    category: 'everyday-tools',
+    icon: 'Lock',
+    key: 'password-crack-time',
+    order: 6,
+  },
+  {
+    name: 'Resume ATS X-Ray',
+    description:
+      'Upload your resume and see exactly what an ATS parser would actually extract from it — real layout-hazard detection, not an invented score.',
+    category: 'everyday-tools',
+    icon: 'FileSearch',
+    key: 'resume-ats-xray',
+    order: 7,
+  },
+  {
+    name: 'PDF Power-Tools',
+    description:
+      'Merge, split, compress, and sign PDFs — entirely in your browser, nothing is ever uploaded.',
+    category: 'everyday-tools',
+    icon: 'FileStack',
+    key: 'pdf-power-tools',
+    order: 8,
+  },
+  {
+    name: 'Music Remover',
+    description:
+      'Real ML-based vocal isolation, running entirely in your browser — pull the vocals or the instrumental out of any song, no upload, no server.',
+    category: 'everyday-tools',
+    icon: 'Mic2',
+    key: 'music-remover',
+    order: 9,
+  },
 ];
 
 const tools: ITool[] = toolsRaw.map((t) => ({
