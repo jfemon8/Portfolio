@@ -201,7 +201,8 @@ export type ToolKey =
   | 'password-crack-time'
   | 'resume-ats-xray'
   | 'pdf-power-tools'
-  | 'music-remover';
+  | 'music-remover'
+  | 'email-verifier';
 
 export type ToolIcon =
   | 'KeyRound'
@@ -216,7 +217,8 @@ export type ToolIcon =
   | 'Lock'
   | 'FileSearch'
   | 'FileStack'
-  | 'Mic2';
+  | 'Mic2'
+  | 'MailCheck';
 
 export interface Tool {
   name: string;

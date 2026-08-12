@@ -12,6 +12,7 @@ import {
   FileSearch,
   FileStack,
   Mic2,
+  MailCheck,
   type LucideIcon,
 } from 'lucide-react';
 import type { ToolIcon } from '@/types';
@@ -31,6 +32,7 @@ export const TOOL_ICONS: Record<ToolIcon, LucideIcon> = {
   FileSearch,
   FileStack,
   Mic2,
+  MailCheck,
 };
 
 export const TOOL_ICON_OPTIONS: { value: ToolIcon; label: string }[] =

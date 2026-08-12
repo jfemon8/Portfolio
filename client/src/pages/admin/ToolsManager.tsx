@@ -19,6 +19,7 @@ const KEY_OPTIONS = [
   { value: 'resume-ats-xray', label: 'Resume ATS X-Ray' },
   { value: 'pdf-power-tools', label: 'PDF Power-Tools' },
   { value: 'music-remover', label: 'Music Remover' },
+  { value: 'email-verifier', label: 'Email Extractor & Verifier' },
 ];
 
 // Two-panel /admin/tools view (Tools + Categories tabs), mirroring SkillsManager's Skills/Categories split.

@@ -461,7 +461,8 @@ export type ToolKey =
   | 'password-crack-time'
   | 'resume-ats-xray'
   | 'pdf-power-tools'
-  | 'music-remover';
+  | 'music-remover'
+  | 'email-verifier';
 
 export type ToolIcon =
   | 'KeyRound'
@@ -476,7 +477,8 @@ export type ToolIcon =
   | 'Lock'
   | 'FileSearch'
   | 'FileStack'
-  | 'Mic2';
+  | 'Mic2'
+  | 'MailCheck';
 
 /** Admin-editable metadata for a public /tools entry; the tool's actual behavior lives in code under client/src/components/tools, keyed by `key`. */
 export interface ITool {

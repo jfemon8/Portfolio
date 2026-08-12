@@ -496,6 +496,15 @@ const toolsRaw: Omit<ITool, 'slug'>[] = [
     key: 'music-remover',
     order: 9,
   },
+  {
+    name: 'Email Extractor & Verifier',
+    description:
+      'Pull every email out of any text, then check each one against its real mail configuration — no signup, no upload, no limit.',
+    category: 'everyday-tools',
+    icon: 'MailCheck',
+    key: 'email-verifier',
+    order: 10,
+  },
 ];
 
 const tools: ITool[] = toolsRaw.map((t) => ({
