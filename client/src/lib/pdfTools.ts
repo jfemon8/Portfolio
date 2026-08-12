@@ -1,4 +1,4 @@
-import { PDFDocument, EncryptedPDFError } from 'pdf-lib';
+import { PDFDocument, EncryptedPDFError, type PDFImage } from 'pdf-lib';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 import { pdfjsLib } from './pdfjsSetup';
 
@@ -180,30 +180,82 @@ export interface SignaturePlacement {
   signaturePngDataUrl: string;
 }
 
-export async function applySignature(
+export async function applySignatures(
   file: File,
-  placement: SignaturePlacement
+  placements: SignaturePlacement[]
 ): Promise<Uint8Array> {
   const bytes = await file.arrayBuffer();
   const doc = await loadPdf(bytes);
-  const page = doc.getPage(placement.pageIndex);
-  const pageWidth = page.getWidth();
-  const pageHeight = page.getHeight();
+  // One signature reused across pages is embedded once, so repeating it costs almost no file size.
+  const embedded = new Map<string, PDFImage>();
 
-  const pngImage = await doc.embedPng(placement.signaturePngDataUrl);
-  const drawWidth = placement.widthPct * pageWidth;
-  const scaled = pngImage.scale(drawWidth / pngImage.width);
-  const x = placement.xPct * pageWidth;
-  // UI coordinates are top-left origin; PDF coordinates are bottom-left origin.
-  const y = pageHeight - placement.yPct * pageHeight - scaled.height;
-
-  page.drawImage(pngImage, {
-    x,
-    y,
-    width: scaled.width,
-    height: scaled.height,
-  });
+  for (const placement of placements) {
+    let image = embedded.get(placement.signaturePngDataUrl);
+    if (!image) {
+      image = await doc.embedPng(placement.signaturePngDataUrl);
+      embedded.set(placement.signaturePngDataUrl, image);
+    }
+    const page = doc.getPage(placement.pageIndex);
+    const pageWidth = page.getWidth();
+    const pageHeight = page.getHeight();
+    const scaled = image.scale((placement.widthPct * pageWidth) / image.width);
+    page.drawImage(image, {
+      x: placement.xPct * pageWidth,
+      // UI coordinates are top-left origin; PDF coordinates are bottom-left origin.
+      y: pageHeight - placement.yPct * pageHeight - scaled.height,
+      width: scaled.width,
+      height: scaled.height,
+    });
+  }
   return doc.save();
+}
+
+const MAX_SIGNATURE_DIMENSION = 1200;
+const WHITE_THRESHOLD = 235;
+
+export interface SignatureImage {
+  dataUrl: string;
+  aspect: number;
+}
+
+// Normalizes any uploaded image to PNG, optionally clearing the white background of a photographed signature.
+export async function imageFileToSignaturePng(
+  file: File,
+  removeWhiteBackground: boolean
+): Promise<SignatureImage> {
+  const bitmap = await createImageBitmap(file);
+  const scale = Math.min(
+    1,
+    MAX_SIGNATURE_DIMENSION / Math.max(bitmap.width, bitmap.height)
+  );
+  const width = Math.max(1, Math.round(bitmap.width * scale));
+  const height = Math.max(1, Math.round(bitmap.height * scale));
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  if (!ctx)
+    throw new Error('Canvas rendering is not supported in this browser.');
+  ctx.drawImage(bitmap, 0, 0, width, height);
+  bitmap.close();
+
+  if (removeWhiteBackground) {
+    const imageData = ctx.getImageData(0, 0, width, height);
+    const data = imageData.data;
+    for (let i = 0; i < data.length; i += 4) {
+      if (
+        data[i]! > WHITE_THRESHOLD &&
+        data[i + 1]! > WHITE_THRESHOLD &&
+        data[i + 2]! > WHITE_THRESHOLD
+      ) {
+        data[i + 3] = 0;
+      }
+    }
+    ctx.putImageData(imageData, 0, 0);
+  }
+
+  return { dataUrl: canvas.toDataURL('image/png'), aspect: height / width };
 }
 
 export function formatPageRanges(indices: number[]): string {
