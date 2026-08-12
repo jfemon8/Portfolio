@@ -2,6 +2,7 @@ export interface SeparateRequest {
   type: 'separate';
   channelData: Float32Array[];
   sampleRate: number;
+  denoise: boolean;
 }
 
 export interface ModelProgressMessage {

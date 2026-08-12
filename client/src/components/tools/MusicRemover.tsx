@@ -50,6 +50,7 @@ export default function MusicRemover() {
     chunk: number;
     total: number;
   } | null>(null);
+  const [denoise, setDenoise] = useState(true);
   const [result, setResult] = useState<ResultAudio | null>(null);
   const workerRef = useRef<Worker | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -183,6 +184,7 @@ export default function MusicRemover() {
       type: 'separate',
       channelData: decoded.channelData,
       sampleRate: decoded.sampleRate,
+      denoise,
     });
   };
 
@@ -195,9 +197,7 @@ export default function MusicRemover() {
         <ShieldCheck className="h-4 w-4 shrink-0 translate-y-0.5 text-neon" />
         <p>
           Your song is processed entirely in your browser and never uploaded
-          anywhere. The first run downloads a ~67MB separation model (cached
-          after that), so it takes a minute or two — genuinely running the
-          model, not a canned demo.
+          anywhere.
         </p>
       </div>
 
@@ -265,10 +265,25 @@ export default function MusicRemover() {
       )}
 
       {stage === 'ready' && (
-        <Button onClick={handleSeparate} className="mt-5 w-full sm:w-auto">
-          <Mic2 className="h-4 w-4" />
-          Separate Vocals
-        </Button>
+        <div className="mt-5 space-y-3">
+          <label className="flex items-start gap-2 text-xs text-muted-foreground">
+            <input
+              type="checkbox"
+              checked={denoise}
+              onChange={(e) => setDenoise(e.target.checked)}
+              className="mt-0.5 accent-primary"
+            />
+            <span>
+              Extra noise reduction — runs the model a second time on an
+              inverted signal to cancel artefacts it adds either way. Noticeably
+              cleaner, but roughly doubles the processing time.
+            </span>
+          </label>
+          <Button onClick={handleSeparate} className="w-full sm:w-auto">
+            <Mic2 className="h-4 w-4" />
+            Separate Vocals
+          </Button>
+        </div>
       )}
 
       {stage === 'loading-model' && (

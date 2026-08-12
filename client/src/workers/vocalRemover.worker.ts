@@ -18,6 +18,8 @@ const COMPENSATE = 1.021;
 const CHUNK_SIZE = HOP * (DIM_T - 1);
 const TRIM = N_FFT / 2;
 const GEN_SIZE = CHUNK_SIZE - 2 * TRIM;
+// ~0.19s of shared audio between chunks, costing ~3% more inference for seam-free joins.
+const OVERLAP = 8192;
 
 const window = hannWindow(N_FFT);
 
@@ -92,32 +94,32 @@ function interleave(re: Float32Array, im: Float32Array): Float32Array {
   return out;
 }
 
-function computePad(totalLength: number): {
-  pad: number;
-  paddedLength: number;
-  numChunks: number;
-} {
-  const remainder = totalLength % GEN_SIZE;
-  const pad = GEN_SIZE + TRIM - remainder;
-  const paddedLength = TRIM + totalLength + pad;
-  const numChunks = Math.floor((paddedLength - CHUNK_SIZE) / GEN_SIZE) + 1;
-  return { pad, paddedLength, numChunks };
-}
-
+// Leading silence puts the first chunk's discarded edge outside the real audio; the tail zero-fills to the last chunk.
 function padMixtureChannel(
   samples: Float32Array,
   trim: number,
-  pad: number
+  paddedLength: number
 ): Float32Array {
-  const out = new Float32Array(trim + samples.length + pad);
+  const out = new Float32Array(Math.max(paddedLength, trim + samples.length));
   out.set(samples, trim);
   return out;
+}
+
+async function infer(
+  session: ort.InferenceSession,
+  inputData: Float32Array
+): Promise<Float32Array> {
+  const tensor = new ort.Tensor('float32', inputData, [1, 4, DIM_F, DIM_T]);
+  const outputs = await session.run({ input: tensor });
+  // Copied out of the runtime's own memory, which the next run would otherwise overwrite.
+  return Float32Array.from(outputs.output!.data as Float32Array);
 }
 
 async function runChunk(
   session: ort.InferenceSession,
   leftChunk: Float32Array,
-  rightChunk: Float32Array
+  rightChunk: Float32Array,
+  denoise: boolean
 ): Promise<{ left: Float32Array; right: Float32Array }> {
   const leftFrames = stft(leftChunk, N_FFT, HOP, window).map(deinterleave);
   const rightFrames = stft(rightChunk, N_FFT, HOP, window).map(deinterleave);
@@ -136,14 +138,17 @@ async function runChunk(
     }
   }
 
-  const inputTensor = new ort.Tensor('float32', inputData, [
-    1,
-    4,
-    DIM_F,
-    DIM_T,
-  ]);
-  const outputs = await session.run({ input: inputTensor });
-  const outputData = outputs.output!.data as Float32Array;
+  const outputData = await infer(session, inputData);
+  if (denoise) {
+    // Averaging the prediction with the negated-input prediction cancels artefacts the model adds regardless of sign.
+    const negated = await infer(
+      session,
+      Float32Array.from(inputData, (v) => -v)
+    );
+    for (let i = 0; i < outputData.length; i++) {
+      outputData[i] = (outputData[i]! - negated[i]!) * 0.5;
+    }
+  }
 
   const leftOutFrames: Float32Array[] = [];
   const rightOutFrames: Float32Array[] = [];
@@ -158,13 +163,7 @@ async function runChunk(
       rRe[f] = outputData[2 * DIM_F * DIM_T + f * DIM_T + t]! * COMPENSATE;
       rIm[f] = outputData[3 * DIM_F * DIM_T + f * DIM_T + t]! * COMPENSATE;
     }
-    // Bins above dim_f are outside the model's band — carried over from the original mix rather than left silent.
-    for (let f = DIM_F; f < N_BINS; f++) {
-      lRe[f] = leftFrames[t]!.re[f]!;
-      lIm[f] = leftFrames[t]!.im[f]!;
-      rRe[f] = rightFrames[t]!.re[f]!;
-      rIm[f] = rightFrames[t]!.im[f]!;
-    }
+    // Bins above dim_f stay zero — the model never predicts them, so all that treble belongs to the instrumental.
     leftOutFrames.push(interleave(lRe, lIm));
     rightOutFrames.push(interleave(rRe, rIm));
   }
@@ -175,45 +174,79 @@ async function runChunk(
   };
 }
 
-async function separate(channelData: Float32Array[]): Promise<{
-  vocals: Float32Array[];
-  instrumental: Float32Array[];
-}> {
+// Fades a segment in/out across the overlap so neighbouring chunks blend instead of butting together with a click.
+function crossfadeWeight(
+  j: number,
+  segLen: number,
+  fadeIn: boolean,
+  fadeOut: boolean
+): number {
+  let w = 1;
+  if (fadeIn && j < OVERLAP) w = Math.min(w, j / OVERLAP);
+  if (fadeOut && j >= segLen - OVERLAP) {
+    w = Math.min(w, (segLen - 1 - j) / OVERLAP);
+  }
+  return Math.max(w, 0);
+}
+
+async function separate(
+  channelData: Float32Array[],
+  denoise: boolean
+): Promise<{ vocals: Float32Array[]; instrumental: Float32Array[] }> {
   const isStereo = channelData.length >= 2;
   const left = channelData[0]!;
   const right = isStereo ? channelData[1]! : channelData[0]!;
   const totalLength = left.length;
 
-  const { pad, numChunks } = computePad(totalLength);
-  const paddedLeft = padMixtureChannel(left, TRIM, pad);
-  const paddedRight = padMixtureChannel(right, TRIM, pad);
+  const step = GEN_SIZE - OVERLAP;
+  const numChunks = Math.max(
+    1,
+    Math.ceil(Math.max(0, totalLength - GEN_SIZE) / step) + 1
+  );
+  const paddedLength = TRIM + (numChunks - 1) * step + CHUNK_SIZE;
+  const paddedLeft = padMixtureChannel(left, TRIM, paddedLength);
+  const paddedRight = padMixtureChannel(right, TRIM, paddedLength);
 
   const session = await getSession();
 
-  const vocalLeft = new Float32Array(numChunks * GEN_SIZE);
-  const vocalRight = new Float32Array(numChunks * GEN_SIZE);
+  const accLeft = new Float32Array(totalLength);
+  const accRight = new Float32Array(totalLength);
+  const weights = new Float32Array(totalLength);
 
   for (let c = 0; c < numChunks; c++) {
-    const start = c * GEN_SIZE;
-    const leftChunk = paddedLeft.slice(start, start + CHUNK_SIZE);
-    const rightChunk = paddedRight.slice(start, start + CHUNK_SIZE);
+    const start = c * step;
     const { left: outLeft, right: outRight } = await runChunk(
       session,
-      leftChunk,
-      rightChunk
+      paddedLeft.slice(start, start + CHUNK_SIZE),
+      paddedRight.slice(start, start + CHUNK_SIZE),
+      denoise
     );
-    vocalLeft.set(outLeft.slice(TRIM, TRIM + GEN_SIZE), c * GEN_SIZE);
-    vocalRight.set(outRight.slice(TRIM, TRIM + GEN_SIZE), c * GEN_SIZE);
+
+    for (let j = 0; j < GEN_SIZE; j++) {
+      const target = start + j;
+      if (target >= totalLength) break;
+      const w = crossfadeWeight(j, GEN_SIZE, c > 0, c < numChunks - 1);
+      accLeft[target]! += outLeft[TRIM + j]! * w;
+      accRight[target]! += outRight[TRIM + j]! * w;
+      weights[target]! += w;
+    }
     post({ type: 'processing-progress', chunk: c + 1, totalChunks: numChunks });
   }
 
-  const vocals = [
-    vocalLeft.slice(0, totalLength),
-    vocalRight.slice(0, totalLength),
-  ];
+  const vocalLeft = new Float32Array(totalLength);
+  const vocalRight = new Float32Array(totalLength);
+  for (let i = 0; i < totalLength; i++) {
+    const w = weights[i]!;
+    if (w > 1e-6) {
+      vocalLeft[i] = accLeft[i]! / w;
+      vocalRight[i] = accRight[i]! / w;
+    }
+  }
+
+  const vocals = [vocalLeft, vocalRight];
   const instrumental = [
-    Float32Array.from(left, (v, i) => v - vocals[0]![i]!),
-    Float32Array.from(right, (v, i) => v - vocals[1]![i]!),
+    Float32Array.from(left, (v, i) => v - vocalLeft[i]!),
+    Float32Array.from(right, (v, i) => v - vocalRight[i]!),
   ];
 
   return { vocals, instrumental };
@@ -222,7 +255,7 @@ async function separate(channelData: Float32Array[]): Promise<{
 self.onmessage = (event: MessageEvent<WorkerRequest>) => {
   const request = event.data;
   if (request.type !== 'separate') return;
-  separate(request.channelData)
+  separate(request.channelData, request.denoise)
     .then(({ vocals, instrumental }) => {
       post(
         {
