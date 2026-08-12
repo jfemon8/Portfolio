@@ -14,6 +14,7 @@ self.onmessage = (event: MessageEvent<EmailVerifyRequest>) => {
   if (request.type !== 'verify') return;
 
   verifyEmails(request.emails, {
+    domainCache: new Map(request.domainCache),
     onProgress: ({ done, total }) => post({ type: 'progress', done, total }),
   })
     .then((results) => post({ type: 'result', results }))

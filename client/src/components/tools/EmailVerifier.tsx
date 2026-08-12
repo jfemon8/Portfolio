@@ -11,17 +11,25 @@ import {
   XCircle,
   AlertTriangle,
   HelpCircle,
+  Copy,
+  Search,
+  Sparkles,
 } from 'lucide-react';
 import GlassCard from '@/components/shared/GlassCard';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/cn';
-import { extractEmails, type ExtractionResult } from '@/lib/email/extract';
+import type { ExtractionResult } from '@/lib/email/extract';
 import type { VerifiedEmail } from '@/lib/email/verify';
 import type { EmailVerdict } from '@/lib/email/classify';
+import type { DomainInfo } from '@/lib/email/dns';
 import type {
   EmailVerifyRequest,
   EmailWorkerMessage,
 } from '@/workers/emailVerify.types';
+import type {
+  EmailExtractRequest,
+  EmailExtractWorkerMessage,
+} from '@/workers/emailExtract.types';
 
 const EXTRACT_DEBOUNCE_MS = 200;
 // Past this, rendering the raw text costs seconds of browser layout for no benefit — a summary is shown instead.
@@ -35,6 +43,10 @@ const EMPTY_EXTRACTION: ExtractionResult = {
 
 // Safety ceiling only — the real cost is unique domains, so this sits far above any realistic list.
 const MAX_EMAILS = 250000;
+const DOMAIN_CACHE_MAX = 3000;
+const DOMAIN_CACHE_MS = 10 * 60 * 1000;
+const FAILED_LOOKUP_CACHE_MS = 30 * 1000;
+const SAMPLE_INPUT = `Maya: maya@example.com\nSales: sales@acme.test\nTypo: hello@gmial.com\nTemporary: signup@mailinator.com\nDuplicate: maya@example.com`;
 const VERDICTS: {
   key: EmailVerdict;
   label: string;
@@ -111,7 +123,13 @@ function toCsv(rows: VerifiedEmail[]): string {
     'free_provider',
     'suggested_domain',
   ];
-  const esc = (v: string | number) => `"${String(v).replace(/"/g, '""')}"`;
+  // Excel treats cells beginning with these characters as formulas, even when
+  // quoted. Keep exports safe when an untrusted list is opened in a spreadsheet.
+  const esc = (v: string | number) => {
+    const value = String(v);
+    const safeValue = /^[=+\-@]/.test(value) ? `'${value}` : value;
+    return `"${safeValue.replace(/"/g, '""')}"`;
+  };
 
   const lines: string[] = [];
   for (const verdict of GROUP_ORDER) {
@@ -150,14 +168,21 @@ export default function EmailVerifier() {
   } | null>(null);
   const [running, setRunning] = useState(false);
   const [filter, setFilter] = useState<EmailVerdict | 'all'>('all');
+  const [query, setQuery] = useState('');
   const [extraction, setExtraction] =
     useState<ExtractionResult>(EMPTY_EXTRACTION);
   const [scanning, setScanning] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const workerRef = useRef<Worker | null>(null);
+  const scanWorkerRef = useRef<Worker | null>(null);
+  const scanIdRef = useRef(0);
+  const domainCacheRef = useRef(
+    new Map<string, { info: DomainInfo; expiresAt: number }>()
+  );
 
   // Debounced so typing never re-scans per keystroke; the pending flag drives a spinner instead of a dead screen.
   useEffect(() => {
+    const requestId = ++scanIdRef.current;
     if (!text.trim()) {
       setExtraction(EMPTY_EXTRACTION);
       setScanning(false);
@@ -165,13 +190,52 @@ export default function EmailVerifier() {
     }
     setScanning(true);
     const id = setTimeout(() => {
-      setExtraction(extractEmails(text));
-      setScanning(false);
+      const worker = new Worker(
+        new URL('../../workers/emailExtract.worker.ts', import.meta.url),
+        { type: 'module' }
+      );
+      scanWorkerRef.current = worker;
+      worker.onmessage = (event: MessageEvent<EmailExtractWorkerMessage>) => {
+        const msg = event.data;
+        if (msg.id !== requestId || scanWorkerRef.current !== worker) return;
+        if (msg.type === 'result') {
+          setExtraction(msg.extraction);
+        } else {
+          setExtraction(EMPTY_EXTRACTION);
+          toast.error(msg.message);
+        }
+        setScanning(false);
+        worker.terminate();
+        scanWorkerRef.current = null;
+      };
+      worker.onerror = () => {
+        if (scanWorkerRef.current !== worker) return;
+        setExtraction(EMPTY_EXTRACTION);
+        setScanning(false);
+        toast.error('Could not scan the input. Please try again.');
+        worker.terminate();
+        scanWorkerRef.current = null;
+      };
+      worker.postMessage({
+        type: 'extract',
+        id: requestId,
+        text,
+      } satisfies EmailExtractRequest);
     }, EXTRACT_DEBOUNCE_MS);
-    return () => clearTimeout(id);
+    return () => {
+      clearTimeout(id);
+      scanWorkerRef.current?.terminate();
+      scanWorkerRef.current = null;
+    };
   }, [text]);
 
-  useEffect(() => () => workerRef.current?.terminate(), []);
+  useEffect(
+    () => () => {
+      workerRef.current?.terminate();
+      scanWorkerRef.current?.terminate();
+    },
+    []
+  );
 
   const counts = useMemo(() => {
     const c: Record<string, number> = {
@@ -184,22 +248,46 @@ export default function EmailVerifier() {
     return c;
   }, [results]);
 
-  const visible = useMemo(
-    () =>
+  const visible = useMemo(() => {
+    const byVerdict =
       filter === 'all'
         ? (results ?? [])
-        : (results ?? []).filter((r) => r.verdict === filter),
-    [results, filter]
-  );
+        : (results ?? []).filter((r) => r.verdict === filter);
+    const term = query.trim().toLowerCase();
+    if (!term) return byVerdict;
+    return byVerdict.filter((r) =>
+      [r.email, r.domain, r.reason, r.domainInfo?.provider ?? ''].some(
+        (value) => value.toLowerCase().includes(term)
+      )
+    );
+  }, [results, filter, query]);
+
+  const replaceText = useCallback((next: string): void => {
+    // Input and results always belong to the same batch. Invalidate any work
+    // immediately so an old worker can never overwrite a newly pasted list.
+    scanIdRef.current++;
+    scanWorkerRef.current?.terminate();
+    scanWorkerRef.current = null;
+    workerRef.current?.terminate();
+    workerRef.current = null;
+    setText(next);
+    setExtraction(EMPTY_EXTRACTION);
+    setScanning(Boolean(next.trim()));
+    setResults(null);
+    setRunning(false);
+    setProgress(null);
+    setFilter('all');
+    setQuery('');
+  }, []);
 
   const handleTextChange = useCallback(
-    (e: React.ChangeEvent<HTMLTextAreaElement>) => setText(e.target.value),
-    []
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => replaceText(e.target.value),
+    [replaceText]
   );
 
   const handleFile = async (file: File): Promise<void> => {
     try {
-      setText(await file.text());
+      replaceText(await file.text());
     } catch {
       toast.error('Could not read that file.');
     }
@@ -219,7 +307,23 @@ export default function EmailVerifier() {
     stopWorker();
     setRunning(true);
     setResults(null);
+    setQuery('');
     setProgress({ done: 0, total: extraction.uniqueDomains });
+
+    const now = Date.now();
+    const domains = new Set(
+      emails.map((email) => email.slice(email.lastIndexOf('@') + 1))
+    );
+    const domainCache: Array<[string, DomainInfo]> = [];
+    for (const domain of domains) {
+      const cached = domainCacheRef.current.get(domain);
+      if (!cached) continue;
+      if (cached.expiresAt <= now) {
+        domainCacheRef.current.delete(domain);
+      } else {
+        domainCache.push([domain, cached.info]);
+      }
+    }
 
     const worker = new Worker(
       new URL('../../workers/emailVerify.worker.ts', import.meta.url),
@@ -229,9 +333,27 @@ export default function EmailVerifier() {
 
     worker.onmessage = (event: MessageEvent<EmailWorkerMessage>) => {
       const msg = event.data;
+      if (workerRef.current !== worker) return;
       if (msg.type === 'progress') {
         setProgress({ done: msg.done, total: msg.total });
       } else if (msg.type === 'result') {
+        const cachedAt = Date.now();
+        for (const result of msg.results) {
+          if (!result.domainInfo) continue;
+          domainCacheRef.current.set(result.domain, {
+            info: result.domainInfo,
+            expiresAt:
+              cachedAt +
+              (result.domainInfo.status === 'lookup-failed'
+                ? FAILED_LOOKUP_CACHE_MS
+                : DOMAIN_CACHE_MS),
+          });
+        }
+        while (domainCacheRef.current.size > DOMAIN_CACHE_MAX) {
+          const oldest = domainCacheRef.current.keys().next().value;
+          if (oldest === undefined) break;
+          domainCacheRef.current.delete(oldest);
+        }
         setResults(msg.results);
         setRunning(false);
         setProgress(null);
@@ -254,7 +376,11 @@ export default function EmailVerifier() {
       stopWorker();
     };
 
-    worker.postMessage({ type: 'verify', emails } satisfies EmailVerifyRequest);
+    worker.postMessage({
+      type: 'verify',
+      emails,
+      domainCache,
+    } satisfies EmailVerifyRequest);
   };
 
   const handleCancel = (): void => {
@@ -264,7 +390,9 @@ export default function EmailVerifier() {
   };
 
   const download = (rows: VerifiedEmail[], name: string): void => {
-    const blob = new Blob([toCsv(rows)], { type: 'text/csv;charset=utf-8' });
+    const blob = new Blob(['\ufeff', toCsv(rows)], {
+      type: 'text/csv;charset=utf-8',
+    });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -294,13 +422,22 @@ export default function EmailVerifier() {
           <label className="label mb-0" htmlFor="email-input">
             Paste anything containing emails
           </label>
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-1.5 text-2xs text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <Upload className="h-3.5 w-3.5" /> or load a .txt / .csv
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => replaceText(SAMPLE_INPUT)}
+              className="flex items-center gap-1.5 text-2xs text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <Sparkles className="h-3.5 w-3.5" /> Try sample
+            </button>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center gap-1.5 text-2xs text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <Upload className="h-3.5 w-3.5" /> Load .txt / .csv
+            </button>
+          </div>
           <input
             ref={fileInputRef}
             type="file"
@@ -319,7 +456,7 @@ export default function EmailVerifier() {
               {(text.length / 1024 / 1024).toFixed(2)} MB loaded — too large to
               display without slowing the page down.
             </span>
-            <Button size="sm" variant="ghost" onClick={() => setText('')}>
+            <Button size="sm" variant="ghost" onClick={() => replaceText('')}>
               Clear
             </Button>
           </div>
@@ -374,9 +511,9 @@ export default function EmailVerifier() {
                 )
                 .then(() => toast.success('Addresses copied'))
             }
-            className="text-2xs text-muted-foreground transition-colors hover:text-foreground"
+            className="flex items-center gap-1.5 text-2xs text-muted-foreground transition-colors hover:text-foreground"
           >
-            Copy extracted addresses
+            <Copy className="h-3.5 w-3.5" /> Copy extracted addresses
           </button>
         )}
       </div>
@@ -474,6 +611,32 @@ export default function EmailVerifier() {
             )}
           </div>
 
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/60 bg-bg-elevated/35 p-2.5">
+            <label className="relative min-w-52 flex-1">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <input
+                aria-label="Search verification results"
+                className="input min-h-0 w-full py-2 pl-8 text-xs"
+                placeholder="Search address, domain, provider or reason"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </label>
+            <button
+              type="button"
+              onClick={() =>
+                void navigator.clipboard
+                  .writeText(visible.map((r) => r.email).join('\n'))
+                  .then(() => toast.success('Visible addresses copied'))
+              }
+              disabled={visible.length === 0}
+              className="flex items-center gap-1.5 px-1.5 text-2xs text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <Copy className="h-3.5 w-3.5" /> Copy visible (
+              {visible.length.toLocaleString()})
+            </button>
+          </div>
+
           <div
             data-lenis-prevent
             tabIndex={0}
@@ -514,6 +677,16 @@ export default function EmailVerifier() {
                     </tr>
                   );
                 })}
+                {visible.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={4}
+                      className="px-3 py-8 text-center text-xs text-muted-foreground"
+                    >
+                      No results match this search.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
             {visible.length > 500 && (

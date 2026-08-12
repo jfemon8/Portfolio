@@ -96,16 +96,23 @@ export interface VerifyProgress {
   total: number;
 }
 
+export interface VerifyOptions {
+  concurrency?: number;
+  onProgress?: (progress: VerifyProgress) => void;
+  shouldStop?: () => boolean;
+  /**
+   * Known domain lookups from an earlier run. This deliberately lives in memory
+   * in the UI, never in persistent storage, and contains domains only.
+   */
+  domainCache?: ReadonlyMap<string, DomainInfo>;
+}
+
 // Verification is per-domain, not per-address — deduplicating here removes ~98% of the network work on real lists.
 export async function verifyEmails(
   emails: string[],
-  options: {
-    concurrency?: number;
-    onProgress?: (progress: VerifyProgress) => void;
-    shouldStop?: () => boolean;
-  } = {}
+  options: VerifyOptions = {}
 ): Promise<VerifiedEmail[]> {
-  const { concurrency = 16, onProgress, shouldStop } = options;
+  const { concurrency = 16, onProgress, shouldStop, domainCache } = options;
 
   const parsed = emails.map((email) => {
     const syntaxFailure = verifySyntaxOnly(email);
@@ -122,17 +129,24 @@ export async function verifyEmails(
   ];
 
   const cache = new Map<string, DomainInfo>();
-  let done = 0;
+  for (const domain of domains) {
+    const cached = domainCache?.get(domain);
+    if (cached) cache.set(domain, cached);
+  }
+
+  const pendingDomains = domains.filter((domain) => !cache.has(domain));
+  let done = cache.size;
   let cursor = 0;
+  onProgress?.({ done, total: domains.length });
 
   const workers = Array.from(
-    { length: Math.min(concurrency, domains.length) },
+    { length: Math.min(concurrency, pendingDomains.length) },
     async () => {
       for (;;) {
         if (shouldStop?.()) return;
         const index = cursor++;
-        if (index >= domains.length) return;
-        const domain = domains[index]!;
+        if (index >= pendingDomains.length) return;
+        const domain = pendingDomains[index]!;
         cache.set(domain, await lookupDomain(domain));
         done++;
         onProgress?.({ done, total: domains.length });
