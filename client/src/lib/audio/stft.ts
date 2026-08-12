@@ -27,13 +27,17 @@ export function stft(
   const fftr = new FFTR(nFft);
   const frames: Float32Array[] = [];
   const frameBuf = new Float32Array(nFft);
-  for (let i = 0; i < numFrames; i++) {
-    const start = i * hop;
-    for (let j = 0; j < nFft; j++)
-      frameBuf[j] = (padded[start + j] ?? 0) * window[j]!;
-    frames.push(Float32Array.from(fftr.forward(frameBuf)));
+  try {
+    for (let i = 0; i < numFrames; i++) {
+      const start = i * hop;
+      for (let j = 0; j < nFft; j++)
+        frameBuf[j] = (padded[start + j] ?? 0) * window[j]!;
+      frames.push(Float32Array.from(fftr.forward(frameBuf)));
+    }
+  } finally {
+    // Without this the emscripten heap allocation leaks whenever a transform throws.
+    fftr.dispose();
   }
-  fftr.dispose();
   return frames;
 }
 
@@ -52,17 +56,20 @@ export function istft(
   const weight = new Float32Array(paddedLength);
   const scale = 1 / nFft;
 
-  for (let i = 0; i < frames.length; i++) {
-    const frame = frames[i]!;
-    const scaled = Float32Array.from(frame, (v) => v * scale);
-    const timeFrame = fftr.inverse(scaled);
-    const start = i * hop;
-    for (let j = 0; j < nFft; j++) {
-      out[start + j]! += timeFrame[j]! * window[j]!;
-      weight[start + j]! += window[j]! * window[j]!;
+  try {
+    for (let i = 0; i < frames.length; i++) {
+      const frame = frames[i]!;
+      const scaled = Float32Array.from(frame, (v) => v * scale);
+      const timeFrame = fftr.inverse(scaled);
+      const start = i * hop;
+      for (let j = 0; j < nFft; j++) {
+        out[start + j]! += timeFrame[j]! * window[j]!;
+        weight[start + j]! += window[j]! * window[j]!;
+      }
     }
+  } finally {
+    fftr.dispose();
   }
-  fftr.dispose();
 
   for (let i = 0; i < out.length; i++) {
     if (weight[i]! > 1e-8) out[i]! /= weight[i]!;

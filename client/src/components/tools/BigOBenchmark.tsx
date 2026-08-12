@@ -235,7 +235,8 @@ export default function BigOBenchmark() {
   };
   const onLanguageChange = (next: Language): void => {
     setLanguage(next);
-    setSource(EXAMPLES[next][inputGenerator]);
+    // Guarded like the input-type switch — one stray click on the other language used to wipe pasted code.
+    if (isUnmodifiedExample) setSource(EXAMPLES[next][inputGenerator]);
     resetRunState();
   };
   const onInputGeneratorChange = (next: InputGeneratorId): void => {

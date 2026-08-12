@@ -11,6 +11,7 @@ import type { WorkerMessage } from '@/workers/vocalRemover.types';
 
 const TARGET_SAMPLE_RATE = 44100;
 const MAX_DURATION_SECONDS = 10 * 60;
+const MAX_FILE_BYTES = 80 * 1024 * 1024;
 
 type Stage =
   | 'idle'
@@ -36,6 +37,10 @@ function formatBytes(n: number): string {
   return `${(n / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function wavUrl(bytes: ArrayBuffer): string {
+  return URL.createObjectURL(new Blob([bytes], { type: 'audio/wav' }));
+}
+
 export default function MusicRemover() {
   const [stage, setStage] = useState<Stage>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -51,16 +56,19 @@ export default function MusicRemover() {
     total: number;
   } | null>(null);
   const [denoise, setDenoise] = useState(true);
+  const [retryNote, setRetryNote] = useState<string | null>(null);
   const [result, setResult] = useState<ResultAudio | null>(null);
   const workerRef = useRef<Worker | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const objectUrlsRef = useRef<string[]>([]);
+  const resultUrlsRef = useRef<string[]>([]);
 
   useEffect(() => {
     return () => {
       workerRef.current?.terminate();
       // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional: revoke every URL accumulated by unmount, not a stale snapshot from mount.
       objectUrlsRef.current.forEach((u) => URL.revokeObjectURL(u));
+      resultUrlsRef.current.forEach((u) => URL.revokeObjectURL(u));
     };
   }, []);
 
@@ -69,19 +77,35 @@ export default function MusicRemover() {
     return url;
   };
 
+  // Stems are hundreds of MB; they are released as soon as they are replaced rather than piling up until unmount.
+  const revokeResultUrls = (): void => {
+    resultUrlsRef.current.forEach((u) => URL.revokeObjectURL(u));
+    resultUrlsRef.current = [];
+  };
+
   const handleFile = async (file: File): Promise<void> => {
     setStage('decoding');
     setError(null);
     setResult(null);
     setQuickPreviewUrl(null);
     setOriginalUrl(trackUrl(URL.createObjectURL(file)));
+    // Guards before decoding, because decodeAudioData allocates the whole PCM buffer before any duration check could run.
+    if (file.size > MAX_FILE_BYTES) {
+      setError(
+        `That file is ${(file.size / 1024 / 1024).toFixed(0)} MB. Please use one under ${MAX_FILE_BYTES / 1024 / 1024} MB so your browser doesn't run out of memory.`
+      );
+      setStage('error');
+      return;
+    }
+
+    // Decoding at the target rate avoids a pointless 44.1k -> hardware rate -> 44.1k round trip.
+    let audioCtx: AudioContext | null = null;
     try {
       const arrayBuffer = await file.arrayBuffer();
-      const audioCtx = new AudioContext();
+      audioCtx = new AudioContext({ sampleRate: TARGET_SAMPLE_RATE });
       const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
 
       if (audioBuffer.duration > MAX_DURATION_SECONDS) {
-        await audioCtx.close();
         throw new Error(
           `This track is ${Math.round(audioBuffer.duration / 60)} minutes long — please use one under ${MAX_DURATION_SECONDS / 60} minutes so processing stays reasonable.`
         );
@@ -100,7 +124,6 @@ export default function MusicRemover() {
         source.start();
         finalBuffer = await offlineCtx.startRendering();
       }
-      await audioCtx.close();
 
       const channelData: Float32Array[] = [];
       for (let i = 0; i < finalBuffer.numberOfChannels; i++) {
@@ -116,9 +139,7 @@ export default function MusicRemover() {
       const quick = phaseCancelInstrumental(channelData);
       if (quick) {
         setQuickPreviewUrl(
-          trackUrl(
-            URL.createObjectURL(encodeWav([quick], finalBuffer.sampleRate))
-          )
+          trackUrl(wavUrl(encodeWav([quick], finalBuffer.sampleRate)))
         );
       }
 
@@ -128,15 +149,36 @@ export default function MusicRemover() {
         err instanceof Error ? err.message : 'Could not read this audio file.'
       );
       setStage('error');
+    } finally {
+      // Closed on every path — leaking contexts eventually trips the browser's hard limit and breaks valid files too.
+      await audioCtx?.close().catch(() => undefined);
     }
+  };
+
+  const stopWorker = (): void => {
+    // Always terminated, never just dropped — an orphaned worker keeps a multi-hundred-MB session alive unreachably.
+    workerRef.current?.terminate();
+    workerRef.current = null;
+  };
+
+  const handleCancel = (): void => {
+    stopWorker();
+    setStage('ready');
+    setModelProgress(null);
+    setChunkProgress(null);
+    setRetryNote(null);
   };
 
   const handleSeparate = (): void => {
     if (!decoded) return;
+    stopWorker();
+    revokeResultUrls();
+    setResult(null);
     setStage('loading-model');
     setError(null);
     setModelProgress(null);
     setChunkProgress(null);
+    setRetryNote(null);
 
     const worker = new Worker(
       new URL('../../workers/vocalRemover.worker.ts', import.meta.url),
@@ -150,34 +192,33 @@ export default function MusicRemover() {
       const msg = event.data;
       if (msg.type === 'model-progress') {
         setModelProgress({ loaded: msg.loaded, total: msg.total });
+      } else if (msg.type === 'model-retry') {
+        setRetryNote(
+          `Download stalled — retrying (attempt ${msg.attempt + 1} of ${msg.attempts})…`
+        );
       } else if (msg.type === 'processing-progress') {
         setStage('processing');
+        setRetryNote(null);
         setChunkProgress({ chunk: msg.chunk, total: msg.totalChunks });
       } else if (msg.type === 'result') {
-        setResult({
-          vocalsUrl: trackUrl(
-            URL.createObjectURL(encodeWav(msg.vocals, msg.sampleRate))
-          ),
-          instrumentalUrl: trackUrl(
-            URL.createObjectURL(encodeWav(msg.instrumental, msg.sampleRate))
-          ),
-        });
+        const vocalsUrl = wavUrl(msg.vocalsWav);
+        const instrumentalUrl = wavUrl(msg.instrumentalWav);
+        resultUrlsRef.current = [vocalsUrl, instrumentalUrl];
+        setResult({ vocalsUrl, instrumentalUrl });
         setStage('done');
         toast.success('Separation complete');
-        worker.terminate();
-        workerRef.current = null;
+        stopWorker();
       } else if (msg.type === 'error') {
         setError(msg.message);
         setStage('error');
-        worker.terminate();
-        workerRef.current = null;
+        stopWorker();
       }
     };
 
     worker.onerror = () => {
       setError('The separation worker crashed unexpectedly. Please try again.');
       setStage('error');
-      workerRef.current = null;
+      stopWorker();
     };
 
     worker.postMessage({
@@ -304,6 +345,17 @@ export default function MusicRemover() {
               />
             </div>
           )}
+          {retryNote && (
+            <p className="mt-2 text-2xs text-amber-400">{retryNote}</p>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="mt-3"
+            onClick={handleCancel}
+          >
+            Cancel
+          </Button>
         </div>
       )}
 
@@ -325,6 +377,14 @@ export default function MusicRemover() {
               />
             </div>
           )}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="mt-3"
+            onClick={handleCancel}
+          >
+            Cancel
+          </Button>
         </div>
       )}
 

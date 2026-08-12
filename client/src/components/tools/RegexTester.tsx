@@ -1,9 +1,25 @@
-import { useMemo, useState, Fragment } from 'react';
+import { useEffect, useMemo, useRef, useState, Fragment } from 'react';
 import { motion } from 'motion/react';
 import { Sparkles } from 'lucide-react';
 import GlassCard from '@/components/shared/GlassCard';
 import AutoTextarea from '@/components/shared/AutoTextarea';
 import { cn } from '@/lib/cn';
+import type {
+  RegexMatch,
+  RegexRequest,
+  RegexWorkerMessage,
+} from '@/workers/regexMatch.types';
+
+const MAX_MATCHES = 2000;
+const MAX_LISTED_MATCHES = 200;
+const WATCHDOG_MS = 2000;
+const DEBOUNCE_MS = 250;
+
+interface MatchState {
+  matches: RegexMatch[];
+  truncated: boolean;
+  error: string | null;
+}
 
 interface Segment {
   text: string;
@@ -59,17 +75,13 @@ const PRESETS = [
   },
 ];
 
-type IndexedMatch = RegExpMatchArray & {
-  indices?: (readonly [number, number] | undefined)[];
-};
-
 // Splits each match into runs owned by whichever capturing group covers them (innermost/highest-numbered wins on overlap), so `(\d{4})-(\d{2})` highlights each group in a distinct color instead of one flat block — needs the 'd' flag for per-group character offsets.
-function buildSegments(text: string, matches: IndexedMatch[]): Segment[] {
+function buildSegments(text: string, matches: RegexMatch[]): Segment[] {
   const segments: Segment[] = [];
   let cursor = 0;
   for (const m of matches) {
     const indices = m.indices;
-    if (m.index == null || m[0] === '' || !indices?.[0]) continue;
+    if (m.text === '' || !indices[0]) continue;
     const [matchStart, matchEnd] = indices[0];
     if (matchStart > cursor) {
       segments.push({ text: text.slice(cursor, matchStart), groupIndex: null });
@@ -107,6 +119,9 @@ export default function RegexTester() {
   const [pattern, setPattern] = useState('');
   const [flags, setFlags] = useState('gi');
   const [text, setText] = useState('');
+  const [matchState, setMatchState] = useState<MatchState | null>(null);
+  const [running, setRunning] = useState(false);
+  const workerRef = useRef<Worker | null>(null);
 
   const loadPreset = (index: number): void => {
     const p = PRESETS[Number(index)];
@@ -116,30 +131,78 @@ export default function RegexTester() {
     setText(p.sample);
   };
 
-  const result = useMemo(() => {
-    if (!pattern) return null;
-    try {
-      // matchAll needs 'g'; per-group offsets need 'd' — both added transparently regardless of what the user typed.
-      let f = flags;
-      if (!f.includes('g')) f += 'g';
-      if (!f.includes('d')) f += 'd';
-      const re = new RegExp(pattern, f);
-      const matches = [...text.matchAll(re)] as IndexedMatch[];
-      const segments = buildSegments(text, matches);
-
-      return { segments, matches, error: null as string | null };
-    } catch (e) {
-      return {
-        segments: null,
-        matches: null,
-        error: e instanceof Error ? e.message : 'Invalid regular expression.',
-      };
+  // Debounced into a watchdogged worker — a backtracking pattern like `(a+)+$` used to freeze this tab for minutes.
+  useEffect(() => {
+    if (!pattern) {
+      setMatchState(null);
+      setRunning(false);
+      return;
     }
+    setRunning(true);
+    const debounce = setTimeout(() => {
+      workerRef.current ??= new Worker(
+        new URL('../../workers/regexMatch.worker.ts', import.meta.url),
+        { type: 'module' }
+      );
+      const worker = workerRef.current;
+
+      const watchdog = setTimeout(() => {
+        worker.terminate();
+        workerRef.current = null;
+        setRunning(false);
+        setMatchState({
+          matches: [],
+          truncated: false,
+          error:
+            'This pattern is taking too long on this input — it is probably backtracking catastrophically. Try making it less ambiguous (for example replace nested quantifiers like (a+)+ with a+).',
+        });
+      }, WATCHDOG_MS);
+
+      worker.onmessage = (event: MessageEvent<RegexWorkerMessage>) => {
+        clearTimeout(watchdog);
+        setRunning(false);
+        const msg = event.data;
+        if (msg.type === 'result') {
+          setMatchState({
+            matches: msg.matches,
+            truncated: msg.truncated,
+            error: null,
+          });
+        } else {
+          setMatchState({ matches: [], truncated: false, error: msg.message });
+        }
+      };
+
+      worker.postMessage({
+        type: 'match',
+        pattern,
+        flags,
+        text,
+        limit: MAX_MATCHES,
+      } satisfies RegexRequest);
+    }, DEBOUNCE_MS);
+
+    return () => clearTimeout(debounce);
   }, [pattern, flags, text]);
 
-  const groupCount = Math.max(
-    0,
-    ...(result?.matches?.map((m) => m.length - 1) ?? [0])
+  useEffect(() => () => workerRef.current?.terminate(), []);
+
+  const result = useMemo(() => {
+    if (!matchState) return null;
+    if (matchState.error) {
+      return { segments: null, matches: null, error: matchState.error };
+    }
+    return {
+      segments: buildSegments(text, matchState.matches),
+      matches: matchState.matches,
+      error: null as string | null,
+    };
+  }, [matchState, text]);
+
+  // Reduced rather than spread — spreading 200k matches into Math.max throws a RangeError that escapes render and takes down the whole app.
+  const groupCount = (result?.matches ?? []).reduce(
+    (max, m) => Math.max(max, m.groupCount),
+    0
   );
 
   return (
@@ -229,6 +292,11 @@ export default function RegexTester() {
           <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
             <span className="label mb-0">
               Highlighted matches ({result.matches?.length ?? 0})
+              {running && (
+                <span className="ml-2 normal-case text-muted-foreground/60">
+                  matching…
+                </span>
+              )}
             </span>
             {groupCount > 0 && (
               <div className="flex flex-wrap items-center gap-2">
@@ -271,24 +339,39 @@ export default function RegexTester() {
       {result?.matches && result.matches.length > 0 && (
         <div className="mt-4 space-y-2">
           <span className="label">Matches</span>
-          {result.matches.map((m, i) => (
+          {matchState?.truncated && (
+            <p className="text-2xs text-amber-400">
+              Showing the first {MAX_MATCHES.toLocaleString()} matches — the
+              pattern matched more than that.
+            </p>
+          )}
+          {result.matches.slice(0, MAX_LISTED_MATCHES).map((m, i) => (
             <div
               key={i}
               className="glass-thin rounded-lg p-3 font-mono text-2xs text-muted-foreground"
             >
-              <span className="text-foreground">Match {i + 1}:</span> "{m[0]}"
-              {m.length > 1 && (
+              <span className="text-foreground">Match {i + 1}:</span> "{m.text}"
+              {m.groupCount > 0 && (
                 <span>
                   {' '}
                   — groups:{' '}
-                  {m
+                  {m.indices
                     .slice(1)
-                    .map((g) => `"${g ?? ''}"`)
+                    .map(
+                      (span) => `"${span ? text.slice(span[0], span[1]) : ''}"`
+                    )
                     .join(', ')}
                 </span>
               )}
             </div>
           ))}
+          {result.matches.length > MAX_LISTED_MATCHES && (
+            <p className="text-2xs text-muted-foreground/70">
+              …and{' '}
+              {(result.matches.length - MAX_LISTED_MATCHES).toLocaleString()}{' '}
+              more not listed.
+            </p>
+          )}
         </div>
       )}
     </GlassCard>

@@ -11,6 +11,12 @@ export interface ModelProgressMessage {
   total: number;
 }
 
+export interface ModelRetryMessage {
+  type: 'model-retry';
+  attempt: number;
+  attempts: number;
+}
+
 export interface ProcessingProgressMessage {
   type: 'processing-progress';
   chunk: number;
@@ -19,9 +25,8 @@ export interface ProcessingProgressMessage {
 
 export interface ResultMessage {
   type: 'result';
-  vocals: Float32Array[];
-  instrumental: Float32Array[];
-  sampleRate: number;
+  vocalsWav: ArrayBuffer;
+  instrumentalWav: ArrayBuffer;
 }
 
 export interface ErrorMessage {
@@ -33,6 +38,7 @@ export type WorkerRequest = SeparateRequest;
 
 export type WorkerMessage =
   | ModelProgressMessage
+  | ModelRetryMessage
   | ProcessingProgressMessage
   | ResultMessage
   | ErrorMessage;

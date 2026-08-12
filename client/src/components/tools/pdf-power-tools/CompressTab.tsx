@@ -34,6 +34,8 @@ export default function CompressTab() {
   const [result, setResult] = useState<{
     bytes: Uint8Array;
     name: string;
+    // Captured with the result: reading the live summary would compare against whatever file was dropped mid-run.
+    originalSize: number;
   } | null>(null);
 
   const loadFile = async (files: File[]) => {
@@ -74,6 +76,7 @@ export default function CompressTab() {
       setResult({
         bytes,
         name: `${file.name.replace(/\.pdf$/i, '')}-compressed.pdf`,
+        originalSize: file.size,
       });
     } catch (err) {
       toast.error(
@@ -85,7 +88,7 @@ export default function CompressTab() {
     }
   };
 
-  const originalSize = summary?.sizeBytes ?? 0;
+  const originalSize = result?.originalSize ?? summary?.sizeBytes ?? 0;
   const resultSize = result?.bytes.length ?? 0;
   const pctChange =
     originalSize > 0 ? (1 - resultSize / originalSize) * 100 : 0;

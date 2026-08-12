@@ -72,25 +72,43 @@ export async function parseResume(file: File): Promise<ParsedResume> {
   return extractDocx(buffer);
 }
 
-// A wide gap mid-page signals columns, which parsers read straight across and scramble.
+const COLUMN_BINS = 40;
+
+// True columns leave an empty channel with real text on BOTH sides; a bare gap test fired on centered names instead.
 function pageHasMultiColumnLayout(positions: TextPosition[]): boolean {
-  const xs = positions.map((p) => p.x).sort((a, b) => a - b);
-  if (xs.length < 20) return false;
-  const minX = xs[0]!;
-  const maxX = xs[xs.length - 1]!;
+  if (positions.length < 40) return false;
+  const xs = positions.map((p) => p.x);
+  const minX = Math.min(...xs);
+  const maxX = Math.max(...xs);
   const range = maxX - minX;
-  if (range < 100) return false;
-  const gapThreshold = range * 0.12;
-  for (let i = 1; i < xs.length; i++) {
-    const gap = xs[i]! - xs[i - 1]!;
-    const positionInRange = (xs[i - 1]! - minX) / range;
-    if (
-      gap > gapThreshold &&
-      positionInRange > 0.25 &&
-      positionInRange < 0.75
-    ) {
-      return true;
+  if (range < 150) return false;
+
+  const counts = new Array<number>(COLUMN_BINS).fill(0);
+  for (const x of xs) {
+    const bin = Math.min(
+      COLUMN_BINS - 1,
+      Math.floor(((x - minX) / range) * COLUMN_BINS)
+    );
+    counts[bin]!++;
+  }
+
+  for (let start = 0; start < COLUMN_BINS; start++) {
+    if (counts[start] !== 0) continue;
+    let end = start;
+    while (end + 1 < COLUMN_BINS && counts[end + 1] === 0) end++;
+
+    const centre = (start + end + 1) / 2 / COLUMN_BINS;
+    const width = (end - start + 1) / COLUMN_BINS;
+    if (width >= 0.08 && centre >= 0.3 && centre <= 0.7) {
+      let left = 0;
+      let right = 0;
+      for (let b = 0; b < start; b++) left += counts[b]!;
+      for (let b = end + 1; b < COLUMN_BINS; b++) right += counts[b]!;
+      const total = left + right;
+      // Both sides must carry real content, which is what separates a second column from a stray right-aligned date.
+      if (total > 0 && left / total >= 0.2 && right / total >= 0.2) return true;
     }
+    start = end;
   }
   return false;
 }

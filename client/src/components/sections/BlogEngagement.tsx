@@ -163,14 +163,12 @@ export default function BlogEngagement({
       setErrors({});
       setReplyTo(null);
       qc.invalidateQueries({ queryKey: ['blog', 'post', slug] });
-      void qc
-        .resetQueries({ queryKey: ['blog', 'comments', slug] })
-        .then(() =>
-          listTopRef.current?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-          })
-        );
+      void qc.resetQueries({ queryKey: ['blog', 'comments', slug] }).then(() =>
+        listTopRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        })
+      );
     },
     onError: (err: unknown) => {
       toast.error(

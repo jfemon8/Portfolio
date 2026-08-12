@@ -72,6 +72,7 @@ export default function PasswordCrackTime() {
   const [showPassword, setShowPassword] = useState(false);
   const [analysis, setAnalysis] = useState<PasswordAnalysis | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [hashesPerSecond, setHashesPerSecond] = useState<number | null>(null);
 
   const workerRef = useRef<Worker | null>(null);
@@ -100,15 +101,26 @@ export default function PasswordCrackTime() {
       return;
     }
     setAnalyzing(true);
+    setLoadError(null);
     const requestId = ++requestIdRef.current;
     debounceRef.current = setTimeout(() => {
-      void analyzePassword(password).then((result) => {
-        // A later keystroke's analysis may resolve before an earlier one if the dictionary was still loading on the first call — only the most recent request is allowed to land.
-        if (requestId === requestIdRef.current) {
-          setAnalysis(result);
-          setAnalyzing(false);
-        }
-      });
+      void analyzePassword(password)
+        .then((result) => {
+          // A later keystroke's analysis may resolve before an earlier one if the dictionary was still loading on the first call — only the most recent request is allowed to land.
+          if (requestId === requestIdRef.current) {
+            setAnalysis(result);
+            setAnalyzing(false);
+          }
+        })
+        .catch(() => {
+          // Without this the skeleton spins forever whenever the dictionary chunk fails to load.
+          if (requestId === requestIdRef.current) {
+            setAnalyzing(false);
+            setLoadError(
+              "Couldn't load the password dictionary — check your connection and type again."
+            );
+          }
+        });
     }, DEBOUNCE_MS);
   }, [password]);
 
@@ -158,7 +170,9 @@ export default function PasswordCrackTime() {
           transition={{ duration: 0.2 }}
           className="mt-4"
         >
-          {analyzing || !analysis ? (
+          {loadError ? (
+            <p className="text-xs text-destructive">{loadError}</p>
+          ) : analyzing || !analysis ? (
             <div className="h-1.5 w-full animate-pulse rounded-full bg-bg-elevated" />
           ) : (
             <>

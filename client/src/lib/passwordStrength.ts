@@ -33,7 +33,14 @@ async function getFactory(): Promise<ZxcvbnFactoryType> {
       },
     });
   })();
-  return factoryPromise;
+
+  try {
+    return await factoryPromise;
+  } catch (err) {
+    // Caching a rejection would brick the tool for the whole session; a dropped chunk must stay retryable.
+    factoryPromise = null;
+    throw err;
+  }
 }
 
 export async function analyzePassword(

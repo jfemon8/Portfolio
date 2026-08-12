@@ -46,6 +46,9 @@ const COLOR: Record<TokenType, string> = {
   punct: 'text-muted-foreground/80',
 };
 
+// Past this, per-token spans stop being worth it: a 5 MB document tokenizes into ~1.7M DOM nodes and locks the tab.
+const MAX_HIGHLIGHT_CHARS = 200_000;
+
 // Tokenizes already-valid JSON text into typed spans — no dangerouslySetInnerHTML, so there's nothing to escape/sanitize.
 export default function JsonHighlight({
   code,
@@ -54,15 +57,20 @@ export default function JsonHighlight({
   code: string;
   className?: string;
 }) {
-  const tokens = useMemo(() => tokenize(code), [code]);
+  const tokens = useMemo(
+    () => (code.length > MAX_HIGHLIGHT_CHARS ? null : tokenize(code)),
+    [code]
+  );
   return (
     // data-lenis-prevent stops the smooth-scroll provider eating the wheel, so height-capped callers scroll themselves.
     <pre data-lenis-prevent tabIndex={0} className={className}>
-      {tokens.map((t, i) => (
-        <span key={i} className={COLOR[t.type]}>
-          {t.text}
-        </span>
-      ))}
+      {tokens
+        ? tokens.map((t, i) => (
+            <span key={i} className={COLOR[t.type]}>
+              {t.text}
+            </span>
+          ))
+        : code}
     </pre>
   );
 }

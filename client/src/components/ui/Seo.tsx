@@ -44,9 +44,7 @@ export default function Seo({
   const siteName = s?.siteName || SITE_TITLE;
   const origin = (s?.siteUrl || SITE_URL).replace(/\/$/, '');
   const abs = (p = ''): string =>
-    /^https?:\/\//.test(p)
-      ? p
-      : `${origin}${p.startsWith('/') ? p : `/${p}`}`;
+    /^https?:\/\//.test(p) ? p : `${origin}${p.startsWith('/') ? p : `/${p}`}`;
   const fullTitle = title ? `${title} — ${author}` : s?.metaTitle || siteName;
   const desc = description || s?.metaDescription || DEFAULT_DESCRIPTION;
   const url = abs(path);
@@ -59,11 +57,7 @@ export default function Seo({
   const robots = noindex
     ? 'noindex, nofollow'
     : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
-  const schemas = jsonLd
-    ? Array.isArray(jsonLd)
-      ? jsonLd
-      : [jsonLd]
-    : [];
+  const schemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 
   return (
     <Helmet>
@@ -92,9 +86,7 @@ export default function Seo({
         <meta property="article:modified_time" content={modifiedTime} />
       )}
       {type === 'article' &&
-        tags?.map((t) => (
-          <meta key={t} property="article:tag" content={t} />
-        ))}
+        tags?.map((t) => <meta key={t} property="article:tag" content={t} />)}
 
       <meta name="twitter:card" content="summary_large_image" />
       {twitter && <meta name="twitter:site" content={twitter} />}

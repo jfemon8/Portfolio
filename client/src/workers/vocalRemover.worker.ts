@@ -1,5 +1,6 @@
 import * as ort from 'onnxruntime-web';
 import { hannWindow, stft, istft } from '../lib/audio/stft';
+import { encodeWav } from '../lib/audio/wavEncoder';
 import type { WorkerRequest, WorkerMessage } from './vocalRemover.types';
 
 ort.env.wasm.wasmPaths =
@@ -27,36 +28,94 @@ function post(message: WorkerMessage, transfer: Transferable[] = []): void {
   (self as unknown as Worker).postMessage(message, transfer);
 }
 
-async function fetchModelBytes(): Promise<ArrayBuffer> {
-  const cache = await caches.open(MODEL_CACHE_KEY);
-  const cached = await cache.match(MODEL_URL);
-  if (cached) return cached.arrayBuffer();
+const DOWNLOAD_STALL_MS = 30_000;
+const DOWNLOAD_ATTEMPTS = 3;
 
-  const response = await fetch(MODEL_URL);
-  if (!response.ok || !response.body) {
-    throw new Error(
-      `Could not download the separation model (HTTP ${response.status}).`
-    );
+// The Cache API is unavailable in some private-browsing modes, where a miss must not break the download.
+async function readCachedModel(): Promise<ArrayBuffer | null> {
+  try {
+    const cached = await (await caches.open(MODEL_CACHE_KEY)).match(MODEL_URL);
+    return cached ? await cached.arrayBuffer() : null;
+  } catch {
+    return null;
   }
-  const total = Number(response.headers.get('content-length') ?? 0);
-  const reader = response.body.getReader();
-  const chunks: Uint8Array[] = [];
+}
+
+async function writeCachedModel(bytes: Uint8Array): Promise<void> {
+  try {
+    const body = new Response(bytes as Uint8Array<ArrayBuffer>);
+    await (await caches.open(MODEL_CACHE_KEY)).put(MODEL_URL, body);
+  } catch {
+    // A full quota only costs a re-download next time; not worth failing the run over.
+  }
+}
+
+// Resumable and stall-guarded: a connection that opens then dies mid-stream would otherwise hang the tool forever.
+async function fetchModelBytes(): Promise<ArrayBuffer> {
+  const cached = await readCachedModel();
+  if (cached) return cached;
+
+  const parts: Uint8Array[] = [];
   let loaded = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    chunks.push(value);
-    loaded += value.length;
-    post({ type: 'model-progress', loaded, total });
+  let total = 0;
+  let lastError: unknown = null;
+
+  for (let attempt = 1; attempt <= DOWNLOAD_ATTEMPTS; attempt++) {
+    const controller = new AbortController();
+    let stallTimer = setTimeout(() => controller.abort(), DOWNLOAD_STALL_MS);
+    try {
+      const response = await fetch(MODEL_URL, {
+        signal: controller.signal,
+        headers: loaded > 0 ? { Range: `bytes=${loaded}-` } : {},
+      });
+      if (!response.ok || !response.body)
+        throw new Error(`HTTP ${response.status}`);
+      // A server that ignores the Range header restarts the file, so anything already buffered is stale.
+      if (loaded > 0 && response.status !== 206) {
+        parts.length = 0;
+        loaded = 0;
+      }
+      const declared = Number(response.headers.get('content-length') ?? 0);
+      if (declared > 0) total = Math.max(total, loaded + declared);
+
+      const reader = response.body.getReader();
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        clearTimeout(stallTimer);
+        stallTimer = setTimeout(() => controller.abort(), DOWNLOAD_STALL_MS);
+        parts.push(value);
+        loaded += value.length;
+        post({
+          type: 'model-progress',
+          loaded,
+          total: Math.max(total, loaded),
+        });
+      }
+      clearTimeout(stallTimer);
+
+      const bytes = new Uint8Array(loaded);
+      let offset = 0;
+      for (const part of parts) {
+        bytes.set(part, offset);
+        offset += part.length;
+      }
+      await writeCachedModel(bytes);
+      return bytes.buffer;
+    } catch (err) {
+      clearTimeout(stallTimer);
+      lastError = err;
+      if (attempt < DOWNLOAD_ATTEMPTS) {
+        post({ type: 'model-retry', attempt, attempts: DOWNLOAD_ATTEMPTS });
+      }
+    }
   }
-  const bytes = new Uint8Array(loaded);
-  let offset = 0;
-  for (const chunk of chunks) {
-    bytes.set(chunk, offset);
-    offset += chunk.length;
-  }
-  await cache.put(MODEL_URL, new Response(bytes));
-  return bytes.buffer;
+
+  const detail =
+    lastError instanceof Error ? lastError.message : 'unknown error';
+  throw new Error(
+    `The separation model could not be downloaded after ${DOWNLOAD_ATTEMPTS} attempts (${detail}). Check your connection and try again.`
+  );
 }
 
 let sessionPromise: Promise<ort.InferenceSession> | null = null;
@@ -110,9 +169,14 @@ async function infer(
   inputData: Float32Array
 ): Promise<Float32Array> {
   const tensor = new ort.Tensor('float32', inputData, [1, 4, DIM_F, DIM_T]);
-  const outputs = await session.run({ input: tensor });
+  // Names are read from the model rather than hardcoded, so a renamed export fails loudly instead of yielding undefined.
+  const inputName = session.inputNames[0]!;
+  const outputName = session.outputNames[0]!;
+  const outputs = await session.run({ [inputName]: tensor });
+  const raw = outputs[outputName]?.data as Float32Array | undefined;
+  if (!raw) throw new Error('The separation model returned no output.');
   // Copied out of the runtime's own memory, which the next run would otherwise overwrite.
-  return Float32Array.from(outputs.output!.data as Float32Array);
+  return Float32Array.from(raw);
 }
 
 async function runChunk(
@@ -243,11 +307,14 @@ async function separate(
     }
   }
 
-  const vocals = [vocalLeft, vocalRight];
-  const instrumental = [
-    Float32Array.from(left, (v, i) => v - vocalLeft[i]!),
-    Float32Array.from(right, (v, i) => v - vocalRight[i]!),
-  ];
+  // A mono source was duplicated for inference, so it collapses back to one channel instead of writing a doubled-size file.
+  const vocals = isStereo ? [vocalLeft, vocalRight] : [vocalLeft];
+  const instrumental = isStereo
+    ? [
+        Float32Array.from(left, (v, i) => v - vocalLeft[i]!),
+        Float32Array.from(right, (v, i) => v - vocalRight[i]!),
+      ]
+    : [Float32Array.from(left, (v, i) => v - vocalLeft[i]!)];
 
   return { vocals, instrumental };
 }
@@ -257,15 +324,13 @@ self.onmessage = (event: MessageEvent<WorkerRequest>) => {
   if (request.type !== 'separate') return;
   separate(request.channelData, request.denoise)
     .then(({ vocals, instrumental }) => {
-      post(
-        {
-          type: 'result',
-          vocals,
-          instrumental,
-          sampleRate: request.sampleRate,
-        },
-        [...vocals.map((c) => c.buffer), ...instrumental.map((c) => c.buffer)]
-      );
+      // Encoded here so the main thread never runs a multi-million-iteration loop, and only the finished bytes cross the boundary.
+      const vocalsWav = encodeWav(vocals, request.sampleRate);
+      const instrumentalWav = encodeWav(instrumental, request.sampleRate);
+      post({ type: 'result', vocalsWav, instrumentalWav }, [
+        vocalsWav,
+        instrumentalWav,
+      ]);
     })
     .catch((err: unknown) => {
       post({

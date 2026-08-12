@@ -119,7 +119,14 @@ async function getPyodide(): Promise<PyodideInterface> {
     pyodideInstance = pyodide;
     return pyodide;
   })();
-  return pyodideLoadPromise;
+
+  try {
+    return await pyodideLoadPromise;
+  } catch (err) {
+    // A cached rejection would keep failing after the network recovers, with only a reload to clear it.
+    pyodideLoadPromise = null;
+    throw err;
+  }
 }
 
 function detectSolePyBinding(source: string): string | null {

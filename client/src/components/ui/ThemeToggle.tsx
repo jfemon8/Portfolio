@@ -49,11 +49,7 @@ export default function ThemeToggle({ className }: { className?: string }) {
           transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
           className="absolute"
         >
-          {isDark ? (
-            <Moon className="h-5 w-5" />
-          ) : (
-            <Sun className="h-5 w-5" />
-          )}
+          {isDark ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
         </motion.span>
       </AnimatePresence>
     </button>

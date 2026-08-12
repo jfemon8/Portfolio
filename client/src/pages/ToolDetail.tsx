@@ -80,7 +80,7 @@ export default function ToolDetail() {
             </div>
           </div>
           {tool.description && (
-            <p className="mt-4text-base text-muted-foreground">
+            <p className="mt-4 text-base text-muted-foreground">
               {tool.description}
             </p>
           )}

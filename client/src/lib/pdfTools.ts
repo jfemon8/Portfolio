@@ -322,8 +322,14 @@ export function downloadBytes(
   const a = document.createElement('a');
   a.href = url;
   a.download = filename;
+  // Anchored in the DOM and revoked a tick later: revoking immediately aborts the transfer in Safari and can truncate large files.
+  a.style.display = 'none';
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(url);
+  setTimeout(() => {
+    a.remove();
+    URL.revokeObjectURL(url);
+  }, 10_000);
 }
 
 export function formatBytes(n: number): string {

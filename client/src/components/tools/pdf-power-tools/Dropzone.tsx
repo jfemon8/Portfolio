@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import toast from 'react-hot-toast';
 import { Upload } from 'lucide-react';
 import { cn } from '@/lib/cn';
 
@@ -26,6 +27,13 @@ export default function Dropzone({
     const files = Array.from(list).filter(
       (f) => f.type === 'application/pdf' || /\.pdf$/i.test(f.name)
     );
+    // Dropping a non-PDF used to do nothing at all, which reads as the tool being broken.
+    if (files.length < list.length) {
+      const skipped = list.length - files.length;
+      toast.error(
+        `Skipped ${skipped} file${skipped === 1 ? '' : 's'} — only PDFs can be used here.`
+      );
+    }
     if (files.length) onFiles(files);
   };
 

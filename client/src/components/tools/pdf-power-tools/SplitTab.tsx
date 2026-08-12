@@ -2,6 +2,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/cn';
 import {
   renderPageThumbnails,
   extractPages,
@@ -20,6 +21,7 @@ export default function SplitTab() {
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [rangeText, setRangeText] = useState('');
+  const [rangeError, setRangeError] = useState<string | null>(null);
   const [busy, setBusy] = useState<'extract' | 'splitAll' | null>(null);
 
   const loadFile = async (files: File[]) => {
@@ -57,13 +59,17 @@ export default function SplitTab() {
     setRangeText(value);
     if (!value.trim()) {
       setSelected(new Set());
+      setRangeError(null);
       return;
     }
     try {
-      const indices = parsePageRanges(value, thumbnails.length);
-      setSelected(new Set(indices));
-    } catch {
-      // Leave the selection as-is while the user is still mid-typing an invalid range.
+      setSelected(new Set(parsePageRanges(value, thumbnails.length)));
+      setRangeError(null);
+    } catch (err) {
+      // Surfaced rather than swallowed: silently keeping the old selection let "Extract" export pages the user never asked for.
+      setRangeError(
+        err instanceof Error ? err.message : 'That page range is not valid.'
+      );
     }
   };
 
@@ -144,17 +150,23 @@ export default function SplitTab() {
             </label>
             <input
               id="split-ranges"
-              className="input mt-1.5"
+              className={cn(
+                'input mt-1.5',
+                rangeError && 'border-destructive/60 focus:border-destructive'
+              )}
               value={rangeText}
               onChange={(e) => onRangeTextChange(e.target.value)}
               placeholder="e.g. 1-3, 5, 8-10"
             />
+            {rangeError && (
+              <p className="mt-1.5 text-2xs text-destructive">{rangeError}</p>
+            )}
           </div>
 
           <div className="flex flex-wrap gap-3">
             <Button
               onClick={handleExtract}
-              disabled={selected.size === 0 || busy !== null}
+              disabled={selected.size === 0 || busy !== null || !!rangeError}
             >
               {busy === 'extract'
                 ? 'Extracting…'

@@ -84,7 +84,12 @@ export default function SignaturePad({ onChange }: SignaturePadProps) {
       <canvas
         ref={canvasRef}
         className="touch-none rounded-lg border border-border/70 bg-white"
-        style={{ width: '100%', maxWidth: WIDTH, height: HEIGHT }}
+        // Aspect-locked to the backing store; a fixed pixel height in a narrower column stretched the exported PNG.
+        style={{
+          width: '100%',
+          maxWidth: WIDTH,
+          aspectRatio: `${WIDTH} / ${HEIGHT}`,
+        }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={finishStroke}

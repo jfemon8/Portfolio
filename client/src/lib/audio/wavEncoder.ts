@@ -1,4 +1,8 @@
-export function encodeWav(channels: Float32Array[], sampleRate: number): Blob {
+// Returns raw bytes rather than a Blob so the worker can build and transfer WAVs without touching the main thread.
+export function encodeWav(
+  channels: Float32Array[],
+  sampleRate: number
+): ArrayBuffer {
   const numChannels = channels.length;
   const numSamples = channels[0]?.length ?? 0;
   const bytesPerSample = 2;
@@ -29,15 +33,17 @@ export function encodeWav(channels: Float32Array[], sampleRate: number): Blob {
   let offset = 44;
   for (let i = 0; i < numSamples; i++) {
     for (let ch = 0; ch < numChannels; ch++) {
-      const sample = Math.max(-1, Math.min(1, channels[ch]?.[i] ?? 0));
+      const raw = channels[ch]?.[i] ?? 0;
+      const sample = Number.isNaN(raw) ? 0 : Math.max(-1, Math.min(1, raw));
+      // Rounded rather than truncated — truncation toward zero adds roughly 6 dB of quantization noise.
       view.setInt16(
         offset,
-        sample < 0 ? sample * 0x8000 : sample * 0x7fff,
+        Math.round(sample < 0 ? sample * 0x8000 : sample * 0x7fff),
         true
       );
       offset += 2;
     }
   }
 
-  return new Blob([buffer], { type: 'audio/wav' });
+  return buffer;
 }
