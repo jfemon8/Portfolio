@@ -56,7 +56,8 @@ export default function JsonHighlight({
 }) {
   const tokens = useMemo(() => tokenize(code), [code]);
   return (
-    <pre className={className}>
+    // data-lenis-prevent stops the smooth-scroll provider eating the wheel, so height-capped callers scroll themselves.
+    <pre data-lenis-prevent tabIndex={0} className={className}>
       {tokens.map((t, i) => (
         <span key={i} className={COLOR[t.type]}>
           {t.text}

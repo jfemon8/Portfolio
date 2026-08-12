@@ -18,6 +18,7 @@ import {
   type ParsedResume,
   type AtsHazard,
   type KeywordOverlap,
+  type KeywordHit,
 } from '@/lib/resumeParser';
 
 type Status = 'idle' | 'parsing' | 'done' | 'error';
@@ -77,8 +78,8 @@ export default function ResumeAtsXray() {
         <ShieldCheck className="h-4 w-4 shrink-0 translate-y-0.5 text-neon" />
         <p>
           Your resume is parsed entirely in your browser and never uploaded
-          anywhere. This shows exactly what a real ATS text-extraction step
-          would see — not an invented percentage.
+          anywhere. Everything below — including the match score — is counted
+          from your own text, never guessed.
         </p>
       </div>
 
@@ -93,7 +94,7 @@ export default function ResumeAtsXray() {
       >
         <Upload className="h-6 w-6 text-muted-foreground" />
         <p className="text-sm text-foreground">
-          {fileName || 'Drop your resume here, or click to choose a file'}
+          {fileName || 'Drop your Resume/CV here, or click to choose a file'}
         </p>
         <p className="text-2xs text-muted-foreground/70">PDF or DOCX</p>
         <input
@@ -136,7 +137,12 @@ export default function ResumeAtsXray() {
               {resume.pageCount === 1 ? '' : 's'} — in the same order a real
               parser would read them.
             </p>
-            <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap rounded-lg border border-border/60 bg-bg-elevated/50 p-3 font-mono text-xs text-muted-foreground">
+            <pre
+              // Without this the smooth-scroll provider eats the wheel and the page moves instead of this box.
+              data-lenis-prevent
+              tabIndex={0}
+              className="mt-2 max-h-64 overflow-auto overscroll-contain whitespace-pre-wrap rounded-lg border border-border/60 bg-bg-elevated/50 p-3 font-mono text-xs text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/40"
+            >
               {resume.fullText.trim() || '(no text could be extracted)'}
             </pre>
           </div>
@@ -179,7 +185,9 @@ export default function ResumeAtsXray() {
             </label>
             <AutoTextarea
               id="ats-jd"
-              className="input mt-1.5 min-h-24 text-xs"
+              // Caps the auto-grow; overflow-auto beats AutoTextarea's overflow-hidden via tailwind-merge.
+              data-lenis-prevent
+              className="input mt-1.5 max-h-64 min-h-24 overflow-auto overscroll-contain text-xs"
               value={jobDescription}
               onChange={(e) => setJobDescription(e.target.value)}
               placeholder="Paste the job posting text here…"
@@ -187,40 +195,21 @@ export default function ResumeAtsXray() {
           </div>
 
           {keywordOverlap && (
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div>
-                <p className="flex items-center gap-1.5 text-xs font-semibold text-neon">
-                  <CheckCircle2 className="h-3.5 w-3.5" />
-                  Found in your resume ({keywordOverlap.matched.length})
-                </p>
-                <div className="mt-1.5 flex flex-wrap gap-1.5">
-                  {keywordOverlap.matched.map((w) => (
-                    <span
-                      key={w}
-                      className="rounded-full bg-neon/10 px-2 py-0.5 text-2xs text-neon"
-                    >
-                      {w}
-                    </span>
-                  ))}
-                </div>
+            <>
+              <MatchScore overlap={keywordOverlap} />
+              <div className="grid gap-4 sm:grid-cols-2">
+                <KeywordColumn
+                  tone="matched"
+                  title="Found in your resume"
+                  hits={keywordOverlap.matched}
+                />
+                <KeywordColumn
+                  tone="missing"
+                  title="Missing from your resume"
+                  hits={keywordOverlap.missing}
+                />
               </div>
-              <div>
-                <p className="flex items-center gap-1.5 text-xs font-semibold text-amber-400">
-                  <XCircle className="h-3.5 w-3.5" />
-                  Missing from your resume ({keywordOverlap.missing.length})
-                </p>
-                <div className="mt-1.5 flex flex-wrap gap-1.5">
-                  {keywordOverlap.missing.map((w) => (
-                    <span
-                      key={w}
-                      className="rounded-full bg-amber-400/10 px-2 py-0.5 text-2xs text-amber-400"
-                    >
-                      {w}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
+            </>
           )}
 
           <p className="flex items-start gap-1.5 text-2xs text-muted-foreground/70">
@@ -232,5 +221,144 @@ export default function ResumeAtsXray() {
         </motion.div>
       )}
     </GlassCard>
+  );
+}
+
+function MatchScore({ overlap }: { overlap: KeywordOverlap }) {
+  const { skillMatchPercent, matchedSkillCount, totalSkillCount } = overlap;
+
+  if (skillMatchPercent === null) {
+    return (
+      <div className="rounded-xl border border-border/60 bg-bg-elevated/40 p-3.5 text-xs text-muted-foreground">
+        No recognisable skills or technologies were found in this job
+        description, so there's nothing concrete to score against yet.
+      </div>
+    );
+  }
+
+  const band =
+    skillMatchPercent >= 70
+      ? { label: 'Strong match', text: 'text-neon', bar: 'bg-neon' }
+      : skillMatchPercent >= 40
+        ? {
+            label: 'Partial match',
+            text: 'text-amber-400',
+            bar: 'bg-amber-400',
+          }
+        : {
+            label: 'Weak match',
+            text: 'text-destructive',
+            bar: 'bg-destructive',
+          };
+
+  return (
+    <div className="rounded-xl border border-border/60 bg-bg-elevated/40 p-4">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <p className="text-sm font-semibold text-foreground">
+          Skill match
+          <span className={cn('ml-2 text-xs font-semibold', band.text)}>
+            {band.label}
+          </span>
+        </p>
+        <p className={cn('text-2xl font-bold tabular-nums', band.text)}>
+          {skillMatchPercent}%
+        </p>
+      </div>
+
+      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-bg-elevated">
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${skillMatchPercent}%` }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className={cn('h-full rounded-full', band.bar)}
+        />
+      </div>
+
+      <p className="mt-2 text-2xs text-muted-foreground/70">
+        Your resume contains {matchedSkillCount} of the {totalSkillCount} skills
+        and technologies this posting names. It counts skill terms only — not
+        job titles, benefits, or company details — and a real ATS weighs far
+        more than keyword overlap.
+      </p>
+    </div>
+  );
+}
+
+function KeywordColumn({
+  tone,
+  title,
+  hits,
+}: {
+  tone: 'matched' | 'missing';
+  title: string;
+  hits: KeywordHit[];
+}) {
+  const [showOthers, setShowOthers] = useState(false);
+  const skills = hits.filter((h) => h.isSkill);
+  const others = hits.filter((h) => !h.isSkill);
+  const isMatched = tone === 'matched';
+
+  return (
+    <div>
+      <p
+        className={cn(
+          'flex items-center gap-1.5 text-xs font-semibold',
+          isMatched ? 'text-neon' : 'text-amber-400'
+        )}
+      >
+        {isMatched ? (
+          <CheckCircle2 className="h-3.5 w-3.5" />
+        ) : (
+          <XCircle className="h-3.5 w-3.5" />
+        )}
+        {title} ({skills.length})
+      </p>
+
+      <div className="mt-1.5 flex flex-wrap gap-1.5">
+        {skills.length === 0 && (
+          <span className="text-2xs text-muted-foreground/60">
+            No skills or technologies {isMatched ? 'matched' : 'missing'}.
+          </span>
+        )}
+        {skills.map((h) => (
+          <span
+            key={h.term}
+            className={cn(
+              'rounded-full px-2 py-0.5 text-2xs',
+              isMatched
+                ? 'bg-neon/10 text-neon'
+                : 'bg-amber-400/10 text-amber-400'
+            )}
+          >
+            {h.term}
+          </span>
+        ))}
+      </div>
+
+      {others.length > 0 && (
+        <div className="mt-2">
+          <button
+            type="button"
+            onClick={() => setShowOthers((v) => !v)}
+            className="text-2xs text-muted-foreground/70 underline-offset-2 transition-colors hover:text-foreground hover:underline"
+          >
+            {showOthers ? 'Hide' : 'Show'} {others.length} other word
+            {others.length === 1 ? '' : 's'}
+          </button>
+          {showOthers && (
+            <div className="mt-1.5 flex flex-wrap gap-1.5">
+              {others.map((h) => (
+                <span
+                  key={h.term}
+                  className="rounded-full bg-bg-elevated/70 px-2 py-0.5 text-2xs text-muted-foreground/70"
+                >
+                  {h.term}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
