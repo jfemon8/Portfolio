@@ -7,6 +7,7 @@ const importers = {
   blog: () => import('@/pages/Blog'),
   blogPost: () => import('@/pages/BlogPostPage'),
   tools: () => import('@/pages/Tools'),
+  jobs: () => import('@/pages/Jobs'),
   toolDetail: () => import('@/pages/ToolDetail'),
 };
 
@@ -26,6 +27,8 @@ export function prefetchRoute(path: string): void {
     prefetchBlogPost(blogSlug);
   } else if (path === '/blog') {
     void importers.blog();
+  } else if (path === '/tools/jobs') {
+    void importers.jobs();
   } else if (toolSlug) {
     void importers.toolDetail();
   } else if (path === '/tools') {
@@ -42,6 +45,7 @@ const PUBLIC_ROUTE_IMPORTERS: ChunkImporter[] = [
   importers.blog,
   importers.blogPost,
   importers.tools,
+  importers.jobs,
   importers.toolDetail,
 ];
 
@@ -63,6 +67,7 @@ const ADMIN_ROUTE_IMPORTERS: ChunkImporter[] = [
   () => import('@/pages/admin/AuditLogViewer'),
   () => import('@/pages/admin/SiteCopyManager'),
   () => import('@/pages/admin/ToolsManager'),
+  () => import('@/pages/admin/JobsManager'),
   () => import('@/pages/admin/SettingsManager'),
 ];
 

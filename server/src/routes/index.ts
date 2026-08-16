@@ -14,6 +14,7 @@ import auditRoutes from './auditRoutes.js';
 import uploadRoutes from './uploadRoutes.js';
 import cpRoutes from './cpRoutes.js';
 import categoryRoutes from './categoryRoutes.js';
+import jobRoutes from './jobRoutes.js';
 import { getSitemap } from '../controllers/sitemapController.js';
 import { getRobots } from '../controllers/siteMetaController.js';
 
@@ -41,6 +42,7 @@ router.use('/audit', auditRoutes);
 router.use('/upload', uploadRoutes);
 router.use('/cp', cpRoutes);
 router.use('/categories', categoryRoutes);
+router.use('/jobs', jobRoutes);
 router.use('/', contentRoutes); // /experience /skills /education /certifications /publications
 
 export default router;

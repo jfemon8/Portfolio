@@ -1,4 +1,8 @@
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import {
+  keepPreviousData,
+  useInfiniteQuery,
+  useQuery,
+} from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { queryClient } from '@/lib/queryClient';
 import { getBlogVisitorKey } from '@/lib/blog';
@@ -22,6 +26,8 @@ import type {
   SkillDoc,
   CategoryDoc,
   ToolDoc,
+  JobDetailResponse,
+  JobListResponse,
 } from '@/types';
 
 const get = async <T>(url: string): Promise<T> => (await api.get<T>(url)).data;
@@ -140,6 +146,59 @@ export const useTools = () =>
     queryFn: () => get<ListResponse<ToolDoc>>('/tools'),
     staleTime: CONTENT,
     gcTime: CONTENT_GC,
+  });
+
+export interface JobQuery {
+  category?: string;
+  q?: string;
+  region?: string;
+  page?: number;
+  limit?: number;
+}
+
+const jobSearchParams = (query: JobQuery): string => {
+  const params = new URLSearchParams();
+  if (query.category && query.category !== 'all')
+    params.set('category', query.category);
+  if (query.q?.trim()) params.set('q', query.q.trim());
+  if (query.region && query.region !== 'all')
+    params.set('region', query.region);
+  if (query.page && query.page > 1) params.set('page', String(query.page));
+  if (query.limit) params.set('limit', String(query.limit));
+  const search = params.toString();
+  return search ? `?${search}` : '';
+};
+
+/** Paged board query — page 1 also carries the facet counts, and `keepPreviousData` keeps the current results on screen while a new filter loads. */
+export const useJobsInfinite = (query: JobQuery = {}) => {
+  const base = jobSearchParams(query);
+  return useInfiniteQuery({
+    queryKey: ['jobs', 'list', base],
+    queryFn: ({ pageParam }) =>
+      get<JobListResponse>(
+        `/jobs${base ? `${base}&` : '?'}page=${String(pageParam)}`
+      ),
+    initialPageParam: 1,
+    getNextPageParam: (last) =>
+      last.pagination.page < last.pagination.pages
+        ? last.pagination.page + 1
+        : undefined,
+    placeholderData: keepPreviousData,
+    staleTime: 60 * 1000,
+    gcTime: CONTENT_GC,
+  });
+};
+
+export const useJob = (id?: string) =>
+  useQuery({
+    queryKey: ['job', id],
+    queryFn: () => get<JobDetailResponse>(`/jobs/${id}`),
+    enabled: Boolean(id),
+    // Expiry is date-driven, so a stale cache entry can misrepresent an open job.
+    staleTime: 60 * 1000,
+    gcTime: CONTENT_GC,
+    retry: (count, error) =>
+      (error as { status?: number })?.status === 410 ? false : count < 2,
   });
 
 /** Consumes the server `pagination` metadata so posts beyond the first page stay reachable via `fetchNextPage`. */

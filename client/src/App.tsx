@@ -12,6 +12,8 @@ const Blog = lazy(() => import('@/pages/Blog'));
 const BlogPostPage = lazy(() => import('@/pages/BlogPostPage'));
 const Tools = lazy(() => import('@/pages/Tools'));
 const ToolDetail = lazy(() => import('@/pages/ToolDetail'));
+const Jobs = lazy(() => import('@/pages/Jobs'));
+const JobDetail = lazy(() => import('@/pages/JobDetail'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
 // Admin (code-split — never loaded by public visitors)
@@ -36,6 +38,7 @@ const ToolsManager = lazy(() => import('@/pages/admin/ToolsManager'));
 const UsersManager = lazy(() => import('@/pages/admin/UsersManager'));
 const AuditLogViewer = lazy(() => import('@/pages/admin/AuditLogViewer'));
 const MediaLibrary = lazy(() => import('@/pages/admin/MediaLibrary'));
+const JobsManager = lazy(() => import('@/pages/admin/JobsManager'));
 
 const Fallback = (
   <div className="grid min-h-screen place-items-center">
@@ -54,6 +57,8 @@ export default function App() {
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPostPage />} />
           <Route path="/tools" element={<Tools />} />
+          <Route path="/tools/jobs" element={<Jobs />} />
+          <Route path="/tools/jobs/:id" element={<JobDetail />} />
           <Route path="/tools/:slug" element={<ToolDetail />} />
           <Route path="*" element={<NotFound />} />
         </Route>
@@ -98,6 +103,7 @@ export default function App() {
           />
           <Route path="site-copy" element={<SiteCopyManager />} />
           <Route path="tools" element={<ToolsManager />} />
+          <Route path="jobs" element={<JobsManager />} />
           <Route path="settings" element={<SettingsManager />} />
         </Route>
       </Routes>

@@ -1,5 +1,5 @@
 import { memo, useCallback, useState, type ReactNode } from 'react';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Pencil, Search, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCrud } from '@/hooks/useCrud';
 import { Spinner, ErrorState, EmptyState } from '@/components/ui/States';
@@ -62,6 +62,9 @@ export interface ResourceConfig<T extends WithId> {
   fields: FieldSchema[];
   labelOf?: (item: T) => string;
   renderItem: (item: T) => ReactNode;
+  /** Opt-in client-side filter box; returns the text a row should be matched against. */
+  searchOf?: (item: T) => string;
+  searchPlaceholder?: string;
 }
 
 /** Schema-driven CRUD screen reused by every simple resource. */
@@ -73,6 +76,7 @@ export default function ResourceManager<T extends WithId>({
   const { items, isLoading, isError, refetch, create, update, remove } =
     useCrud<T>(config.base, config.queryKey ?? config.base);
   const confirm = useConfirm();
+  const [search, setSearch] = useState('');
   const [editing, setEditing] = useState<T | Record<string, never> | null>(
     null
   );
@@ -236,6 +240,14 @@ export default function ResourceManager<T extends WithId>({
     [config, confirm, remove]
   );
 
+  const query = search.trim().toLowerCase();
+  const visible =
+    config.searchOf && query
+      ? items.filter((item) =>
+          config.searchOf?.(item).toLowerCase().includes(query)
+        )
+      : items;
+
   return (
     <div>
       <PageHeader
@@ -248,14 +260,30 @@ export default function ResourceManager<T extends WithId>({
         }
       />
 
+      {config.searchOf && items.length > 0 && (
+        <div className="relative mb-4">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={config.searchPlaceholder ?? `Filter ${config.title}…`}
+            aria-label={`Filter ${config.title}`}
+            className="input pl-9"
+          />
+        </div>
+      )}
+
       {isLoading && <Spinner />}
       {isError && <ErrorState onRetry={() => void refetch()} />}
       {!isLoading && !isError && items.length === 0 && (
         <EmptyState message="Nothing here yet — add your first entry." />
       )}
+      {!isLoading && !isError && items.length > 0 && visible.length === 0 && (
+        <EmptyState message="No entries match this filter." />
+      )}
 
       <div className="space-y-3">
-        {items.map((item) => (
+        {visible.map((item) => (
           <ResourceRow
             key={item._id}
             item={item}

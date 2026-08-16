@@ -230,6 +230,132 @@ export interface Tool {
   order: number;
 }
 
+export type JobCategory =
+  | 'government'
+  | 'private'
+  | 'it'
+  | 'bank'
+  | 'ngo'
+  | 'other';
+export type JobSource = 'manual' | 'automated';
+
+export interface Job {
+  title: string;
+  company: string;
+  location: string;
+  category: JobCategory;
+  description: string;
+  applyUrl: string;
+  sourceUrl: string;
+  sourceName: string;
+  sourceKey: string;
+  externalId?: string;
+  source: JobSource;
+  employmentType: string;
+  salary: string;
+  publishedAt?: string;
+  deadline?: string;
+  lastSeenAt?: string;
+  expired?: boolean;
+  /** True while `deadline` is the default one-month validity, not a stated one. */
+  deadlineAssumed?: boolean;
+  /** Every board this same vacancy was found on. */
+  sources?: Array<{ key: string; name: string; url: string }>;
+  quality?: number;
+  region?: JobRegion;
+  /** Scanned circulars and PDF notices published with the posting. */
+  attachments?: JobAttachment[];
+}
+
+export type JobRegion = 'bangladesh' | 'remote' | 'international';
+
+export interface JobAttachment {
+  url: string;
+  type: 'image' | 'pdf';
+  label: string;
+}
+
+/** Per-category totals for the filter chips, unaffected by the active category. */
+export interface JobFacets {
+  all: number;
+  categories: Partial<Record<JobCategory, number>>;
+  regions: Partial<Record<JobRegion, number>>;
+}
+
+export interface JobListResponse extends PaginatedResponse<JobDoc> {
+  facets: JobFacets;
+}
+
+export type JobRelated = Pick<
+  JobDoc,
+  | '_id'
+  | 'title'
+  | 'company'
+  | 'location'
+  | 'category'
+  | 'deadline'
+  | 'sourceName'
+>;
+
+export interface JobDetailResponse {
+  success: true;
+  data: JobDoc;
+  related: JobRelated[];
+}
+
+export interface JobFeedOutcome {
+  key: string;
+  name: string;
+  kind: 'feed' | 'crawler';
+  ok: boolean;
+  scanned: number;
+  durationMs: number;
+  skippedDisabled?: boolean;
+  error?: string;
+}
+
+export interface JobSyncResult {
+  /** True when the agent ran on its own least-privilege database user. */
+  scopedDb: boolean;
+  feeds: number;
+  scanned: number;
+  unique: number;
+  duplicatesMerged: number;
+  added: number;
+  updated: number;
+  skipped: number;
+  expiredRemoved: number;
+  purged: number;
+  durationMs: number;
+  failures: string[];
+  warnings: string[];
+  perFeed: JobFeedOutcome[];
+}
+
+export type JobSourceStatus =
+  | 'healthy'
+  | 'empty'
+  | 'failing'
+  | 'resting'
+  | 'unknown';
+
+export interface JobSourceDiagnostic {
+  key: string;
+  name: string;
+  kind: 'feed' | 'crawler';
+  status: JobSourceStatus;
+  lastRunAt?: string;
+  lastOkAt?: string;
+  lastError: string;
+  consecutiveFailures: number;
+  consecutiveEmpty: number;
+  lastScanned: number;
+  totalRuns: number;
+  totalFailures: number;
+  lastDurationMs: number;
+  disabledUntil?: string;
+}
+
 export type CredentialCategory =
   | 'certification'
   | 'publication'
@@ -340,6 +466,7 @@ export type SkillDoc = Entity<Skill>;
 export type CategoryDoc = Entity<Category>;
 export type EducationDoc = Entity<Education>;
 export type ToolDoc = Entity<Tool>;
+export type JobDoc = Entity<Job>;
 export type CertificationDoc = Entity<Certification>;
 export type PublicationDoc = Entity<Publication>;
 export type BlogPostDoc = Entity<BlogPost>;
@@ -620,6 +747,8 @@ export interface MediaListResponse {
 export interface ListResponse<T> {
   success: true;
   count?: number;
+  /** Matching documents on the server when `data` is a capped slice. */
+  total?: number;
   unread?: number;
   data: T[];
 }

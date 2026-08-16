@@ -491,6 +491,104 @@ export interface ITool {
   order: number;
 }
 
+export type JobCategory =
+  | 'government'
+  | 'private'
+  | 'it'
+  | 'bank'
+  | 'ngo'
+  | 'other';
+export type JobSource = 'manual' | 'automated';
+
+/** A Bangladesh job posting. `deadline` is intentionally a local calendar date (Asia/Dhaka). */
+export interface IJob {
+  title: string;
+  company: string;
+  location: string;
+  category: JobCategory;
+  description: string;
+  applyUrl: string;
+  sourceUrl: string;
+  sourceName: string;
+  sourceKey: string;
+  externalId?: string;
+  source: JobSource;
+  employmentType: string;
+  salary: string;
+  publishedAt?: Date;
+  deadline?: string;
+  lastSeenAt?: Date;
+  /** Cross-source fingerprint (normalised company + title) used to merge duplicates. */
+  dedupeKey?: string;
+  /** Every board this same vacancy was found on. */
+  sources: Array<{ key: string; name: string; url: string }>;
+  /** True while `deadline` is the default one-month validity, not a stated one. */
+  deadlineAssumed: boolean;
+  /** Completeness score; the highest-scoring source wins a merge. */
+  quality: number;
+  /** Where the vacancy sits, so a Bangladesh board can still carry global roles. */
+  region: JobRegion;
+  /** Scanned circulars and PDF notices published with the posting. */
+  attachments: JobAttachment[];
+}
+
+export type JobRegion = 'bangladesh' | 'remote' | 'international';
+
+export interface JobAttachment {
+  url: string;
+  type: 'image' | 'pdf';
+  label: string;
+}
+
+/** Rolling health of one configured job source, used for diagnosis and auto-disable. */
+export interface IJobSourceHealth {
+  key: string;
+  name: string;
+  kind: 'feed' | 'crawler';
+  lastRunAt?: Date;
+  lastOkAt?: Date;
+  lastError: string;
+  consecutiveFailures: number;
+  consecutiveEmpty: number;
+  lastScanned: number;
+  lastAdded: number;
+  totalRuns: number;
+  totalFailures: number;
+  lastDurationMs: number;
+  disabledUntil?: Date;
+}
+
+/** Per-source outcome of one ingestion run, surfaced to the admin sync screen. */
+export interface JobFeedOutcome {
+  key: string;
+  name: string;
+  kind: 'feed' | 'crawler';
+  ok: boolean;
+  scanned: number;
+  durationMs: number;
+  skippedDisabled?: boolean;
+  error?: string;
+}
+
+export interface JobSyncResult {
+  /** True when the agent ran on its own least-privilege database user. */
+  scopedDb: boolean;
+  feeds: number;
+  scanned: number;
+  /** Postings left after cross-source duplicates were merged away. */
+  unique: number;
+  duplicatesMerged: number;
+  added: number;
+  updated: number;
+  skipped: number;
+  expiredRemoved: number;
+  purged: number;
+  durationMs: number;
+  failures: string[];
+  warnings: string[];
+  perFeed: JobFeedOutcome[];
+}
+
 export type CredentialCategory =
   | 'certification'
   | 'publication'
