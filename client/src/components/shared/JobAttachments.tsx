@@ -25,8 +25,8 @@ export default function JobAttachments({
 
   return (
     <section className="mt-10">
-      <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight text-foreground">
-        <ImageIcon className="h-5 w-5 text-neon" />
+      <h2 className="flex items-center gap-2 text-lg font-bold tracking-tight text-foreground sm:text-xl">
+        <ImageIcon className="h-5 w-5 shrink-0 text-neon" />
         Official circular
       </h2>
       <p className="mt-1 text-sm text-muted-foreground">
@@ -42,15 +42,16 @@ export default function JobAttachments({
               type="button"
               onClick={() => setLightboxIndex(index)}
               aria-label={`Open ${item.label || 'circular'} full screen`}
-              className="group relative block overflow-hidden rounded-xl border border-border/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="group relative block w-full overflow-hidden rounded-xl border border-border/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <SmartImage
                 src={item.url}
                 alt={item.label || `${title} circular`}
                 imgWidth={720}
-                className="max-h-[28rem] w-full bg-card/40 object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+                className="max-h-[20rem] w-full bg-card/40 object-contain transition-transform duration-300 group-hover:scale-[1.02] sm:max-h-[28rem]"
               />
-              <span className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-lg bg-background/80 text-foreground opacity-0 backdrop-blur transition-opacity group-hover:opacity-100">
+              {/* Always visible on touch, where there is no hover to reveal it. */}
+              <span className="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-lg bg-background/80 text-foreground backdrop-blur transition-opacity sm:right-3 sm:top-3 sm:opacity-0 sm:group-hover:opacity-100">
                 <Maximize2 className="h-4 w-4" />
               </span>
             </button>

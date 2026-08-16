@@ -81,7 +81,7 @@ export default function Lightbox({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="glass-thin absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-xl text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
+            className="glass-thin absolute right-4 top-4 z-10 grid h-11 w-11 place-items-center rounded-xl text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
           >
             <X className="h-5 w-5" />
           </button>
@@ -92,12 +92,13 @@ export default function Lightbox({
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="glass-thin absolute left-4 top-4 inline-flex h-11 items-center gap-1.5 rounded-xl px-4 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
+              className="glass-thin absolute left-4 top-4 z-10 inline-flex h-11 items-center gap-1.5 rounded-xl px-4 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
             >
               {action.label} <ExternalLink className="h-4 w-4" />
             </a>
           )}
 
+          {/* z-10 keeps these above the figure, whose transform would otherwise paint over them once the image fills the width. */}
           {many && (
             <>
               <button
@@ -107,7 +108,7 @@ export default function Lightbox({
                   e.stopPropagation();
                   setI((v) => (v - 1 + images.length) % images.length);
                 }}
-                className="glass-thin absolute left-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary sm:left-6"
+                className="glass-thin absolute left-3 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full text-foreground shadow-lg transition-colors hover:border-primary/50 hover:text-primary sm:left-6"
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
@@ -118,7 +119,7 @@ export default function Lightbox({
                   e.stopPropagation();
                   setI((v) => (v + 1) % images.length);
                 }}
-                className="glass-thin absolute right-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary sm:right-6"
+                className="glass-thin absolute right-3 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full text-foreground shadow-lg transition-colors hover:border-primary/50 hover:text-primary sm:right-6"
               >
                 <ChevronRight className="h-5 w-5" />
               </button>
@@ -131,7 +132,7 @@ export default function Lightbox({
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
             onClick={(e) => e.stopPropagation()}
-            className="max-w-5xl"
+            className="w-full max-w-5xl"
           >
             <TransformWrapper
               initialScale={1}
@@ -144,15 +145,16 @@ export default function Lightbox({
               pinch={{ step: 5 }}
             >
               <TransformComponent
-                wrapperStyle={{ maxHeight: '80vh', maxWidth: '100%' }}
-                contentStyle={{ justifyContent: 'center' }}
+                wrapperStyle={{ maxHeight: '78vh', maxWidth: '100%' }}
+                contentStyle={{ justifyContent: 'center', width: '100%' }}
               >
+                {/* Shorter cap on phones so the caption and counter still fit under the image. */}
                 <SmartImage
                   src={img.url}
                   alt={img.caption || `Image ${i + 1}`}
                   priority
                   imgWidth={1600}
-                  className="mx-auto max-h-[80vh] w-auto rounded-xl border border-border/70 object-contain"
+                  className="mx-auto max-h-[68vh] w-auto max-w-full rounded-xl border border-border/70 object-contain sm:max-h-[78vh]"
                 />
               </TransformComponent>
             </TransformWrapper>

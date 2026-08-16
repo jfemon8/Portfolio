@@ -119,8 +119,8 @@ export default function JobDetail() {
           <ArrowLeft className="h-4 w-4" /> Back
         </button>
 
-        <GlassCard className="p-6 sm:p-8">
-          <div className="flex flex-wrap items-center justify-between gap-3">
+        <GlassCard className="p-5 sm:p-8">
+          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
             <div className="flex flex-wrap items-center gap-2">
               <span className="rounded-full bg-primary/10 px-2.5 py-1 text-2xs font-semibold capitalize text-primary">
                 {job.category === 'private' ? 'Non-govt.' : job.category}
@@ -131,28 +131,34 @@ export default function JobDetail() {
                 </span>
               )}
             </div>
-            <span className="text-xs text-muted-foreground">
+            <span className="min-w-0 truncate text-xs text-muted-foreground">
               via {job.sourceName}
             </span>
           </div>
 
-          <h1 className="mt-5 text-balance text-3xl font-extrabold tracking-tight text-foreground sm:text-5xl">
+          {/* Bengali circular headlines run long and have few break points, so wrapping is forced. */}
+          <h1 className="mt-5 text-balance break-words text-2xl font-extrabold leading-tight tracking-tight text-foreground sm:text-4xl lg:text-5xl">
             {job.title}
           </h1>
-          <p className="mt-3 text-lg font-semibold text-neon">{job.company}</p>
+          <p className="mt-3 break-words text-base font-semibold text-neon sm:text-lg">
+            {job.company}
+          </p>
 
-          <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1.5">
-              <MapPin className="h-4 w-4" /> {job.location || 'Bangladesh'}
+          <div className="mt-5 flex flex-col gap-2 text-sm text-muted-foreground sm:flex-row sm:flex-wrap sm:gap-x-5">
+            <span className="flex items-start gap-1.5">
+              <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+              <span className="min-w-0 break-words">
+                {job.location || 'Bangladesh'}
+              </span>
             </span>
             {job.deadline && (
               <span
                 className={cn(
-                  'flex items-center gap-1.5',
+                  'flex items-start gap-1.5',
                   closingSoon && 'font-semibold text-destructive'
                 )}
               >
-                <CalendarDays className="h-4 w-4" /> Deadline:{' '}
+                <CalendarDays className="mt-0.5 h-4 w-4 shrink-0" /> Deadline:{' '}
                 {formatDate(job.deadline)}
                 {remaining !== null &&
                   remaining >= 0 &&
@@ -160,13 +166,15 @@ export default function JobDetail() {
               </span>
             )}
             {job.salary && (
-              <span className="flex items-center gap-1.5">
-                <Wallet className="h-4 w-4" /> {job.salary}
+              <span className="flex items-start gap-1.5">
+                <Wallet className="mt-0.5 h-4 w-4 shrink-0" />
+                <span className="min-w-0 break-words">{job.salary}</span>
               </span>
             )}
             {job.publishedAt && (
               <span className="flex items-center gap-1.5">
-                <Clock className="h-4 w-4" /> Posted {timeAgo(job.publishedAt)}
+                <Clock className="h-4 w-4 shrink-0" /> Posted{' '}
+                {timeAgo(job.publishedAt)}
               </span>
             )}
           </div>
@@ -176,9 +184,9 @@ export default function JobDetail() {
               href={destination}
               target="_blank"
               rel="noreferrer"
-              className="mt-7 inline-flex"
+              className="mt-7 block sm:inline-flex"
             >
-              <Button size="lg">
+              <Button size="lg" className="w-full sm:w-auto">
                 Apply now <ExternalLink className="h-4 w-4" />
               </Button>
             </a>
@@ -187,7 +195,7 @@ export default function JobDetail() {
 
         {(job.description.trim() || !hasCircular) && (
           <section className="mt-8">
-            <h2 className="text-2xl font-bold tracking-tight text-foreground">
+            <h2 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
               Job description
             </h2>
             {job.description.trim() ? (
@@ -213,16 +221,24 @@ export default function JobDetail() {
             </h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {related.map((item) => (
-                <Link key={item._id} to={`/tools/jobs/${item._id}`}>
+                <Link
+                  key={item._id}
+                  to={`/tools/jobs/${item._id}`}
+                  className="block h-full"
+                >
                   <GlassCard interactive className="h-full p-4">
-                    <p className="font-semibold leading-snug text-foreground">
+                    <p className="break-words font-semibold leading-snug text-foreground">
                       {item.title}
                     </p>
-                    <p className="mt-1 text-sm text-neon">{item.company}</p>
-                    <p className="mt-2 flex items-center gap-1 text-2xs text-muted-foreground">
-                      <MapPin className="h-3.5 w-3.5" />
-                      {item.location || 'Bangladesh'}
-                      {item.deadline && ` · ${formatDate(item.deadline)}`}
+                    <p className="mt-1 break-words text-sm text-neon">
+                      {item.company}
+                    </p>
+                    <p className="mt-2 flex items-start gap-1 text-2xs text-muted-foreground">
+                      <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                      <span className="min-w-0 break-words">
+                        {item.location || 'Bangladesh'}
+                        {item.deadline && ` · ${formatDate(item.deadline)}`}
+                      </span>
                     </p>
                   </GlassCard>
                 </Link>
