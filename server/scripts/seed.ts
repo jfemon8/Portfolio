@@ -62,17 +62,17 @@ const profile: Partial<IProfile> = {
   socials: [
     {
       label: 'GitHub',
-      url: 'https://github.com/your-username',
+      url: 'https://github.com/jfemon8',
       icon: 'github',
     },
     {
       label: 'LinkedIn',
-      url: 'https://linkedin.com/in/your-username',
+      url: 'https://linkedin.com/in/jfemon',
       icon: 'linkedin',
     },
     {
       label: 'LeetCode',
-      url: 'https://leetcode.com/your-username',
+      url: 'https://leetcode.com/jfemon8',
       icon: 'code',
     },
     { label: 'Email', url: 'mailto:jfemon8@gmail.com', icon: 'mail' },
@@ -104,7 +104,17 @@ const experiences: IExperience[] = [
       'Collaborate on backend integration using .NET MVC and .NET Core Web API and apply OOP principles (C#) to support dynamic, scalable features.',
       'Contribute to asynchronous operations like AJAX, fetch, Axios, participate in code reviews, and continuously learn tools like Kubernetes, Terraform, and monitoring systems.',
     ],
-    tech: ['React', 'Redux', 'Next.js', 'jQuery', '.NET Core', 'C#', 'Axios'],
+    tech: [
+      'React',
+      'Redux',
+      'Next.js',
+      'jQuery',
+      '.NET Core',
+      'C#',
+      'Axios',
+      'Bootstrap',
+      'Tailwind CSS',
+    ],
     order: 0,
   },
   {
@@ -164,7 +174,7 @@ const projects: Partial<IProject>[] = [
       'Added real-time chat, notifications, and dark/light theme React front-end',
     ],
     category: 'fullstack',
-    sourceUrl: 'https://github.com/your-username/rdswa',
+    sourceUrl: 'https://github.com/jfemon8/rdswa',
     liveUrl: '',
     featured: true,
     status: 'completed',
@@ -192,7 +202,7 @@ const projects: Partial<IProject>[] = [
       'Integrated bKash, Nagad & SSLCommerz with order tracking',
     ],
     category: 'fullstack',
-    sourceUrl: 'https://github.com/your-username/bangaliyana',
+    sourceUrl: 'https://github.com/jfemon8/bangaliyana',
     featured: true,
     status: 'completed',
     year: '2023',
@@ -220,7 +230,7 @@ const projects: Partial<IProject>[] = [
       'Admin panel with protected routes',
     ],
     category: 'frontend',
-    sourceUrl: 'https://github.com/your-username/quickquiz',
+    sourceUrl: 'https://github.com/jfemon8/quickquiz',
     featured: true,
     status: 'completed',
     year: '2023',
@@ -241,7 +251,7 @@ const projects: Partial<IProject>[] = [
       'Deployed via GitHub Actions',
     ],
     category: 'fullstack',
-    sourceUrl: 'https://github.com/your-username/agriblog',
+    sourceUrl: 'https://github.com/jfemon8/agriblog',
     featured: false,
     status: 'completed',
     year: '2022',
@@ -408,8 +418,7 @@ const publications: Partial<IPublication>[] = [
 const toolsRaw: Omit<ITool, 'slug'>[] = [
   {
     name: 'JWT Decoder',
-    description:
-      'Decode a JWT to see its header and payload — entirely in your browser, nothing is sent anywhere.',
+    description: 'Decode a JWT to see its header and payload.',
     category: 'developer-utilities',
     icon: 'KeyRound',
     key: 'jwt-decoder',
@@ -463,7 +472,7 @@ const toolsRaw: Omit<ITool, 'slug'>[] = [
   {
     name: 'Password Crack-Time Benchmark',
     description:
-      "See how long your password would really take to crack — benchmarked live against this device's actual hashing speed, not a generic lookup table.",
+      "See how long your password would really take to crack. Benchmarked live against this device's actual hashing speed, not a generic lookup table.",
     category: 'everyday-tools',
     icon: 'Lock',
     key: 'password-crack-time',
@@ -472,7 +481,7 @@ const toolsRaw: Omit<ITool, 'slug'>[] = [
   {
     name: 'Resume ATS X-Ray',
     description:
-      'Upload your resume and see exactly what an ATS parser would actually extract from it — real layout-hazard detection, not an invented score.',
+      'Upload your resume and see exactly what an ATS parser would actually extract from it. Real layout-hazard detection, not an invented score.',
     category: 'everyday-tools',
     icon: 'FileSearch',
     key: 'resume-ats-xray',
@@ -480,8 +489,7 @@ const toolsRaw: Omit<ITool, 'slug'>[] = [
   },
   {
     name: 'PDF Power-Tools',
-    description:
-      'Merge, split, compress, and sign PDFs — entirely in your browser, nothing is ever uploaded.',
+    description: 'Merge, split, compress, and sign PDFs.',
     category: 'everyday-tools',
     icon: 'FileStack',
     key: 'pdf-power-tools',
@@ -490,7 +498,7 @@ const toolsRaw: Omit<ITool, 'slug'>[] = [
   {
     name: 'Music Remover',
     description:
-      'Real ML-based vocal isolation, running entirely in your browser — pull the vocals or the instrumental out of any song, no upload, no server.',
+      'Real ML-based vocal isolation. Pull the vocals or the instrumental out of any song.',
     category: 'everyday-tools',
     icon: 'Mic2',
     key: 'music-remover',
@@ -499,7 +507,7 @@ const toolsRaw: Omit<ITool, 'slug'>[] = [
   {
     name: 'Email Extractor & Verifier',
     description:
-      'Pull every email out of any text, then check each one against its real mail configuration — no signup, no upload, no limit.',
+      'Pull every email out of any text, then check each one against its real mail configuration — no signup, no limit.',
     category: 'everyday-tools',
     icon: 'MailCheck',
     key: 'email-verifier',

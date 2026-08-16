@@ -178,9 +178,9 @@ export default function JwtDecoder() {
         onChange={(e) => setToken(e.target.value)}
       />
       <p className="mt-2 text-2xs text-muted-foreground/70">
-        Decoded entirely in your browser — the token never leaves this page.
-        Signature verification needs the secret/key, which isn't (and can't
-        safely be) entered here, so only the raw signature segment is shown.
+        The token never leaves this page. Signature verification needs the
+        secret/key, which isn't (and can't safely be) entered here, so only the
+        raw signature segment is shown.
       </p>
 
       {result?.error && (

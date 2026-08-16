@@ -276,9 +276,7 @@ function MatchScore({ overlap }: { overlap: KeywordOverlap }) {
 
       <p className="mt-2 text-2xs text-muted-foreground/70">
         Your resume contains {matchedSkillCount} of the {totalSkillCount} skills
-        and technologies this posting names. It counts skill terms only — not
-        job titles, benefits, or company details — and a real ATS weighs far
-        more than keyword overlap.
+        and technologies this posting names.
       </p>
     </div>
   );

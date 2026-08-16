@@ -98,10 +98,10 @@ export default function CfRatingPredictor() {
       </div>
       <p className="mt-2 text-2xs text-muted-foreground/70">
         Works right after a contest finishes, before Codeforces runs its own
-        official recalculation (usually within an hour or so) — this is an
-        unofficial estimate (community-standard approximation), not a guaranteed
-        match to the real delta. Contest ID is the number in a contest's URL,
-        e.g. <code>codeforces.com/contest/1234</code> → 1234.
+        official recalculation. This is an unofficial estimate
+        (community-standard approximation), not a guaranteed match to the real
+        delta. Contest ID is the number in a contest's URL, e.g.{' '}
+        <code>codeforces.com/contest/1234</code> → 1234.
       </p>
 
       {loading && (
