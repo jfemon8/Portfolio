@@ -439,7 +439,7 @@ export default function BigOBenchmark() {
           {status === 'running' ? 'Running…' : 'Run Benchmark'}
         </Button>
         <p className="text-2xs text-muted-foreground/70">
-          Runs entirely in your browser — your code never leaves this page.
+          Your code never leaves this page.
         </p>
       </div>
 

@@ -25,9 +25,8 @@ export default function PdfPowerTools() {
       <div className="flex items-start gap-2.5 rounded-xl border border-border/60 bg-bg-elevated/40 p-3.5 text-xs text-muted-foreground">
         <ShieldCheck className="h-4 w-4 shrink-0 translate-y-0.5 text-neon" />
         <p>
-          Every PDF you drop here is processed entirely in your browser and
-          never uploaded anywhere — merging, splitting, compressing, and signing
-          all happen locally.
+          Every PDF you drop here is never uploaded anywhere. Merging,
+          splitting, compressing, and signing all happen securely.
         </p>
       </div>
 

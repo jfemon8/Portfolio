@@ -77,9 +77,8 @@ export default function ResumeAtsXray() {
       <div className="flex items-start gap-2.5 rounded-xl border border-border/60 bg-bg-elevated/40 p-3.5 text-xs text-muted-foreground">
         <ShieldCheck className="h-4 w-4 shrink-0 translate-y-0.5 text-neon" />
         <p>
-          Your resume is parsed entirely in your browser and never uploaded
-          anywhere. Everything below — including the match score — is counted
-          from your own text, never guessed.
+          Your resume is never uploaded anywhere. Everything below, including
+          the match score is counted from your own text.
         </p>
       </div>
 

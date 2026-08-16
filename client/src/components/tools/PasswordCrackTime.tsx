@@ -134,8 +134,8 @@ export default function PasswordCrackTime() {
       <div className="flex items-start gap-2.5 rounded-xl border border-border/60 bg-bg-elevated/40 p-3.5 text-xs text-muted-foreground">
         <ShieldCheck className="h-4 w-4 shrink-0 translate-y-0.5 text-neon" />
         <p>
-          Everything here runs locally in your browser. Your password is never
-          sent anywhere, logged, or stored — not even to check it.
+          Your password is never sent anywhere, logged, or stored — not even to
+          check it.
         </p>
       </div>
 

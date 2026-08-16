@@ -411,9 +411,8 @@ export default function EmailVerifier() {
       <div className="flex items-start gap-2.5 rounded-xl border border-border/60 bg-bg-elevated/40 p-3.5 text-xs text-muted-foreground">
         <ShieldCheck className="h-4 w-4 shrink-0 translate-y-0.5 text-neon" />
         <p>
-          Your list is parsed and checked entirely in your browser — no signup,
-          no upload, no stored copy. Only the <em>domain</em> of each address is
-          ever looked up, over encrypted DNS.
+          Your list is parsed and checked safely. No signup, no limits, but no
+          stored copy.
         </p>
       </div>
 

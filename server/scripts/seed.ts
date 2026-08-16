@@ -472,7 +472,7 @@ const toolsRaw: Omit<ITool, 'slug'>[] = [
   {
     name: 'Password Crack-Time Benchmark',
     description:
-      "See how long your password would really take to crack. Benchmarked live against this device's actual hashing speed, not a generic lookup table.",
+      "See how long your password would really take to crack. Benchmarked live against this device's actual hashing speed.",
     category: 'everyday-tools',
     icon: 'Lock',
     key: 'password-crack-time',
