@@ -130,8 +130,55 @@ interface LayoutBlock {
   gapBefore: boolean;
 }
 
+/** OCR reports each table cell as its own line, so cells sharing a row are stitched back into one before anything is measured. */
+function groupRows(lines: LayoutLine[]): LayoutLine[] {
+  if (lines.length < 2) return lines;
+  const ordered = [...lines].sort((a, b) => a.y - b.y || a.x - b.x);
+  const heightOf = (line: LayoutLine): number => Math.max(1, line.size * 1.28);
+  const median =
+    [...ordered].map((l) => l.size).sort((a, b) => a - b)[
+      Math.floor(ordered.length / 2)
+    ] ?? 12;
+
+  const rows: LayoutLine[][] = [];
+  for (const line of ordered) {
+    const row = rows[rows.length - 1];
+    const last = row?.[row.length - 1];
+    // Same row when the two boxes overlap vertically by more than half the shorter one.
+    if (
+      last &&
+      Math.abs(line.y - last.y) < Math.min(heightOf(line), heightOf(last)) * 0.5
+    )
+      row.push(line);
+    else rows.push([line]);
+  }
+
+  return rows.map((row) => {
+    if (row.length === 1) return row[0] as LayoutLine;
+    const cells = [...row].sort((a, b) => a.x - b.x);
+    const charWidth = Math.max(1, median * 0.55);
+    let text = '';
+    let cursor = (cells[0] as LayoutLine).x;
+    for (const cell of cells) {
+      // Cells are separated by the gap that was actually between them, so columns stay lined up.
+      const gap = Math.round((cell.x - cursor) / charWidth);
+      if (text) text += ' '.repeat(Math.max(2, gap));
+      text += cell.text;
+      cursor = cell.right;
+    }
+    return {
+      text,
+      x: (cells[0] as LayoutLine).x,
+      right: cells.reduce((max, c) => Math.max(max, c.right), 0),
+      y: row.reduce((min, c) => Math.min(min, c.y), Infinity),
+      size: median,
+    };
+  });
+}
+
 /** Reads the alignment a line was laid out with, measured against the text block's own margins. */
-function analyseLayout(lines: LayoutLine[], width: number): LayoutBlock[] {
+function analyseLayout(input: LayoutLine[], width: number): LayoutBlock[] {
+  const lines = groupRows(input);
   if (!lines.length) return [];
   const bodyLeft = lines.reduce((min, l) => Math.min(min, l.x), width);
   const bodyRight = lines.reduce((max, l) => Math.max(max, l.right), 0);

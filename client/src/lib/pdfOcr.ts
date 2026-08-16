@@ -1,6 +1,5 @@
 import { pdfjsLib } from './pdfjsSetup';
 import { PSM } from 'tesseract.js';
-import { fixBengaliVisualOrder } from './bengaliText';
 import { layoutToText, type LayoutLine } from './docxWriter';
 
 /** One OCR-recovered line, already converted back into PDF point coordinates. */
@@ -398,6 +397,31 @@ export interface OcrImageResult {
   mode: 'printed' | 'handwriting' | 'handwriting-unavailable';
 }
 
+/** Last resort when layout analysis returns no paragraphs: the flat transcript, stacked as evenly spaced lines. */
+function flatTextLines(
+  text: string | undefined,
+  canvas: HTMLCanvasElement
+): LayoutLine[] {
+  const rows = (text ?? '')
+    .split(/\r?\n/)
+    .map((row) =>
+      row
+        .replace(/[ \t]+/g, ' ')
+        .trim()
+        .normalize('NFC')
+    )
+    .filter(Boolean);
+  if (!rows.length) return [];
+  const size = Math.max(10, canvas.height / (rows.length * 1.6));
+  return rows.map((row, i) => ({
+    text: row,
+    x: 0,
+    right: canvas.width,
+    y: i * size * 1.4,
+    size,
+  }));
+}
+
 /** A Bengali-heavy read rules the handwriting model out: TrOCR only ever learnt Latin script. */
 const isBengaliHeavy = (text: string): boolean => {
   const bengali = text.match(/[ঀ-৿]/g)?.length ?? 0;
@@ -460,9 +484,8 @@ export async function ocrImages(
         .flatMap((block) => block.paragraphs ?? [])
         .flatMap((paragraph) => paragraph.lines ?? [])
         .flatMap((line): LayoutLine[] => {
-          const text = fixBengaliVisualOrder(
-            line.text.replace(/\s+/g, ' ').trim()
-          );
+          // Tesseract already emits logical order; only the composition is normalised.
+          const text = line.text.replace(/\s+/g, ' ').trim().normalize('NFC');
           // A blank page still yields "lines"; their own score is what separates them from real text.
           const floor = /[ঀ-৿]/.test(text)
             ? BENGALI_CONFIDENCE_FLOOR
@@ -479,12 +502,14 @@ export async function ocrImages(
             },
           ];
         })
-        .sort((a, b) => a.y - b.y);
+        .sort((a, b) => a.y - b.y || a.x - b.x);
 
+      // Tesseract classifies a ruled table as its own block type, which carries no paragraphs; its flat text still holds the cells.
+      const recovered = lines.length ? lines : flatTextLines(data.text, canvas);
       const confidence = data.confidence ?? 0;
       const printed: OcrImageResult = {
-        text: layoutToText(lines, pageWidth),
-        lines,
+        text: layoutToText(recovered, pageWidth),
+        lines: recovered,
         width: pageWidth,
         confidence,
         mode: 'printed',

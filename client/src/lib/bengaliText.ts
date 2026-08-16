@@ -1,5 +1,7 @@
 /** PDFs store Bengali in painted order, so a pre-base vowel sign arrives before its consonant; this restores the typed order. */
 
+/** Only for pdf.js text extraction: OCR already emits logical order, and running this over it moves every matra one cluster too far. */
+
 /** Vowel signs that render to the left of the cluster they belong to. */
 const PRE_BASE = new Set(['ি', 'ে', 'ৈ']);
 const NUKTA = '়';
