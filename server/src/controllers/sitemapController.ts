@@ -3,6 +3,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { Project } from '../models/Project.js';
 import { BlogPost } from '../models/BlogPost.js';
 import { Profile } from '../models/Profile.js';
+import { Tool } from '../models/Tool.js';
 import { publicVisibility } from './blogController.js';
 import { env } from '../config/env.js';
 
@@ -51,7 +52,7 @@ const urlTag = ({
   `</url>`;
 
 export const getSitemap = asyncHandler(async (_req: Request, res: Response) => {
-  const [projects, posts, profile] = await Promise.all([
+  const [projects, posts, tools, profile] = await Promise.all([
     Project.find()
       .select('slug updatedAt coverImage')
       .sort({ updatedAt: -1 })
@@ -60,6 +61,10 @@ export const getSitemap = asyncHandler(async (_req: Request, res: Response) => {
       .select('slug updatedAt coverImage')
       .sort({ updatedAt: -1 })
       .lean<{ slug: string; updatedAt: Date; coverImage?: string }[]>(),
+    Tool.find()
+      .select('slug updatedAt')
+      .sort({ order: 1 })
+      .lean<{ slug: string; updatedAt: Date }[]>(),
     Profile.findOne().select('avatar').lean<{ avatar?: string } | null>(),
   ]);
 
@@ -71,7 +76,16 @@ export const getSitemap = asyncHandler(async (_req: Request, res: Response) => {
       images: [profile?.avatar ?? '', `${SITE}/og.png`],
     },
     { loc: '/projects', changefreq: 'weekly', priority: '0.9' },
+    // The tools are the pages search traffic actually lands on, so they rank above the blog here.
+    { loc: '/tools', changefreq: 'weekly', priority: '0.9' },
+    { loc: '/tools/jobs', changefreq: 'daily', priority: '0.8' },
     { loc: '/blog', changefreq: 'weekly', priority: '0.8' },
+    ...tools.map((t) => ({
+      loc: `/tools/${t.slug}`,
+      lastmod: t.updatedAt,
+      changefreq: 'monthly',
+      priority: '0.8',
+    })),
     ...projects.map((p) => ({
       loc: `/projects/${p.slug}`,
       lastmod: p.updatedAt,

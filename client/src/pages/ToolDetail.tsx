@@ -2,7 +2,12 @@ import { Suspense } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import Seo from '@/components/ui/Seo';
-import { breadcrumbSchema } from '@/lib/structuredData';
+import {
+  breadcrumbSchema,
+  softwareApplicationSchema,
+} from '@/lib/structuredData';
+import { TOOL_SEO, fallbackToolSeo } from '@/lib/toolSeo';
+import RelatedTools from '@/components/tools/RelatedTools';
 import { Section } from '@/components/shared/Section';
 import Reveal from '@/components/motion/Reveal';
 import { Button } from '@/components/ui/button';
@@ -49,18 +54,40 @@ export default function ToolDetail() {
 
   const Icon = TOOL_ICONS[tool.icon];
   const Component = TOOL_COMPONENTS[tool.key];
+  const seo = TOOL_SEO[tool.key] ?? fallbackToolSeo(tool);
+  const path = `/tools/${tool.slug}`;
+  // Siblings from the same category first, so the internal links point somewhere a visitor plausibly wants.
+  const related = (data?.data ?? [])
+    .filter((t) => t.slug !== tool.slug)
+    .sort(
+      (a, b) =>
+        Number(b.category === tool.category) -
+        Number(a.category === tool.category)
+    )
+    .slice(0, 6);
 
   return (
     <>
       <Seo
-        title={tool.name}
-        description={tool.description}
-        path={`/tools/${tool.slug}`}
-        jsonLd={breadcrumbSchema([
-          { name: 'Home', path: '/' },
-          { name: 'Tools', path: '/tools' },
-          { name: tool.name, path: `/tools/${tool.slug}` },
-        ])}
+        title={seo.title}
+        exactTitle
+        description={seo.description}
+        keywords={seo.keywords}
+        path={path}
+        jsonLd={[
+          breadcrumbSchema([
+            { name: 'Home', path: '/' },
+            { name: 'Tools', path: '/tools' },
+            { name: tool.name, path },
+          ]),
+          softwareApplicationSchema({
+            name: tool.name,
+            slug: tool.slug,
+            description: seo.description,
+            category: categoryLabel ?? tool.category,
+            features: seo.features,
+          }),
+        ]}
       />
       <Section id="tool-detail-page" className="mt-4 pt-4">
         <Reveal>
@@ -106,6 +133,10 @@ export default function ToolDetail() {
               <ErrorState message={st.toolUnavailable} />
             )}
           </div>
+        </Reveal>
+
+        <Reveal delay={0.1}>
+          <RelatedTools tools={related} />
         </Reveal>
       </Section>
     </>

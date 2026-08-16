@@ -153,3 +153,37 @@ export const projectSchema = (p: ProjectDoc, authorName?: string): Json => ({
   },
   url: absoluteUrl(`/projects/${p.slug}`),
 });
+
+/** Marks a tool page as free software, which is what earns the "Free" and app-style treatment in results. */
+export const softwareApplicationSchema = (tool: {
+  name: string;
+  slug: string;
+  description: string;
+  category: string;
+  features?: string[];
+}): Json => ({
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  '@id': `${absoluteUrl(`/tools/${tool.slug}`)}#app`,
+  name: tool.name,
+  url: absoluteUrl(`/tools/${tool.slug}`),
+  description: tool.description,
+  applicationCategory: 'UtilitiesApplication',
+  applicationSubCategory: tool.category,
+  // Runs entirely in the browser, which is a genuine differentiator worth declaring.
+  operatingSystem: 'Any',
+  browserRequirements:
+    'Requires JavaScript. Works in Chrome, Edge, Firefox and Safari.',
+  isAccessibleForFree: true,
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+    availability: 'https://schema.org/InStock',
+  },
+  ...(tool.features?.length ? { featureList: tool.features } : {}),
+  inLanguage: 'en',
+  isPartOf: { '@id': WEBSITE_ID },
+  author: personRef,
+  publisher: personRef,
+});

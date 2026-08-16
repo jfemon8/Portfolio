@@ -23,6 +23,10 @@ interface SeoProps {
   publishedTime?: string;
   modifiedTime?: string;
   tags?: string[];
+  /** Page-specific keywords; they lead, with the site-wide list kept behind them. */
+  keywords?: string[];
+  /** Uses the title verbatim, for pages whose title is already at the length a result snippet allows. */
+  exactTitle?: boolean;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
@@ -36,6 +40,8 @@ export default function Seo({
   publishedTime,
   modifiedTime,
   tags,
+  keywords: pageKeywords,
+  exactTitle = false,
   jsonLd,
 }: SeoProps) {
   const { data: seoData } = useSeoSettings();
@@ -45,13 +51,18 @@ export default function Seo({
   const origin = (s?.siteUrl || SITE_URL).replace(/\/$/, '');
   const abs = (p = ''): string =>
     /^https?:\/\//.test(p) ? p : `${origin}${p.startsWith('/') ? p : `/${p}`}`;
-  const fullTitle = title ? `${title} — ${author}` : s?.metaTitle || siteName;
+  const fullTitle = title
+    ? exactTitle
+      ? title
+      : `${title} — ${author}`
+    : s?.metaTitle || siteName;
   const desc = description || s?.metaDescription || DEFAULT_DESCRIPTION;
   const url = abs(path);
   const ogImage = image ? abs(image) : s?.ogImage || `${origin}/og.png`;
-  const keywords = (s?.keywords?.length ? s.keywords : DEFAULT_KEYWORDS).join(
-    ', '
-  );
+  const siteKeywords = s?.keywords?.length ? s.keywords : DEFAULT_KEYWORDS;
+  const keywords = [
+    ...new Set([...(pageKeywords ?? []), ...siteKeywords]),
+  ].join(', ');
   const twitter = s?.twitterHandle?.trim();
   // max-image-preview:large lets Google show full-size image previews in search/Discover.
   const robots = noindex

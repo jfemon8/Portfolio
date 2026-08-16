@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { ArrowUpRight, BriefcaseBusiness } from 'lucide-react';
 import Seo from '@/components/ui/Seo';
 import { breadcrumbSchema, collectionPageSchema } from '@/lib/structuredData';
+import { TOOL_SEO } from '@/lib/toolSeo';
 import { Section, SectionHeading } from '@/components/shared/Section';
 import { useSectionCopy } from '@/hooks/useSectionCopy';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
@@ -24,6 +25,13 @@ const JOBS_CARD = {
   label: 'Career',
 };
 
+/** The hub competes for the generic "free online tools" searches; the detail pages take the specific ones. */
+const HUB_SEO = {
+  title: 'Free Online Tools — No Sign-Up, Nothing Uploaded',
+  description:
+    'A set of free browser tools: PDF editing, OCR for English and Bangla, JSON and JWT utilities, regex testing, vocal removal and more. No account, no upload.',
+};
+
 export default function Tools() {
   const [filter, setFilter] = useState('all');
   const { data, isLoading, isError, refetch } = useTools();
@@ -44,6 +52,15 @@ export default function Tools() {
   );
   const tools =
     filter === 'all' ? all : all.filter((t) => t.category === filter);
+  // Every tool's own keywords roll up to the hub, so the listing competes on the same phrases its children do.
+  const hubKeywords = useMemo(
+    () => [
+      'free online tools',
+      'browser tools no upload',
+      ...all.flatMap((t) => TOOL_SEO[t.key]?.keywords ?? []),
+    ],
+    [all]
+  );
   // The jobs finder is its own page rather than a Tool row, so it is filtered by hand instead of by the query.
   const showJobsCard = filter === 'all' || filter === JOBS_CARD.category;
 
@@ -61,22 +78,24 @@ export default function Tools() {
   return (
     <>
       <Seo
-        title="Tools"
+        title={HUB_SEO.title}
+        exactTitle
         path="/tools"
-        description={copy.subtitle}
+        description={HUB_SEO.description}
+        keywords={hubKeywords}
         jsonLd={[
           breadcrumbSchema([
             { name: 'Home', path: '/' },
             { name: 'Tools', path: '/tools' },
           ]),
           collectionPageSchema(
-            'Tools',
+            'Free Online Tools',
             '/tools',
             [
               { name: JOBS_CARD.title, path: '/tools/jobs' },
               ...all.map((t) => ({ name: t.name, path: `/tools/${t.slug}` })),
             ],
-            copy.subtitle
+            HUB_SEO.description
           ),
         ]}
       />
