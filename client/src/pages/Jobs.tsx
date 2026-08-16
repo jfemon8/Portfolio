@@ -275,17 +275,17 @@ export default function Jobs() {
   return (
     <>
       <Seo
-        title="Bangladesh Jobs"
+        title="Job Circular Finder"
         path="/tools/jobs"
         description="Open jobs in Bangladesh plus remote and international roles — government circulars, company career pages and worldwide job APIs, collected nightly."
         jsonLd={[
           breadcrumbSchema([
             { name: 'Home', path: '/' },
             { name: 'Tools', path: '/tools' },
-            { name: 'Jobs', path: '/tools/jobs' },
+            { name: 'Job Circular Finder', path: '/tools/jobs' },
           ]),
           collectionPageSchema(
-            'Bangladesh Jobs',
+            'Job Circular Finder',
             '/tools/jobs',
             jobs
               .filter((job) => !job.expired)
@@ -301,8 +301,8 @@ export default function Jobs() {
       <Section id="jobs-page" className="mt-4 pt-4">
         <SectionHeading
           index="~/tools/jobs"
-          title="Bangladesh Jobs"
-          subtitle="Government, private, IT, bank and NGO openings — collected nightly from Bangladeshi boards, company career pages and worldwide job APIs. Every listing here is still open."
+          title="Job Circular Finder"
+          subtitle="Government, private, IT, Bank, NGO and Other opportunities from Bangladeshi boards, company career pages and worldwide job portals. Every listing here is still open."
         />
 
         <div className="mb-6 space-y-3">

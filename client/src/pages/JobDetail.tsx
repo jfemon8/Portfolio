@@ -105,7 +105,7 @@ export default function JobDetail() {
         jsonLd={[
           breadcrumbSchema([
             { name: 'Home', path: '/' },
-            { name: 'Jobs', path: '/tools/jobs' },
+            { name: 'Job Circular Finder', path: '/tools/jobs' },
             { name: job.title, path: `/tools/jobs/${job._id}` },
           ]),
           jobPostingSchema(job),
