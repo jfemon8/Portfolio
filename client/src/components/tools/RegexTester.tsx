@@ -122,6 +122,7 @@ export default function RegexTester() {
   const [matchState, setMatchState] = useState<MatchState | null>(null);
   const [running, setRunning] = useState(false);
   const workerRef = useRef<Worker | null>(null);
+  const watchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const loadPreset = (index: number): void => {
     const p = PRESETS[Number(index)];
@@ -146,7 +147,7 @@ export default function RegexTester() {
       );
       const worker = workerRef.current;
 
-      const watchdog = setTimeout(() => {
+      watchdogRef.current = setTimeout(() => {
         worker.terminate();
         workerRef.current = null;
         setRunning(false);
@@ -159,7 +160,8 @@ export default function RegexTester() {
       }, WATCHDOG_MS);
 
       worker.onmessage = (event: MessageEvent<RegexWorkerMessage>) => {
-        clearTimeout(watchdog);
+        if (watchdogRef.current) clearTimeout(watchdogRef.current);
+        watchdogRef.current = null;
         setRunning(false);
         const msg = event.data;
         if (msg.type === 'result') {
@@ -182,10 +184,21 @@ export default function RegexTester() {
       } satisfies RegexRequest);
     }, DEBOUNCE_MS);
 
-    return () => clearTimeout(debounce);
+    // The watchdog outlives the debounce once a request is in flight; left running it kills the worker mid-answer and blames backtracking.
+    return () => {
+      clearTimeout(debounce);
+      if (watchdogRef.current) clearTimeout(watchdogRef.current);
+      watchdogRef.current = null;
+    };
   }, [pattern, flags, text]);
 
-  useEffect(() => () => workerRef.current?.terminate(), []);
+  useEffect(
+    () => () => {
+      if (watchdogRef.current) clearTimeout(watchdogRef.current);
+      workerRef.current?.terminate();
+    },
+    []
+  );
 
   const result = useMemo(() => {
     if (!matchState) return null;

@@ -58,6 +58,8 @@ export default function ImageToText() {
     setFiles(list);
     setResults([]);
     setEdited(null);
+    // A viewer left open on an index the new, shorter selection has no image for would stick open on nothing.
+    setViewerIndex(null);
     setPreviews(list.map((f) => URL.createObjectURL(f)));
   };
 
@@ -143,6 +145,7 @@ export default function ImageToText() {
     setPreviews([]);
     setResults([]);
     setEdited(null);
+    setViewerIndex(null);
   };
 
   const averageConfidence = results.length

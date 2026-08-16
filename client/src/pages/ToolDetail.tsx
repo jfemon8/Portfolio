@@ -21,7 +21,10 @@ export default function ToolDetail() {
   const categoryLabel =
     categoriesData?.data.find((c) => c.slug === tool?.category)?.name ??
     tool?.category;
-  const st = useSiteCopy('states', { toolNotFound: 'Tool Not Found.' });
+  const st = useSiteCopy('states', {
+    toolNotFound: 'Tool Not Found.',
+    toolUnavailable: 'This Tool Is Not Available Yet.',
+  });
   const lab = useSiteCopy('labels', {
     btnBack: 'Back',
     backToTools: 'Back To Tools',
@@ -88,15 +91,20 @@ export default function ToolDetail() {
 
         <Reveal delay={0.06}>
           <div className="mt-8">
-            <Suspense
-              fallback={
-                <div className="grid min-h-[30vh] place-items-center">
-                  <Spinner />
-                </div>
-              }
-            >
-              <Component />
-            </Suspense>
+            {/* A row whose key has no component yet would otherwise render <undefined /> and take the page down. */}
+            {Component ? (
+              <Suspense
+                fallback={
+                  <div className="grid min-h-[30vh] place-items-center">
+                    <Spinner />
+                  </div>
+                }
+              >
+                <Component />
+              </Suspense>
+            ) : (
+              <ErrorState message={st.toolUnavailable} />
+            )}
           </div>
         </Reveal>
       </Section>

@@ -17,6 +17,13 @@ import {
 import { useTools, useCategories } from '@/hooks/usePortfolio';
 import { cn } from '@/lib/cn';
 
+/** The jobs finder lives at its own route, so its card is declared here rather than coming from the Tool collection. */
+const JOBS_CARD = {
+  title: 'Job Circular Finder',
+  category: 'career',
+  label: 'Career',
+};
+
 export default function Tools() {
   const [filter, setFilter] = useState('all');
   const { data, isLoading, isError, refetch } = useTools();
@@ -37,6 +44,8 @@ export default function Tools() {
   );
   const tools =
     filter === 'all' ? all : all.filter((t) => t.category === filter);
+  // The jobs finder is its own page rather than a Tool row, so it is filtered by hand instead of by the query.
+  const showJobsCard = filter === 'all' || filter === JOBS_CARD.category;
 
   const copy = useSectionCopy('tools', {
     index: '~/tools',
@@ -63,7 +72,10 @@ export default function Tools() {
           collectionPageSchema(
             'Tools',
             '/tools',
-            all.map((t) => ({ name: t.name, path: `/tools/${t.slug}` })),
+            [
+              { name: JOBS_CARD.title, path: '/tools/jobs' },
+              ...all.map((t) => ({ name: t.name, path: `/tools/${t.slug}` })),
+            ],
             copy.subtitle
           ),
         ]}
@@ -96,36 +108,40 @@ export default function Tools() {
 
         {isLoading && <CardGridSkeleton />}
         {isError && <ErrorState onRetry={() => void refetch()} />}
-        {!isLoading && !isError && tools.length === 0 && (
+        {!isLoading && !isError && tools.length === 0 && !showJobsCard && (
           <EmptyState message={st.toolsFilterEmpty} />
         )}
 
         <div className="grid auto-rows-[1fr] gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {filter === 'all' && (
-            <PrefetchLink to="/tools/jobs" className="group block h-full">
-              <GlassCard interactive className="flex h-full flex-col p-5">
-                <div className="flex items-center justify-between">
-                  <span className="grid h-10 w-10 place-items-center rounded-xl border border-border/60 bg-background/40 text-neon">
-                    <BriefcaseBusiness className="h-5 w-5" />
-                  </span>
-                  <span className="rounded-full border border-border/60 bg-card/60 px-2.5 py-1 text-2xs text-muted-foreground backdrop-blur-md">
-                    Career
-                  </span>
-                </div>
+          {showJobsCard && (
+            <Reveal>
+              <PrefetchLink to="/tools/jobs" className="group block h-full">
+                <GlassCard interactive className="flex h-full flex-col p-5">
+                  <div className="flex items-center justify-between">
+                    <span className="grid h-10 w-10 place-items-center rounded-xl border border-border/60 bg-background/40 text-neon">
+                      <BriefcaseBusiness className="h-5 w-5" />
+                    </span>
+                    <span className="rounded-full border border-border/60 bg-card/60 px-2.5 py-1 text-2xs text-muted-foreground backdrop-blur-md">
+                      {categoryOptions.find(
+                        (c) => c.slug === JOBS_CARD.category
+                      )?.name ?? JOBS_CARD.label}
+                    </span>
+                  </div>
 
-                <h3 className="mt-4 text-lg font-bold text-foreground transition-colors group-hover:text-neon">
-                  Job Circular Finder
-                </h3>
-                <p className="mt-1 flex-1 text-sm leading-relaxed text-muted-foreground line-clamp-2">
-                  Government circulars, company career pages and remote roles —
-                  collected and de-duplicated every night.
-                </p>
+                  <h3 className="mt-4 text-lg font-bold text-foreground transition-colors group-hover:text-neon">
+                    {JOBS_CARD.title}
+                  </h3>
+                  <p className="mt-1 flex-1 text-sm leading-relaxed text-muted-foreground line-clamp-2">
+                    Government circulars, company career pages and remote roles
+                    — collected and de-duplicated every night.
+                  </p>
 
-                <span className="mt-4 flex items-center gap-1 text-sm font-medium text-neon">
-                  Open <ArrowUpRight className="h-4 w-4" />
-                </span>
-              </GlassCard>
-            </PrefetchLink>
+                  <span className="mt-4 flex items-center gap-1 text-sm font-medium text-neon">
+                    Open <ArrowUpRight className="h-4 w-4" />
+                  </span>
+                </GlassCard>
+              </PrefetchLink>
+            </Reveal>
           )}
           {tools.map((t, i) => (
             <Reveal key={t._id} delay={i * 0.05}>
