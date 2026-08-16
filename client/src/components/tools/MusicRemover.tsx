@@ -419,10 +419,9 @@ export default function MusicRemover() {
             </a>
           </div>
           <p className="text-2xs text-muted-foreground/70">
-            Real machine-learning separation (UVR-MDX-NET), not a filter — but a
-            browser running one CPU core will never match a paid, GPU-backed
-            service. Expect good results on typical pop/rock mixes and more
-            bleed on dense or mono ones.
+            Real machine-learning separation (UVR-MDX-NET), not a filter. Expect
+            good results on typical pop/rock mixes and more bleed on dense or
+            mono ones.
           </p>
         </motion.div>
       )}

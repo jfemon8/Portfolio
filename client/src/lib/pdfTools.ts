@@ -7,7 +7,7 @@ export interface PdfSummary {
   sizeBytes: number;
 }
 
-async function loadPdf(bytes: ArrayBuffer): Promise<PDFDocument> {
+export async function loadPdf(bytes: ArrayBuffer): Promise<PDFDocument> {
   try {
     return await PDFDocument.load(bytes);
   } catch (err) {

@@ -202,7 +202,8 @@ export type ToolKey =
   | 'resume-ats-xray'
   | 'pdf-power-tools'
   | 'music-remover'
-  | 'email-verifier';
+  | 'email-verifier'
+  | 'image-to-text';
 
 export type ToolIcon =
   | 'KeyRound'
@@ -218,7 +219,8 @@ export type ToolIcon =
   | 'FileSearch'
   | 'FileStack'
   | 'Mic2'
-  | 'MailCheck';
+  | 'MailCheck'
+  | 'ScanText';
 
 export interface Tool {
   name: string;

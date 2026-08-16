@@ -20,4 +20,5 @@ export const TOOL_COMPONENTS: Record<ToolKey, ComponentType> = {
   'pdf-power-tools': lazy(() => import('@/components/tools/PdfPowerTools')),
   'music-remover': lazy(() => import('@/components/tools/MusicRemover')),
   'email-verifier': lazy(() => import('@/components/tools/EmailVerifier')),
+  'image-to-text': lazy(() => import('@/components/tools/ImageToText')),
 };

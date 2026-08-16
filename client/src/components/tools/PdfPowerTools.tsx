@@ -7,12 +7,14 @@ import MergeTab from './pdf-power-tools/MergeTab';
 import SplitTab from './pdf-power-tools/SplitTab';
 import CompressTab from './pdf-power-tools/CompressTab';
 import SignTab from './pdf-power-tools/SignTab';
+import EditTab from './pdf-power-tools/EditTab';
 
 const TABS = [
   { key: 'merge', label: 'Merge' },
   { key: 'split', label: 'Split' },
   { key: 'compress', label: 'Compress' },
   { key: 'sign', label: 'Sign' },
+  { key: 'edit', label: 'Edit' },
 ] as const;
 
 type TabKey = (typeof TABS)[number]['key'];
@@ -26,7 +28,7 @@ export default function PdfPowerTools() {
         <ShieldCheck className="h-4 w-4 shrink-0 translate-y-0.5 text-neon" />
         <p>
           Every PDF you drop here is never uploaded anywhere. Merging,
-          splitting, compressing, and signing all happen securely.
+          splitting, compressing, signing, and editing all happen securely.
         </p>
       </div>
 
@@ -70,6 +72,7 @@ export default function PdfPowerTools() {
         {tab === 'split' && <SplitTab />}
         {tab === 'compress' && <CompressTab />}
         {tab === 'sign' && <SignTab />}
+        {tab === 'edit' && <EditTab />}
       </motion.div>
     </GlassCard>
   );

@@ -462,7 +462,8 @@ export type ToolKey =
   | 'resume-ats-xray'
   | 'pdf-power-tools'
   | 'music-remover'
-  | 'email-verifier';
+  | 'email-verifier'
+  | 'image-to-text';
 
 export type ToolIcon =
   | 'KeyRound'
@@ -478,7 +479,8 @@ export type ToolIcon =
   | 'FileSearch'
   | 'FileStack'
   | 'Mic2'
-  | 'MailCheck';
+  | 'MailCheck'
+  | 'ScanText';
 
 /** Admin-editable metadata for a public /tools entry; the tool's actual behavior lives in code under client/src/components/tools, keyed by `key`. */
 export interface ITool {

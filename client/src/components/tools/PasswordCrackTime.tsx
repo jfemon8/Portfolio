@@ -217,11 +217,11 @@ export default function PasswordCrackTime() {
                   <span>Benchmarking this device…</span>
                 ) : (
                   <span>
-                    This browser just computed{' '}
+                    The result is{' '}
                     <span className="font-mono font-semibold text-neon">
                       {Math.round(hashesPerSecond).toLocaleString()}
                     </span>{' '}
-                    SHA-256 hashes/sec, right now, on this device.
+                    SHA-256 hashes/sec, right now.
                   </span>
                 )}
               </div>

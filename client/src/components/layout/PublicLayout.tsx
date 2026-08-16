@@ -51,7 +51,6 @@ export default function PublicLayout() {
   // Waits for the `/#section` target to mount, lands on it, then keeps re-snapping while sections above are still fetching and reflowing taller.
   useEffect(() => {
     if (!hash) {
-      // Only restore on browser back/forward (POP) — a fresh link click (PUSH) always lands at the top like a new page should.
       const saved = navigationType === 'POP' ? getScroll(pathname) : undefined;
       if (saved == null) {
         resetScroll();

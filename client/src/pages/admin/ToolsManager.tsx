@@ -20,6 +20,7 @@ const KEY_OPTIONS = [
   { value: 'pdf-power-tools', label: 'PDF Power-Tools' },
   { value: 'music-remover', label: 'Music Remover' },
   { value: 'email-verifier', label: 'Email Extractor & Verifier' },
+  { value: 'image-to-text', label: 'Image-to-Text (OCR)' },
 ];
 
 // Two-panel /admin/tools view (Tools + Categories tabs), mirroring SkillsManager's Skills/Categories split.
