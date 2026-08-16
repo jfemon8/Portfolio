@@ -111,3 +111,104 @@ export async function textToDocx(
     .join('');
   return packDocx(body, { title });
 }
+
+/** A recognised or extracted line, with the geometry alignment is derived from. */
+export interface LayoutLine {
+  text: string;
+  x: number;
+  right: number;
+  y: number;
+  size: number;
+}
+
+export type LayoutAlign = 'left' | 'center' | 'right';
+
+interface LayoutBlock {
+  text: string;
+  align: LayoutAlign;
+  indentChars: number;
+  gapBefore: boolean;
+}
+
+/** Reads the alignment a line was laid out with, measured against the text block's own margins. */
+function analyseLayout(lines: LayoutLine[], width: number): LayoutBlock[] {
+  if (!lines.length) return [];
+  const bodyLeft = lines.reduce((min, l) => Math.min(min, l.x), width);
+  const bodyRight = lines.reduce((max, l) => Math.max(max, l.right), 0);
+  const span = Math.max(1, bodyRight - bodyLeft);
+  const median =
+    [...lines].map((l) => l.size).sort((a, b) => a - b)[
+      Math.floor(lines.length / 2)
+    ] ?? 12;
+
+  return lines.map((line, i) => {
+    const leftGap = line.x - bodyLeft;
+    const rightGap = bodyRight - line.right;
+    const lineWidth = line.right - line.x;
+    let align: LayoutAlign = 'left';
+    // Centred text leaves a similar margin on both sides without filling the column.
+    if (
+      lineWidth < span * 0.85 &&
+      Math.abs(leftGap - rightGap) < span * 0.08 &&
+      leftGap > span * 0.06
+    )
+      align = 'center';
+    else if (leftGap > span * 0.2 && rightGap < span * 0.05) align = 'right';
+
+    const previous = lines[i - 1];
+    return {
+      text: line.text,
+      align,
+      // Indentation is expressed in characters so plain text can show it too.
+      indentChars: align === 'left' ? Math.round(leftGap / (median * 0.55)) : 0,
+      gapBefore: Boolean(previous && line.y - previous.y > median * 2.1),
+    };
+  });
+}
+
+/** Plain-text rendering that keeps centring and indents using spaces. */
+export function layoutToText(lines: LayoutLine[], width: number): string {
+  const blocks = analyseLayout(lines, width);
+  const columns = 78;
+  return blocks
+    .map((block) => {
+      const prefix = block.gapBefore ? '\n' : '';
+      if (block.align === 'center')
+        return (
+          prefix +
+          ' '.repeat(
+            Math.max(0, Math.floor((columns - block.text.length) / 2))
+          ) +
+          block.text
+        );
+      if (block.align === 'right')
+        return (
+          prefix +
+          ' '.repeat(Math.max(0, columns - block.text.length)) +
+          block.text
+        );
+      return prefix + ' '.repeat(Math.max(0, block.indentChars)) + block.text;
+    })
+    .join('\n');
+}
+
+/** Same layout, but as real Word paragraphs with genuine alignment and indents. */
+export async function layoutToDocx(
+  lines: LayoutLine[],
+  width: number,
+  title: string
+): Promise<Uint8Array> {
+  const body = analyseLayout(lines, width)
+    .map((block) => {
+      const font = /[ঀ-৿]/.test(block.text) ? 'Nirmala UI' : 'Calibri';
+      const jc = block.align === 'left' ? '' : `<w:jc w:val="${block.align}"/>`;
+      const indent =
+        block.indentChars > 1
+          ? `<w:ind w:left="${block.indentChars * 110}"/>`
+          : '';
+      const spacing = `<w:spacing w:after="${block.gapBefore ? 160 : 60}"/>`;
+      return `<w:p><w:pPr>${jc}${indent}${spacing}</w:pPr><w:r><w:rPr><w:rFonts w:ascii="${font}" w:hAnsi="${font}" w:cs="${font}"/><w:sz w:val="22"/><w:szCs w:val="22"/></w:rPr><w:t xml:space="preserve">${escapeXml(block.text)}</w:t></w:r></w:p>`;
+    })
+    .join('');
+  return packDocx(body, { title });
+}

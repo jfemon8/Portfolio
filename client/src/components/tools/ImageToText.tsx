@@ -7,17 +7,20 @@ import {
   FileText,
   ImageIcon,
   Loader2,
+  Maximize2,
   ShieldCheck,
   Trash2,
 } from 'lucide-react';
 import GlassCard from '@/components/shared/GlassCard';
+import Lightbox from '@/components/shared/Lightbox';
 import { downloadBytes } from '@/lib/pdfTools';
-import { textToDocx } from '@/lib/docxWriter';
+import { layoutToDocx, textToDocx } from '@/lib/docxWriter';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/cn';
 import {
   ocrImages,
   OCR_LANGUAGES,
+  OCR_USABLE_CONFIDENCE,
   type OcrLanguage,
   type OcrImageResult,
 } from '@/lib/pdfOcr';
@@ -36,6 +39,7 @@ export default function ImageToText() {
   const [copied, setCopied] = useState(false);
   const [saving, setSaving] = useState(false);
   const [dragging, setDragging] = useState(false);
+  const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // One owner for the blob URLs: this cleanup runs on every replacement and on unmount.
@@ -69,7 +73,17 @@ export default function ImageToText() {
       );
       setResults(out);
       const words = out.reduce((sum, r) => sum + r.text.split(/\s+/).length, 0);
-      toast.success(`Read ${words} words from ${out.length} image(s)`);
+      const mean =
+        out.reduce((sum, r) => sum + r.confidence, 0) / (out.length || 1);
+      if (out.some((r) => r.mode === 'handwriting-unavailable'))
+        toast.error('Bengali handwriting cannot be read yet — printed only.');
+      else if (out.some((r) => r.mode === 'handwriting'))
+        toast.success(`Read ${words} words as handwriting`);
+      else if (mean < OCR_USABLE_CONFIDENCE)
+        toast.error(
+          'Barely readable — try a sharper, flatter, better-lit shot.'
+        );
+      else toast.success(`Read ${words} words from ${out.length} image(s)`);
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : 'Could not read those images.'
@@ -103,7 +117,12 @@ export default function ImageToText() {
   const saveDocx = async (): Promise<void> => {
     setSaving(true);
     try {
-      const bytes = await textToDocx(text, baseName);
+      // Untouched output keeps its real alignment; a hand-edited one is plain text again.
+      const layout = results.flatMap((r) => r.lines);
+      const bytes =
+        edited === null && layout.length
+          ? await layoutToDocx(layout, results[0]?.width ?? 1000, baseName)
+          : await textToDocx(text, baseName);
       downloadBytes(
         bytes,
         `${baseName}.docx`,
@@ -129,6 +148,14 @@ export default function ImageToText() {
   const averageConfidence = results.length
     ? Math.round(results.reduce((s, r) => s + r.confidence, 0) / results.length)
     : 0;
+  const handwritten = results.some((r) => r.mode === 'handwriting');
+  const noBengaliModel = results.some(
+    (r) => r.mode === 'handwriting-unavailable'
+  );
+  const unusable =
+    results.length > 0 &&
+    !handwritten &&
+    averageConfidence < OCR_USABLE_CONFIDENCE;
 
   return (
     <GlassCard className="p-6">
@@ -166,6 +193,9 @@ export default function ImageToText() {
         <span className="text-2xs text-muted-foreground/70">
           PNG, JPG, WebP, BMP or GIF · several at once is fine
         </span>
+        <span className="text-2xs text-muted-foreground/60">
+          Handwriting is read too — English only.
+        </span>
       </div>
       <input
         ref={inputRef}
@@ -182,12 +212,22 @@ export default function ImageToText() {
       {previews.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-2">
           {previews.map((url, i) => (
-            <img
+            <button
               key={url}
-              src={url}
-              alt={`Selected ${i + 1}`}
-              className="h-20 w-20 rounded-lg border border-border/60 object-cover"
-            />
+              type="button"
+              onClick={() => setViewerIndex(i)}
+              aria-label={`View image ${i + 1} full screen`}
+              className="group relative h-20 w-20 overflow-hidden rounded-lg border border-border/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              <img
+                src={url}
+                alt={`Selected ${i + 1}`}
+                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+              <span className="absolute inset-0 grid place-items-center bg-background/50 opacity-0 backdrop-blur-[1px] transition-opacity group-hover:opacity-100">
+                <Maximize2 className="h-4 w-4 text-foreground" />
+              </span>
+            </button>
           ))}
         </div>
       )}
@@ -233,9 +273,25 @@ export default function ImageToText() {
       {results.length > 0 && (
         <div className="mt-5">
           <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-            <span className="text-xs text-muted-foreground">
-              Average confidence {averageConfidence}%
-              {averageConfidence < 70 && ' — try a sharper or larger image'}
+            <span
+              className={cn(
+                'text-xs',
+                unusable || noBengaliModel
+                  ? 'text-destructive'
+                  : 'text-muted-foreground'
+              )}
+            >
+              {handwritten
+                ? 'Read as handwriting — check it against the image before using it.'
+                : noBengaliModel
+                  ? 'This looks like Bengali handwriting, which no available model can read yet. Printed Bengali works fine.'
+                  : `Average confidence ${averageConfidence}%${
+                      unusable
+                        ? ' — this looks unreadable. Try a sharper, flatter, better-lit shot.'
+                        : averageConfidence < 75
+                          ? ' — try a sharper, flatter, better-lit photo'
+                          : ''
+                    }`}
             </span>
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => void copy()}>
@@ -274,6 +330,16 @@ export default function ImageToText() {
           />
         </div>
       )}
+
+      <Lightbox
+        images={previews.map((url, i) => ({
+          url,
+          caption: files[i]?.name,
+        }))}
+        open={viewerIndex !== null}
+        startIndex={viewerIndex ?? 0}
+        onClose={() => setViewerIndex(null)}
+      />
     </GlassCard>
   );
 }

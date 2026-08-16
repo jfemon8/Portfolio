@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { X, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
@@ -56,7 +57,8 @@ export default function Lightbox({
   const img = images[i];
   const many = images.length > 1;
 
-  return (
+  // Portalled to <body>: fixed positioning otherwise anchors to a transformed Reveal/motion ancestor.
+  return createPortal(
     <AnimatePresence>
       {open && img && (
         <motion.div
@@ -139,22 +141,36 @@ export default function Lightbox({
               minScale={1}
               maxScale={4}
               centerOnInit
+              centerZoomedOut
               doubleClick={{ mode: 'toggle' }}
-              panning={{ velocityDisabled: true }}
+              // One finger drags the image only once it is zoomed in, so a swipe on a fitted image still reaches the page.
+              panning={{ velocityDisabled: true, disabled: false }}
               wheel={{ step: 0.2 }}
               pinch={{ step: 5 }}
             >
+              {/* The wrapper fills the slot and the content centres inside it, otherwise a short image sits against the top-left. */}
               <TransformComponent
-                wrapperStyle={{ maxHeight: '78vh', maxWidth: '100%' }}
-                contentStyle={{ justifyContent: 'center', width: '100%' }}
+                wrapperStyle={{
+                  width: '100%',
+                  height: '72vh',
+                  maxWidth: '100%',
+                  // Without its own touch-action the browser claims the gesture and the two-finger pinch never fires.
+                  touchAction: 'none',
+                }}
+                contentStyle={{
+                  width: '100%',
+                  height: '100%',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
               >
-                {/* Shorter cap on phones so the caption and counter still fit under the image. */}
+                {/* Fills the slot and letterboxes inside it, so portrait and landscape both sit centred at their true aspect. */}
                 <SmartImage
                   src={img.url}
                   alt={img.caption || `Image ${i + 1}`}
                   priority
                   imgWidth={1600}
-                  className="mx-auto max-h-[68vh] w-auto max-w-full rounded-xl border border-border/70 object-contain sm:max-h-[78vh]"
+                  className="h-full max-h-full w-full max-w-full rounded-xl border border-border/70 object-contain"
                 />
               </TransformComponent>
             </TransformWrapper>
@@ -171,6 +187,7 @@ export default function Lightbox({
           </motion.figure>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }
