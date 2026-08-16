@@ -125,7 +125,7 @@ export default function ProjectDetail() {
             </span>
           </div>
 
-          <h1 className="mt-5 text-balance text-3xl font-extrabold tracking-tight text-foreground sm:text-5xl">
+          <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-foreground md:text-5xl">
             {p.title}
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">{p.tagline}</p>

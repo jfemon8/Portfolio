@@ -42,7 +42,7 @@ export default function About({ profile }: { profile?: ProfileDoc }) {
 
       <div className="grid gap-6 sm:gap-10 lg:grid-cols-[1.4fr_1fr]">
         <Reveal>
-          <p className="text-balance text-lg leading-relaxed text-muted-foreground">
+          <p className="text-lg leading-relaxed text-muted-foreground">
             {profile?.summary}
           </p>
 

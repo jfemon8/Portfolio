@@ -39,5 +39,8 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "react-zoom-pan-pinch": "^4.0.4"
   }
 }

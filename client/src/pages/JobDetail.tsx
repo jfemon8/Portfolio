@@ -137,7 +137,7 @@ export default function JobDetail() {
           </div>
 
           {/* Bengali circular headlines run long and have few break points, so wrapping is forced. */}
-          <h1 className="mt-5 text-balance break-words text-2xl font-extrabold leading-tight tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+          <h1 className="mt-4 break-words text-2xl font-extrabold leading-tight tracking-tight text-foreground sm:text-4xl lg:text-5xl">
             {job.title}
           </h1>
           <p className="mt-3 break-words text-base font-semibold text-neon sm:text-lg">

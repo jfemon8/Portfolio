@@ -89,7 +89,7 @@ export default function HeroPremium({
 
             <motion.h1
               {...rise(0.06)}
-              className="mt-4 text-balance text-4xl font-extrabold leading-[1.05] tracking-tight md:text-6xl lg:text-7xl"
+              className="mt-4 text-4xl font-extrabold leading-[1.05] tracking-tight md:text-6xl lg:text-7xl"
             >
               {hero.greeting}{' '}
               <span className="gradient-text">
