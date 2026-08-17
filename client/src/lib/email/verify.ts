@@ -100,10 +100,7 @@ export interface VerifyOptions {
   concurrency?: number;
   onProgress?: (progress: VerifyProgress) => void;
   shouldStop?: () => boolean;
-  /**
-   * Known domain lookups from an earlier run. This deliberately lives in memory
-   * in the UI, never in persistent storage, and contains domains only.
-   */
+  /** Known domain lookups from an earlier run. This deliberately lives in memory in the UI, never in persistent storage, and contains domains only. */
   domainCache?: ReadonlyMap<string, DomainInfo>;
 }
 

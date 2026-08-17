@@ -123,8 +123,7 @@ function toCsv(rows: VerifiedEmail[]): string {
     'free_provider',
     'suggested_domain',
   ];
-  // Excel treats cells beginning with these characters as formulas, even when
-  // quoted. Keep exports safe when an untrusted list is opened in a spreadsheet.
+  // Excel treats cells beginning with these characters as formulas, even when quoted. Keep exports safe when an untrusted list is opened in a spreadsheet.
   const esc = (v: string | number) => {
     const value = String(v);
     const safeValue = /^[=+\-@]/.test(value) ? `'${value}` : value;
@@ -263,8 +262,7 @@ export default function EmailVerifier() {
   }, [results, filter, query]);
 
   const replaceText = useCallback((next: string): void => {
-    // Input and results always belong to the same batch. Invalidate any work
-    // immediately so an old worker can never overwrite a newly pasted list.
+    // Input and results always belong to the same batch. Invalidate any work immediately so an old worker can never overwrite a newly pasted list.
     scanIdRef.current++;
     scanWorkerRef.current?.terminate();
     scanWorkerRef.current = null;

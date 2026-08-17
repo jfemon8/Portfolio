@@ -40,9 +40,7 @@ export default function Home() {
 
   // Hash-scroll for `/#section` is handled centrally by PublicLayout.
 
-  /*
-   * Loading state
-   */
+  // Loading state
   if (isLoading) {
     return (
       <div className="grid min-h-[70vh] place-items-center">
@@ -51,9 +49,7 @@ export default function Home() {
     );
   }
 
-  /*
-   * Error state
-   */
+  // Error state
   if (isError) {
     return (
       <div className="grid min-h-[70vh] place-items-center">
@@ -62,9 +58,7 @@ export default function Home() {
     );
   }
 
-  /*
-   * HOME_SECTIONS remains the source of truth.
-   */
+  // HOME_SECTIONS remains the source of truth.
   const sectionEl: Record<string, ReactNode> = {
     about: <About profile={profile} />,
     skills: <Skills />,
@@ -92,9 +86,7 @@ export default function Home() {
       ]
     : known;
 
-  /*
-   * Render page
-   */
+  // Render page
   return (
     <>
       <Seo

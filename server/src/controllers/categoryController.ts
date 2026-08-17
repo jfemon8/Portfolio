@@ -6,10 +6,7 @@ import type { CategoryScope } from '../types/index.js';
 
 type DefaultCategory = { name: string; slug: string; order: number };
 
-/** The legacy enum values that pre-existing Skill rows reference. Seeded
- *  once on first read so the public Skills section keeps rendering the
- *  same category tabs out of the box. Admins can rename / reorder / add /
- *  delete them freely after that. */
+/** The legacy enum values that pre-existing Skill rows reference. Seeded once on first read so the public Skills section keeps rendering the same category tabs out of the box. Admins can rename / reorder / add / delete them freely after that. */
 const DEFAULT_SKILL_CATEGORIES: DefaultCategory[] = [
   { name: 'Languages', slug: 'language', order: 0 },
   { name: 'Frameworks', slug: 'framework', order: 1 },

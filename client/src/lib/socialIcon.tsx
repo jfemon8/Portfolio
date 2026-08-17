@@ -40,8 +40,7 @@ import type { Social } from '@/types';
 
 type IconComponent = ComponentType<{ className?: string }>;
 
-// Order matters: matchIconKey does substring checks, so more specific keys
-// (e.g. "leetcode") must precede substrings they contain (e.g. "code").
+// Order matters: matchIconKey does substring checks, so more specific keys (e.g. "leetcode") must precede substrings they contain (e.g. "code").
 const iconMap: Record<string, IconComponent> = {
   github: Github,
   linkedin: Linkedin,

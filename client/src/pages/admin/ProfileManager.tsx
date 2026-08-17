@@ -96,8 +96,7 @@ export default function ProfileManager() {
     }));
   };
 
-  /** Socials get their own setters — they carry image-upload fields too,
-   *  so the generic `Record<string,string>` setArr doesn't fit cleanly. */
+  /** Socials get their own setters — they carry image-upload fields too, so the generic `Record<string,string>` setArr doesn't fit cleanly. */
   const setSocial = <K extends keyof Social>(
     idx: number,
     field: K,

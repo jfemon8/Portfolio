@@ -48,11 +48,29 @@ const ENGINE_CONFIG = [
   'debug_file /dev/null',
 ].join('\n');
 
+/** Must track the tesseract.js-core version tesseract.js itself resolves, or the glue and the worker disagree. */
+const CORE_CDN = 'https://cdn.jsdelivr.net/npm/tesseract.js-core@7.0.0';
+
+/** The SIMD probe from wasm-feature-detect, which is what tesseract.js uses to choose a build. */
+const supportsSimd = (): boolean =>
+  WebAssembly.validate(
+    new Uint8Array([
+      0, 97, 115, 109, 1, 0, 0, 0, 1, 5, 1, 96, 0, 1, 123, 3, 2, 1, 0, 10, 10,
+      1, 8, 0, 65, 0, 253, 15, 253, 98, 11,
+    ])
+  );
+
+/** Names the core file explicitly, which skips tesseract.js's own auto-selection. Its relaxed-SIMD build imports DotProductSSE, a symbol none of the v7.0.0 wasm binaries define, so recognition aborts on any browser that reports relaxed SIMD. */
+const corePath = (): string =>
+  `${CORE_CDN}/tesseract-core${supportsSimd() ? '-simd' : ''}-lstm.wasm.js`;
+
 /** Bengali needs the accurate models; English alone does not, and they cost several megabytes. */
 const workerOptionsFor = (
   language: OcrLanguage
-): { langPath?: string; gzip?: boolean } =>
-  language.includes('ben') ? { langPath: BEST_MODELS } : {};
+): { langPath?: string; corePath: string } => ({
+  corePath: corePath(),
+  ...(language.includes('ben') ? { langPath: BEST_MODELS } : {}),
+});
 
 /** Infers the language from the document; Bangladeshi paperwork is usually mixed, so both models load together. */
 export const detectOcrLanguage = (sampleText: string): OcrLanguage => {

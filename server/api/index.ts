@@ -1,9 +1,4 @@
-/**
- * Vercel serverless entry point.
- *
- * vercel.json routes every request here. We lazily ensure a cached Mongo
- * connection on each cold start, then hand the request to the Express app.
- */
+/** Vercel serverless entry point. vercel.json routes every request here. We lazily ensure a cached Mongo connection on each cold start, then hand the request to the Express app. */
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import app from '../src/app.js';
 import { connectDB } from '../src/config/db.js';

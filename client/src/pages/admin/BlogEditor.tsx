@@ -14,9 +14,7 @@ import type { ApiError, BlogPostDoc, ItemResponse } from '@/types';
 
 type BlogForm = Partial<BlogPostDoc>;
 
-/** Format an ISO instant as a `datetime-local` value in the admin's LOCAL
- *  wall-clock time (the input has no timezone; `toISOString` would show UTC
- *  and misrepresent the scheduled time for non-UTC admins). */
+/** Format an ISO instant as a `datetime-local` value in the admin's LOCAL wall-clock time (the input has no timezone; `toISOString` would show UTC and misrepresent the scheduled time for non-UTC admins). */
 const toLocalInput = (iso?: string): string => {
   if (!iso) return '';
   const d = new Date(iso);

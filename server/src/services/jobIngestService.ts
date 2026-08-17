@@ -243,8 +243,7 @@ export async function syncConfiguredJobFeeds(
           [],
         ];
       }
-      // Leaves room to persist before the serverless function is killed; a source
-      // skipped here simply runs first on the next pass.
+      // Leaves room to persist before the serverless function is killed; a source skipped here simply runs first on the next pass.
       if (Date.now() - startedAt > RUN_BUDGET_MS) {
         return [
           {
