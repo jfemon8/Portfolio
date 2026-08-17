@@ -6,7 +6,7 @@ export default function RelatedTools({ tools }: { tools: ToolDoc[] }) {
   if (!tools.length) return null;
 
   return (
-    <section aria-labelledby="tool-related" className="mt-12">
+    <section aria-labelledby="tool-related" className="mt-4">
       <h2
         id="tool-related"
         className="text-xl font-bold tracking-tight text-foreground"

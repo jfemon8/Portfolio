@@ -16,7 +16,7 @@ import { cn } from '@/lib/cn';
 const TIME_CLAIMS = new Set(['exp', 'iat', 'nbf']);
 
 const SAMPLE_JWT =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjE5MDAwMDAwMDB9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpGIEVtb24iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MTYyMzkwMjIsImV4cCI6NDEwMjQ0NDgwMH0.ZbaldMDDH0DqL9F9GoXrgo3SxUVqxSjLSSF-Nnu3vmI';
 
 function base64UrlDecode(input: string): string {
   const base64 = input
