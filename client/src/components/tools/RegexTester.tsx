@@ -41,13 +41,13 @@ const PRESETS = [
     label: 'Email',
     pattern: '[\\w.+-]+@[\\w-]+\\.[a-zA-Z]{2,}',
     flags: 'g',
-    sample: 'Contact us at hello@example.com or support@test.co',
+    sample: 'Contact us at jfemon8@gmail.com or jfemon8@yahoo.com',
   },
   {
     label: 'URL',
     pattern: 'https?:\\/\\/[^\\s]+',
     flags: 'g',
-    sample: 'Visit https://example.com or http://test.dev/path?q=1',
+    sample: 'Visit https://jfemon.vercel.app/ or https://jfemon.pro.bd/',
   },
   {
     label: 'IPv4 address',
@@ -65,13 +65,13 @@ const PRESETS = [
     label: 'Date (YYYY-MM-DD)',
     pattern: '(\\d{4})-(\\d{2})-(\\d{2})',
     flags: 'g',
-    sample: 'Sprint runs 2024-01-15 through 2024-01-29',
+    sample: 'Sprint runs 2000-11-13 through 2026-02-20',
   },
   {
-    label: 'Phone (US)',
+    label: 'Phone (BD)',
     pattern: '\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}',
     flags: 'g',
-    sample: 'Call (555) 123-4567 or 555.987.6543',
+    sample: 'Call (+880) 1735 626 822',
   },
 ];
 
