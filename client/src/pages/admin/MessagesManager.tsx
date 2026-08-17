@@ -128,8 +128,24 @@ export default function MessagesManager() {
     if (!m.read) patch.mutate({ id: m._id, body: { read: true } });
   };
 
+  // Switching filters has to drop the open message: it belongs to the list you just left, so it would otherwise sit there under an empty list.
+  const selectFilter = (next: FilterKey): void => {
+    setFilter(next);
+    setActive(null);
+    setReply(null);
+  };
+
+  const emptyMessage =
+    filter === 'unread'
+      ? 'Nothing unread — you are all caught up.'
+      : filter === 'starred'
+        ? 'No starred messages yet.'
+        : filter === 'archived'
+          ? 'Nothing archived.'
+          : 'No messages yet. Submissions from your contact form land here.';
+
   const iconBtn =
-    'rounded-lg border border-border/70 p-2.5 text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon';
+    'grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-border/70 text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon';
 
   return (
     <div>
@@ -138,30 +154,38 @@ export default function MessagesManager() {
         subtitle={`Visitor submissions from the Contact form on your public site · ${data?.unread ?? 0} unread`}
       />
 
-      <div className="mb-5 flex flex-wrap gap-2">
+      {/* Scrolls instead of wrapping, so the four filters stay on one row on a phone rather than reflowing into a block. */}
+      <div className="-mx-1 mb-5 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {filters.map((ff) => (
           <button
             key={ff.k}
-            onClick={() => setFilter(ff.k)}
+            onClick={() => selectFilter(ff.k)}
+            aria-pressed={filter === ff.k}
             className={cn(
-              'rounded-full border px-4 py-1.5 text-sm backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105 transition-all',
+              'flex shrink-0 items-center gap-1.5 rounded-full border px-4 py-2 text-sm backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105 transition-all',
               filter === ff.k
                 ? 'border-primary/50 bg-primary/10 text-primary shadow-glow'
-                : 'border-border/70 text-muted-foreground hover:text-foreground'
+                : 'border-border/70 text-muted-foreground hover:border-primary/30 hover:text-foreground'
             )}
           >
             {ff.l}
+            {/* Only the unread count is shown, because it is the only one the list endpoint actually returns. */}
+            {ff.k === 'unread' && (data?.unread ?? 0) > 0 && (
+              <span className="rounded-full bg-neon/15 px-1.5 py-0.5 text-2xs font-semibold text-neon">
+                {data?.unread}
+              </span>
+            )}
           </button>
         ))}
       </div>
 
-      {isLoading && <Spinner />}
-      {!isLoading && messages.length === 0 && (
-        <EmptyState message="No messages here." />
-      )}
-
-      <div className="grid gap-4 grid-cols-1 lg:grid-cols-[20rem_1fr]">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[20rem_1fr]">
+        {/* The list column owns its own loading and empty states; rendering them above the grid stacked an empty card on top of an open message. */}
         <div className={cn('space-y-2', active && 'hidden lg:block')}>
+          {isLoading && <Spinner />}
+          {!isLoading && messages.length === 0 && (
+            <EmptyState message={emptyMessage} />
+          )}
           {messages.map((m) => (
             <button
               key={m._id}
@@ -217,12 +241,12 @@ export default function MessagesManager() {
             >
               <ChevronLeft className="h-4 w-4" /> Back to messages
             </button>
-            <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border/60 pb-4">
-              <div>
-                <h2 className="text-lg font-bold text-foreground">
+            <div className="flex flex-col gap-3 border-b border-border/60 pb-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <h2 className="break-words text-lg font-bold text-foreground">
                   {active.subject || '(no subject)'}
                 </h2>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="mt-1 break-words text-sm text-muted-foreground">
                   {active.name} ·{' '}
                   <a
                     href={`mailto:${active.email}`}
@@ -235,7 +259,7 @@ export default function MessagesManager() {
                   {formatDateTime(active.createdAt)}
                 </p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex shrink-0 gap-2">
                 <button
                   onClick={() =>
                     patch.mutate({
@@ -292,14 +316,14 @@ export default function MessagesManager() {
                     });
                     if (ok) del.mutate(active._id);
                   }}
-                  className="rounded-lg border border-border/70 p-2.5 text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
+                  className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-border/70 text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
                   title="Delete"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
             </div>
-            <p className="whitespace-pre-wrap py-5 text-sm leading-relaxed text-muted-foreground">
+            <p className="whitespace-pre-wrap break-words py-5 text-sm leading-relaxed text-muted-foreground">
               {active.message}
             </p>
             <div className="border-t border-border/60 pt-4">
@@ -374,9 +398,11 @@ export default function MessagesManager() {
             </div>
           </GlassCard>
         ) : (
-          <GlassCard className="hidden place-items-center p-10 text-muted-foreground/60 lg:grid">
-            Select a message to read
-          </GlassCard>
+          messages.length > 0 && (
+            <GlassCard className="hidden place-items-center p-10 text-muted-foreground/60 lg:grid">
+              Select a message to read
+            </GlassCard>
+          )
         )}
       </div>
     </div>
