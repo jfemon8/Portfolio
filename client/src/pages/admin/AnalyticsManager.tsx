@@ -131,7 +131,7 @@ export default function AnalyticsManager() {
         </GlassCard>
 
         <GlassCard className="p-4 sm:p-6">
-          <h3 className="mb-4 font-semibold text-foreground">By device</h3>
+          <h3 className="mb-4 font-semibold text-foreground">By Device</h3>
           <ResponsiveContainer width="100%" height={240}>
             <PieChart>
               <Pie
@@ -159,7 +159,7 @@ export default function AnalyticsManager() {
                   className="h-2.5 w-2.5 rounded-full"
                   style={{ background: COLORS[i % COLORS.length] }}
                 />
-                {d._id} ({d.count})
+                {d._id.charAt(0).toUpperCase() + d._id.slice(1)} ({d.count})
               </span>
             ))}
           </div>
@@ -177,7 +177,9 @@ export default function AnalyticsManager() {
                 >
                   <span className="flex items-center gap-2 text-muted-foreground">
                     <Icon className="h-4 w-4 text-neon" />
-                    {t._id.replace('_', ' ')}
+                    {t._id
+                      .replace(/_/g, ' ')
+                      .replace(/\b\w/g, (char) => char.toUpperCase())}
                   </span>
                   <span className="font-mono text-foreground">{t.count}</span>
                 </div>
@@ -187,7 +189,7 @@ export default function AnalyticsManager() {
         </GlassCard>
 
         <GlassCard className="p-4 sm:p-6 lg:col-span-2">
-          <h3 className="mb-4 font-semibold text-foreground">Top projects</h3>
+          <h3 className="mb-4 font-semibold text-foreground">Top Projects</h3>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={a.topProjects} layout="vertical">
               <XAxis type="number" stroke={axisStroke} fontSize={11} />
@@ -209,7 +211,7 @@ export default function AnalyticsManager() {
 
         <GlassCard className="p-4 sm:p-6 lg:col-span-3">
           <h3 className="mb-4 font-semibold text-foreground">
-            Visitor activity
+            Visitor Activity
           </h3>
           <Heatmap
             data={a.byDay.map((d) => ({ date: d.date, count: d.views }))}
@@ -219,7 +221,7 @@ export default function AnalyticsManager() {
         </GlassCard>
 
         <GlassCard className="p-4 sm:p-6 lg:col-span-2">
-          <h3 className="mb-4 font-semibold text-foreground">By country</h3>
+          <h3 className="mb-4 font-semibold text-foreground">By Country</h3>
           {byCountry.length === 0 ? (
             <p className="py-10 text-center text-sm text-muted-foreground">
               No country data yet.
@@ -251,7 +253,7 @@ export default function AnalyticsManager() {
         </GlassCard>
 
         <GlassCard className="p-4 sm:p-6">
-          <h3 className="mb-4 font-semibold text-foreground">By browser</h3>
+          <h3 className="mb-4 font-semibold text-foreground">By Browser</h3>
           {byBrowser.length === 0 ? (
             <p className="py-10 text-center text-sm text-muted-foreground">
               No data yet.
@@ -263,7 +265,11 @@ export default function AnalyticsManager() {
                   key={b._id}
                   className="flex items-center justify-between text-sm"
                 >
-                  <span className="text-muted-foreground">{b._id}</span>
+                  <span className="text-muted-foreground">
+                    {b._id
+                      ? b._id.charAt(0).toUpperCase() + b._id.slice(1)
+                      : ''}
+                  </span>
                   <span className="font-mono text-foreground">{b.count}</span>
                 </div>
               ))}
@@ -272,7 +278,7 @@ export default function AnalyticsManager() {
         </GlassCard>
 
         <GlassCard className="p-4 sm:p-6 lg:col-span-3">
-          <h3 className="font-semibold text-foreground">Scroll depth</h3>
+          <h3 className="font-semibold text-foreground">Scroll Depth</h3>
           <p className="mb-4 text-xs text-muted-foreground">
             How far visitors scroll through a page.
           </p>
