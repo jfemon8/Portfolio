@@ -56,10 +56,35 @@ export default function MessagesManager() {
       id: string;
       body: Partial<Pick<MessageDoc, 'read' | 'starred' | 'archived'>>;
     }) => (await api.patch(`/messages/${id}`, body)).data,
-    onSuccess: (_data, vars) => {
-      qc.invalidateQueries({ queryKey: ['messages'] });
-      // Keep the detail pane in sync.
+    // Applied before the round trip: on a slow link the icon otherwise sits unchanged long enough to read as a dead button.
+    onMutate: async (vars) => {
+      await qc.cancelQueries({ queryKey: ['messages'] });
+      const snapshot = qc.getQueriesData<ListResponse<MessageDoc>>({
+        queryKey: ['messages'],
+      });
+      for (const [key, cachedList] of snapshot) {
+        if (!cachedList) continue;
+        const next = cachedList.data.map((m) =>
+          m._id === vars.id ? { ...m, ...vars.body } : m
+        );
+        qc.setQueryData(key, {
+          ...cachedList,
+          data: next,
+          unread: next.filter((m) => !m.read).length,
+        });
+      }
       setActive((a) => (a && a._id === vars.id ? { ...a, ...vars.body } : a));
+      return { snapshot };
+    },
+    onError: (err, _vars, context) => {
+      // Without this the request could fail silently, which is indistinguishable from the button doing nothing.
+      for (const [key, cachedList] of context?.snapshot ?? [])
+        qc.setQueryData(key, cachedList);
+      qc.invalidateQueries({ queryKey: ['messages'] });
+      toast.error((err as ApiError)?.message || 'Could not update the message');
+    },
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: ['messages'] });
     },
   });
   const del = useMutation({
@@ -135,7 +160,7 @@ export default function MessagesManager() {
         <EmptyState message="No messages here." />
       )}
 
-      <div className="grid gap-4 lg:grid-cols-[23.75rem_1fr]">
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-[20rem_1fr]">
         <div className={cn('space-y-2', active && 'hidden lg:block')}>
           {messages.map((m) => (
             <button
@@ -151,8 +176,23 @@ export default function MessagesManager() {
                 )}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="truncate font-semibold text-foreground">
-                    {m.name}
+                  <span className="flex min-w-0 items-center gap-2">
+                    {/* An explicit dot, because a left border alone is easy to miss when checking whether a message was opened. */}
+                    <span
+                      aria-label={m.read ? 'Read' : 'Unread'}
+                      className={cn(
+                        'h-1.5 w-1.5 shrink-0 rounded-full',
+                        m.read ? 'bg-transparent' : 'bg-neon'
+                      )}
+                    />
+                    <span
+                      className={cn(
+                        'truncate text-foreground',
+                        m.read ? 'font-medium' : 'font-bold'
+                      )}
+                    >
+                      {m.name}
+                    </span>
                   </span>
                   <span className="shrink-0 text-2xs text-muted-foreground/60">
                     {formatDate(m.createdAt)}
@@ -220,13 +260,14 @@ export default function MessagesManager() {
                       body: { read: !active.read },
                     })
                   }
-                  className={iconBtn}
-                  title="Toggle read"
+                  className={cn(iconBtn, active.read && 'text-neon')}
+                  title={active.read ? 'Mark as unread' : 'Mark as read'}
                 >
+                  {/* Open envelope means read, closed means unread — the reverse of this read as "nothing happened" on click. */}
                   {active.read ? (
-                    <Mail className="h-4 w-4" />
-                  ) : (
                     <MailOpen className="h-4 w-4" />
+                  ) : (
+                    <Mail className="h-4 w-4" />
                   )}
                 </button>
                 <button
