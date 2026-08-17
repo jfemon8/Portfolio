@@ -2,6 +2,7 @@ import { timingSafeEqual } from 'node:crypto';
 import type { Request, Response } from 'express';
 import mongoose, { type PipelineStage } from 'mongoose';
 import { Job } from '../models/Job.js';
+import { JobSyncRun } from '../models/JobSyncRun.js';
 import { env } from '../config/env.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
@@ -10,7 +11,13 @@ import {
   getJobSourceDiagnostics,
   syncConfiguredJobFeeds,
 } from '../services/jobIngestService.js';
-import type { IJob, JobCategory, JobRegion } from '../types/index.js';
+import type {
+  IJob,
+  JobCategory,
+  JobRegion,
+  JobSyncResult,
+  JobSyncTrigger,
+} from '../types/index.js';
 
 const CATEGORIES: JobCategory[] = [
   'government',
@@ -321,10 +328,48 @@ export const deleteJob = asyncHandler(async (req: Request, res: Response) => {
   res.json({ success: true, message: 'Job deleted' });
 });
 
+/** Recorded on the app connection, not the agent's: the agent credential is scoped to the job collections on purpose. */
+const recordRun = async (
+  trigger: JobSyncTrigger,
+  result: JobSyncResult
+): Promise<void> => {
+  await JobSyncRun.create({
+    trigger,
+    finishedAt: new Date(),
+    durationMs: result.durationMs,
+    feeds: result.feeds,
+    scanned: result.scanned,
+    unique: result.unique,
+    duplicatesMerged: result.duplicatesMerged,
+    added: result.added,
+    updated: result.updated,
+    expiredRemoved: result.expiredRemoved,
+    purged: result.purged,
+    failures: result.failures,
+    warnings: result.warnings,
+    scopedDb: result.scopedDb,
+  }).catch((error: unknown) => {
+    // A sync that worked must not be reported as failed just because its log entry could not be written.
+    console.warn('⚠️  Sync run not recorded:', error);
+  });
+};
+
 export const syncJobs = asyncHandler(async (_req: Request, res: Response) => {
   const result = await syncConfiguredJobFeeds();
+  await recordRun('manual', result);
   res.json({ success: true, data: result });
 });
+
+/** Recent runs, newest first, so the panel can show what actually happened instead of a fixed description. */
+export const jobSyncRuns = asyncHandler(
+  async (_req: Request, res: Response) => {
+    const data = await JobSyncRun.find()
+      .sort({ finishedAt: -1 })
+      .limit(10)
+      .lean();
+    res.json({ success: true, count: data.length, data });
+  }
+);
 
 export const jobSourceHealth = asyncHandler(
   async (_req: Request, res: Response) => {
@@ -346,6 +391,7 @@ export const cronSyncJobs = asyncHandler(
       throw ApiError.forbidden('Invalid cron secret');
     }
     const result = await syncConfiguredJobFeeds();
+    await recordRun('automatic', result);
     res.json({ success: true, data: result });
   }
 );

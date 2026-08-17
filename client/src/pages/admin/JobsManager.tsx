@@ -2,6 +2,9 @@ import ResourceManager, {
   type ResourceConfig,
 } from '@/components/admin/ResourceManager';
 import JobAgentPanel from '@/components/admin/JobAgentPanel';
+import { useState } from 'react';
+import { Bot, Briefcase } from 'lucide-react';
+import { cn } from '@/lib/cn';
 import { formatDate } from '@/lib/date';
 import type { JobDoc } from '@/types';
 
@@ -104,11 +107,42 @@ const config: ResourceConfig<JobDoc> = {
   ),
 };
 
+const TABS = [
+  { k: 'jobs' as const, l: 'Jobs', icon: Briefcase },
+  { k: 'agent' as const, l: 'Agent', icon: Bot },
+];
+
 export default function JobsManager() {
+  const [tab, setTab] = useState<'jobs' | 'agent'>('jobs');
+
   return (
     <div>
-      <JobAgentPanel />
-      <ResourceManager<JobDoc> config={config} />
+      <div className="-mx-1 mb-5 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {TABS.map(({ k, l, icon: Icon }) => (
+          <button
+            key={k}
+            onClick={() => setTab(k)}
+            aria-pressed={tab === k}
+            className={cn(
+              'flex shrink-0 items-center gap-1.5 rounded-full border px-4 py-2 text-sm backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105 transition-all',
+              tab === k
+                ? 'border-primary/50 bg-primary/10 text-primary shadow-glow'
+                : 'border-border/70 text-muted-foreground hover:border-primary/30 hover:text-foreground'
+            )}
+          >
+            <Icon className="h-4 w-4" />
+            {l}
+          </button>
+        ))}
+      </div>
+
+      {/* Both stay mounted: unmounting the agent tab would drop an in-flight sync and its result. */}
+      <div className={cn(tab !== 'agent' && 'hidden')}>
+        <JobAgentPanel />
+      </div>
+      <div className={cn(tab !== 'jobs' && 'hidden')}>
+        <ResourceManager<JobDoc> config={config} />
+      </div>
     </div>
   );
 }

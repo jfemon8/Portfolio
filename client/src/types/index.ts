@@ -824,3 +824,25 @@ export interface ApiError {
   message: string;
   details?: { field?: string; message: string }[];
 }
+
+/** What triggered a sync: the nightly cron, or an admin pressing Run now. */
+export type JobSyncTrigger = 'automatic' | 'manual';
+
+/** One completed run of the ingestion agent, as recorded by the server. */
+export interface JobSyncRun {
+  _id: string;
+  trigger: JobSyncTrigger;
+  finishedAt: string;
+  durationMs: number;
+  feeds: number;
+  scanned: number;
+  unique: number;
+  duplicatesMerged: number;
+  added: number;
+  updated: number;
+  expiredRemoved: number;
+  purged: number;
+  failures: string[];
+  warnings: string[];
+  scopedDb: boolean;
+}

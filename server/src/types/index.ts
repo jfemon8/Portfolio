@@ -721,3 +721,24 @@ export interface JwtPayload {
   iat?: number;
   exp?: number;
 }
+
+/** What triggered a sync: the nightly cron, or an admin pressing the button. */
+export type JobSyncTrigger = 'automatic' | 'manual';
+
+/** One completed run of the ingestion agent, recorded so the admin panel can show real history rather than a fixed description. */
+export interface IJobSyncRun {
+  trigger: JobSyncTrigger;
+  finishedAt: Date;
+  durationMs: number;
+  feeds: number;
+  scanned: number;
+  unique: number;
+  duplicatesMerged: number;
+  added: number;
+  updated: number;
+  expiredRemoved: number;
+  purged: number;
+  failures: string[];
+  warnings: string[];
+  scopedDb: boolean;
+}

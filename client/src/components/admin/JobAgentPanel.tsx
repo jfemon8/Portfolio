@@ -14,6 +14,7 @@ import {
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import GlassCard from '@/components/shared/GlassCard';
+import JobSyncHistory from '@/components/admin/JobSyncHistory';
 import { formatDateTime } from '@/lib/date';
 import { cn } from '@/lib/cn';
 import type {
@@ -129,6 +130,8 @@ export default function JobAgentPanel() {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ['jobs/admin'] }),
       queryClient.invalidateQueries({ queryKey: ['jobs/admin/health'] }),
+      // The run this sync just recorded is what the history panel reads.
+      queryClient.invalidateQueries({ queryKey: ['job-sync-runs'] }),
       queryClient.invalidateQueries({ queryKey: ['jobs'] }),
     ]);
   };
@@ -175,10 +178,6 @@ export default function JobAgentPanel() {
           <h2 className="flex items-center gap-2 font-semibold text-foreground">
             <Bot className="h-4 w-4 text-neon" /> Ingestion agent
           </h2>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Runs nightly at 11:45 PM (Asia/Dhaka). Merges duplicates across
-            sources and removes postings once their deadline passes.
-          </p>
         </div>
         <Button
           variant="secondary"
@@ -189,6 +188,8 @@ export default function JobAgentPanel() {
           {syncing ? 'Running…' : 'Run now'}
         </Button>
       </div>
+
+      <JobSyncHistory />
 
       {isLoading && (
         <p className="mt-4 text-xs text-muted-foreground">Loading sources…</p>

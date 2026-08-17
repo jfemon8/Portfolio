@@ -7,6 +7,7 @@ import {
   deleteJob,
   getPublicJob,
   jobSourceHealth,
+  jobSyncRuns,
   listAdminJobs,
   listJobs,
   syncJobs,
@@ -21,6 +22,7 @@ router.get('/admin', protect, adminOnly, listAdminJobs);
 router.post('/admin', protect, adminOnly, createJob);
 router.post('/admin/sync', protect, adminOnly, syncJobs);
 router.get('/admin/health', protect, adminOnly, jobSourceHealth);
+router.get('/admin/runs', protect, adminOnly, jobSyncRuns);
 router.put('/admin/:id', protect, adminOnly, updateJob);
 router.delete('/admin/:id', protect, adminOnly, deleteJob);
 router.get('/:id', cacheControl(120), getPublicJob);
