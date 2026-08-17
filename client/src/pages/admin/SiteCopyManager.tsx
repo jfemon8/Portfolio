@@ -49,7 +49,7 @@ function Panel({
         <span className="flex-1">{title}</span>
         <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180" />
       </summary>
-      <div className="border-t border-border/60 p-4 pt-5 sm:p-6">
+      <div className="border-t border-border/60 p-4 pt-4 md:p-6">
         {children}
       </div>
     </details>

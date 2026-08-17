@@ -22,6 +22,12 @@ import {
 } from '@/components/ui/States';
 import GlassCard from '@/components/shared/GlassCard';
 import Reveal from '@/components/motion/Reveal';
+import {
+  AppliedBadge,
+  SaveButton,
+  HideButton,
+} from '@/components/shared/JobTrackerControls';
+import { useJobTracker } from '@/stores/jobTracker';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useJobsInfinite } from '@/hooks/usePortfolio';
 import { daysUntil, formatDate, timeAgo } from '@/lib/date';
@@ -174,21 +180,30 @@ function JobCard({ job }: { job: JobDoc }) {
         </p>
       )}
 
-      <div className="mt-auto flex items-center justify-between gap-3 pt-5 text-2xs text-muted-foreground/75">
-        <span className="truncate">
+      <div className="mt-auto pt-4">
+        <p className="truncate text-2xs text-muted-foreground/75">
           via {job.sourceName}
           {extraSources(job) > 0 && ` +${extraSources(job)} more`}
-        </span>
-        {!job.expired && destination && (
-          <a
-            href={destination}
-            target="_blank"
-            rel="noreferrer"
-            onClick={(event) => event.stopPropagation()}
-            className="inline-flex shrink-0 items-center gap-1.5 font-semibold text-primary transition-colors hover:text-neon"
-          >
-            Apply <ExternalLink className="h-3.5 w-3.5" />
-          </a>
+        </p>
+        {!job.expired && (
+          <div className="mt-2.5 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5">
+              <AppliedBadge jobId={job._id} />
+              <SaveButton jobId={job._id} />
+              <HideButton jobId={job._id} />
+            </div>
+            {destination && (
+              <a
+                href={destination}
+                target="_blank"
+                rel="noreferrer"
+                onClick={(event) => event.stopPropagation()}
+                className="inline-flex shrink-0 items-center gap-1.5 text-2xs font-semibold text-primary transition-colors hover:text-neon"
+              >
+                Apply <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+            )}
+          </div>
         )}
       </div>
     </GlassCard>
@@ -244,10 +259,25 @@ export default function Jobs() {
     isFetchingNextPage,
   } = useJobsInfinite({ category, q: query });
 
-  const jobs = useMemo(
-    () => data?.pages.flatMap((page) => page.data) ?? [],
-    [data]
-  );
+  // One-time merge of server-synced tracker state into the local store.
+  const hydrate = useJobTracker((s) => s.hydrate);
+  useEffect(() => void hydrate(), [hydrate]);
+
+  // Subscribing to entries keeps the list reactive: hiding a job drops it immediately.
+  const trackerEntries = useJobTracker((s) => s.entries);
+  const jobs = useMemo(() => {
+    const visible = (data?.pages.flatMap((page) => page.data) ?? []).filter(
+      (job) => !trackerEntries[job._id]?.hidden
+    );
+    // Saved first, then applied, then the rest; the sort is stable, so the server order holds within each group.
+    const rank = (job: JobDoc): number => {
+      const entry = trackerEntries[job._id];
+      if (entry?.saved) return 0;
+      if (entry?.applied) return 1;
+      return 2;
+    };
+    return [...visible].sort((a, b) => rank(a) - rank(b));
+  }, [data, trackerEntries]);
   const total = data?.pages[0]?.pagination.total ?? 0;
   const facets: JobFacets | undefined = data?.pages[0]?.facets;
 

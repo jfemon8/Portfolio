@@ -157,7 +157,7 @@ export default function About({ profile }: { profile?: ProfileDoc }) {
                   ))}
                 </div>
               </div>
-              <div className="border-t border-border/70 pt-5">
+              <div className="border-t border-border/70 pt-4">
                 <dl className="space-y-2 text-sm">
                   <div className="flex justify-between gap-3">
                     <dt className="text-muted-foreground/70">Email</dt>

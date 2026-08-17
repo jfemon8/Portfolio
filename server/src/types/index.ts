@@ -742,3 +742,22 @@ export interface IJobSyncRun {
   warnings: string[];
   scopedDb: boolean;
 }
+
+/** One job's tracking state for an anonymous device: applied, saved, hidden or annotated. */
+export interface IJobTrackerEntry {
+  jobId: string;
+  applied?: boolean;
+  appliedAt?: Date;
+  saved?: boolean;
+  savedAt?: Date;
+  hidden?: boolean;
+  hiddenAt?: Date;
+  note?: string;
+  updatedAt: Date;
+}
+
+/** All tracked jobs for one anonymous device id; the id is client-generated, never an IP. */
+export interface IJobTracker {
+  deviceId: string;
+  entries: IJobTrackerEntry[];
+}

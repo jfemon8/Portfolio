@@ -289,11 +289,19 @@ export async function syncConfiguredJobFeeds(
       (health.get(b.key)?.lastRunAt?.getTime() ?? 0)
   );
 
+  // A pool, not fixed waves: as each source finishes another starts, so one slow source never idles the rest of its wave.
   const outcomes: Array<[JobFeedOutcome, SourceJob[]]> = [];
-  for (let index = 0; index < queue.length; index += SOURCE_CONCURRENCY) {
-    const wave = queue.slice(index, index + SOURCE_CONCURRENCY);
-    outcomes.push(...(await Promise.all(wave.map(runSource))));
-  }
+  let cursor = 0;
+  const worker = async (): Promise<void> => {
+    // `cursor++` runs to completion before any await, so the shared index is race-free on JS's single thread.
+    while (cursor < queue.length) {
+      const feed = queue[cursor++];
+      if (feed) outcomes.push(await runSource(feed));
+    }
+  };
+  await Promise.all(
+    Array.from({ length: Math.min(SOURCE_CONCURRENCY, queue.length) }, worker)
+  );
 
   const perFeed = outcomes.map(([outcome]) => outcome);
   const collected = outcomes.flatMap(([, jobs]) => jobs);

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -12,6 +13,12 @@ import Seo from '@/components/ui/Seo';
 import { breadcrumbSchema } from '@/lib/structuredData';
 import { absoluteUrl } from '@/config/site';
 import GlassCard from '@/components/shared/GlassCard';
+import {
+  AppliedBadge,
+  SaveButton,
+  JobTrackerNote,
+} from '@/components/shared/JobTrackerControls';
+import { useJobTracker } from '@/stores/jobTracker';
 import JobAttachments from '@/components/shared/JobAttachments';
 import RichText from '@/components/shared/RichText';
 import { Button } from '@/components/ui/button';
@@ -59,6 +66,9 @@ export default function JobDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data, isLoading, isError, error, refetch } = useJob(id);
+  // A directly-opened detail page needs the server-synced tracker state too.
+  const hydrate = useJobTracker((s) => s.hydrate);
+  useEffect(() => void hydrate(), [hydrate]);
   const job = data?.data;
   const related = data?.related ?? [];
   const status =
@@ -191,7 +201,17 @@ export default function JobDetail() {
               </Button>
             </a>
           )}
+
+          <div className="mt-5 flex items-center gap-2 border-t border-border/50 pt-4">
+            <AppliedBadge jobId={job._id} />
+            <SaveButton jobId={job._id} />
+            <span className="text-2xs text-muted-foreground/70">
+              Track without login.
+            </span>
+          </div>
         </GlassCard>
+
+        <JobTrackerNote jobId={job._id} />
 
         {(job.description.trim() || !hasCircular) && (
           <section className="mt-8">

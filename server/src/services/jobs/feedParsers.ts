@@ -394,9 +394,12 @@ export function parseSmartRecruiters(
         item.location && typeof item.location === 'object'
           ? (item.location as Record<string, unknown>)
           : {};
+      // The country arrives as the ISO code `bd`, which the Bangladesh-location test does not match; spelling it out keeps the region filter correct.
+      const country = oneLine(String(loc.country ?? ''));
+      const place = country.toLowerCase() === 'bd' ? 'Bangladesh' : country;
       const location =
         oneLine(String(loc.fullLocation ?? '')) ||
-        [loc.city, loc.country].filter(Boolean).join(', ') ||
+        [loc.city, place].filter(Boolean).join(', ') ||
         'Bangladesh';
       // The API ref is JSON; the human-facing posting lives on the public jobs host.
       const sourceUrl = `https://jobs.smartrecruiters.com/${identifier}/${id}`;

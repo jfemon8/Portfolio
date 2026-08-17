@@ -846,3 +846,16 @@ export interface JobSyncRun {
   warnings: string[];
   scopedDb: boolean;
 }
+
+/** One job's anonymous tracking state, mirrored between localStorage and the sync endpoint. */
+export interface JobTrackerEntry {
+  jobId: string;
+  applied?: boolean;
+  appliedAt?: string;
+  saved?: boolean;
+  savedAt?: string;
+  hidden?: boolean;
+  hiddenAt?: string;
+  note?: string;
+  updatedAt: string;
+}

@@ -3,6 +3,7 @@ import type { Request, Response } from 'express';
 import mongoose, { type PipelineStage } from 'mongoose';
 import { Job } from '../models/Job.js';
 import { JobSyncRun } from '../models/JobSyncRun.js';
+import { JobTracker } from '../models/JobTracker.js';
 import { env } from '../config/env.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
@@ -13,6 +14,7 @@ import {
 } from '../services/jobIngestService.js';
 import type {
   IJob,
+  IJobTrackerEntry,
   JobCategory,
   JobRegion,
   JobSyncResult,
@@ -393,5 +395,112 @@ export const cronSyncJobs = asyncHandler(
     const result = await syncConfiguredJobFeeds();
     await recordRun('automatic', result);
     res.json({ success: true, data: result });
+  }
+);
+
+/* -------------------------------------------------- anonymous job tracker */
+
+/** The client generates this opaque id; bounding its shape stops it being abused as free-form storage. */
+const DEVICE_ID_RE = /^[A-Za-z0-9_-]{16,64}$/;
+
+interface IncomingEntry {
+  jobId?: unknown;
+  applied?: unknown;
+  appliedAt?: unknown;
+  saved?: unknown;
+  savedAt?: unknown;
+  hidden?: unknown;
+  hiddenAt?: unknown;
+  note?: unknown;
+  updatedAt?: unknown;
+}
+
+const asDateOrUndefined = (value: unknown): Date | undefined => {
+  if (typeof value !== 'string' && typeof value !== 'number') return undefined;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date;
+};
+
+/** Returns a device's tracked jobs, pruning any whose posting no longer exists so state never outlives the job. */
+export const getJobTracker = asyncHandler(
+  async (req: Request, res: Response) => {
+    const deviceId = String(req.params.deviceId ?? '');
+    if (!DEVICE_ID_RE.test(deviceId))
+      throw ApiError.badRequest('Invalid device id');
+
+    const doc = await JobTracker.findOne({ deviceId }).lean();
+    const entries = doc?.entries ?? [];
+    if (!entries.length) return res.json({ success: true, data: [] });
+
+    const ids = entries
+      .map((entry) => entry.jobId)
+      .filter((id) => mongoose.isValidObjectId(id));
+    const live = new Set(
+      (
+        await Job.find({ _id: { $in: ids } })
+          .select('_id')
+          .lean()
+      ).map((job) => String(job._id))
+    );
+    const kept = entries.filter((entry) => live.has(entry.jobId));
+    if (kept.length !== entries.length)
+      await JobTracker.updateOne({ deviceId }, { $set: { entries: kept } });
+
+    res.json({ success: true, data: kept });
+  }
+);
+
+/** Merges a device's incoming state, newest write per job winning so two synced devices can't clobber each other. */
+export const putJobTracker = asyncHandler(
+  async (req: Request, res: Response) => {
+    const deviceId = String(req.params.deviceId ?? '');
+    if (!DEVICE_ID_RE.test(deviceId))
+      throw ApiError.badRequest('Invalid device id');
+
+    const body = req.body as { entries?: unknown };
+    const incoming = Array.isArray(body.entries) ? body.entries : [];
+    const clean = incoming.slice(0, 1000).flatMap((raw): IJobTrackerEntry[] => {
+      const entry = raw as IncomingEntry;
+      if (
+        typeof entry.jobId !== 'string' ||
+        !mongoose.isValidObjectId(entry.jobId)
+      )
+        return [];
+      return [
+        {
+          jobId: entry.jobId,
+          applied: Boolean(entry.applied),
+          appliedAt: asDateOrUndefined(entry.appliedAt),
+          saved: Boolean(entry.saved),
+          savedAt: asDateOrUndefined(entry.savedAt),
+          hidden: Boolean(entry.hidden),
+          hiddenAt: asDateOrUndefined(entry.hiddenAt),
+          note:
+            typeof entry.note === 'string'
+              ? entry.note.slice(0, 2000)
+              : undefined,
+          updatedAt: asDateOrUndefined(entry.updatedAt) ?? new Date(),
+        },
+      ];
+    });
+
+    const existing =
+      (await JobTracker.findOne({ deviceId }).lean())?.entries ?? [];
+    const byId = new Map(existing.map((entry) => [entry.jobId, entry]));
+    for (const entry of clean) {
+      const prev = byId.get(entry.jobId);
+      if (!prev || entry.updatedAt >= new Date(prev.updatedAt))
+        byId.set(entry.jobId, entry);
+    }
+    // An entry with nothing set is just noise, so it is dropped rather than stored.
+    const merged = [...byId.values()].filter(
+      (entry) => entry.applied || entry.saved || entry.hidden || entry.note
+    );
+    await JobTracker.updateOne(
+      { deviceId },
+      { $set: { entries: merged } },
+      { upsert: true }
+    );
+    res.json({ success: true, count: merged.length });
   }
 );

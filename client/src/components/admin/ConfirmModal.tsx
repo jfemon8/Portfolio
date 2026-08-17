@@ -239,7 +239,7 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
                   </motion.div>
                 </div>
 
-                <div className="relative px-5 pb-5 text-center sm:px-7">
+                <div className="relative px-4 pb-4 text-center md:px-6">
                   <motion.h3
                     id="confirm-modal-title"
                     initial={{ opacity: 0, y: 6 }}
@@ -296,7 +296,7 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
-                  className="flex flex-col-reverse gap-2 px-5 pb-5 sm:flex-row sm:gap-3 sm:px-7 sm:pb-6"
+                  className="flex flex-col-reverse gap-2 px-4 pb-4 md:px-6 md:pb-6 sm:flex-row sm:gap-2"
                 >
                   <button
                     onClick={() => handleClose(false)}
