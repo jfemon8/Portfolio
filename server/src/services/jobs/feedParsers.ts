@@ -362,6 +362,67 @@ export function parseGreenhouse(
   });
 }
 
+/** SmartRecruiters public postings API: `{ content: [...] }`, one of the few ATS boards BD employers actually use. */
+export function parseSmartRecruiters(
+  text: string,
+  feed: JobFeedConfig
+): SourceJob[] {
+  const value: unknown = JSON.parse(text);
+  const content =
+    value &&
+    typeof value === 'object' &&
+    Array.isArray((value as { content?: unknown }).content)
+      ? (value as { content: unknown[] }).content
+      : [];
+
+  return content
+    .filter((entry): entry is Record<string, unknown> =>
+      Boolean(entry && typeof entry === 'object')
+    )
+    .slice(0, MAX_ITEMS_PER_SOURCE)
+    .flatMap((item): SourceJob[] => {
+      const title = oneLine(String(item.name ?? ''));
+      const id = String(item.id ?? '');
+      const company =
+        item.company && typeof item.company === 'object'
+          ? (item.company as Record<string, unknown>)
+          : {};
+      const identifier = String(company.identifier ?? '');
+      if (!title || !id || !identifier) return [];
+
+      const loc =
+        item.location && typeof item.location === 'object'
+          ? (item.location as Record<string, unknown>)
+          : {};
+      const location =
+        oneLine(String(loc.fullLocation ?? '')) ||
+        [loc.city, loc.country].filter(Boolean).join(', ') ||
+        'Bangladesh';
+      // The API ref is JSON; the human-facing posting lives on the public jobs host.
+      const sourceUrl = `https://jobs.smartrecruiters.com/${identifier}/${id}`;
+
+      return [
+        {
+          title,
+          externalId: id,
+          sourceUrl,
+          applyUrl: sourceUrl,
+          description: '',
+          publishedAt: sanePublishedAt(asDate(item.releasedDate)),
+          deadline: undefined,
+          company:
+            oneLine(String(company.name ?? '')) || feed.company || feed.name,
+          location,
+          employmentType: employmentTypeFrom(title),
+          salary: '',
+          classifierHint: String(
+            (item.department as Record<string, unknown>)?.label ?? ''
+          ),
+        },
+      ];
+    });
+}
+
 /** Maps Remotive, Jobicy, Arbeitnow and RemoteOK, whose shapes differ only by key name. */
 export function parseRemoteBoard(
   text: string,

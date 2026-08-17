@@ -4,6 +4,7 @@ import { getAgentModels } from './jobs/agentDb.js';
 import { crawlSource } from './jobs/crawlers.js';
 import {
   parseGreenhouse,
+  parseSmartRecruiters,
   parseJson,
   parseLever,
   parseRemoteBoard,
@@ -125,6 +126,8 @@ async function loadSource(feed: JobFeedConfig): Promise<SourceJob[]> {
           if (feed.format === 'rss') return parseRss(text, feed);
           if (feed.format === 'lever') return parseLever(text, feed);
           if (feed.format === 'greenhouse') return parseGreenhouse(text, feed);
+          if (feed.format === 'smartrecruiters')
+            return parseSmartRecruiters(text, feed);
           if (feed.format === 'remote') return parseRemoteBoard(text, feed);
           return parseJson(text, feed);
         })();
@@ -204,13 +207,11 @@ export async function syncConfiguredJobFeeds(
   const { Job, JobSourceHealth, scoped } = await getAgentModels();
   const warnings: string[] = [];
   if (!scoped && env.jobSync.agentUri === undefined) {
-    warnings.push(
-      'Agent is using the application database credential — set JOBS_AGENT_MONGODB_URI to restrict it to the job collections.'
-    );
+    warnings.push('Agent is using the application database credential.');
   } else {
     // A configured-but-unusable credential must be loud, not a silent fallback.
     warnings.push(
-      'JOBS_AGENT_MONGODB_URI is set but could not be used — the agent fell back to the application credential. Check the user, password and role in Atlas.'
+      'The agent fell back to the application credential. Check the user, password and role in Atlas.'
     );
   }
 
@@ -250,7 +251,7 @@ export async function syncConfiguredJobFeeds(
             ...base,
             ok: true,
             skippedDisabled: true,
-            error: 'Skipped — run budget reached, will be picked up next run',
+            error: 'Skipped',
           },
           [],
         ];

@@ -96,7 +96,14 @@ export interface JobFeedConfig {
   key: string;
   name: string;
   url: string;
-  format: 'rss' | 'json' | 'lever' | 'greenhouse' | 'remote' | 'crawl';
+  format:
+    | 'rss'
+    | 'json'
+    | 'lever'
+    | 'greenhouse'
+    | 'smartrecruiters'
+    | 'remote'
+    | 'crawl';
   /** Which crawler definition handles this source when `format` is `crawl`. */
   crawler?: string;
   company?: string;
@@ -157,6 +164,16 @@ const DEFAULT_JOB_FEEDS: JobFeedConfig[] = [
     category: 'private',
     bangladeshOnly: true,
   },
+  // SmartRecruiters public board; verified live serving a Dhaka-based listing.
+  {
+    key: 'shopup-smartrecruiters',
+    name: 'ShopUp',
+    url: 'https://api.smartrecruiters.com/v1/companies/shopup/postings',
+    format: 'smartrecruiters',
+    company: 'ShopUp',
+    category: 'it',
+    bangladeshOnly: true,
+  },
   // Crawled because no ATS feed carries Bangladeshi government circulars.
   {
     key: 'bdjobstoday',
@@ -171,6 +188,8 @@ const DEFAULT_JOB_FEEDS: JobFeedConfig[] = [
     ['bdgovtjob', 'BD Govt Job', 'https://bdgovtjob.net/feed/'],
     ['ejobscircular', 'eJobsCircular', 'https://ejobscircular.com/feed/'],
     ['chakrirkhobor', 'Chakrir Khobor', 'https://chakrirkhobor.net/feed/'],
+    // Verified live: Bengali circulars spanning banks, govt and private employers, robots-permitted.
+    ['bdjobscareer', 'BDJobs Career', 'https://bdjobscareer.com/feed/'],
   ].map(
     ([key, label, url]): JobFeedConfig => ({
       key: key ?? '',
