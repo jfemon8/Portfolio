@@ -327,8 +327,8 @@ export default function Jobs() {
           subtitle="Government, private, IT, Bank, NGO and Other opportunities from Bangladeshi boards, company career pages and worldwide job portals. Every listing here is still open."
         />
 
-        <div className="mb-6 space-y-3">
-          <div className="flex flex-col gap-3 sm:flex-row">
+        <div className="mb-4 space-y-2">
+          <div className="flex flex-col gap-2 sm:flex-row">
             <label className="relative min-w-0 flex-1">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
@@ -391,7 +391,7 @@ export default function Jobs() {
 
         <div
           className={cn(
-            'grid auto-rows-[1fr] gap-5 transition-opacity sm:grid-cols-2 lg:grid-cols-3',
+            'grid auto-rows-[1fr] gap-4 transition-opacity md:grid-cols-2 lg:grid-cols-3',
             isFetching && !isFetchingNextPage && 'opacity-60'
           )}
         >
@@ -418,7 +418,7 @@ export default function Jobs() {
         </div>
 
         {jobs.length > 0 && (
-          <div className="mt-10 text-center text-xs text-muted-foreground">
+          <div className="mt-4 text-center text-xs text-muted-foreground">
             {hasNextPage ? (
               <div
                 ref={sentinelRef}

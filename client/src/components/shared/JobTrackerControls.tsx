@@ -41,7 +41,7 @@ export function AppliedBadge({ jobId }: { jobId: string }) {
       onClick={(e) => void onClick(e)}
       aria-pressed={applied}
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-2xs font-semibold transition-colors',
+        'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-2xs font-semibold transition-colors',
         applied
           ? 'border-neon/50 bg-neon/10 text-neon'
           : 'border-border/70 text-muted-foreground hover:border-primary/40 hover:text-primary'
