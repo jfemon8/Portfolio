@@ -48,6 +48,25 @@ module.exports = {
       files: ['src/workers/**/*.ts'],
       env: { worker: true, browser: false },
     },
+    {
+      // Public surfaces place a shape-matched skeleton in the content's own slot (see ui/Async.tsx); Spinner stays for admin screens and auth gates.
+      files: ['src/pages/*.tsx', 'src/components/sections/**/*.tsx'],
+      rules: {
+        'no-restricted-imports': [
+          'error',
+          {
+            paths: [
+              {
+                name: '@/components/ui/States',
+                importNames: ['Spinner'],
+                message:
+                  'Use <Async> with a skeleton from components/ui/Skeletons instead — a public surface should never block on a spinner.',
+              },
+            ],
+          },
+        ],
+      },
+    },
   ],
   ignorePatterns: [
     'dist',

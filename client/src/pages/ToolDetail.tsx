@@ -11,7 +11,8 @@ import RelatedTools from '@/components/tools/RelatedTools';
 import { Section } from '@/components/shared/Section';
 import Reveal from '@/components/motion/Reveal';
 import { Button } from '@/components/ui/button';
-import { Spinner, ErrorState } from '@/components/ui/States';
+import { ErrorState, Skeleton } from '@/components/ui/States';
+import { ToolDetailSkeleton } from '@/components/ui/Skeletons';
 import { useTools, useCategories } from '@/hooks/usePortfolio';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
 import { TOOL_ICONS } from '@/lib/toolIcon';
@@ -35,11 +36,18 @@ export default function ToolDetail() {
     backToTools: 'Back To Tools',
   });
 
+  // The tool component is keyed by `tool.key`, which the slug does not encode — but the frame and back link need not wait for the record.
   if (isLoading)
     return (
-      <div className="grid min-h-[70vh] place-items-center">
-        <Spinner />
-      </div>
+      <Section id="tool-detail-page" className="mt-4 pt-4">
+        <button
+          onClick={() => navigate(-1)}
+          className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-neon"
+        >
+          <ArrowLeft className="h-4 w-4" /> {lab.btnBack}
+        </button>
+        <ToolDetailSkeleton />
+      </Section>
     );
 
   if (isError || !tool)
@@ -121,11 +129,7 @@ export default function ToolDetail() {
             {/* A row whose key has no component yet would otherwise render <undefined /> and take the page down. */}
             {Component ? (
               <Suspense
-                fallback={
-                  <div className="grid min-h-[30vh] place-items-center">
-                    <Spinner />
-                  </div>
-                }
+                fallback={<Skeleton className="h-80 w-full rounded-2xl" />}
               >
                 <Component />
               </Suspense>

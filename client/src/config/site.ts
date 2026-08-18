@@ -1,22 +1,43 @@
-// Single source of truth for SEO identity (Seo component + structured-data builders read from here so nothing drifts); VITE_SITE_URL is public, safe in the bundle.
-export const SITE_URL = (
-  import.meta.env.VITE_SITE_URL || 'https://jfemon.vercel.app'
-).replace(/\/$/, '');
+// SEO identity in one place; the canonical origin is resolved at runtime from the admin's SeoSettings.siteUrl so a domain change needs no code edit, with VITE_SITE_URL and the literal below as fallbacks until it loads.
+const envSiteUrl: string | undefined =
+  (import.meta.env as { VITE_SITE_URL?: string } | undefined)?.VITE_SITE_URL ??
+  (typeof process !== 'undefined' ? process.env.VITE_SITE_URL : undefined);
+
+const normalize = (url: string): string => url.trim().replace(/\/$/, '');
+
+export const FALLBACK_SITE_URL = normalize(
+  envSiteUrl || 'https://jfemon.vercel.app'
+);
+
+let adminOrigin: string | undefined;
+
+/** Publishes the admin-configured origin; called once the SeoSettings query resolves, and by the prerender before it emits. */
+export const setSiteOrigin = (url?: string): void => {
+  const next = url ? normalize(url) : '';
+  adminOrigin = /^https?:\/\//.test(next) ? next : undefined;
+};
+
+/** The one origin every canonical link, og:url and structured-data @id is built from. */
+export const siteOrigin = (): string => adminOrigin ?? FALLBACK_SITE_URL;
 
 export const AUTHOR_NAME = 'Md Jannatul Ferdhous Emon';
 
 export const AUTHOR_JOB_TITLE = 'Assistant Front-End Developer';
 
-// Name variants people search for; powers both Person.alternateName and the default keywords meta from one list so they never drift.
+// Name variants people search for — Person.alternateName and the default keywords read this one list; search is case-insensitive, so only distinct token patterns belong here, not casing variants.
 export const AUTHOR_ALTERNATE_NAMES = [
   'Jannatul Ferdhous Emon',
   'Md Jannatul Ferdhous',
+  'Md Jannatul Ferdhous Emon',
   'Jannatul Ferdhous',
   'Jannatul Emon',
   'Ferdhous Emon',
   'JF Emon',
+  'J F Emon',
+  'JFEmon',
   'jfemon',
   'jfemon8',
+  'Emon',
   'Emon Khan',
 ] as const;
 
@@ -118,10 +139,10 @@ export const DEFAULT_KEYWORDS = [
 ] as const;
 
 // Static raster (not generated) because social scrapers don't execute JS; owner-supplied at client/public/og.png (1200×630), same pattern as avatar/resume placeholders.
-export const DEFAULT_OG_IMAGE = `${SITE_URL}/og.png`;
+export const defaultOgImage = (): string => `${siteOrigin()}/og.png`;
 
-/** Resolve a route path or an already-absolute URL to an absolute URL. */
+/** Resolve a route path or an already-absolute URL against the current canonical origin. */
 export const absoluteUrl = (path = ''): string =>
   /^https?:\/\//.test(path)
     ? path
-    : `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`;
+    : `${siteOrigin()}${path.startsWith('/') ? path : `/${path}`}`;

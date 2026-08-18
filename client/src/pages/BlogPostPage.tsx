@@ -9,7 +9,8 @@ import GlassCard from '@/components/shared/GlassCard';
 import Reveal from '@/components/motion/Reveal';
 import BlogEngagement from '@/components/sections/BlogEngagement';
 import { Button } from '@/components/ui/button';
-import { Spinner, ErrorState } from '@/components/ui/States';
+import { ErrorState } from '@/components/ui/States';
+import { DetailPageSkeleton } from '@/components/ui/Skeletons';
 import { useBlogPost, useProfile } from '@/hooks/usePortfolio';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
 import { formatDate, formatTime } from '@/lib/date';
@@ -46,8 +47,8 @@ export default function BlogPostPage() {
 
   if (isLoading)
     return (
-      <div className="grid min-h-[70vh] place-items-center">
-        <Spinner />
+      <div className="container-x py-8">
+        <DetailPageSkeleton />
       </div>
     );
   if (isError || !post)

@@ -1,12 +1,6 @@
 import { Helmet } from 'react-helmet-async';
-import {
-  AUTHOR_NAME,
-  AUTHOR_HANDLE,
-  SITE_TITLE,
-  DEFAULT_DESCRIPTION,
-  DEFAULT_KEYWORDS,
-  SITE_URL,
-} from '@/config/site';
+import { AUTHOR_HANDLE } from '@/config/site';
+import { resolveSeo } from '@/lib/seoMeta';
 import { useSeoSettings } from '@/hooks/usePortfolio';
 
 // Structured data comes in via `jsonLd` from @/lib/structuredData builders, keeping this component presentational.
@@ -40,52 +34,33 @@ export default function Seo({
   publishedTime,
   modifiedTime,
   tags,
-  keywords: pageKeywords,
+  keywords,
   exactTitle = false,
   jsonLd,
 }: SeoProps) {
   const { data: seoData } = useSeoSettings();
-  const s = seoData?.data;
-  const author = s?.authorName || AUTHOR_NAME;
-  const siteName = s?.siteName || SITE_TITLE;
-  const origin = (s?.siteUrl || SITE_URL).replace(/\/$/, '');
-  const abs = (p = ''): string =>
-    /^https?:\/\//.test(p) ? p : `${origin}${p.startsWith('/') ? p : `/${p}`}`;
-  const fullTitle = title
-    ? exactTitle
-      ? title
-      : `${title} — ${author}`
-    : s?.metaTitle || siteName;
-  const desc = description || s?.metaDescription || DEFAULT_DESCRIPTION;
-  const url = abs(path);
-  const ogImage = image ? abs(image) : s?.ogImage || `${origin}/og.png`;
-  const siteKeywords = s?.keywords?.length ? s.keywords : DEFAULT_KEYWORDS;
-  const keywords = [
-    ...new Set([...(pageKeywords ?? []), ...siteKeywords]),
-  ].join(', ');
-  const twitter = s?.twitterHandle?.trim();
-  // max-image-preview:large lets Google show full-size image previews in search/Discover.
-  const robots = noindex
-    ? 'noindex, nofollow'
-    : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+  const m = resolveSeo(
+    { title, description, image, path, noindex, keywords, exactTitle },
+    seoData?.data
+  );
   const schemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 
   return (
     <Helmet>
-      <title>{fullTitle}</title>
-      <meta name="description" content={desc} />
-      <meta name="author" content={author} />
-      <meta name="robots" content={robots} />
-      <link rel="canonical" href={url} />
-      {keywords && <meta name="keywords" content={keywords} />}
+      <title>{m.fullTitle}</title>
+      <meta name="description" content={m.description} />
+      <meta name="author" content={m.author} />
+      <meta name="robots" content={m.robots} />
+      <link rel="canonical" href={m.url} />
+      {m.keywords && <meta name="keywords" content={m.keywords} />}
 
-      <meta property="og:site_name" content={siteName} />
+      <meta property="og:site_name" content={m.siteName} />
       <meta property="og:type" content={type} />
-      <meta property="og:title" content={fullTitle} />
-      <meta property="og:description" content={desc} />
-      <meta property="og:url" content={url} />
-      <meta property="og:image" content={ogImage} />
-      <meta property="og:image:alt" content={fullTitle} />
+      <meta property="og:title" content={m.fullTitle} />
+      <meta property="og:description" content={m.description} />
+      <meta property="og:url" content={m.url} />
+      <meta property="og:image" content={m.ogImage} />
+      <meta property="og:image:alt" content={m.fullTitle} />
       <meta property="og:locale" content="en_US" />
       {type === 'profile' && (
         <meta property="profile:username" content={AUTHOR_HANDLE} />
@@ -100,12 +75,12 @@ export default function Seo({
         tags?.map((t) => <meta key={t} property="article:tag" content={t} />)}
 
       <meta name="twitter:card" content="summary_large_image" />
-      {twitter && <meta name="twitter:site" content={twitter} />}
-      {twitter && <meta name="twitter:creator" content={twitter} />}
-      <meta name="twitter:title" content={fullTitle} />
-      <meta name="twitter:description" content={desc} />
-      <meta name="twitter:image" content={ogImage} />
-      <meta name="twitter:image:alt" content={fullTitle} />
+      {m.twitter && <meta name="twitter:site" content={m.twitter} />}
+      {m.twitter && <meta name="twitter:creator" content={m.twitter} />}
+      <meta name="twitter:title" content={m.fullTitle} />
+      <meta name="twitter:description" content={m.description} />
+      <meta name="twitter:image" content={m.ogImage} />
+      <meta name="twitter:image:alt" content={m.fullTitle} />
 
       {schemas.map((s, i) => (
         <script key={i} type="application/ld+json">

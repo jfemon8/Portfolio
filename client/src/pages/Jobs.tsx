@@ -15,11 +15,8 @@ import {
 import Seo from '@/components/ui/Seo';
 import { breadcrumbSchema, collectionPageSchema } from '@/lib/structuredData';
 import { Section, SectionHeading } from '@/components/shared/Section';
-import {
-  ErrorState,
-  EmptyState,
-  CardGridSkeleton,
-} from '@/components/ui/States';
+import Async from '@/components/ui/Async';
+import { JobCardSkeleton } from '@/components/ui/Skeletons';
 import GlassCard from '@/components/shared/GlassCard';
 import Reveal from '@/components/motion/Reveal';
 import {
@@ -29,6 +26,7 @@ import {
 } from '@/components/shared/JobTrackerControls';
 import { useJobTracker } from '@/stores/jobTracker';
 import { useDebounce } from '@/hooks/useDebounce';
+import { PAGE_SEO } from '@/lib/pageSeo';
 import { useJobsInfinite } from '@/hooks/usePortfolio';
 import { daysUntil, formatDate, timeAgo } from '@/lib/date';
 import { cn } from '@/lib/cn';
@@ -248,16 +246,9 @@ export default function Jobs() {
     );
   }, [query, setSearchParams]);
 
-  const {
-    data,
-    isLoading,
-    isError,
-    isFetching,
-    refetch,
-    hasNextPage,
-    fetchNextPage,
-    isFetchingNextPage,
-  } = useJobsInfinite({ category, q: query });
+  const jobsQuery = useJobsInfinite({ category, q: query });
+  const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage } =
+    jobsQuery;
 
   // One-time merge of server-synced tracker state into the local store.
   const hydrate = useJobTracker((s) => s.hydrate);
@@ -305,9 +296,9 @@ export default function Jobs() {
   return (
     <>
       <Seo
-        title="Job Circular Finder"
+        title={PAGE_SEO.jobs.title}
         path="/tools/jobs"
-        description="Open jobs in Bangladesh plus remote and international roles — government circulars, company career pages and worldwide job APIs, collected nightly."
+        description={PAGE_SEO.jobs.description}
         jsonLd={[
           breadcrumbSchema([
             { name: 'Home', path: '/' },
@@ -330,6 +321,7 @@ export default function Jobs() {
       />
       <Section id="jobs-page" className="mt-4 pt-4">
         <SectionHeading
+          as="h1"
           index="~/tools/jobs"
           title="Job Circular Finder"
           subtitle="Government, private, IT, Bank, NGO and Other opportunities from Bangladeshi boards, company career pages and worldwide job portals. Every listing here is still open."
@@ -397,53 +389,54 @@ export default function Jobs() {
           </div>
         </div>
 
-        {isLoading && <CardGridSkeleton />}
-        {isError && <ErrorState onRetry={() => void refetch()} />}
-        {!isLoading && !isError && jobs.length === 0 && (
-          <EmptyState
-            message={
+        <div
+          className={cn(
+            'grid auto-rows-[1fr] gap-5 transition-opacity sm:grid-cols-2 lg:grid-cols-3',
+            isFetching && !isFetchingNextPage && 'opacity-60'
+          )}
+        >
+          <Async
+            query={jobsQuery}
+            select={() => jobs}
+            hint="jobs"
+            skeleton={(n) => <JobCardSkeleton count={n} />}
+            empty={
               hasFilters
                 ? 'No jobs match these filters. Try widening your search.'
                 : 'No jobs are available right now. Please check again after the next daily sync.'
             }
-          />
-        )}
-
-        {jobs.length > 0 && (
-          <>
-            <div
-              className={cn(
-                'grid auto-rows-[1fr] gap-5 transition-opacity sm:grid-cols-2 lg:grid-cols-3',
-                isFetching && !isFetchingNextPage && 'opacity-60'
-              )}
-            >
-              {jobs.map((job, index) => (
+            stateClass="col-span-full"
+          >
+            {(items) =>
+              items.map((job, index) => (
                 <Reveal key={job._id} delay={Math.min(index, 5) * 0.05}>
                   <JobCard job={job} />
                 </Reveal>
-              ))}
-            </div>
+              ))
+            }
+          </Async>
+        </div>
 
-            <div className="mt-10 text-center text-xs text-muted-foreground">
-              {hasNextPage ? (
-                <div
-                  ref={sentinelRef}
-                  className="flex items-center justify-center gap-2 py-2"
-                >
-                  {isFetchingNextPage && (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  )}
-                  Showing {jobs.length} of {total} openings
-                </div>
-              ) : (
-                <span className="inline-flex items-center gap-1.5">
-                  <BriefcaseBusiness className="h-3.5 w-3.5" />
-                  All {jobs.length} matching opening
-                  {jobs.length === 1 ? '' : 's'} loaded.
-                </span>
-              )}
-            </div>
-          </>
+        {jobs.length > 0 && (
+          <div className="mt-10 text-center text-xs text-muted-foreground">
+            {hasNextPage ? (
+              <div
+                ref={sentinelRef}
+                className="flex items-center justify-center gap-2 py-2"
+              >
+                {isFetchingNextPage && (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                )}
+                Showing {jobs.length} of {total} openings
+              </div>
+            ) : (
+              <span className="inline-flex items-center gap-1.5">
+                <BriefcaseBusiness className="h-3.5 w-3.5" />
+                All {jobs.length} matching opening
+                {jobs.length === 1 ? '' : 's'} loaded.
+              </span>
+            )}
+          </div>
         )}
       </Section>
     </>

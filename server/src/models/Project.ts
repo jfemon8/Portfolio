@@ -1,5 +1,5 @@
 import mongoose, { type Model } from 'mongoose';
-import slugify from 'slugify';
+import { toSlug } from '../utils/slug.js';
 import type { IProject } from '../types/index.js';
 
 const caseStudySchema = new mongoose.Schema(
@@ -61,7 +61,7 @@ const projectSchema = new mongoose.Schema<IProject>(
 projectSchema.pre('validate', function setSlug(next) {
   // Guard on a present title so a missing one falls through to the required validator (400) instead of throwing inside slugify (500).
   if (this.title && (this.isModified('title') || !this.slug)) {
-    this.slug = slugify(this.title, { lower: true, strict: true });
+    this.slug = toSlug(this.title, String(this._id));
   }
   next();
 });

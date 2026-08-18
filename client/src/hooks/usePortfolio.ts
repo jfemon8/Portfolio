@@ -6,6 +6,7 @@ import {
 import { api } from '@/lib/api';
 import { queryClient } from '@/lib/queryClient';
 import { getBlogVisitorKey } from '@/lib/blog';
+import { setSiteOrigin } from '@/config/site';
 import type {
   BlogCommentsPageResponse,
   BlogDetailResponse,
@@ -48,7 +49,12 @@ export const useProfile = () =>
 export const useSeoSettings = () =>
   useQuery({
     queryKey: ['seo'],
-    queryFn: () => get<ItemResponse<SeoSettingsDoc>>('/seo'),
+    // Publishes the canonical origin as soon as it arrives, so every URL built afterwards agrees with it.
+    queryFn: async () => {
+      const res = await get<ItemResponse<SeoSettingsDoc>>('/seo');
+      setSiteOrigin(res.data?.siteUrl);
+      return res;
+    },
     staleTime: CONTENT,
     gcTime: CONTENT_GC,
   });

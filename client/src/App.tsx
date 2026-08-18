@@ -3,7 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import PublicLayout from '@/components/layout/PublicLayout';
 import ProtectedRoute from '@/components/admin/ProtectedRoute';
 import RequireRole from '@/components/admin/RequireRole';
-import { Spinner } from '@/components/ui/States';
+import { PageSkeleton } from '@/components/ui/Skeletons';
 import Home from '@/pages/Home';
 
 const Projects = lazy(() => import('@/pages/Projects'));
@@ -40,11 +40,8 @@ const AuditLogViewer = lazy(() => import('@/pages/admin/AuditLogViewer'));
 const MediaLibrary = lazy(() => import('@/pages/admin/MediaLibrary'));
 const JobsManager = lazy(() => import('@/pages/admin/JobsManager'));
 
-const Fallback = (
-  <div className="grid min-h-screen place-items-center">
-    <Spinner />
-  </div>
-);
+// Route-shaped, not a full-screen spinner: a chunk still downloading should not blank the viewport.
+const Fallback = <PageSkeleton />;
 
 export default function App() {
   return (

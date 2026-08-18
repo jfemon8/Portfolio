@@ -1,5 +1,5 @@
 import mongoose, { type Model } from 'mongoose';
-import slugify from 'slugify';
+import { toSlug } from '../utils/slug.js';
 import type { IBlogPost } from '../types/index.js';
 
 const blogSchema = new mongoose.Schema<IBlogPost>(
@@ -29,7 +29,7 @@ const blogSchema = new mongoose.Schema<IBlogPost>(
 blogSchema.pre('validate', function prep(next) {
   // Guard on a present title so a missing one falls through to the required validator (400) instead of throwing inside slugify (500).
   if (this.title && (this.isModified('title') || !this.slug)) {
-    this.slug = slugify(this.title, { lower: true, strict: true });
+    this.slug = toSlug(this.title, String(this._id));
   }
   if (this.isModified('content')) {
     const words = (this.content || '').trim().split(/\s+/).length;

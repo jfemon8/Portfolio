@@ -15,6 +15,7 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { useSeoSettings, useSiteSettings } from '@/hooks/usePortfolio';
 import { HOME_SECTIONS } from '@/config/homeSections';
+import { FALLBACK_SITE_URL } from '@/config/site';
 import PageHeader from '@/components/admin/PageHeader';
 import ImageUpload from '@/components/admin/ImageUpload';
 import Toggle from '@/components/ui/Toggle';
@@ -309,11 +310,16 @@ export default function SettingsManager() {
                   <input
                     className="input"
                     value={seo.siteUrl}
-                    placeholder="https://example.com"
+                    placeholder={FALLBACK_SITE_URL}
                     onChange={(e) =>
                       setSeo({ ...seo, siteUrl: e.target.value })
                     }
                   />
+                  <p className="mt-1.5 text-2xs text-muted-foreground/70">
+                    The canonical origin for canonical links, og:url, sitemap
+                    and structured data. Changing it here is all a domain move
+                    needs — no redeploy.
+                  </p>
                 </div>
               </div>
               <div>

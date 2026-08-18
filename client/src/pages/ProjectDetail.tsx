@@ -17,7 +17,8 @@ import GlassCard from '@/components/shared/GlassCard';
 import Counter from '@/components/shared/Counter';
 import Reveal from '@/components/motion/Reveal';
 import { Button } from '@/components/ui/button';
-import { Spinner, ErrorState } from '@/components/ui/States';
+import { ErrorState } from '@/components/ui/States';
+import { DetailPageSkeleton } from '@/components/ui/Skeletons';
 import { useProject, useProfile } from '@/hooks/usePortfolio';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
 import { capitalizeFirst } from '@/lib/text';
@@ -63,10 +64,11 @@ export default function ProjectDetail() {
     unitViews: 'Views',
   });
 
+  // Page-shaped placeholder rather than a centred spinner, so the layout the record will fill is already on screen.
   if (isLoading)
     return (
-      <div className="grid min-h-[70vh] place-items-center">
-        <Spinner />
+      <div className="container-x py-8">
+        <DetailPageSkeleton />
       </div>
     );
   if (isError || !p)

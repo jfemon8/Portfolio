@@ -17,6 +17,9 @@ import { useSiteCopy } from '@/hooks/useSiteCopy';
 import Reveal from '@/components/motion/Reveal';
 import GlassCard from '@/components/shared/GlassCard';
 import { Button } from '@/components/ui/button';
+import Async from '@/components/ui/Async';
+import { ContactInfoSkeleton } from '@/components/ui/Skeletons';
+import { useProfile } from '@/hooks/usePortfolio';
 import { api } from '@/lib/api';
 import { getValidationMessage } from '@/lib/validation';
 import type { ApiError, ProfileDoc } from '@/types';
@@ -36,7 +39,9 @@ interface InfoItem {
   href?: string;
 }
 
-export default function Contact({ profile }: { profile?: ProfileDoc }) {
+// The form needs no server data, so it paints immediately while only the contact details wait on the profile.
+export default function Contact() {
+  const profileQuery = useProfile();
   const {
     register,
     handleSubmit,
@@ -87,26 +92,26 @@ export default function Contact({ profile }: { profile?: ProfileDoc }) {
     toast.error(getValidationMessage(formErrors));
   };
 
-  const info: InfoItem[] = [
+  const infoItems = (profile: ProfileDoc): InfoItem[] => [
     {
       id: 'email',
       icon: Mail,
       label: f.infoEmail,
-      value: profile?.email,
-      href: `mailto:${profile?.email}`,
+      value: profile.email,
+      href: `mailto:${profile.email}`,
     },
     {
       id: 'phone',
       icon: Phone,
       label: f.infoPhone,
-      value: profile?.phone,
-      href: `tel:${profile?.phone}`,
+      value: profile.phone,
+      href: `tel:${profile.phone}`,
     },
     {
       id: 'location',
       icon: MapPin,
       label: f.infoLocation,
-      value: profile?.location,
+      value: profile.location,
     },
   ];
   const copy = useSectionCopy('contact', {
@@ -125,30 +130,37 @@ export default function Contact({ profile }: { profile?: ProfileDoc }) {
 
       <div className="grid gap-6 sm:gap-8 lg:grid-cols-[0.85fr_1.15fr]">
         <Reveal>
-          {/* `flex flex-col gap-8` instead of `space-y-8` because the wrapped
-              `<a>` elements are `display: inline` by default, and inline
-              elements ignore `margin-top` — so Tailwind's space-y had zero
-              effect. Flex children get a proper block-axis box, so `gap`
-              applies cleanly between the cards. */}
-          <div className="flex flex-col gap-5 sm:gap-8">
-            {info.map((c) => (
-              <a key={c.id} href={c.href || undefined} className="block">
-                <GlassCard interactive className="flex items-center gap-4 p-5">
-                  <span className="grid h-11 w-11 place-items-center rounded-xl border border-primary/30 bg-card/60 text-neon backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
-                    <c.icon className="h-5 w-5" />
-                  </span>
-                  <div className="min-w-0">
-                    <p className="text-xs uppercase tracking-wider text-muted-foreground/70">
-                      {c.label}
-                    </p>
-                    <p className="break-words text-sm text-muted-foreground">
-                      {c.value}
-                    </p>
-                  </div>
-                </GlassCard>
-              </a>
-            ))}
-          </div>
+          <Async
+            query={profileQuery}
+            select={(r) => r.data}
+            skeleton={<ContactInfoSkeleton />}
+          >
+            {/* flex/gap, not space-y: the wrapped `<a>` elements are inline and ignore the margin-top space-y relies on. */}
+            {(profile) => (
+              <div className="flex flex-col gap-5 sm:gap-8">
+                {infoItems(profile).map((c) => (
+                  <a key={c.id} href={c.href || undefined} className="block">
+                    <GlassCard
+                      interactive
+                      className="flex items-center gap-4 p-5"
+                    >
+                      <span className="grid h-11 w-11 place-items-center rounded-xl border border-primary/30 bg-card/60 text-neon backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
+                        <c.icon className="h-5 w-5" />
+                      </span>
+                      <div className="min-w-0">
+                        <p className="text-xs uppercase tracking-wider text-muted-foreground/70">
+                          {c.label}
+                        </p>
+                        <p className="break-words text-sm text-muted-foreground">
+                          {c.value}
+                        </p>
+                      </div>
+                    </GlassCard>
+                  </a>
+                ))}
+              </div>
+            )}
+          </Async>
         </Reveal>
 
         <Reveal delay={0.1}>

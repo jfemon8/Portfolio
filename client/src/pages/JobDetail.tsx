@@ -22,7 +22,8 @@ import { useJobTracker } from '@/stores/jobTracker';
 import JobAttachments from '@/components/shared/JobAttachments';
 import RichText from '@/components/shared/RichText';
 import { Button } from '@/components/ui/button';
-import { ErrorState, Spinner } from '@/components/ui/States';
+import { ErrorState } from '@/components/ui/States';
+import { DetailPageSkeleton } from '@/components/ui/Skeletons';
 import { useJob } from '@/hooks/usePortfolio';
 import { daysUntil, formatDate, timeAgo } from '@/lib/date';
 import { formatJobDescription } from '@/lib/jobText';
@@ -78,8 +79,8 @@ export default function JobDetail() {
 
   if (isLoading) {
     return (
-      <div className="grid min-h-[70vh] place-items-center">
-        <Spinner />
+      <div className="container-x py-8">
+        <DetailPageSkeleton cover={false} />
       </div>
     );
   }

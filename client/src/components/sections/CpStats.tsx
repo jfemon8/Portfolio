@@ -11,7 +11,8 @@ import {
 import { Section, SectionHeading } from '@/components/shared/Section';
 import { useSectionCopy } from '@/hooks/useSectionCopy';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
-import { Spinner } from '@/components/ui/States';
+import Async from '@/components/ui/Async';
+import { CpStatsSkeleton } from '@/components/ui/Skeletons';
 import GlassCard from '@/components/shared/GlassCard';
 import SparkArea from '@/components/shared/SparkArea';
 import Heatmap from '@/components/shared/Heatmap';
@@ -19,17 +20,47 @@ import Terminal from '@/components/shared/Terminal';
 import Counter from '@/components/shared/Counter';
 import Reveal from '@/components/motion/Reveal';
 import { useCpStats } from '@/hooks/usePortfolio';
+import type { CpStatsDoc } from '@/types';
 
-/** Self-hiding: renders nothing when there's no handle set, still loading, or on error. */
+interface CpCopy {
+  index: string;
+  title: string;
+  subtitle: string;
+}
+
+/** Self-hiding: reserves no space until a previous visit proved this section has data. */
 export default function CpStats() {
-  const { data, isLoading, isError } = useCpStats();
-  const cp = data?.data;
+  const cpQuery = useCpStats();
   const copy = useSectionCopy('cp', {
     index: '~/cp',
     title: 'Competitive programming',
     subtitle:
       'Live Codeforces & LeetCode standing — problem-solving under time pressure.',
   });
+
+  return (
+    <Async
+      query={cpQuery}
+      select={(r) => r.data}
+      hint="cp"
+      selfHiding
+      skeleton={
+        <Section id="competitive">
+          <SectionHeading
+            index={copy.index}
+            title={copy.title}
+            subtitle={copy.subtitle}
+          />
+          <CpStatsSkeleton />
+        </Section>
+      }
+    >
+      {(cp) => <CpStatsBody cp={cp} copy={copy} />}
+    </Async>
+  );
+}
+
+function CpStatsBody({ cp, copy }: { cp: CpStatsDoc; copy: CpCopy }) {
   const lab = useSiteCopy('labels', {
     cpCurrentRating: 'Current rating',
     cpMaxRating: 'Max rating',
@@ -48,14 +79,6 @@ export default function CpStats() {
     cpHighest: 'Highest',
     cpCcProfile: 'CodeChef profile',
   });
-  if (isLoading) {
-    return (
-      <div className="grid min-h-[40vh] place-items-center">
-        <Spinner />
-      </div>
-    );
-  }
-  if (isError || !cp) return null;
 
   const cards = [
     {

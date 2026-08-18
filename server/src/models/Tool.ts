@@ -1,5 +1,5 @@
 import mongoose, { type Model } from 'mongoose';
-import slugify from 'slugify';
+import { toSlug } from '../utils/slug.js';
 import type { ITool } from '../types/index.js';
 
 const toolSchema = new mongoose.Schema<ITool>(
@@ -55,7 +55,7 @@ const toolSchema = new mongoose.Schema<ITool>(
 toolSchema.pre('validate', function setSlug(next) {
   // Guard on a present name so a missing one falls through to the required validator (400) instead of throwing inside slugify (500).
   if (this.name && (this.isModified('name') || !this.slug)) {
-    this.slug = slugify(this.name, { lower: true, strict: true });
+    this.slug = toSlug(this.name, String(this._id));
   }
   next();
 });

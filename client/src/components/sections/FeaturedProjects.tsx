@@ -7,14 +7,14 @@ import Reveal from '@/components/motion/Reveal';
 import Spotlight from '@/components/motion/Spotlight';
 import ProjectCard from '@/components/shared/ProjectCard';
 import { Button } from '@/components/ui/button';
-import { Spinner, ErrorState, EmptyState } from '@/components/ui/States';
+import Async from '@/components/ui/Async';
+import { ProjectCardSkeleton } from '@/components/ui/Skeletons';
 import { useProjects } from '@/hooks/usePortfolio';
 import { cn } from '@/lib/cn';
 
 // Bento layout: the first featured project gets the hero slot, the rest tile around it.
 export default function FeaturedProjects() {
-  const { data, isLoading, isError, refetch } = useProjects('?featured=true');
-  const projects = data?.data ?? [];
+  const projectsQuery = useProjects('?featured=true');
   const copy = useSectionCopy('featured', {
     index: '03.',
     title: 'Featured work',
@@ -39,28 +39,34 @@ export default function FeaturedProjects() {
         }
       />
 
-      {isLoading && <Spinner />}
-      {isError && <ErrorState onRetry={() => void refetch()} />}
-      {!isLoading && !isError && projects.length === 0 && (
-        <EmptyState message={st.projectsEmpty} />
-      )}
-
       <Spotlight
         size={560}
         className="grid auto-rows-[1fr] gap-5 sm:grid-cols-2 lg:grid-cols-3"
       >
-        {projects.map((p, i) => {
-          const big = i === 0;
-          return (
-            <Reveal
-              key={p._id}
-              delay={i * 0.07}
-              className={cn(big && 'sm:col-span-2 lg:row-span-2')}
-            >
-              <ProjectCard project={p} featured={big} />
-            </Reveal>
-          );
-        })}
+        <Async
+          query={projectsQuery}
+          select={(r) => r.data}
+          hint="featured-projects"
+          fallbackCount={3}
+          skeleton={(n) => <ProjectCardSkeleton count={n} bento />}
+          empty={st.projectsEmpty}
+          stateClass="col-span-full"
+        >
+          {(projects) =>
+            projects.map((p, i) => {
+              const big = i === 0;
+              return (
+                <Reveal
+                  key={p._id}
+                  delay={i * 0.07}
+                  className={cn(big && 'sm:col-span-2 lg:row-span-2')}
+                >
+                  <ProjectCard project={p} featured={big} />
+                </Reveal>
+              );
+            })
+          }
+        </Async>
       </Spotlight>
 
       <div className="mt-10 text-center sm:hidden">

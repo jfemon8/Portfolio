@@ -8,7 +8,12 @@ import Counter from '@/components/shared/Counter';
 import ResumeViewer from '@/components/shared/ResumeViewer';
 import FloatingTechIcons from '@/components/motion/FloatingTechIcons';
 import SmartImage from '@/components/shared/SmartImage';
-import type { ProfileDoc } from '@/types';
+import Async from '@/components/ui/Async';
+import {
+  AboutIntroSkeleton,
+  AboutAsideSkeleton,
+} from '@/components/ui/Skeletons';
+import { useProfile } from '@/hooks/usePortfolio';
 
 const personalSkills = [
   'Analytical & problem-solving',
@@ -19,8 +24,9 @@ const personalSkills = [
   'Fast learner & adaptable',
 ];
 
-export default function About({ profile }: { profile?: ProfileDoc }) {
-  const stats = profile?.stats ?? [];
+// Reads the profile query itself instead of taking a prop, so it can place its own skeleton rather than block the page.
+export default function About() {
+  const profileQuery = useProfile();
   const copy = useSectionCopy('about', {
     index: '01.',
     title: 'About me',
@@ -29,6 +35,9 @@ export default function About({ profile }: { profile?: ProfileDoc }) {
   const about = useSiteCopy('about', {
     strengthsHeading: 'What I bring',
     strengths: personalSkills,
+  });
+  const st = useSiteCopy('states', {
+    homeError: 'Trying to Reach The API.',
   });
 
   return (
@@ -42,25 +51,38 @@ export default function About({ profile }: { profile?: ProfileDoc }) {
 
       <div className="grid gap-6 sm:gap-10 lg:grid-cols-[1.4fr_1fr]">
         <Reveal>
-          <p className="text-lg leading-relaxed text-muted-foreground">
-            {profile?.summary}
-          </p>
+          <Async
+            query={profileQuery}
+            select={(r) => r.data}
+            hint="about-stats"
+            skeleton={(n) => <AboutIntroSkeleton stats={n} />}
+            fallbackCount={4}
+            errorMessage={st.homeError}
+          >
+            {(profile) => (
+              <>
+                <p className="text-lg leading-relaxed text-muted-foreground">
+                  {profile.summary}
+                </p>
 
-          {stats.length > 0 && (
-            <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
-              {stats.map((s) => (
-                <GlassCard key={s.label} className="p-4 text-center">
-                  <Counter
-                    value={s.value}
-                    className="block text-2xl font-extrabold text-neon"
-                  />
-                  <span className="mt-1 block text-2xs uppercase tracking-wide text-muted-foreground/70">
-                    {s.label}
-                  </span>
-                </GlassCard>
-              ))}
-            </div>
-          )}
+                {(profile.stats ?? []).length > 0 && (
+                  <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+                    {(profile.stats ?? []).map((s) => (
+                      <GlassCard key={s.label} className="p-4 text-center">
+                        <Counter
+                          value={s.value}
+                          className="block text-2xl font-extrabold text-neon"
+                        />
+                        <span className="mt-1 block text-2xs uppercase tracking-wide text-muted-foreground/70">
+                          {s.label}
+                        </span>
+                      </GlassCard>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </Async>
 
           <div className="mt-9">
             <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-foreground">
@@ -81,104 +103,112 @@ export default function About({ profile }: { profile?: ProfileDoc }) {
         </Reveal>
 
         <Reveal delay={0.1}>
-          <div className="space-y-4 sm:space-y-6">
-            {/* Avatar + identity + View-Resume affordance — premium glass
-                profile card that anchors the right column. The gradient
-                ring + soft halo glow + pinging "available" dot give it the
-                eye-catching feel without going overboard. */}
-            <GlassCard className="p-6 text-center">
-              <div className="relative mx-auto h-44 w-44 sm:h-48 sm:w-48">
-                <div
-                  aria-hidden
-                  className="absolute inset-0 -z-10 rounded-full bg-gradient-to-tr from-primary/30 via-neon-blue/30 to-neon-violet/30 blur-3xl"
-                />
-                <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-primary via-neon-blue to-neon-violet p-[0.1875rem] shadow-[inset_0_0.0625rem_0_var(--glass-highlight),0_0_3.75rem_-0.75rem_hsl(var(--ring)/0.55)]">
-                  <div className="h-full w-full overflow-hidden rounded-full bg-card">
-                    {profile?.avatar ? (
-                      <SmartImage
-                        src={profile.avatar}
-                        alt={profile?.name || 'Avatar'}
-                        imgWidth={400}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="grid h-full w-full place-items-center text-4xl font-bold text-muted-foreground">
-                        {profile?.name?.[0]?.toUpperCase() || '?'}
+          <Async
+            query={profileQuery}
+            select={(r) => r.data}
+            skeleton={<AboutAsideSkeleton />}
+            hideOnError
+          >
+            {(profile) => (
+              <div className="space-y-4 sm:space-y-6">
+                {/* Avatar, identity and resume affordance — the glass card that anchors the right column. */}
+                <GlassCard className="p-6 text-center">
+                  <div className="relative mx-auto h-44 w-44 sm:h-48 sm:w-48">
+                    <div
+                      aria-hidden
+                      className="absolute inset-0 -z-10 rounded-full bg-gradient-to-tr from-primary/30 via-neon-blue/30 to-neon-violet/30 blur-3xl"
+                    />
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-primary via-neon-blue to-neon-violet p-[0.1875rem] shadow-[inset_0_0.0625rem_0_var(--glass-highlight),0_0_3.75rem_-0.75rem_hsl(var(--ring)/0.55)]">
+                      <div className="h-full w-full overflow-hidden rounded-full bg-card">
+                        {profile?.avatar ? (
+                          <SmartImage
+                            src={profile.avatar}
+                            alt={profile?.name || 'Avatar'}
+                            imgWidth={400}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="grid h-full w-full place-items-center text-4xl font-bold text-muted-foreground">
+                            {profile?.name?.[0]?.toUpperCase() || '?'}
+                          </div>
+                        )}
                       </div>
+                    </div>
+                    {profile?.available && (
+                      <span
+                        aria-label="Available for opportunities"
+                        className="absolute bottom-3 right-3 flex h-6 w-6 items-center justify-center rounded-full border-4 border-background bg-emerald-500"
+                      >
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-70" />
+                      </span>
                     )}
                   </div>
-                </div>
-                {profile?.available && (
-                  <span
-                    aria-label="Available for opportunities"
-                    className="absolute bottom-3 right-3 flex h-6 w-6 items-center justify-center rounded-full border-4 border-background bg-emerald-500"
-                  >
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-70" />
-                  </span>
-                )}
-              </div>
 
-              <h3 className="mt-5 text-lg font-bold text-foreground">
-                {profile?.name}
-              </h3>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {profile?.title}
-              </p>
+                  <h3 className="mt-5 text-lg font-bold text-foreground">
+                    {profile?.name}
+                  </h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {profile?.title}
+                  </p>
 
-              {profile?.resumeUrl && (
-                <div className="mt-5 flex justify-center">
-                  <ResumeViewer
-                    url={profile.resumeUrl}
-                    size="lg"
-                    className="w-full sm:w-auto"
-                  />
-                </div>
-              )}
-            </GlassCard>
-
-            <GlassCard className="space-y-3 p-6 sm:space-y-5">
-              <div>
-                <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-foreground">
-                  <Languages className="h-4 w-4 text-neon" /> Languages
-                </h3>
-                <div className="space-y-3">
-                  {(profile?.languages ?? []).map((l) => (
-                    <div
-                      key={l.name}
-                      className="flex items-center justify-between"
-                    >
-                      <span className="text-sm text-muted-foreground">
-                        {l.name}
-                      </span>
-                      <span className="rounded-full border border-border/70 bg-card/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
-                        {l.level}
-                      </span>
+                  {profile?.resumeUrl && (
+                    <div className="mt-5 flex justify-center">
+                      <ResumeViewer
+                        url={profile.resumeUrl}
+                        size="lg"
+                        className="w-full sm:w-auto"
+                      />
                     </div>
-                  ))}
-                </div>
+                  )}
+                </GlassCard>
+
+                <GlassCard className="space-y-3 p-6 sm:space-y-5">
+                  <div>
+                    <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-foreground">
+                      <Languages className="h-4 w-4 text-neon" /> Languages
+                    </h3>
+                    <div className="space-y-3">
+                      {(profile?.languages ?? []).map((l) => (
+                        <div
+                          key={l.name}
+                          className="flex items-center justify-between"
+                        >
+                          <span className="text-sm text-muted-foreground">
+                            {l.name}
+                          </span>
+                          <span className="rounded-full border border-border/70 bg-card/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
+                            {l.level}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="border-t border-border/70 pt-4">
+                    <dl className="space-y-2 text-sm">
+                      <div className="flex justify-between gap-3">
+                        <dt className="text-muted-foreground/70">Email</dt>
+                        <dd className="break-words text-muted-foreground">
+                          {profile?.email}
+                        </dd>
+                      </div>
+                      <div className="flex justify-between gap-3">
+                        <dt className="text-muted-foreground/70">Phone</dt>
+                        <dd className="text-muted-foreground">
+                          {profile?.phone}
+                        </dd>
+                      </div>
+                      <div className="flex justify-between gap-3">
+                        <dt className="text-muted-foreground/70">Status</dt>
+                        <dd className="font-medium text-neon">
+                          {profile?.available ? 'Open to work' : 'Building'}
+                        </dd>
+                      </div>
+                    </dl>
+                  </div>
+                </GlassCard>
               </div>
-              <div className="border-t border-border/70 pt-4">
-                <dl className="space-y-2 text-sm">
-                  <div className="flex justify-between gap-3">
-                    <dt className="text-muted-foreground/70">Email</dt>
-                    <dd className="break-words text-muted-foreground">
-                      {profile?.email}
-                    </dd>
-                  </div>
-                  <div className="flex justify-between gap-3">
-                    <dt className="text-muted-foreground/70">Phone</dt>
-                    <dd className="text-muted-foreground">{profile?.phone}</dd>
-                  </div>
-                  <div className="flex justify-between gap-3">
-                    <dt className="text-muted-foreground/70">Status</dt>
-                    <dd className="font-medium text-neon">
-                      {profile?.available ? 'Open to work' : 'Building'}
-                    </dd>
-                  </div>
-                </dl>
-              </div>
-            </GlassCard>
-          </div>
+            )}
+          </Async>
         </Reveal>
       </div>
     </Section>

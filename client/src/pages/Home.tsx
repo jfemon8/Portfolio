@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode } from 'react';
+import { Fragment, useEffect, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Seo from '@/components/ui/Seo';
@@ -8,10 +8,9 @@ import {
   profilePageSchema,
 } from '@/lib/structuredData';
 
-import { Spinner, ErrorState } from '@/components/ui/States';
 import { useProfile, useSiteSettings } from '@/hooks/usePortfolio';
-import { useSiteCopy } from '@/hooks/useSiteCopy';
 import { HOME_SECTIONS } from '@/config/homeSections';
+import { getOrder, rememberOrder } from '@/stores/layoutHints';
 import { scrollToId } from '@/lib/smoothScroll';
 
 import HeroPremium from '@/components/sections/HeroPremium';
@@ -25,42 +24,21 @@ import Research from '@/components/sections/Research';
 import Credentials from '@/components/sections/Credentials';
 import Contact from '@/components/sections/Contact';
 
+const ORDER_HINT = 'home-sections';
+
 export default function Home() {
-  const { data, isLoading, isError, refetch } = useProfile();
-  const { data: siteData } = useSiteSettings();
+  const { data } = useProfile();
+  const { data: siteData, isPending: sitePending } = useSiteSettings();
 
   const navigate = useNavigate();
 
   const profile = data?.data;
 
-  const st = useSiteCopy('states', {
-    homeLoading: 'Loading Portfolio…',
-    homeError: "Couldn't Reach The API. Is The Backend Running?",
-  });
-
   // Hash-scroll for `/#section` is handled centrally by PublicLayout.
-
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className="grid min-h-[70vh] place-items-center">
-        <Spinner label={st.homeLoading} />
-      </div>
-    );
-  }
-
-  // Error state
-  if (isError) {
-    return (
-      <div className="grid min-h-[70vh] place-items-center">
-        <ErrorState message={st.homeError} onRetry={() => void refetch()} />
-      </div>
-    );
-  }
 
   // HOME_SECTIONS remains the source of truth.
   const sectionEl: Record<string, ReactNode> = {
-    about: <About profile={profile} />,
+    about: <About />,
     skills: <Skills />,
     cp: <CpStats />,
     projects: <FeaturedProjects />,
@@ -68,7 +46,7 @@ export default function Home() {
     education: <Education />,
     research: <Research />,
     credentials: <Credentials />,
-    contact: <Contact profile={profile} />,
+    contact: <Contact />,
   };
 
   const known = HOME_SECTIONS.map((s) => s.key);
@@ -79,14 +57,24 @@ export default function Home() {
 
   const inCfg = new Set(cfg.map((c) => c.key));
 
-  const keys = cfg.length
+  const resolved = cfg.length
     ? [
         ...cfg.filter((c) => c.visible).map((c) => c.key),
         ...known.filter((k) => !inCfg.has(k)),
       ]
     : known;
 
-  // Render page
+  // Sections mount before the settings query resolves, so the last-known order stands in rather than letting them visibly re-shuffle.
+  const [hinted] = useState(() => getOrder(ORDER_HINT));
+  const keys =
+    sitePending && hinted ? hinted.filter((k) => known.includes(k)) : resolved;
+
+  const orderKey = keys.join(',');
+  useEffect(() => {
+    if (!sitePending) rememberOrder(ORDER_HINT, orderKey.split(','));
+  }, [sitePending, orderKey]);
+
+  // Every section owns its own loading state, so none of them waits on another.
   return (
     <>
       <Seo

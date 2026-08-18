@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { ArrowUpRight, BriefcaseBusiness } from 'lucide-react';
 import Seo from '@/components/ui/Seo';
 import { breadcrumbSchema, collectionPageSchema } from '@/lib/structuredData';
@@ -10,11 +10,12 @@ import Reveal from '@/components/motion/Reveal';
 import ToolCard from '@/components/shared/ToolCard';
 import PrefetchLink from '@/components/shared/PrefetchLink';
 import GlassCard from '@/components/shared/GlassCard';
+import Async from '@/components/ui/Async';
 import {
-  ErrorState,
-  EmptyState,
-  CardGridSkeleton,
-} from '@/components/ui/States';
+  ToolCardSkeleton,
+  FilterTabsSkeleton,
+} from '@/components/ui/Skeletons';
+import { PAGE_SEO } from '@/lib/pageSeo';
 import { useTools, useCategories } from '@/hooks/usePortfolio';
 import { cn } from '@/lib/cn';
 
@@ -25,16 +26,9 @@ const JOBS_CARD = {
   label: 'Career',
 };
 
-/** The hub competes for the generic "free online tools" searches; the detail pages take the specific ones. */
-const HUB_SEO = {
-  title: 'Free Online Tools — No Sign-Up, Nothing Uploaded',
-  description:
-    'A set of free browser tools: PDF editing, OCR for English and Bangla, JSON and JWT utilities, regex testing, vocal removal and more. No account, no upload.',
-};
-
 export default function Tools() {
   const [filter, setFilter] = useState('all');
-  const { data, isLoading, isError, refetch } = useTools();
+  const toolsQuery = useTools();
   const { data: categoriesData } = useCategories('tool');
   const categoryOptions = useMemo(
     () => categoriesData?.data ?? [],
@@ -43,8 +37,8 @@ export default function Tools() {
   const categoryLabel = (slug: string): string =>
     categoryOptions.find((c) => c.slug === slug)?.name ?? slug;
   const all = useMemo(
-    () => [...(data?.data ?? [])].sort((a, b) => a.order - b.order),
-    [data]
+    () => [...(toolsQuery.data?.data ?? [])].sort((a, b) => a.order - b.order),
+    [toolsQuery.data]
   );
   const categories = useMemo(
     () => Array.from(new Set(all.map((t) => t.category))),
@@ -75,13 +69,18 @@ export default function Tools() {
   });
   const lab = useSiteCopy('labels', { filterAll: 'All' });
 
+  // Shared by the real pills and their placeholders, so the row never changes height mid-load.
+  const tabRow = (children: ReactNode): ReactNode => (
+    <div className="mb-4 flex flex-wrap gap-2">{children}</div>
+  );
+
   return (
     <>
       <Seo
-        title={HUB_SEO.title}
+        title={PAGE_SEO.tools.title}
         exactTitle
         path="/tools"
-        description={HUB_SEO.description}
+        description={PAGE_SEO.tools.description}
         keywords={hubKeywords}
         jsonLd={[
           breadcrumbSchema([
@@ -95,43 +94,48 @@ export default function Tools() {
               { name: JOBS_CARD.title, path: '/tools/jobs' },
               ...all.map((t) => ({ name: t.name, path: `/tools/${t.slug}` })),
             ],
-            HUB_SEO.description
+            PAGE_SEO.tools.description
           ),
         ]}
       />
       <Section id="tools-page" className="mt-4 pt-4">
         <SectionHeading
+          as="h1"
           index={copy.index}
           title={copy.title}
           subtitle={copy.subtitle}
         />
 
-        {categories.length > 1 && (
-          <div className="mb-4 flex flex-wrap gap-2">
-            {['all', ...categories].map((f) => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={cn(
-                  'rounded-full border px-4 py-1.5 text-sm transition-all duration-200',
-                  filter === f
-                    ? 'border-primary/50 bg-primary/10 text-primary shadow-glow'
-                    : 'border-border/70 text-muted-foreground hover:border-primary/30 hover:text-foreground'
-                )}
-              >
-                {f === 'all' ? lab.filterAll : categoryLabel(f)}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {isLoading && <CardGridSkeleton />}
-        {isError && <ErrorState onRetry={() => void refetch()} />}
-        {!isLoading && !isError && tools.length === 0 && !showJobsCard && (
-          <EmptyState message={st.toolsFilterEmpty} />
-        )}
+        <Async
+          query={toolsQuery}
+          // A lone category means no meaningful filter, so the row collapses to nothing.
+          select={() => (categories.length > 1 ? ['all', ...categories] : [])}
+          hint="tool-tabs"
+          fallbackCount={5}
+          skeleton={(n) => tabRow(<FilterTabsSkeleton count={n} />)}
+        >
+          {(options) =>
+            tabRow(
+              options.map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  className={cn(
+                    'rounded-full border px-4 py-1.5 text-sm transition-all duration-200',
+                    filter === f
+                      ? 'border-primary/50 bg-primary/10 text-primary shadow-glow'
+                      : 'border-border/70 text-muted-foreground hover:border-primary/30 hover:text-foreground'
+                  )}
+                >
+                  {f === 'all' ? lab.filterAll : categoryLabel(f)}
+                </button>
+              ))
+            )
+          }
+        </Async>
 
         <div className="grid auto-rows-[1fr] gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Static card: renders on first paint and keeps its slot while the dynamic ones load in beside it. */}
           {showJobsCard && (
             <Reveal>
               <PrefetchLink to="/tools/jobs" className="group block h-full">
@@ -162,11 +166,27 @@ export default function Tools() {
               </PrefetchLink>
             </Reveal>
           )}
-          {tools.map((t, i) => (
-            <Reveal key={t._id} delay={i * 0.05}>
-              <ToolCard tool={t} categoryLabel={categoryLabel(t.category)} />
-            </Reveal>
-          ))}
+
+          <Async
+            query={toolsQuery}
+            select={() => tools}
+            hint="tools"
+            skeleton={(n) => <ToolCardSkeleton count={n} />}
+            // With the jobs card present the grid is not actually empty, so the empty state would be wrong.
+            empty={showJobsCard ? undefined : st.toolsFilterEmpty}
+            stateClass="col-span-full"
+          >
+            {(items) =>
+              items.map((t, i) => (
+                <Reveal key={t._id} delay={i * 0.05}>
+                  <ToolCard
+                    tool={t}
+                    categoryLabel={categoryLabel(t.category)}
+                  />
+                </Reveal>
+              ))
+            }
+          </Async>
         </div>
       </Section>
     </>

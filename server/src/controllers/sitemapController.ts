@@ -4,11 +4,11 @@ import { Project } from '../models/Project.js';
 import { BlogPost } from '../models/BlogPost.js';
 import { Profile } from '../models/Profile.js';
 import { Tool } from '../models/Tool.js';
+import { SeoSettings } from '../models/SeoSettings.js';
 import { publicVisibility } from './blogController.js';
-import { env } from '../config/env.js';
+import { canonicalOrigin } from '../utils/canonicalOrigin.js';
 
 // Dynamic XML sitemap, generated per-request (Vercel has no cron) — reuses the blog API's public-visibility filter so URLs never outpace what's reachable; exposed via a vercel.json rewrite.
-const SITE = env.clientOrigins[0] ?? 'http://localhost:5173';
 
 const XML_ENTITIES: Record<string, string> = {
   '&': '&amp;',
@@ -30,15 +30,12 @@ interface UrlEntry {
   images?: string[];
 }
 
-const urlTag = ({
-  loc,
-  lastmod,
-  changefreq,
-  priority,
-  images,
-}: UrlEntry): string =>
+const urlTag = (
+  site: string,
+  { loc, lastmod, changefreq, priority, images }: UrlEntry
+): string =>
   `<url>` +
-  `<loc>${xmlEscape(SITE + loc)}</loc>` +
+  `<loc>${xmlEscape(site + loc)}</loc>` +
   (lastmod ? `<lastmod>${new Date(lastmod).toISOString()}</lastmod>` : '') +
   `<changefreq>${changefreq}</changefreq>` +
   `<priority>${priority}</priority>` +
@@ -52,7 +49,7 @@ const urlTag = ({
   `</url>`;
 
 export const getSitemap = asyncHandler(async (_req: Request, res: Response) => {
-  const [projects, posts, tools, profile] = await Promise.all([
+  const [projects, posts, tools, profile, seo] = await Promise.all([
     Project.find()
       .select('slug updatedAt coverImage')
       .sort({ updatedAt: -1 })
@@ -66,7 +63,17 @@ export const getSitemap = asyncHandler(async (_req: Request, res: Response) => {
       .sort({ order: 1 })
       .lean<{ slug: string; updatedAt: Date }[]>(),
     Profile.findOne().select('avatar').lean<{ avatar?: string } | null>(),
+    SeoSettings.findOne().select('siteUrl').lean<{ siteUrl?: string } | null>(),
   ]);
+
+  const SITE = canonicalOrigin(seo?.siteUrl);
+  // A blank slug would emit the parent listing's URL again, so it is dropped rather than duplicated.
+  const slugged = <T extends { slug?: string }>(rows: T[]): T[] =>
+    rows.filter((r) => Boolean(r.slug?.trim()));
+
+  // Newest child timestamp, so a hub's lastmod actually moves when its listing changes.
+  const newest = (rows: { updatedAt: Date }[]): Date | undefined =>
+    rows.length ? rows[0]?.updatedAt : undefined;
 
   const urls: UrlEntry[] = [
     {
@@ -75,25 +82,40 @@ export const getSitemap = asyncHandler(async (_req: Request, res: Response) => {
       priority: '1.0',
       images: [profile?.avatar ?? '', `${SITE}/og.png`],
     },
-    { loc: '/projects', changefreq: 'weekly', priority: '0.9' },
+    {
+      loc: '/projects',
+      lastmod: newest(projects),
+      changefreq: 'weekly',
+      priority: '0.9',
+    },
     // The tools are the pages search traffic actually lands on, so they rank above the blog here.
-    { loc: '/tools', changefreq: 'weekly', priority: '0.9' },
+    {
+      loc: '/tools',
+      lastmod: newest(tools),
+      changefreq: 'weekly',
+      priority: '0.9',
+    },
     { loc: '/tools/jobs', changefreq: 'daily', priority: '0.8' },
-    { loc: '/blog', changefreq: 'weekly', priority: '0.8' },
-    ...tools.map((t) => ({
+    {
+      loc: '/blog',
+      lastmod: newest(posts),
+      changefreq: 'weekly',
+      priority: '0.8',
+    },
+    ...slugged(tools).map((t) => ({
       loc: `/tools/${t.slug}`,
       lastmod: t.updatedAt,
       changefreq: 'monthly',
       priority: '0.8',
     })),
-    ...projects.map((p) => ({
+    ...slugged(projects).map((p) => ({
       loc: `/projects/${p.slug}`,
       lastmod: p.updatedAt,
       changefreq: 'monthly',
       priority: '0.7',
       images: p.coverImage ? [p.coverImage] : undefined,
     })),
-    ...posts.map((b) => ({
+    ...slugged(posts).map((b) => ({
       loc: `/blog/${b.slug}`,
       lastmod: b.updatedAt,
       changefreq: 'monthly',
@@ -106,7 +128,7 @@ export const getSitemap = asyncHandler(async (_req: Request, res: Response) => {
     `<?xml version="1.0" encoding="UTF-8"?>` +
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"` +
     ` xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">` +
-    urls.map(urlTag).join('') +
+    urls.map((u) => urlTag(SITE, u)).join('') +
     `</urlset>`;
 
   res.header('Content-Type', 'application/xml; charset=utf-8');

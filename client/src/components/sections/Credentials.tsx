@@ -15,6 +15,8 @@ import Lightbox from '@/components/shared/Lightbox';
 import PdfPreviewModal, {
   type PdfPreviewTarget,
 } from '@/components/shared/PdfPreviewModal';
+import Async from '@/components/ui/Async';
+import { CredentialsColumnSkeleton } from '@/components/ui/Skeletons';
 import { useCertifications } from '@/hooks/usePortfolio';
 import { isPdfUrl } from '@/lib/media';
 import { formatDate } from '@/lib/date';
@@ -111,8 +113,8 @@ function Column({
 }
 
 export default function Credentials() {
-  const { data: certData } = useCertifications();
-  const all = certData?.data ?? [];
+  const certificationsQuery = useCertifications();
+  const all = certificationsQuery.data?.data ?? [];
 
   const [lightbox, setLightbox] = useState<{
     url: string;
@@ -171,22 +173,33 @@ export default function Credentials() {
         subtitle={copy.subtitle}
       />
       <div className="grid gap-6 sm:grid-cols-2">
-        <Column
-          icon={Award}
-          title="Certifications"
-          items={certs}
-          delay={0}
-          mediaLabel="certificate"
-          onOpenMedia={openMedia}
-        />
-        <Column
-          icon={Trophy}
-          title="Achievements"
-          items={achievements}
-          delay={0.08}
-          mediaLabel="attachment"
-          onOpenMedia={openMedia}
-        />
+        <Async
+          query={certificationsQuery}
+          select={(r) => r.data}
+          skeleton={<CredentialsColumnSkeleton count={2} />}
+          stateClass="col-span-full"
+        >
+          {() => (
+            <>
+              <Column
+                icon={Award}
+                title="Certifications"
+                items={certs}
+                delay={0}
+                mediaLabel="certificate"
+                onOpenMedia={openMedia}
+              />
+              <Column
+                icon={Trophy}
+                title="Achievements"
+                items={achievements}
+                delay={0.08}
+                mediaLabel="attachment"
+                onOpenMedia={openMedia}
+              />
+            </>
+          )}
+        </Async>
       </div>
 
       <Lightbox

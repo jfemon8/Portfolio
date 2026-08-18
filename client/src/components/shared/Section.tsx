@@ -24,6 +24,8 @@ interface SectionHeadingProps {
   /** Optional right-aligned slot. */
   action?: ReactNode;
   align?: 'left' | 'center';
+  /** A listing page's top heading is its single h1; in-page sections stay h2. */
+  as?: 'h1' | 'h2';
 }
 
 export function SectionHeading({
@@ -32,6 +34,7 @@ export function SectionHeading({
   subtitle,
   action,
   align = 'left',
+  as: Heading = 'h2',
 }: SectionHeadingProps) {
   const centered = align === 'center';
 
@@ -48,9 +51,9 @@ export function SectionHeading({
             {index}
           </span>
         )}
-        <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl lg:text-5xl 3xl:text-6xl">
+        <Heading className="mt-2 text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl lg:text-5xl 3xl:text-6xl">
           {title} <span className="text-neon">.</span>
-        </h2>
+        </Heading>
         {subtitle && (
           <p className="mt-4 text-base leading-relaxed text-muted-foreground">
             {subtitle}

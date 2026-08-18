@@ -2,7 +2,11 @@ import { useMemo, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Section, SectionHeading } from '@/components/shared/Section';
 import { useSectionCopy } from '@/hooks/useSectionCopy';
-import { Spinner, ErrorState } from '@/components/ui/States';
+import Async, { allOf } from '@/components/ui/Async';
+import {
+  SkillCardSkeleton,
+  FilterTabsSkeleton,
+} from '@/components/ui/Skeletons';
 import { useSkills, useCategories } from '@/hooks/usePortfolio';
 import { staggerContainer } from '@/config/animation';
 import { getSkillIcon, FallbackSkillIcon } from '@/lib/skillIcon';
@@ -11,20 +15,17 @@ import SmartImage from '@/components/shared/SmartImage';
 
 /** Icon resolves as uploaded `iconImage` → react-icons brand match → neutral glyph; category tabs are driven by the /categories CRUD. */
 export default function Skills() {
-  const {
-    data: skillsData,
-    isLoading: skillsLoading,
-    isError: skillsError,
-    refetch,
-  } = useSkills();
-  const { data: categoriesData, isLoading: categoriesLoading } =
-    useCategories();
+  const skillsQuery = useSkills();
+  const categoriesQuery = useCategories();
   const reduce = useReducedMotion();
 
-  const skills = useMemo(() => skillsData?.data ?? [], [skillsData]);
+  const skills = useMemo(
+    () => skillsQuery.data?.data ?? [],
+    [skillsQuery.data]
+  );
   const categories = useMemo(
-    () => categoriesData?.data ?? [],
-    [categoriesData]
+    () => categoriesQuery.data?.data ?? [],
+    [categoriesQuery.data]
   );
 
   // Only show category tabs that contain at least one skill.
@@ -44,8 +45,6 @@ export default function Skills() {
     subtitle: 'The stack I build with — explore by category.',
   });
 
-  const isLoading = skillsLoading || categoriesLoading;
-
   return (
     <Section id="skills">
       <SectionHeading
@@ -54,13 +53,17 @@ export default function Skills() {
         subtitle={copy.subtitle}
       />
 
-      {isLoading && <Spinner />}
-      {skillsError && <ErrorState onRetry={() => void refetch()} />}
-
-      {!isLoading && !skillsError && (
-        <>
-          <div className="mb-10 flex flex-wrap gap-2">
-            {available.map((g) => {
+      {/* The tab list is the intersection of both queries; the grid below needs skills only, so it fills in on its own. */}
+      <div className="mb-10 flex flex-wrap gap-2">
+        <Async
+          query={allOf(skillsQuery, categoriesQuery)}
+          select={() => available}
+          hint="skill-tabs"
+          fallbackCount={4}
+          skeleton={(n) => <FilterTabsSkeleton count={n} />}
+        >
+          {(groups) =>
+            groups.map((g) => {
               const on = g.slug === activeSlug;
               return (
                 <button
@@ -87,19 +90,29 @@ export default function Skills() {
                   <span className="relative">{g.name}</span>
                 </button>
               );
-            })}
-          </div>
+            })
+          }
+        </Async>
+      </div>
 
-          <AnimatePresence mode="wait">
-            <motion.ul
-              key={activeSlug}
-              variants={staggerContainer(0.04)}
-              initial={reduce ? false : 'hidden'}
-              animate="show"
-              exit={reduce ? undefined : { opacity: 0, y: -8 }}
-              className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
-            >
-              {items.map((s) => {
+      <AnimatePresence mode="wait">
+        <motion.ul
+          key={activeSlug}
+          variants={staggerContainer(0.04)}
+          initial={reduce ? false : 'hidden'}
+          animate="show"
+          exit={reduce ? undefined : { opacity: 0, y: -8 }}
+          className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+        >
+          <Async
+            query={skillsQuery}
+            select={() => items}
+            hint="skills"
+            fallbackCount={10}
+            skeleton={(n) => <SkillCardSkeleton count={n} />}
+          >
+            {(list) =>
+              list.map((s) => {
                 const BrandIcon = s.iconImage
                   ? null
                   : (getSkillIcon(s.name) ?? FallbackSkillIcon);
@@ -156,11 +169,11 @@ export default function Skills() {
                     </div>
                   </motion.li>
                 );
-              })}
-            </motion.ul>
-          </AnimatePresence>
-        </>
-      )}
+              })
+            }
+          </Async>
+        </motion.ul>
+      </AnimatePresence>
     </Section>
   );
 }

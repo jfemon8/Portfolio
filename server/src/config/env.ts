@@ -15,6 +15,8 @@ const envSchema = z.object({
   NODE_ENV: z.string().default('development'),
   PORT: z.coerce.number().int().positive().default(5000),
   CLIENT_URL: z.string().default('http://localhost:5173'),
+  // Separate from CLIENT_URL: that is a CORS allow-list which may hold several origins, while sitemap/robots need the one canonical origin.
+  SITE_URL: z.string().optional(),
 
   MONGODB_URI: z.string().min(1, 'MONGODB_URI is required'),
 
@@ -404,6 +406,8 @@ export interface Env {
   isProd: boolean;
   port: number;
   clientOrigins: string[];
+  /** The single canonical origin every emitted URL must use. */
+  siteUrl: string;
   mongoUri: string;
   jwtSecret: string;
   jwtExpiresIn: string;
@@ -429,6 +433,14 @@ export const env: Env = {
     .split(',')
     .map((s) => s.trim().replace(/\/$/, ''))
     .filter(Boolean),
+
+  siteUrl: (
+    e.SITE_URL ??
+    (e.CLIENT_URL ?? 'http://localhost:5173').split(',')[0] ??
+    'http://localhost:5173'
+  )
+    .trim()
+    .replace(/\/$/, ''),
 
   mongoUri: e.MONGODB_URI,
 

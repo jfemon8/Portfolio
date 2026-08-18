@@ -6,11 +6,9 @@ import { useSectionCopy } from '@/hooks/useSectionCopy';
 import { useSiteCopy } from '@/hooks/useSiteCopy';
 import Reveal from '@/components/motion/Reveal';
 import ProjectCard from '@/components/shared/ProjectCard';
-import {
-  ErrorState,
-  EmptyState,
-  CardGridSkeleton,
-} from '@/components/ui/States';
+import Async from '@/components/ui/Async';
+import { ProjectCardSkeleton } from '@/components/ui/Skeletons';
+import { PAGE_SEO } from '@/lib/pageSeo';
 import { useProjects } from '@/hooks/usePortfolio';
 import { cn } from '@/lib/cn';
 import type { ProjectCategory } from '@/types';
@@ -21,8 +19,8 @@ const FILTERS: Filter[] = ['all', 'fullstack', 'frontend', 'backend'];
 
 export default function Projects() {
   const [filter, setFilter] = useState<Filter>('all');
-  const { data, isLoading, isError, refetch } = useProjects();
-  const all = data?.data ?? [];
+  const projectsQuery = useProjects();
+  const all = projectsQuery.data?.data ?? [];
   const projects =
     filter === 'all' ? all : all.filter((p) => p.category === filter);
   const copy = useSectionCopy('projects', {
@@ -50,9 +48,9 @@ export default function Projects() {
   return (
     <>
       <Seo
-        title="Projects"
+        title={PAGE_SEO.projects.title}
         path="/projects"
-        description="Full-Stack Platforms, Front-Ends And Experiments — From MERN Products To .NET E-Commerce."
+        description={PAGE_SEO.projects.description}
         jsonLd={[
           breadcrumbSchema([
             { name: 'Home', path: '/' },
@@ -65,12 +63,13 @@ export default function Projects() {
               name: p.title,
               path: `/projects/${p.slug}`,
             })),
-            'Full-Stack Platforms, Front-Ends And Experiments — From MERN Products To .NET E-Commerce.'
+            PAGE_SEO.projects.description
           ),
         ]}
       />
       <Section id="projects-page" className="mt-4 pt-4">
         <SectionHeading
+          as="h1"
           index={copy.index}
           title={copy.title}
           subtitle={copy.subtitle}
@@ -93,18 +92,23 @@ export default function Projects() {
           ))}
         </div>
 
-        {isLoading && <CardGridSkeleton />}
-        {isError && <ErrorState onRetry={() => void refetch()} />}
-        {!isLoading && !isError && projects.length === 0 && (
-          <EmptyState message={st.projectsFilterEmpty} />
-        )}
-
         <div className="grid auto-rows-[1fr] gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {projects.map((p, i) => (
-            <Reveal key={p._id} delay={i * 0.05}>
-              <ProjectCard project={p} />
-            </Reveal>
-          ))}
+          <Async
+            query={projectsQuery}
+            select={() => projects}
+            hint="projects"
+            skeleton={(n) => <ProjectCardSkeleton count={n} />}
+            empty={st.projectsFilterEmpty}
+            stateClass="col-span-full"
+          >
+            {(items) =>
+              items.map((p, i) => (
+                <Reveal key={p._id} delay={i * 0.05}>
+                  <ProjectCard project={p} />
+                </Reveal>
+              ))
+            }
+          </Async>
         </div>
       </Section>
     </>
