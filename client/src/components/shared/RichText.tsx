@@ -27,6 +27,14 @@ const ALLOWED_TAGS = new Set([
   'pre',
   'div',
   'span',
+  'table',
+  'thead',
+  'tbody',
+  'tfoot',
+  'tr',
+  'th',
+  'td',
+  'caption',
 ]);
 
 const BLOCK_TAGS = new Set([
@@ -95,6 +103,20 @@ const serialize = (node: ChildNode): string => {
 
   if (tag === 'li' && !children.trim()) {
     return '<li><br /></li>';
+  }
+
+  if (tag === 'th' || tag === 'td') {
+    // Only the two attributes that carry table structure survive; anything else a paste brought along is dropped like every other attribute.
+    const span = (name: string): string => {
+      const n = Number(element.getAttribute(name));
+      return Number.isInteger(n) && n > 1 && n <= 100 ? ` ${name}="${n}"` : '';
+    };
+    return `<${tag}${span('colspan')}${span('rowspan')}>${children}</${tag}>`;
+  }
+
+  if (tag === 'table') {
+    // Wrapped so a wide table scrolls inside its own box instead of pushing the article sideways on a phone.
+    return `<div class="rt-table"><table>${children}</table></div>`;
   }
 
   if (BLOCK_TAGS.has(tag) && !children.trim()) {

@@ -305,6 +305,12 @@
 .prose-neon th {
   @apply bg-card/60 font-semibold text-foreground;
 }
+.prose-neon .rt-table {
+  @apply my-6 overflow-x-auto;
+}
+.prose-neon .rt-table table {
+  @apply my-0 min-w-[26rem];
+}
 
 /* Links are natively draggable by default, which fights click-and-hold panning in PdfViewer. */
 .annotationLayer a {

@@ -8,6 +8,7 @@ import {
   List,
   Quote,
   Pencil,
+  Table as TableIcon,
   Trash2,
 } from 'lucide-react';
 import { cn } from '@/lib/cn';
@@ -36,6 +37,12 @@ type ActiveState = {
   list: boolean;
 };
 
+// execCommand has no table command, so the button seeds real markup the author then types into.
+const TABLE_SNIPPET =
+  '<table><thead><tr><th>Heading</th><th>Heading</th><th>Heading</th></tr></thead>' +
+  '<tbody><tr><td>Cell</td><td>Cell</td><td>Cell</td></tr>' +
+  '<tr><td>Cell</td><td>Cell</td><td>Cell</td></tr></tbody></table><p><br /></p>';
+
 const TOOLS: Tool[] = [
   { icon: Bold, title: 'Bold', command: 'bold' },
   { icon: Italic, title: 'Italic', command: 'italic' },
@@ -43,6 +50,12 @@ const TOOLS: Tool[] = [
   { icon: Code, title: 'Code block', command: 'formatBlock', value: 'pre' },
   { icon: Quote, title: 'Quote', command: 'formatBlock', value: 'blockquote' },
   { icon: List, title: 'Bullet list', command: 'insertUnorderedList' },
+  {
+    icon: TableIcon,
+    title: 'Table',
+    command: 'insertHTML',
+    value: TABLE_SNIPPET,
+  },
   { icon: Link2, title: 'Link', command: 'createLink', prompt: 'Paste a URL' },
   { icon: Trash2, title: 'Clear formatting', command: 'removeFormat' },
 ];
@@ -194,7 +207,8 @@ export default function RichTextEditor({
             'prose-neon min-h-[18rem] w-full overflow-y-auto bg-transparent p-4 text-sm outline-none',
             'focus:outline-none [&_a]:text-neon [&_blockquote]:border-l-2 [&_blockquote]:border-border/70 [&_blockquote]:pl-4',
             '[&_h2]:mt-0 [&_h2]:text-2xl [&_pre]:rounded-xl [&_pre]:border [&_pre]:border-border/70 [&_pre]:bg-background/60 [&_pre]:p-4',
-            '[&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5'
+            '[&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5',
+            '[&_table]:w-full [&_table]:border-collapse [&_th]:border [&_td]:border [&_th]:border-border/60 [&_td]:border-border/60 [&_th]:px-3 [&_td]:px-3 [&_th]:py-2 [&_td]:py-2 [&_th]:bg-muted/40 [&_th]:text-left'
           )}
           style={{ minHeight }}
         />
