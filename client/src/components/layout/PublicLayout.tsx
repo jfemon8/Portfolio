@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { Outlet, useLocation, useNavigationType } from 'react-router-dom';
 import Footer from './Footer';
 import PremiumBackground from './PremiumBackground';
@@ -28,6 +28,15 @@ export default function PublicLayout() {
 
   useEffect(() => initThemeSync(), []);
 
+  // Read by the restore effect instead of sitting in its deps: a list page syncs its filters with `setSearchParams(replace)`, and re-running the effect on that REPLACE would tear down an in-flight restore and send the visitor to the top.
+  const navType = useRef(navigationType);
+  const instantRef = useRef(instant);
+
+  useLayoutEffect(() => {
+    navType.current = navigationType;
+    instantRef.current = instant;
+  });
+
   useEffect(() => {
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
   }, []);
@@ -51,17 +60,44 @@ export default function PublicLayout() {
   // Waits for the `/#section` target to mount, lands on it, then keeps re-snapping while sections above are still fetching and reflowing taller.
   useEffect(() => {
     if (!hash) {
-      const saved = navigationType === 'POP' ? getScroll(pathname) : undefined;
+      const saved = navType.current === 'POP' ? getScroll(pathname) : undefined;
       if (saved == null) {
         resetScroll();
         return;
       }
-      // One frame to let the route's content commit, then a short follow-up in case images/fonts are still reflowing the page.
-      const raf = requestAnimationFrame(() => scrollToY(saved));
-      const settle = setTimeout(() => scrollToY(saved), 150);
+      // Re-applies until the offset holds: a restored list paints over several frames as its queries land, and one jump would leave the visitor short of where they were.
+      let rafId = 0;
+      let stable = 0;
+      const deadline = performance.now() + 2000;
+      const step = (): void => {
+        // Clamped to what is reachable right now, so a list still fetching later pages is chased as it grows instead of overshooting.
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const target = Math.min(saved, Math.max(0, max));
+        if (Math.abs(window.scrollY - target) > 2) {
+          scrollToY(target);
+          stable = 0;
+        } else if (queryClient.isFetching() === 0) {
+          stable += 1;
+        }
+        if (stable < 10 && performance.now() < deadline) {
+          rafId = requestAnimationFrame(step);
+        }
+      };
+      // A visitor who starts scrolling owns the position from that moment on.
+      const abort = (): void => {
+        cancelAnimationFrame(rafId);
+        stable = Infinity;
+      };
+      rafId = requestAnimationFrame(step);
+      window.addEventListener('wheel', abort, { passive: true, once: true });
+      window.addEventListener('touchstart', abort, {
+        passive: true,
+        once: true,
+      });
       return () => {
-        cancelAnimationFrame(raf);
-        clearTimeout(settle);
+        cancelAnimationFrame(rafId);
+        window.removeEventListener('wheel', abort);
+        window.removeEventListener('touchstart', abort);
       };
     }
     const id = hash.slice(1);
@@ -75,7 +111,7 @@ export default function PublicLayout() {
 
     void waitForElementId(id).then((el) => {
       if (cancelled || !el) return;
-      scrollToId(id, instant);
+      scrollToId(id, instantRef.current);
       window.addEventListener('wheel', abortChase, {
         passive: true,
         once: true,
@@ -113,7 +149,7 @@ export default function PublicLayout() {
           };
           rafId = requestAnimationFrame(chase);
         },
-        instant ? 50 : 500
+        instantRef.current ? 50 : 500
       );
     });
 
@@ -124,7 +160,7 @@ export default function PublicLayout() {
       window.removeEventListener('wheel', abortChase);
       window.removeEventListener('touchstart', abortChase);
     };
-  }, [pathname, hash, instant, navigationType]);
+  }, [pathname, hash]);
 
   useEffect(() => {
     track('pageview', pathname);
