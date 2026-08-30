@@ -295,6 +295,15 @@
 .prose-neon hr {
   @apply my-10 border-border/60;
 }
+.prose-neon pre {
+  @apply my-6 overflow-x-auto rounded-xl border border-border/70 bg-card/60 p-4 text-sm;
+}
+.prose-neon code {
+  @apply rounded bg-card/60 px-1.5 py-0.5 font-mono text-[0.85em] text-neon;
+}
+.prose-neon pre code {
+  @apply bg-transparent p-0 text-inherit;
+}
 .prose-neon table {
   @apply w-full border-collapse text-sm;
 }
