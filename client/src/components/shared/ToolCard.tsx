@@ -29,9 +29,12 @@ export default function ToolCard({
         <h3 className="mt-4 text-lg font-bold text-foreground transition-colors group-hover:text-neon">
           {tool.name}
         </h3>
-        <p className="mt-1 flex-1 text-sm leading-relaxed text-muted-foreground line-clamp-2">
-          {tool.description}
-        </p>
+        {/* flex-1 on a wrapper, not the clamped <p> — see Blog.tsx card for why. */}
+        <div className="mt-1 flex-1">
+          <p className="text-sm leading-relaxed text-muted-foreground line-clamp-2">
+            {tool.description}
+          </p>
+        </div>
 
         <span className="mt-4 flex items-center gap-1 text-sm font-medium text-neon">
           Open <ArrowUpRight className="h-4 w-4" />

@@ -162,9 +162,12 @@ export default function Blog() {
                         <h2 className="text-lg font-bold text-foreground transition-colors group-hover:text-neon">
                           {post.title}
                         </h2>
-                        <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground line-clamp-3">
-                          {post.excerpt}
-                        </p>
+                        {/* flex-1 on this wrapper, not the clamped <p> — flex-grow on the clamped element itself defeats line-clamp. */}
+                        <div className="mt-2 flex-1">
+                          <p className="text-sm leading-relaxed text-muted-foreground line-clamp-3">
+                            {post.excerpt}
+                          </p>
+                        </div>
                         <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-4 text-xs text-muted-foreground/70">
                           <span className="flex items-center gap-1.5">
                             <Calendar className="h-3.5 w-3.5" />

@@ -24,6 +24,8 @@ const ALLOWED_TAGS = new Set([
   'h4',
   'a',
   'img',
+  'sup',
+  'sub',
   'code',
   'pre',
   'div',

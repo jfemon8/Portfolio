@@ -154,10 +154,13 @@ export default function Tools() {
                   <h3 className="mt-4 text-lg font-bold text-foreground transition-colors group-hover:text-neon">
                     {JOBS_CARD.title}
                   </h3>
-                  <p className="mt-1 flex-1 text-sm leading-relaxed text-muted-foreground line-clamp-2">
-                    Government circulars, company career pages and remote roles
-                    — collected and de-duplicated every night.
-                  </p>
+                  {/* flex-1 on a wrapper, not the clamped <p> — see Blog.tsx card for why. */}
+                  <div className="mt-1 flex-1">
+                    <p className="text-sm leading-relaxed text-muted-foreground line-clamp-2">
+                      All the ongoing Government circulars, opportunities from
+                      company career pages and remote roles.
+                    </p>
+                  </div>
 
                   <span className="mt-4 flex items-center gap-1 text-sm font-medium text-neon">
                     Open <ArrowUpRight className="h-4 w-4" />

@@ -95,14 +95,17 @@ export default function ProjectCard({
             )}
           </div>
 
-          <p
-            className={cn(
-              'flex-1 text-sm leading-relaxed text-muted-foreground',
-              featured ? 'line-clamp-3' : 'line-clamp-2'
-            )}
-          >
-            {project.summary || project.tagline}
-          </p>
+          {/* flex-1 on a wrapper, not the clamped <p> — see Blog.tsx card for why. */}
+          <div className="flex-1">
+            <p
+              className={cn(
+                'text-sm leading-relaxed text-muted-foreground',
+                featured ? 'line-clamp-3' : 'line-clamp-2'
+              )}
+            >
+              {project.summary || project.tagline}
+            </p>
+          </div>
 
           <div className="mt-4 flex flex-wrap gap-1.5">
             {(project.techStack ?? []).slice(0, featured ? 7 : 4).map((t) => (

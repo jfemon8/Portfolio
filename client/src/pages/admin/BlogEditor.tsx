@@ -26,7 +26,6 @@ const toLocalInput = (iso?: string): string => {
 
 const empty: BlogForm = {
   title: '',
-  excerpt: '',
   content: '',
   coverImage: '',
   coverPublicId: '',
@@ -86,7 +85,7 @@ export default function BlogEditor() {
 
   return (
     <div>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-6">
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2 border-b border-border/60 pb-2">
         <button
           onClick={() => navigate('/admin/blog')}
           className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-neon"
@@ -104,24 +103,14 @@ export default function BlogEditor() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
-        <GlassCard className="space-y-4 p-6">
+        <GlassCard className="space-y-4 p-2 md:p-4">
           <div>
             <label className="label">Title</label>
             <input
-              className="input text-lg"
+              className="input text-base"
               value={f.title ?? ''}
               onChange={(e) => set('title', e.target.value)}
               placeholder="An awesome post title"
-            />
-          </div>
-          <div>
-            <label className="label">Excerpt</label>
-            <textarea
-              rows={2}
-              className="input resize-none"
-              value={f.excerpt ?? ''}
-              onChange={(e) => set('excerpt', e.target.value)}
-              placeholder="Short summary shown on cards"
             />
           </div>
           <div>
@@ -129,6 +118,7 @@ export default function BlogEditor() {
             <RichTextEditor
               value={f.content ?? ''}
               onChange={(v) => set('content', v)}
+              stickyToolbar
             />
           </div>
         </GlassCard>

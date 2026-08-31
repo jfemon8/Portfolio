@@ -522,8 +522,7 @@ const tools: ITool[] = toolsRaw.map((t) => ({
 
 const sampleBlog: Partial<IBlogPost> = {
   title: 'Welcome to My Developer Journey',
-  excerpt:
-    'A quick intro to who I am, what I build, and what you can expect from this blog.',
+  // No excerpt field — BlogPost's pre-save hook derives it from content.
   content:
     "# Welcome 👋\n\nI'm **Md Jannatul Ferdhous Emon**, an Assistant Front-End Developer who loves turning ideas into fast, accessible, and delightful web apps.\n\nThis blog is where I'll share:\n\n- Notes from building **MERN** + **.NET** applications\n- **Competitive programming** writeups (1000+ problems and counting!)\n- Lessons learned shipping real products\n\nThanks for stopping by — more soon!",
   tags: ['intro', 'mern', 'career'],

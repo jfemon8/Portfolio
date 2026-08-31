@@ -4,6 +4,8 @@ import {
   Italic,
   Underline,
   Strikethrough,
+  Superscript,
+  Subscript,
   Pilcrow,
   Heading1,
   Heading2,
@@ -15,9 +17,12 @@ import {
   Image as ImageIcon,
   List,
   ListOrdered,
+  Indent,
+  Outdent,
   AlignLeft,
   AlignCenter,
   AlignRight,
+  AlignJustify,
   Quote,
   Pencil,
   Table as TableIcon,
@@ -37,6 +42,8 @@ interface RichTextEditorProps {
   placeholder?: string;
   /** Cloudinary folder for images inserted via the toolbar's upload tab. */
   folder?: string;
+  /** Pins the toolbar below the admin header for a full-page editor; leave off inside a Modal. */
+  stickyToolbar?: boolean;
 }
 
 type Tool = {
@@ -52,6 +59,8 @@ type ActiveKey =
   | 'italic'
   | 'underline'
   | 'strike'
+  | 'superscript'
+  | 'subscript'
   | 'h1'
   | 'h2'
   | 'h3'
@@ -61,7 +70,8 @@ type ActiveKey =
   | 'ol'
   | 'alignLeft'
   | 'alignCenter'
-  | 'alignRight';
+  | 'alignRight'
+  | 'alignJustify';
 
 type ActiveState = Record<ActiveKey, boolean> & { inlineCode: boolean };
 
@@ -118,6 +128,20 @@ const TOOL_GROUPS: Tool[][] = [
   ],
   [
     {
+      icon: Superscript,
+      title: 'Superscript',
+      command: 'superscript',
+      activeKey: 'superscript',
+    },
+    {
+      icon: Subscript,
+      title: 'Subscript',
+      command: 'subscript',
+      activeKey: 'subscript',
+    },
+  ],
+  [
+    {
       icon: Quote,
       title: 'Quote',
       command: 'formatBlock',
@@ -147,6 +171,10 @@ const TOOL_GROUPS: Tool[][] = [
     },
   ],
   [
+    { icon: Indent, title: 'Indent', command: 'indent' },
+    { icon: Outdent, title: 'Outdent', command: 'outdent' },
+  ],
+  [
     {
       icon: AlignLeft,
       title: 'Align left',
@@ -164,6 +192,12 @@ const TOOL_GROUPS: Tool[][] = [
       title: 'Align right',
       command: 'justifyRight',
       activeKey: 'alignRight',
+    },
+    {
+      icon: AlignJustify,
+      title: 'Justify',
+      command: 'justifyFull',
+      activeKey: 'alignJustify',
     },
   ],
   [
@@ -184,6 +218,8 @@ const initialActiveState: ActiveState = {
   italic: false,
   underline: false,
   strike: false,
+  superscript: false,
+  subscript: false,
   h1: false,
   h2: false,
   h3: false,
@@ -195,6 +231,7 @@ const initialActiveState: ActiveState = {
   alignLeft: false,
   alignCenter: false,
   alignRight: false,
+  alignJustify: false,
 };
 
 const escapeHtml = (value: string): string =>
@@ -220,6 +257,7 @@ export default function RichTextEditor({
   rows = 12,
   placeholder = 'Write your content here...',
   folder = 'portfolio/richtext',
+  stickyToolbar = false,
 }: RichTextEditorProps) {
   const ref = useRef<HTMLDivElement>(null);
   const savedRangeRef = useRef<Range | null>(null);
@@ -268,6 +306,8 @@ export default function RichTextEditor({
         italic: document.queryCommandState('italic'),
         underline: document.queryCommandState('underline'),
         strike: document.queryCommandState('strikeThrough'),
+        superscript: document.queryCommandState('superscript'),
+        subscript: document.queryCommandState('subscript'),
         h1: block?.tagName === 'H1',
         h2: block?.tagName === 'H2',
         h3: block?.tagName === 'H3',
@@ -279,6 +319,7 @@ export default function RichTextEditor({
         alignLeft: document.queryCommandState('justifyLeft'),
         alignCenter: document.queryCommandState('justifyCenter'),
         alignRight: document.queryCommandState('justifyRight'),
+        alignJustify: document.queryCommandState('justifyFull'),
       });
     };
 
@@ -297,6 +338,34 @@ export default function RichTextEditor({
     if (!editable) return;
     editable.focus();
     document.execCommand(tool.command, false, tool.value);
+    window.requestAnimationFrame(sync);
+  };
+
+  /** Chromium nests a new <sup>/<sub> instead of exiting a collapsed caret out of one, so step outside it manually. */
+  const toggleSupSub = (command: 'superscript' | 'subscript'): void => {
+    const editable = ref.current;
+    const selection = window.getSelection();
+    if (!editable || !selection || selection.rangeCount === 0) return;
+    editable.focus();
+
+    const tag = command === 'superscript' ? 'sup' : 'sub';
+    const anchorElement =
+      (selection.anchorNode instanceof HTMLElement
+        ? selection.anchorNode
+        : selection.anchorNode?.parentElement) ?? null;
+    const wrapper = anchorElement?.closest(tag);
+
+    if (wrapper && editable.contains(wrapper) && selection.isCollapsed) {
+      const marker = document.createTextNode('​');
+      wrapper.after(marker);
+      const range = document.createRange();
+      range.setStart(marker, 1);
+      range.collapse(true);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    } else {
+      document.execCommand(command, false);
+    }
     window.requestAnimationFrame(sync);
   };
 
@@ -418,24 +487,33 @@ export default function RichTextEditor({
 
   const toolButtonClass = (isOn: boolean): string =>
     cn(
-      'rounded-lg border px-2.5 py-2 transition-colors',
+      'flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border transition-colors sm:h-9 sm:w-9',
       isOn
         ? 'border-primary/40 bg-primary/10 text-primary'
         : 'border-transparent text-muted-foreground hover:border-border/70 hover:bg-card hover:text-foreground'
     );
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm">
-      <div className="flex flex-wrap items-center gap-1 border-b border-border/60 bg-muted/35 px-2.5 py-2">
-        <div className="mr-2 hidden items-center gap-2 rounded-full border border-border/60 bg-card px-3 py-1 text-2xs font-medium text-muted-foreground sm:flex">
-          <Pencil className="h-3 w-3" />
-          Rich text editor
-        </div>
-
+    // w-0 + min-w-full (not w-full) stops the toolbar's horizontal scroll from forcing this card, and any grid/flex ancestor, wider than the viewport on mobile.
+    <div
+      className={cn(
+        'w-0 min-w-full rounded-lg border border-border/70 bg-card shadow-sm',
+        // A sticky child can't have an overflow-hidden ancestor, so that case rounds the toolbar/footer corners directly instead.
+        !stickyToolbar && 'overflow-hidden'
+      )}
+    >
+      <div
+        className={cn(
+          'no-scrollbar flex items-center gap-1 overflow-x-auto border-b border-border/60 p-1 sm:flex-wrap',
+          stickyToolbar
+            ? 'sticky top-16 z-20 rounded-t-lg bg-card'
+            : 'bg-muted/35'
+        )}
+      >
         {TOOL_GROUPS.map((group, i) => (
           <div
             key={i}
-            className="flex items-center gap-1 border-r border-border/60 pr-1 last:border-r-0"
+            className="flex shrink-0 items-center gap-1 border-r border-border/60 pr-1 last:border-r-0"
           >
             {group.map((t) => (
               <button
@@ -444,7 +522,11 @@ export default function RichTextEditor({
                 title={t.title}
                 aria-pressed={isActive(t)}
                 onMouseDown={(e) => e.preventDefault()}
-                onClick={() => applyCommand(t)}
+                onClick={() =>
+                  t.command === 'superscript' || t.command === 'subscript'
+                    ? toggleSupSub(t.command)
+                    : applyCommand(t)
+                }
                 className={toolButtonClass(isActive(t))}
               >
                 <t.icon className="h-4 w-4" />
@@ -453,7 +535,7 @@ export default function RichTextEditor({
           </div>
         ))}
 
-        <div className="flex items-center gap-1">
+        <div className="flex shrink-0 items-center gap-1">
           <button
             type="button"
             title="Inline code"
@@ -509,10 +591,6 @@ export default function RichTextEditor({
           )}
           style={{ minHeight }}
         />
-        <div className="border-t border-border/60 bg-muted/20 px-4 py-2 text-2xs text-muted-foreground">
-          Format selected text, then keep typing. Use the link and image buttons
-          to insert media — the editor stores HTML as the source of truth.
-        </div>
       </div>
 
       <RichTextLinkModal

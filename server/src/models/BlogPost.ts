@@ -1,5 +1,6 @@
 import mongoose, { type Model } from 'mongoose';
 import { toSlug } from '../utils/slug.js';
+import { excerptFromHtml } from '../utils/excerpt.js';
 import type { IBlogPost } from '../types/index.js';
 
 const blogSchema = new mongoose.Schema<IBlogPost>(
@@ -34,6 +35,8 @@ blogSchema.pre('validate', function prep(next) {
   if (this.isModified('content')) {
     const words = (this.content || '').trim().split(/\s+/).length;
     this.readingTime = Math.max(1, Math.round(words / 200));
+    // The excerpt is always derived from content — there's no separate admin input for it.
+    this.excerpt = excerptFromHtml(this.content || '');
   }
   if (
     this.status === 'scheduled' &&
