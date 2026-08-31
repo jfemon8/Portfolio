@@ -6,8 +6,6 @@ import { capitalizeFirst } from '@/lib/text';
 
 const config: ResourceConfig<ProjectDoc> = {
   title: 'Projects',
-  subtitle:
-    'Projects Shown On The Public /projects Page (Each One Also Gets A /projects/:slug Detail Page With The Full Case Study). Mark A Project As Featured To Also Show It In The Featured-Projects Strip On Your Homepage.',
   singular: 'project',
   base: 'projects',
   modalSize: 'lg',
@@ -191,7 +189,7 @@ const config: ResourceConfig<ProjectDoc> = {
   ],
   labelOf: (i) => i.title,
   renderItem: (i) => (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-2">
       {i.coverImage && (
         <img
           src={i.coverImage}

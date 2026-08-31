@@ -79,7 +79,6 @@ export default function AnalyticsManager() {
     <div>
       <PageHeader
         title="Analytics"
-        subtitle="Privacy-friendly, cookie-less visitor insights — page views, sessions, scroll depth, device & country breakdown."
         action={
           <select
             value={days}
@@ -93,18 +92,18 @@ export default function AnalyticsManager() {
         }
       />
 
-      <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((c) => (
-          <GlassCard key={c.label} className="p-5">
-            <c.icon className="mb-3 h-5 w-5 text-neon" />
+          <GlassCard key={c.label} className="p-4">
+            <c.icon className="mb-2 h-5 w-5 text-neon" />
             <p className="text-2xl font-bold text-foreground">{c.value}</p>
             <p className="text-xs text-muted-foreground">{c.label}</p>
           </GlassCard>
         ))}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <GlassCard className="p-4 sm:p-6 lg:col-span-2">
+      <div className="grid gap-4 lg:grid-cols-3">
+        <GlassCard className="p-2 md:p-4 lg:col-span-2">
           <h3 className="mb-4 font-semibold text-foreground">
             Page views over time
           </h3>
@@ -130,7 +129,7 @@ export default function AnalyticsManager() {
           </ResponsiveContainer>
         </GlassCard>
 
-        <GlassCard className="p-4 sm:p-6">
+        <GlassCard className="p-2 md:p-4">
           <h3 className="mb-4 font-semibold text-foreground">By Device</h3>
           <ResponsiveContainer width="100%" height={240}>
             <PieChart>
@@ -149,11 +148,11 @@ export default function AnalyticsManager() {
               <Tooltip contentStyle={tooltipStyle} />
             </PieChart>
           </ResponsiveContainer>
-          <div className="mt-2 flex flex-wrap justify-center gap-3 text-xs">
+          <div className="mt-2 flex flex-wrap justify-center gap-2 text-xs">
             {a.byDevice.map((d, i) => (
               <span
                 key={d._id}
-                className="flex items-center gap-1.5 text-muted-foreground"
+                className="flex items-center gap-1 text-muted-foreground"
               >
                 <span
                   className="h-2.5 w-2.5 rounded-full"
@@ -165,9 +164,9 @@ export default function AnalyticsManager() {
           </div>
         </GlassCard>
 
-        <GlassCard className="p-4 sm:p-6">
+        <GlassCard className="p-2 md:p-4">
           <h3 className="mb-4 font-semibold text-foreground">Events</h3>
-          <div className="space-y-3">
+          <div className="space-y-2">
             {a.byType.map((t) => {
               const Icon = typeIcon[t._id as VisitType] ?? Eye;
               return (
@@ -188,7 +187,7 @@ export default function AnalyticsManager() {
           </div>
         </GlassCard>
 
-        <GlassCard className="p-4 sm:p-6 lg:col-span-2">
+        <GlassCard className="p-2 md:p-4 lg:col-span-2">
           <h3 className="mb-4 font-semibold text-foreground">Top Projects</h3>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={a.topProjects} layout="vertical">
@@ -209,7 +208,7 @@ export default function AnalyticsManager() {
           </ResponsiveContainer>
         </GlassCard>
 
-        <GlassCard className="p-4 sm:p-6 lg:col-span-3">
+        <GlassCard className="p-2 md:p-4 lg:col-span-3">
           <h3 className="mb-4 font-semibold text-foreground">
             Visitor Activity
           </h3>
@@ -220,10 +219,10 @@ export default function AnalyticsManager() {
           />
         </GlassCard>
 
-        <GlassCard className="p-4 sm:p-6 lg:col-span-2">
+        <GlassCard className="p-2 md:p-4 lg:col-span-2">
           <h3 className="mb-4 font-semibold text-foreground">By Country</h3>
           {byCountry.length === 0 ? (
-            <p className="py-10 text-center text-sm text-muted-foreground">
+            <p className="py-4 text-center text-sm text-muted-foreground">
               No country data yet.
             </p>
           ) : (
@@ -252,14 +251,14 @@ export default function AnalyticsManager() {
           )}
         </GlassCard>
 
-        <GlassCard className="p-4 sm:p-6">
+        <GlassCard className="p-2 md:p-4">
           <h3 className="mb-4 font-semibold text-foreground">By Browser</h3>
           {byBrowser.length === 0 ? (
-            <p className="py-10 text-center text-sm text-muted-foreground">
+            <p className="py-4 text-center text-sm text-muted-foreground">
               No data yet.
             </p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {byBrowser.map((b) => (
                 <div
                   key={b._id}
@@ -277,17 +276,17 @@ export default function AnalyticsManager() {
           )}
         </GlassCard>
 
-        <GlassCard className="p-4 sm:p-6 lg:col-span-3">
+        <GlassCard className="p-2 md:p-4 lg:col-span-3">
           <h3 className="font-semibold text-foreground">Scroll Depth</h3>
           <p className="mb-4 text-xs text-muted-foreground">
             How far visitors scroll through a page.
           </p>
-          <div className="space-y-3">
+          <div className="space-y-2">
             {[25, 50, 75, 100].map((bucket) => {
               const count = depthMap.get(bucket) ?? 0;
               const pct = Math.round((count / depthMax) * 100);
               return (
-                <div key={bucket} className="flex items-center gap-3 text-sm">
+                <div key={bucket} className="flex items-center gap-2 text-sm">
                   <span className="w-10 shrink-0 font-mono text-muted-foreground">
                     {bucket}%
                   </span>

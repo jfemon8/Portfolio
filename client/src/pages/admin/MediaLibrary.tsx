@@ -92,7 +92,6 @@ export default function MediaLibrary() {
     <div>
       <PageHeader
         title="Media library"
-        subtitle="Every image uploaded across the site (avatar, project covers, blog covers, hero background, SEO social image). Filter by folder, copy URLs, or delete assets you no longer use."
         action={
           <select
             value={folder}
@@ -125,7 +124,7 @@ export default function MediaLibrary() {
                 className="h-full w-full object-cover"
               />
             </div>
-            <div className="space-y-2 p-3">
+            <div className="space-y-2 p-2">
               <p
                 className="truncate font-mono text-2xs text-muted-foreground"
                 title={a.publicId}
@@ -140,7 +139,7 @@ export default function MediaLibrary() {
                 <button
                   onClick={() => void copyUrl(a.url)}
                   title="Copy URL"
-                  className="flex-1 rounded-lg border border-border/70 p-2.5 text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon"
+                  className="flex-1 rounded-lg border border-border/70 p-2 text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon"
                 >
                   <Copy className="mx-auto h-4 w-4" />
                 </button>
@@ -155,7 +154,7 @@ export default function MediaLibrary() {
                     if (ok) del.mutate(a.publicId);
                   }}
                   title="Delete"
-                  className="flex-1 rounded-lg border border-border/70 p-2.5 text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
+                  className="flex-1 rounded-lg border border-border/70 p-2 text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
                 >
                   <Trash2 className="mx-auto h-4 w-4" />
                 </button>

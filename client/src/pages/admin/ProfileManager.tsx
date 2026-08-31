@@ -185,13 +185,10 @@ export default function ProfileManager() {
 
   return (
     <form onSubmit={submit}>
-      <PageHeader
-        title="Profile"
-        subtitle="Your name, title, tagline, avatar, resume, social links, languages and hero stats — used in the Hero (top of homepage), the About section and the Contact section on the public site."
-      />
+      <PageHeader title="Profile" />
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <GlassCard className="space-y-4 p-6">
+        <GlassCard className="space-y-4 p-4">
           <h3 className="font-semibold text-neon">Basics</h3>
           {basics.map(([k, label]) => (
             <div key={k}>
@@ -228,7 +225,7 @@ export default function ProfileManager() {
               Hero roles. Custom layout (not the shared ArrayEditor) so it
               renders as a flat sub-section instead of a nested GlassCard. */}
           <div className="border-t border-border/60 pt-4">
-            <div className="mb-3 flex items-center justify-between">
+            <div className="mb-2 flex items-center justify-between">
               <label className="label mb-0">Stats (Hero Terminal)</label>
               <Button
                 type="button"
@@ -280,7 +277,7 @@ export default function ProfileManager() {
 
           {/* Languages — inline within Basics, immediately under Stats. */}
           <div className="border-t border-border/60 pt-4">
-            <div className="mb-3 flex items-center justify-between">
+            <div className="mb-2 flex items-center justify-between">
               <label className="label mb-0">Languages</label>
               <Button
                 type="button"
@@ -380,7 +377,7 @@ export default function ProfileManager() {
                   </a>
                 </div>
               )}
-              <label className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary/50 hover:bg-muted/60 hover:text-primary">
+              <label className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-border bg-muted/40 px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:border-primary/50 hover:bg-muted/60 hover:text-primary">
                 {resumeBusy ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
@@ -397,7 +394,7 @@ export default function ProfileManager() {
             </div>
           </GlassCard>
 
-          <GlassCard className="p-6">
+          <GlassCard className="p-4">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="font-semibold text-neon">Social links</h3>
               <Button
@@ -420,7 +417,7 @@ export default function ProfileManager() {
                   key={socialKeys[i] ?? i}
                   className="rounded-xl border border-border bg-muted/30 p-4"
                 >
-                  <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="grid gap-2 sm:grid-cols-2">
                     <div>
                       <label className="label">Label</label>
                       <input
@@ -440,7 +437,7 @@ export default function ProfileManager() {
                       />
                     </div>
                   </div>
-                  <div className="mt-3">
+                  <div className="mt-2">
                     <ImageUpload
                       label="Icon image (override)"
                       value={s.iconImage}
@@ -453,7 +450,7 @@ export default function ProfileManager() {
                       }}
                     />
                   </div>
-                  <div className="mt-3 flex justify-end">
+                  <div className="mt-2 flex justify-end">
                     <button
                       type="button"
                       onClick={() => delSocial(i)}

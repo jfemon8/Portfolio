@@ -45,7 +45,6 @@ export default function BlogManager() {
     <div>
       <PageHeader
         title="Blog"
-        subtitle="Articles shown on the public /blog page (each one also gets its own /blog/:slug detail page). Drafts stay hidden from visitors until status is set to Published."
         action={
           <Link to="/admin/blog/new">
             <Button>
@@ -61,7 +60,7 @@ export default function BlogManager() {
         <EmptyState message="No posts yet — write your first article!" />
       )}
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         {posts.map((p) => (
           <GlassCard
             key={p._id}

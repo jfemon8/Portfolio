@@ -481,7 +481,6 @@ export default function SiteCopyManager() {
     <div>
       <PageHeader
         title="Site copy"
-        subtitle="Every piece of text on the public site — section headings, button labels, status messages, toasts, contact-form errors and the auto-reply email template. Leave any field blank to use the built-in English default."
         action={
           <Button onClick={save} disabled={!form || saving}>
             {saving && <Loader2 className="h-4 w-4 animate-spin" />}
@@ -497,7 +496,7 @@ export default function SiteCopyManager() {
             title='Section headings — the title, sub-title and tiny "index" tag above each public section'
             defaultOpen
           >
-            <div className="space-y-3 sm:space-y-5">
+            <div className="space-y-2 md:space-y-4">
               {SECTION_KEYS.map(({ key, label }) => {
                 const s = sec(key);
                 return (
@@ -505,7 +504,7 @@ export default function SiteCopyManager() {
                     key={key}
                     className="rounded-xl border border-border/70 p-4"
                   >
-                    <p className="mb-3 text-sm font-semibold text-foreground">
+                    <p className="mb-2 text-sm font-semibold text-foreground">
                       {label}
                     </p>
                     <div className="grid gap-4 sm:grid-cols-2">

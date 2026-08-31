@@ -59,7 +59,6 @@ export default function AuditLogViewer() {
     <div>
       <PageHeader
         title="Audit log"
-        subtitle="Super-admin only · security & privileged-action trail."
         action={
           <select
             value={action}
@@ -90,7 +89,7 @@ export default function AuditLogViewer() {
             <div className="flex flex-wrap items-center gap-3">
               <span
                 className={cn(
-                  'rounded-full border px-2.5 py-0.5 font-mono text-2xs backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105',
+                  'rounded-full border px-2 py-0.5 font-mono text-2xs backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105',
                   tone(l.action)
                 )}
               >

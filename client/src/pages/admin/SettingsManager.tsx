@@ -183,14 +183,11 @@ export default function SettingsManager() {
 
   return (
     <div>
-      <PageHeader
-        title="Settings"
-        subtitle="Your admin account password, SEO metadata (browser tab title + social-share preview shown when someone shares your link), and the homepage section order & visibility."
-      />
+      <PageHeader title="Settings" />
 
       <div className="grid gap-4">
-        <GlassCard className="p-6">
-          <h3 className="mb-5 flex items-center gap-2 font-semibold text-neon">
+        <GlassCard className="p-4">
+          <h3 className="mb-4 flex items-center gap-2 font-semibold text-neon">
             <User className="h-4 w-4" /> Account
           </h3>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -217,9 +214,9 @@ export default function SettingsManager() {
           </Button>
         </GlassCard>
 
-        <GlassCard className="p-6">
+        <GlassCard className="p-4">
           <form onSubmit={handleSubmit(changePassword, onPasswordInvalid)}>
-            <h3 className="mb-5 flex items-center gap-2 font-semibold text-neon">
+            <h3 className="mb-4 flex items-center gap-2 font-semibold text-neon">
               <KeyRound className="h-4 w-4" /> Change password
             </h3>
             <div className="grid gap-4">
@@ -276,8 +273,8 @@ export default function SettingsManager() {
           </form>
         </GlassCard>
 
-        <GlassCard className="p-6">
-          <h3 className="mb-5 flex items-center gap-2 font-semibold text-neon">
+        <GlassCard className="p-4">
+          <h3 className="mb-4 flex items-center gap-2 font-semibold text-neon">
             <Globe className="h-4 w-4" /> SEO &amp; metadata
           </h3>
           {seo && (
@@ -315,7 +312,7 @@ export default function SettingsManager() {
                       setSeo({ ...seo, siteUrl: e.target.value })
                     }
                   />
-                  <p className="mt-1.5 text-2xs text-muted-foreground/70">
+                  <p className="mt-1 text-2xs text-muted-foreground/70">
                     The canonical origin for canonical links, og:url, sitemap
                     and structured data. Changing it here is all a domain move
                     needs — no redeploy.
@@ -351,7 +348,7 @@ export default function SettingsManager() {
                   <input
                     className="input"
                     value={keywordsText}
-                    placeholder="react, mern, portfolio"
+                    placeholder="react, MERN, portfolio"
                     onChange={(e) => setKeywordsText(e.target.value)}
                   />
                 </div>
@@ -388,19 +385,19 @@ export default function SettingsManager() {
           )}
         </GlassCard>
 
-        <GlassCard className="p-6">
-          <h3 className="mb-5 flex items-center gap-2 font-semibold text-neon">
+        <GlassCard className="p-4">
+          <h3 className="mb-4 flex items-center gap-2 font-semibold text-neon">
             <LayoutList className="h-4 w-4" /> Homepage &amp; hero
           </h3>
           {site && (
-            <div className="space-y-3 sm:space-y-5">
+            <div className="space-y-2 md:space-y-4">
               <div>
                 <label className="label">Section order &amp; visibility</label>
                 <ul className="space-y-2">
                   {site.sections.map((s, i) => (
                     <li
                       key={s.key}
-                      className="flex items-center gap-3 rounded-lg border border-border/70 bg-card/50 px-3 py-2"
+                      className="flex items-center gap-2 rounded-lg border border-border/70 bg-card/50 px-3 py-2"
                     >
                       <span className="flex flex-col">
                         <button
@@ -408,7 +405,7 @@ export default function SettingsManager() {
                           aria-label="Move up"
                           disabled={i === 0}
                           onClick={() => moveSection(i, -1)}
-                          className="rounded p-1.5 text-muted-foreground/70 transition-colors hover:text-neon disabled:opacity-30"
+                          className="rounded p-1 text-muted-foreground/70 transition-colors hover:text-neon disabled:opacity-30"
                         >
                           <ChevronUp className="h-4 w-4" />
                         </button>
@@ -417,7 +414,7 @@ export default function SettingsManager() {
                           aria-label="Move down"
                           disabled={i === site.sections.length - 1}
                           onClick={() => moveSection(i, 1)}
-                          className="rounded p-1.5 text-muted-foreground/70 transition-colors hover:text-neon disabled:opacity-30"
+                          className="rounded p-1 text-muted-foreground/70 transition-colors hover:text-neon disabled:opacity-30"
                         >
                           <ChevronDown className="h-4 w-4" />
                         </button>

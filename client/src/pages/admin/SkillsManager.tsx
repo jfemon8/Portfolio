@@ -21,8 +21,6 @@ export default function SkillsManager() {
   const skillConfig: ResourceConfig<SkillDoc> = useMemo(
     () => ({
       title: 'Skills',
-      subtitle:
-        'Technologies displayed in the Skills & tech section on your homepage. Each skill becomes a card with a name, percentage bar, and an icon — upload an image or leave it blank to let the public renderer auto-match a brand logo from the skill name.',
       singular: 'skill',
       base: 'skills',
       defaults: {
@@ -69,8 +67,6 @@ export default function SkillsManager() {
   const categoryConfig: ResourceConfig<CategoryDoc> = useMemo(
     () => ({
       title: 'Categories',
-      subtitle:
-        'Manage the category tabs shown above the skill grid on your homepage. The slug is the stable id referenced by each skill — change it carefully (existing skills referencing the old slug will be orphaned until reassigned).',
       singular: 'category',
       base: 'categories',
       defaults: { name: '', slug: '', order: 0 },
@@ -99,7 +95,7 @@ export default function SkillsManager() {
   return (
     <div>
       {/* Tab strip — active indicator style borrowed from the public Skills section. */}
-      <div role="tablist" className="mb-6 flex gap-2">
+      <div role="tablist" className="mb-4 flex gap-2">
         {(['skills', 'categories'] as const).map((key) => {
           const on = tab === key;
           return (
@@ -109,7 +105,7 @@ export default function SkillsManager() {
               aria-selected={on}
               onClick={() => setTab(key)}
               className={cn(
-                'relative rounded-full px-4 py-1.5 text-sm transition-colors',
+                'relative rounded-full px-4 py-1 text-sm transition-colors',
                 on
                   ? 'text-primary'
                   : 'text-muted-foreground hover:text-foreground'
@@ -152,7 +148,7 @@ function SkillRow({
     categories.find((c) => c.slug === item.category)?.name ?? item.category;
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-2">
       <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-border/70 bg-card/60 backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
         {item.iconImage ? (
           <img src={item.iconImage} alt="" className="h-7 w-7 object-contain" />
@@ -165,7 +161,7 @@ function SkillRow({
           {item.name}{' '}
           <span className="chip ml-1 normal-case">{categoryLabel}</span>
         </p>
-        <div className="mt-1.5 h-1.5 w-40 overflow-hidden rounded-full bg-bg-elevated">
+        <div className="mt-1 h-1.5 w-40 overflow-hidden rounded-full bg-bg-elevated">
           <div
             className="h-full bg-neon-gradient"
             style={{ width: `${item.level}%` }}

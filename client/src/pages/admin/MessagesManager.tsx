@@ -149,20 +149,17 @@ export default function MessagesManager() {
 
   return (
     <div>
-      <PageHeader
-        title="Messages"
-        subtitle={`Visitor submissions from the Contact form on your public site · ${data?.unread ?? 0} unread`}
-      />
+      <PageHeader title="Messages" subtitle={`${data?.unread ?? 0} unread`} />
 
       {/* Scrolls instead of wrapping, so the four filters stay on one row on a phone rather than reflowing into a block. */}
-      <div className="-mx-1 mb-5 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="-mx-1 mb-4 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {filters.map((ff) => (
           <button
             key={ff.k}
             onClick={() => selectFilter(ff.k)}
             aria-pressed={filter === ff.k}
             className={cn(
-              'flex shrink-0 items-center gap-1.5 rounded-full border px-4 py-2 text-sm backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105 transition-all',
+              'flex shrink-0 items-center gap-1 rounded-full border px-4 py-2 text-sm backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105 transition-all',
               filter === ff.k
                 ? 'border-primary/50 bg-primary/10 text-primary shadow-glow'
                 : 'border-border/70 text-muted-foreground hover:border-primary/30 hover:text-foreground'
@@ -171,7 +168,7 @@ export default function MessagesManager() {
             {ff.l}
             {/* Only the unread count is shown, because it is the only one the list endpoint actually returns. */}
             {ff.k === 'unread' && (data?.unread ?? 0) > 0 && (
-              <span className="rounded-full bg-neon/15 px-1.5 py-0.5 text-2xs font-semibold text-neon">
+              <span className="rounded-full bg-neon/15 px-1 py-0.5 text-2xs font-semibold text-neon">
                 {data?.unread}
               </span>
             )}
@@ -237,11 +234,11 @@ export default function MessagesManager() {
           <GlassCard className="h-fit p-4 sm:p-6">
             <button
               onClick={() => setActive(null)}
-              className="mb-4 flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground lg:hidden"
+              className="mb-4 flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground lg:hidden"
             >
               <ChevronLeft className="h-4 w-4" /> Back to messages
             </button>
-            <div className="flex flex-col gap-3 border-b border-border/60 pb-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex flex-col gap-2 border-b border-border/60 pb-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
                 <h2 className="break-words text-lg font-bold text-foreground">
                   {active.subject || '(no subject)'}
@@ -323,19 +320,19 @@ export default function MessagesManager() {
                 </button>
               </div>
             </div>
-            <p className="whitespace-pre-wrap break-words py-5 text-sm leading-relaxed text-muted-foreground">
+            <p className="whitespace-pre-wrap break-words py-4 text-sm leading-relaxed text-muted-foreground">
               {active.message}
             </p>
             <div className="border-t border-border/60 pt-4">
               {active.replied && (
-                <p className="mb-3 flex items-center gap-1.5 text-xs text-muted-foreground/70">
+                <p className="mb-2 flex items-center gap-1.5 text-xs text-muted-foreground/70">
                   <Check className="h-3.5 w-3.5 text-neon" />
                   Replied
                   {active.repliedAt && ` · ${formatDateTime(active.repliedAt)}`}
                 </p>
               )}
               {reply ? (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <div>
                     <label className="label">Subject</label>
                     <input

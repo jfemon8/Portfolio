@@ -77,15 +77,13 @@ export default function Dashboard() {
   return (
     <div>
       <Reveal>
-        <div className="mb-8">
+        <div className="mb-4">
           <h1 className="text-2xl font-bold text-foreground">
             Welcome back,{' '}
-            <span className="gradient-text">{user?.name?.split(' ')[0]}</span>{' '}
-            👋
+            <span className="gradient-text">
+              {user?.name?.split(' ').pop()}
+            </span>
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Here's what's happening with your portfolio.
-          </p>
         </div>
       </Reveal>
 
@@ -105,7 +103,7 @@ export default function Dashboard() {
                       <s.icon className="h-5 w-5 text-neon" />
                       <ArrowRight className="h-4 w-4 text-muted-foreground/60" />
                     </div>
-                    <p className="mt-3 text-3xl font-bold text-foreground">
+                    <p className="mt-2 text-3xl font-bold text-foreground">
                       <Counter value={String(s.value)} />
                     </p>
                     <p className="text-xs text-muted-foreground/70">
@@ -117,18 +115,18 @@ export default function Dashboard() {
             ))}
           </div>
 
-          <div className="mt-8 grid gap-6 lg:grid-cols-2">
+          <div className="mt-4 grid gap-4 lg:grid-cols-2">
             <Reveal delay={0.1}>
-              <GlassCard className="p-6">
+              <GlassCard className="p-4">
                 <h2 className="mb-4 font-semibold text-foreground">
                   Quick actions
                 </h2>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-2">
                   {quick.map((q) => (
                     <Link
                       key={q.label}
                       to={q.to}
-                      className="flex items-center gap-3 rounded-xl border border-border/70 bg-card/50 px-4 py-3 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary"
+                      className="flex items-center gap-2 rounded-xl border border-border/70 bg-card/50 px-4 py-2 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary"
                     >
                       <q.icon className="h-4 w-4" />
                       {q.label}
@@ -138,8 +136,8 @@ export default function Dashboard() {
               </GlassCard>
             </Reveal>
 
-            <Reveal delay={0.15}>
-              <GlassCard className="p-6">
+            <Reveal delay={0.1}>
+              <GlassCard className="p-4">
                 <h2 className="mb-4 font-semibold text-foreground">
                   Top content
                 </h2>
@@ -152,7 +150,7 @@ export default function Dashboard() {
                       <span className="truncate text-muted-foreground">
                         {p.title}
                       </span>
-                      <span className="flex items-center gap-1.5 text-xs text-muted-foreground/70">
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground/70">
                         <Eye className="h-3.5 w-3.5" /> {p.views}
                       </span>
                     </div>

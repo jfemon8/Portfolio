@@ -7,8 +7,6 @@ import { capitalizeFirst } from '@/lib/text';
 
 const certConfig: ResourceConfig<CertificationDoc> = {
   title: 'Certifications & Achievements',
-  subtitle:
-    'Certificates, awards & competitive-programming milestones shown in the Credentials section on your homepage.',
   singular: 'credential',
   base: 'certifications',
   defaults: {
@@ -72,8 +70,6 @@ const certConfig: ResourceConfig<CertificationDoc> = {
 
 const pubConfig: ResourceConfig<PublicationDoc> = {
   title: 'Publications',
-  subtitle:
-    'Research papers & publications shown in the Research section on your homepage.',
   singular: 'publication',
   base: 'publications',
   modalSize: 'lg',
@@ -127,7 +123,7 @@ export default function CredentialsManager() {
   const [tab, setTab] = useState<'certs' | 'pubs'>('certs');
   return (
     <div>
-      <div className="mb-6 flex gap-2">
+      <div className="mb-4 flex gap-2">
         {(
           [
             { k: 'certs', l: 'Certifications & Achievements' },
@@ -137,7 +133,7 @@ export default function CredentialsManager() {
           <button
             key={t.k}
             onClick={() => setTab(t.k)}
-            className={`rounded-full border px-4 py-1.5 text-sm backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105 transition-all ${
+            className={`rounded-full border px-4 py-1 text-sm backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105 transition-all ${
               tab === t.k
                 ? 'border-primary/50 bg-primary/10 text-primary shadow-glow'
                 : 'border-border/70 text-muted-foreground hover:text-foreground'

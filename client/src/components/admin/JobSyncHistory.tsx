@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { AlertTriangle, Bot, CalendarClock, Hand } from 'lucide-react';
+import { AlertTriangle, CalendarClock, Hand } from 'lucide-react';
 import { api } from '@/lib/api';
 import { formatDateTime } from '@/lib/date';
 import { cn } from '@/lib/cn';
@@ -144,10 +144,6 @@ export default function JobSyncHistory() {
           </ul>
         </details>
       )}
-
-      <p className="mt-3 flex items-center gap-1.5 text-2xs text-muted-foreground/70">
-        <Bot className="h-3 w-3" /> {SCHEDULE}
-      </p>
     </div>
   );
 }

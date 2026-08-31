@@ -19,8 +19,6 @@ const CATEGORIES = [
 
 const config: ResourceConfig<JobDoc> = {
   title: 'Jobs',
-  subtitle:
-    'Automated listings are updated by the scheduled feed sync (latest 200 shown). You can also add, correct or remove any listing manually.',
   singular: 'job',
   base: 'jobs/admin',
   modalSize: 'lg',
@@ -117,14 +115,14 @@ export default function JobsManager() {
 
   return (
     <div>
-      <div className="-mx-1 mb-5 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="-mx-1 mb-4 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {TABS.map(({ k, l, icon: Icon }) => (
           <button
             key={k}
             onClick={() => setTab(k)}
             aria-pressed={tab === k}
             className={cn(
-              'flex shrink-0 items-center gap-1.5 rounded-full border px-4 py-2 text-sm backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105 transition-all',
+              'flex shrink-0 items-center gap-1 rounded-full border px-4 py-2 text-sm backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105 transition-all',
               tab === k
                 ? 'border-primary/50 bg-primary/10 text-primary shadow-glow'
                 : 'border-border/70 text-muted-foreground hover:border-primary/30 hover:text-foreground'

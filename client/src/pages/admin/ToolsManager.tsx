@@ -35,8 +35,6 @@ export default function ToolsManager() {
   const toolConfig: ResourceConfig<ToolDoc> = useMemo(
     () => ({
       title: 'Tools',
-      subtitle:
-        'Free utilities listed on the public /tools page. Each entry points at a built-in implementation — pick the matching one from "Implementation".',
       singular: 'tool',
       base: 'tools',
       defaults: {
@@ -91,8 +89,6 @@ export default function ToolsManager() {
   const categoryConfig: ResourceConfig<CategoryDoc> = useMemo(
     () => ({
       title: 'Categories',
-      subtitle:
-        'Manage the category filter shown above the tools grid on /tools. The slug is the stable id referenced by each tool — change it carefully (existing tools referencing the old slug will be orphaned until reassigned).',
       singular: 'category',
       base: 'categories',
       defaults: { name: '', slug: '', order: 0, scope: 'tool' },
@@ -130,7 +126,7 @@ export default function ToolsManager() {
               aria-selected={on}
               onClick={() => setTab(key)}
               className={cn(
-                'relative rounded-full px-4 py-1.5 text-sm transition-colors',
+                'relative rounded-full px-4 py-1 text-sm transition-colors',
                 on
                   ? 'text-primary'
                   : 'text-muted-foreground hover:text-foreground'

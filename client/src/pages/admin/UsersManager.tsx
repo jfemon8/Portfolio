@@ -144,7 +144,6 @@ export default function UsersManager() {
     <div>
       <PageHeader
         title="Users & Roles"
-        subtitle="Super-admin only · manage admin and visitor accounts."
         action={
           <Button onClick={openNew}>
             <Plus className="h-4 w-4" /> Add user
@@ -158,7 +157,7 @@ export default function UsersManager() {
         <EmptyState message="No users yet." />
       )}
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         {users.map((u) => {
           const locked = u.isImmutableSuperAdmin;
           const isSelf = me?.id === u.id;
@@ -167,7 +166,7 @@ export default function UsersManager() {
               key={u.id}
               className="flex flex-wrap items-center justify-between gap-4 p-4"
             >
-              <div className="flex min-w-0 items-center gap-3">
+              <div className="flex min-w-0 items-center gap-2">
                 <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-primary/30 bg-primary/15 text-sm font-bold text-neon backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
                   {u.name?.[0]?.toUpperCase() || '?'}
                 </span>
@@ -204,7 +203,7 @@ export default function UsersManager() {
                   disabled={locked}
                   onClick={() => openEdit(u)}
                   title={locked ? 'Protected account' : 'Edit'}
-                  className="rounded-lg border border-border/70 p-2.5 text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon disabled:opacity-40 disabled:hover:border-border/70 disabled:hover:text-muted-foreground"
+                  className="rounded-lg border border-border/70 p-2 text-muted-foreground transition-colors hover:border-primary/40 hover:text-neon disabled:opacity-40 disabled:hover:border-border/70 disabled:hover:text-muted-foreground"
                 >
                   <Pencil className="h-4 w-4" />
                 </button>
@@ -227,7 +226,7 @@ export default function UsersManager() {
                         ? 'You cannot delete yourself'
                         : 'Delete'
                   }
-                  className="rounded-lg border border-border/70 p-2.5 text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive disabled:opacity-40 disabled:hover:border-border/70 disabled:hover:text-muted-foreground"
+                  className="rounded-lg border border-border/70 p-2 text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive disabled:opacity-40 disabled:hover:border-border/70 disabled:hover:text-muted-foreground"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
