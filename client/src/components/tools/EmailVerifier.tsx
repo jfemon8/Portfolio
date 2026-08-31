@@ -543,7 +543,7 @@ export default function EmailVerifier() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25 }}
-          className="mt-6"
+          className="mt-4"
         >
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {VERDICTS.map((v) => (
@@ -552,7 +552,7 @@ export default function EmailVerifier() {
                 type="button"
                 onClick={() => setFilter(filter === v.key ? 'all' : v.key)}
                 className={cn(
-                  'rounded-xl border p-3 text-left transition-colors',
+                  'rounded-xl border p-2 text-left transition-colors',
                   filter === v.key
                     ? 'border-primary/60 bg-primary/10'
                     : 'border-border/60 hover:border-primary/40'
@@ -560,7 +560,7 @@ export default function EmailVerifier() {
               >
                 <span
                   className={cn(
-                    'flex items-center gap-1.5 text-2xs font-semibold',
+                    'flex items-center gap-1 text-2xs font-semibold',
                     v.text
                   )}
                 >
@@ -574,7 +574,7 @@ export default function EmailVerifier() {
             ))}
           </div>
 
-          <div className="mt-3 flex flex-wrap items-center gap-3">
+          <div className="mt-2 flex flex-wrap items-center gap-2">
             <Button
               size="sm"
               variant="secondary"

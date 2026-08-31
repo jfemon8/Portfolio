@@ -183,7 +183,7 @@ export default function Contact() {
                       stiffness: 260,
                       damping: 18,
                     }}
-                    className="mb-5 grid h-16 w-16 place-items-center rounded-full border border-primary/30 bg-primary/15 text-neon backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105"
+                    className="mb-4 grid h-16 w-16 place-items-center rounded-full border border-primary/30 bg-primary/15 text-neon backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105"
                   >
                     <CheckCircle2 className="h-8 w-8" strokeWidth={2.25} />
                   </motion.span>
@@ -196,7 +196,7 @@ export default function Contact() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="mt-6"
+                    className="mt-4"
                     onClick={() => setSent(false)}
                   >
                     {f.sendAnother}

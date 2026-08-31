@@ -105,7 +105,7 @@ export default function CfRatingPredictor() {
       </p>
 
       {loading && (
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">
+        <div className="mt-4 grid gap-4 sm:grid-cols-3">
           <StatSkeleton />
           <StatSkeleton />
           <StatSkeleton />
@@ -118,9 +118,9 @@ export default function CfRatingPredictor() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-6 grid gap-4 sm:grid-cols-3"
+          className="mt-4 grid gap-4 sm:grid-cols-3"
         >
-          <GlassCard className="p-5 text-center">
+          <GlassCard className="p-4 text-center">
             <p className="text-2xs uppercase tracking-wide text-muted-foreground">
               Rank
             </p>
@@ -128,7 +128,7 @@ export default function CfRatingPredictor() {
               #<Counter value={String(result.rank)} />
             </p>
           </GlassCard>
-          <GlassCard className="p-5 text-center">
+          <GlassCard className="p-4 text-center">
             <p className="text-2xs uppercase tracking-wide text-muted-foreground">
               Predicted delta
             </p>
@@ -144,7 +144,7 @@ export default function CfRatingPredictor() {
               <Counter value={String(Math.abs(result.predictedDelta))} />
             </p>
           </GlassCard>
-          <GlassCard className="p-5 text-center">
+          <GlassCard className="p-4 text-center">
             <p className="text-2xs uppercase tracking-wide text-muted-foreground">
               {result.currentRating} → New rating
             </p>

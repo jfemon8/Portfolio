@@ -166,7 +166,7 @@ export default function MediaLibrary() {
       </div>
 
       {(pi > 0 || next) && (
-        <div className="mt-6 flex items-center justify-center gap-4">
+        <div className="mt-4 flex items-center justify-center gap-4">
           <Button
             variant="outline"
             size="sm"

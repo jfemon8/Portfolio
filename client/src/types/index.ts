@@ -432,7 +432,6 @@ export interface BlogPost {
   category: string;
   readingTime: number;
   status: BlogStatus;
-  featured: boolean;
   views: number;
   publishedAt?: string;
   scheduledFor?: string;

@@ -19,7 +19,6 @@ const blogSchema = new mongoose.Schema<IBlogPost>(
       enum: ['draft', 'scheduled', 'published'],
       default: 'draft',
     },
-    featured: { type: Boolean, default: false },
     views: { type: Number, default: 0 },
     publishedAt: { type: Date },
     scheduledFor: { type: Date },
@@ -52,7 +51,6 @@ blogSchema.pre('validate', function prep(next) {
 });
 
 blogSchema.index({ status: 1, publishedAt: -1 });
-blogSchema.index({ featured: -1, publishedAt: -1 });
 
 export const BlogPost =
   (mongoose.models.BlogPost as Model<IBlogPost>) ||

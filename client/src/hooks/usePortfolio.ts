@@ -208,12 +208,13 @@ export const useJob = (id?: string) =>
   });
 
 /** Consumes the server `pagination` metadata so posts beyond the first page stay reachable via `fetchNextPage`. */
-export const useBlogInfinite = (query = '') =>
+export const useBlogInfinite = (query = '', tag = '') =>
   useInfiniteQuery({
-    queryKey: ['blog', 'list', query],
+    queryKey: ['blog', 'list', query, tag],
     queryFn: ({ pageParam }) => {
       const qs = new URLSearchParams();
       if (query) qs.set('q', query);
+      if (tag) qs.set('tag', tag);
       qs.set('page', String(pageParam));
       return get<PaginatedResponse<BlogPostDoc>>(`/blog?${qs.toString()}`);
     },

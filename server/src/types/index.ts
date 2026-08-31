@@ -633,7 +633,6 @@ export interface IBlogPost {
   category: string;
   readingTime: number;
   status: BlogStatus;
-  featured: boolean;
   views: number;
   publishedAt?: Date;
   /** when status === 'scheduled', the post becomes public at this time */

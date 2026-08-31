@@ -489,7 +489,7 @@ export default function ProfileManager() {
       {/* Sticky-bottom Save bar — replaces the previous PageHeader-action
           button so the save affordance is always within thumb-reach as the
           admin scrolls through the long Profile form. */}
-      <div className="sticky bottom-4 z-10 mt-6 flex justify-end">
+      <div className="sticky bottom-4 z-10 mt-4 flex justify-end">
         <Button type="submit" disabled={save.isPending} size="lg">
           {save.isPending ? (
             <Loader2 className="h-4 w-4 animate-spin" />

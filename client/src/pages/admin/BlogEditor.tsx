@@ -6,7 +6,6 @@ import { Save, ArrowLeft, Loader2 } from 'lucide-react';
 import { api } from '@/lib/api';
 import ImageUpload from '@/components/admin/ImageUpload';
 import RichTextEditor from '@/components/admin/RichTextEditor';
-import Toggle from '@/components/ui/Toggle';
 import GlassCard from '@/components/shared/GlassCard';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/States';
@@ -32,7 +31,6 @@ const empty: BlogForm = {
   tags: [],
   category: 'General',
   status: 'draft',
-  featured: false,
 };
 
 export default function BlogEditor() {
@@ -176,15 +174,6 @@ export default function BlogEditor() {
                 value={tagsText}
                 onChange={(e) => setTagsText(e.target.value)}
               />
-            </div>
-            <div className="flex items-center gap-3">
-              <Toggle
-                checked={Boolean(f.featured)}
-                onChange={(v) => set('featured', v)}
-              />
-              <span className="text-sm text-muted-foreground">
-                Featured post
-              </span>
             </div>
           </GlassCard>
 

@@ -377,7 +377,7 @@ export default function MusicRemover() {
           <Button
             variant="ghost"
             size="sm"
-            className="mt-3"
+            className="mt-2"
             onClick={handleCancel}
           >
             Cancel
@@ -390,15 +390,15 @@ export default function MusicRemover() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25 }}
-          className="mt-6 space-y-5"
+          className="mt-4 space-y-4"
         >
           <div>
             <p className="label">Vocals</p>
-            <audio controls src={result.vocalsUrl} className="mt-1.5 w-full" />
+            <audio controls src={result.vocalsUrl} className="mt-1 w-full" />
             <a
               href={result.vocalsUrl}
               download="vocals.wav"
-              className="mt-1.5 inline-flex items-center gap-1.5 text-xs text-neon hover:underline"
+              className="mt-1 inline-flex items-center gap-1.5 text-xs text-neon hover:underline"
             >
               <Download className="h-3.5 w-3.5" /> Download vocals.wav
             </a>
@@ -408,12 +408,12 @@ export default function MusicRemover() {
             <audio
               controls
               src={result.instrumentalUrl}
-              className="mt-1.5 w-full"
+              className="mt-1 w-full"
             />
             <a
               href={result.instrumentalUrl}
               download="instrumental.wav"
-              className="mt-1.5 inline-flex items-center gap-1.5 text-xs text-neon hover:underline"
+              className="mt-1 inline-flex items-center gap-1 text-xs text-neon hover:underline"
             >
               <Download className="h-3.5 w-3.5" /> Download instrumental.wav
             </a>
@@ -426,7 +426,7 @@ export default function MusicRemover() {
         </motion.div>
       )}
 
-      <p className="mt-6 text-2xs text-muted-foreground/60">
+      <p className="mt-4 text-2xs text-muted-foreground/60">
         Vocal separation model: UVR-MDX-NET by Anjok07 &amp; aufr33 (MIT
         license).
       </p>

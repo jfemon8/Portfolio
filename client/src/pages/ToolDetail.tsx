@@ -54,7 +54,7 @@ export default function ToolDetail() {
     return (
       <div className="container-x py-4 text-center">
         <ErrorState message={st.toolNotFound} onRetry={() => void refetch()} />
-        <Link to="/tools" className="mt-6 inline-block">
+        <Link to="/tools" className="mt-4 inline-block">
           <Button variant="outline">{lab.backToTools}</Button>
         </Link>
       </div>
@@ -124,8 +124,8 @@ export default function ToolDetail() {
           )}
         </Reveal>
 
-        <Reveal delay={0.06}>
-          <div className="mt-8">
+        <Reveal delay={0.05}>
+          <div className="mt-4">
             {/* A row whose key has no component yet would otherwise render <undefined /> and take the page down. */}
             {Component ? (
               <Suspense

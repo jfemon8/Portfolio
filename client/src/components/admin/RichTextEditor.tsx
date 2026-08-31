@@ -24,7 +24,6 @@ import {
   AlignRight,
   AlignJustify,
   Quote,
-  Pencil,
   Table as TableIcon,
   Minus,
   Undo2,

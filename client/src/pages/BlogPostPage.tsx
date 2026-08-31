@@ -47,7 +47,7 @@ export default function BlogPostPage() {
 
   if (isLoading)
     return (
-      <div className="container-x py-8">
+      <div className="container-x py-4">
         <DetailPageSkeleton />
       </div>
     );
@@ -55,7 +55,7 @@ export default function BlogPostPage() {
     return (
       <div className="container-x py-32 text-center">
         <ErrorState message={st.postNotFound} onRetry={() => void refetch()} />
-        <Link to="/blog" className="mt-6 inline-block">
+        <Link to="/blog" className="mt-4 inline-block">
           <Button variant="outline">{lab.backToBlog}</Button>
         </Link>
       </div>
@@ -72,6 +72,7 @@ export default function BlogPostPage() {
         publishedTime={post.publishedAt || post.createdAt}
         modifiedTime={post.updatedAt}
         tags={post.tags}
+        keywords={post.tags}
         jsonLd={[
           articleSchema(post, profData?.data?.name),
           breadcrumbSchema([
@@ -85,40 +86,42 @@ export default function BlogPostPage() {
         <Reveal>
           <button
             onClick={() => navigate(-1)}
-            className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-neon"
+            className="mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-neon"
           >
             <ArrowLeft className="h-4 w-4" /> {lab.btnBack}
           </button>
 
-          <div className="flex flex-wrap gap-1.5">
+          {/* nowrap + scroll on mobile (matches the RichTextEditor toolbar), wraps once there's room at sm+ */}
+          <div className="no-scrollbar flex items-center gap-1 overflow-x-auto sm:flex-wrap">
             {post.tags.map((t) => (
-              <span
+              <Link
                 key={t}
-                className="rounded-full border border-border/60 bg-card/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105"
+                to={`/blog?tag=${encodeURIComponent(t)}`}
+                className="shrink-0 rounded-full border border-border/60 bg-card/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105 transition-colors hover:border-primary/40 hover:text-primary"
               >
                 #{t}
-              </span>
+              </Link>
             ))}
           </div>
 
-          <h1 className="mt-5 text-3xl font-extrabold leading-tight tracking-tight text-foreground sm:text-5xl">
+          <h1 className="mt-4 text-2xl font-extrabold leading-tight text-foreground sm:text-3xl md:text-4xl lg:text-5xl">
             {post.title}
           </h1>
 
-          <div className="mt-5 flex flex-wrap items-center gap-5 text-xs text-muted-foreground/70">
-            <span className="flex items-center gap-1.5">
+          <div className="mt-4 flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-muted-foreground/70">
+            <span className="flex items-center gap-1">
               <Calendar className="h-3.5 w-3.5" />
               {formatDate(post.publishedAt || post.createdAt)}
             </span>
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center gap-1">
               <Clock className="h-3.5 w-3.5" /> {formatTime(post.updatedAt)}
             </span>
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center gap-1">
               <Eye className="h-3.5 w-3.5" /> {post.views} {lab.unitViews}
             </span>
             <button
               onClick={share}
-              className="ml-auto flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-neon"
+              className="ml-auto flex items-center gap-1 text-muted-foreground transition-colors hover:text-neon"
             >
               <Share2 className="h-3.5 w-3.5" /> {lab.btnShare}
             </button>
@@ -131,25 +134,25 @@ export default function BlogPostPage() {
               src={post.coverImage}
               alt={post.title}
               priority
-              className="mt-9 w-full rounded-2xl border border-border/70"
+              className="mt-4 w-full rounded-2xl border border-border/70"
             />
           </Reveal>
         )}
 
-        <Reveal delay={0.1}>
-          <div className="mt-10">
+        <Reveal delay={0.01}>
+          <div className="mt-4">
             <RichText html={post.content} />
           </div>
         </Reveal>
 
         {related.length > 0 && (
-          <div className="mt-16 border-t border-border/60 pt-10">
-            <h2 className="mb-6 text-xl font-bold text-foreground">
+          <div className="mt-4 border-t border-border/60 pt-4">
+            <h2 className="mb-4 text-xl font-bold text-foreground">
               {lab.headingRelated}
             </h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {related.map((r, i) => (
-                <Reveal key={r._id} delay={i * 0.06}>
+                <Reveal key={r._id} delay={i * 0.05}>
                   <Link to={`/blog/${r.slug}`} className="block h-full">
                     <GlassCard interactive className="h-full p-4">
                       <h3 className="text-sm font-semibold text-foreground">

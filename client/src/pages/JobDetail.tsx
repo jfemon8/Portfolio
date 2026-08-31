@@ -79,7 +79,7 @@ export default function JobDetail() {
 
   if (isLoading) {
     return (
-      <div className="container-x py-8">
+      <div className="container-x py-4">
         <DetailPageSkeleton cover={false} />
       </div>
     );
@@ -91,9 +91,9 @@ export default function JobDetail() {
         ? 'This job has expired. Its description is no longer available.'
         : 'This job could not be found.';
     return (
-      <div className="container-x py-12 text-center">
+      <div className="container-x py-4 text-center">
         <ErrorState message={message} onRetry={() => void refetch()} />
-        <Link to="/tools/jobs" className="mt-6 inline-block">
+        <Link to="/tools/jobs" className="mt-4 inline-block">
           <Button variant="outline">Back to jobs</Button>
         </Link>
       </div>

@@ -466,7 +466,7 @@ export function PageSkeleton() {
   return (
     <div className="container-x py-8">
       <SectionHeadingSkeleton />
-      <div className="mt-6 grid auto-rows-[1fr] gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-4 grid auto-rows-[1fr] gap-5 sm:grid-cols-2 lg:grid-cols-3">
         <ToolCardSkeleton count={6} />
       </div>
     </div>

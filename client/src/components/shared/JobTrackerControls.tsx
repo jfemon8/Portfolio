@@ -130,8 +130,8 @@ export function JobTrackerNote({ jobId }: { jobId: string }) {
   const stats = trackerStats(entries);
 
   return (
-    <GlassCard className="mt-6 p-5 sm:p-6">
-      <div className="flex items-center justify-between gap-3">
+    <GlassCard className="mt-4 p-2 sm:p-4">
+      <div className="flex items-center justify-between gap-2">
         <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground">
           <StickyNote className="h-4 w-4 text-neon" /> Your private note
         </h2>

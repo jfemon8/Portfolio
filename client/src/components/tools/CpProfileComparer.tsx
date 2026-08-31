@@ -148,7 +148,7 @@ export default function CpProfileComparer() {
       </div>
 
       {loading && (
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <StatSkeleton />
           <StatSkeleton />
         </div>
@@ -160,7 +160,7 @@ export default function CpProfileComparer() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-6 grid gap-4 sm:grid-cols-2"
+          className="mt-4 grid gap-4 sm:grid-cols-2"
         >
           <StatCard entry={result.a} winner={winnerSide === 'a'} />
           <StatCard entry={result.b} winner={winnerSide === 'b'} />

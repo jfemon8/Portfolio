@@ -473,7 +473,7 @@ export default function BigOBenchmark() {
       )}
 
       {error && (
-        <div className="mt-4 flex gap-2.5 rounded-xl border border-destructive/40 bg-destructive/10 p-3.5">
+        <div className="mt-4 flex gap-2 rounded-xl border border-destructive/40 bg-destructive/10 p-3">
           <AlertTriangle className="h-4 w-4 shrink-0 translate-y-0.5 text-destructive" />
           <p className="whitespace-pre-wrap text-sm text-destructive">
             {error}
@@ -486,7 +486,7 @@ export default function BigOBenchmark() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-6"
+          className="mt-4"
         >
           <div className="mb-2 flex items-center gap-2">
             {status === 'running' ? (

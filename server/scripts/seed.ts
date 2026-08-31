@@ -528,7 +528,6 @@ const sampleBlog: Partial<IBlogPost> = {
   tags: ['intro', 'mern', 'career'],
   category: 'General',
   status: 'published',
-  featured: true,
 };
 
 /* ------------------------------------------------------------- RUNNER */

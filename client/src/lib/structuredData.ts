@@ -15,6 +15,7 @@ import {
   DEFAULT_DESCRIPTION,
   absoluteUrl,
 } from '@/config/site';
+import { detectLanguage } from './detectLanguage';
 import type { Profile, ProjectDoc, BlogPostDoc } from '@/types';
 
 type Json = Record<string, unknown>;
@@ -159,7 +160,8 @@ export const articleSchema = (
   },
   ...(post.tags?.length ? { keywords: post.tags.join(', ') } : {}),
   publisher: personRef(),
-  inLanguage: 'en',
+  // This blog mixes Bengali and English posts — the site-wide "en" default is wrong often enough to detect per post.
+  inLanguage: detectLanguage(`${post.title} ${post.excerpt}`),
   isPartOf: { '@id': websiteId() },
   mainEntityOfPage: absoluteUrl(`/blog/${post.slug}`),
 });

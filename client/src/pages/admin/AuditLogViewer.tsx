@@ -106,7 +106,7 @@ export default function AuditLogViewer() {
                   {l.entityId ? `#${l.entityId.slice(-6)}` : ''}
                 </span>
               )}
-              <span className="flex items-center gap-3 text-2xs text-muted-foreground/60 sm:ml-auto">
+              <span className="flex items-center gap-2 text-2xs text-muted-foreground/60 sm:ml-auto">
                 {l.ip && (
                   <span className="flex items-center gap-1">
                     <Globe className="h-3 w-3" /> {l.ip}
@@ -125,7 +125,7 @@ export default function AuditLogViewer() {
       </div>
 
       {pg && pg.pages > 1 && (
-        <div className="mt-6 flex items-center justify-center gap-4">
+        <div className="mt-4 flex items-center justify-center gap-4">
           <Button
             variant="outline"
             size="sm"

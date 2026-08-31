@@ -105,7 +105,7 @@ export default function Research() {
                 )}
 
                 {p.url && (
-                  <div className="mt-6">
+                  <div className="mt-4">
                     <a href={p.url} target="_blank" rel="noreferrer">
                       <Button variant="outline" size="sm">
                         <ExternalLink className="h-4 w-4" /> Read paper

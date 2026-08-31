@@ -1,7 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useDebounce } from '@/hooks/useDebounce';
-import { Calendar, Clock, ArrowUpRight, Loader2, Search } from 'lucide-react';
+import {
+  Calendar,
+  Clock,
+  ArrowUpRight,
+  Loader2,
+  Search,
+  Tag,
+  X,
+} from 'lucide-react';
 import SmartImage from '@/components/shared/SmartImage';
 import PrefetchLink from '@/components/shared/PrefetchLink';
 import Seo from '@/components/ui/Seo';
@@ -21,8 +29,9 @@ import { formatCount } from '@/lib/number';
 export default function Blog() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [q, setQ] = useState(searchParams.get('q') ?? '');
+  const [tag, setTag] = useState(searchParams.get('tag') ?? '');
   const query = useDebounce(q.trim(), 350);
-  const blogQuery = useBlogInfinite(query);
+  const blogQuery = useBlogInfinite(query, tag);
   const { data, hasNextPage, fetchNextPage, isFetchingNextPage } = blogQuery;
   const posts = data?.pages.flatMap((p) => p.data) ?? [];
   const total = data?.pages[0]?.pagination.total ?? 0;
@@ -49,11 +58,13 @@ export default function Blog() {
         const params = new URLSearchParams(current);
         if (query) params.set('q', query);
         else params.delete('q');
+        if (tag) params.set('tag', tag);
+        else params.delete('tag');
         return params;
       },
       { replace: true }
     );
-  }, [query, setSearchParams]);
+  }, [query, tag, setSearchParams]);
 
   // Auto-loads the next page once the sentinel below the grid scrolls into view.
   useEffect(() => {
@@ -74,9 +85,14 @@ export default function Blog() {
   return (
     <>
       <Seo
-        title={PAGE_SEO.blog.title}
-        path="/blog"
-        description={PAGE_SEO.blog.description}
+        title={tag ? `#${tag} — ${PAGE_SEO.blog.title}` : PAGE_SEO.blog.title}
+        path={tag ? `/blog?tag=${encodeURIComponent(tag)}` : '/blog'}
+        description={
+          tag
+            ? `Posts tagged #${tag}. ${PAGE_SEO.blog.description}`
+            : PAGE_SEO.blog.description
+        }
+        keywords={tag ? [tag] : undefined}
         jsonLd={[
           breadcrumbSchema([
             { name: 'Home', path: '/' },
@@ -113,13 +129,25 @@ export default function Blog() {
           }
         />
 
+        {tag && (
+          <button
+            type="button"
+            onClick={() => setTag('')}
+            aria-label={`Clear filter: ${tag}`}
+            className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:border-primary/60"
+          >
+            <Tag className="h-3.5 w-3.5" /> #{tag}
+            <X className="h-3.5 w-3.5" />
+          </button>
+        )}
+
         <div className="grid auto-rows-[1fr] gap-5 sm:grid-cols-2 lg:grid-cols-3">
           <Async
             query={blogQuery}
             select={(d) => d.pages.flatMap((page) => page.data)}
             hint="blog"
             skeleton={(n) => <BlogCardSkeleton count={n} />}
-            empty={query ? st.postsSearchEmpty : st.postsEmpty}
+            empty={query || tag ? st.postsSearchEmpty : st.postsEmpty}
             stateClass="col-span-full"
           >
             {(items) =>
@@ -149,14 +177,21 @@ export default function Blog() {
                         <div className="absolute inset-0 bg-gradient-to-t from-background/70 to-transparent opacity-70" />
                       </div>
                       <div className="flex flex-1 flex-col p-5">
-                        <div className="mb-2 flex flex-wrap gap-1.5">
+                        {/* nowrap + scroll on mobile (matches the RichTextEditor toolbar), wraps once there's room at sm+ */}
+                        <div className="no-scrollbar mb-2 flex items-center gap-1.5 overflow-x-auto sm:flex-wrap">
                           {post.tags.slice(0, 3).map((t) => (
-                            <span
+                            <button
                               key={t}
-                              className="rounded-full border border-border/60 bg-card/60 px-2.5 py-0.5 text-2xs text-muted-foreground backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105"
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setTag(t);
+                              }}
+                              className="shrink-0 rounded-full border border-border/60 bg-card/60 px-2.5 py-0.5 text-2xs text-muted-foreground backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105 transition-colors hover:border-primary/40 hover:text-primary"
                             >
                               #{t}
-                            </span>
+                            </button>
                           ))}
                         </div>
                         <h2 className="text-lg font-bold text-foreground transition-colors group-hover:text-neon">

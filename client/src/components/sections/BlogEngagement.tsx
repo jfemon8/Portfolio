@@ -192,18 +192,18 @@ export default function BlogEngagement({
   };
 
   return (
-    <div className="mt-16 border-t border-border/60 pt-10">
-      <div className="mb-6 flex flex-wrap items-center gap-3">
+    <div className="mt-4 border-t border-border/60 pt-4">
+      <div className="mb-4 flex flex-wrap items-center gap-2">
         <h2 className="text-xl font-bold text-foreground">
           Reactions & Comments
         </h2>
-        <span className="rounded-full border border-border/60 bg-card/50 px-3 py-1 text-xs text-muted-foreground">
+        <span className="rounded-full border border-border/60 bg-card/50 px-2 py-1 text-xs text-muted-foreground">
           {formatCount(engagement.totalReactions)} Reactions ·{' '}
           {formatCount(engagement.totalComments)} Comments
         </span>
       </div>
 
-      <GlassCard className="p-5 sm:p-6">
+      <GlassCard className="p-2 sm:p-4">
         <div className="flex flex-wrap gap-2">
           {BLOG_REACTIONS.map((reaction) => {
             const meta = BLOG_REACTION_META[reaction];
@@ -215,7 +215,7 @@ export default function BlogEngagement({
                 onClick={() => void reactionMutation.mutate(reaction)}
                 disabled={reactionMutation.isPending}
                 className={cn(
-                  'inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm transition-colors',
+                  'inline-flex items-center gap-2 rounded-full border px-2 py-1 text-sm transition-colors',
                   selected
                     ? 'border-primary/60 bg-primary/10 text-primary'
                     : 'border-border/70 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground'
@@ -232,8 +232,8 @@ export default function BlogEngagement({
         </div>
       </GlassCard>
 
-      <div ref={formRef} className="mt-6 space-y-6">
-        <GlassCard className="w-full p-5 sm:p-6">
+      <div ref={formRef} className="mt-4 space-y-4">
+        <GlassCard className="w-full p-2 sm:p-4">
           <div className="mb-4 flex items-center justify-between gap-3">
             <div>
               <h3 className="font-semibold text-foreground">

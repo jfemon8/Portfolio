@@ -139,16 +139,20 @@ export const listPublished = asyncHandler(
         $or: [
           { title: { $regex: q, $options: 'i' } },
           { excerpt: { $regex: q, $options: 'i' } },
+          { tags: { $regex: q, $options: 'i' } },
         ],
       });
     }
     const filter: RootFilterQuery<IBlogPost> = { $and: and };
     if (req.query.tag) filter.tags = String(req.query.tag);
 
+    // The prerender script needs full article bodies to embed for non-JS crawlers; the public listing never does.
+    const projection = req.query.full ? '' : '-content';
+
     const [posts, total] = await Promise.all([
       BlogPost.find(filter)
-        .select('-content')
-        .sort({ featured: -1, publishedAt: -1 })
+        .select(projection)
+        .sort({ publishedAt: -1 })
         .skip((page - 1) * limit)
         .limit(limit)
         .lean(),

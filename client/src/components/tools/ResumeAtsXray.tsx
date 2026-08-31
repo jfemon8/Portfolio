@@ -109,11 +109,11 @@ export default function ResumeAtsXray() {
       </div>
 
       {status === 'parsing' && (
-        <p className="mt-3 text-sm text-muted-foreground">Reading file…</p>
+        <p className="mt-2 text-sm text-muted-foreground">Reading file…</p>
       )}
 
       {error && (
-        <div className="mt-4 flex gap-2.5 rounded-xl border border-destructive/40 bg-destructive/10 p-3.5">
+        <div className="mt-4 flex gap-2.5 rounded-xl border border-destructive/40 bg-destructive/10 p-3">
           <AlertTriangle className="h-4 w-4 shrink-0 translate-y-0.5 text-destructive" />
           <p className="text-sm text-destructive">{error}</p>
         </div>
@@ -124,7 +124,7 @@ export default function ResumeAtsXray() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25 }}
-          className="mt-6 space-y-5"
+          className="mt-4 space-y-4"
         >
           <div>
             <h3 className="text-sm font-semibold text-foreground">

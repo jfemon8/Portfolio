@@ -5,11 +5,14 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { JSDOM } from 'jsdom';
 
 import { PAGE_SEO } from '../src/lib/pageSeo';
 import { TOOL_SEO, fallbackToolSeo } from '../src/lib/toolSeo';
 import { resolveSeo, type SeoSettingsLike } from '../src/lib/seoMeta';
-import { setSiteOrigin } from '../src/config/site';
+import { setSiteOrigin, siteOrigin } from '../src/config/site';
+import { sanitizeRichText } from '../src/lib/sanitizeRichText';
+import { detectLanguage } from '../src/lib/detectLanguage';
 import {
   articleSchema,
   breadcrumbSchema,
@@ -39,6 +42,8 @@ interface Route {
   exactTitle?: boolean;
   type: 'website' | 'article' | 'profile';
   jsonLd: Json[];
+  /** Rendered into #root so a crawler that never executes JS still gets the actual article, not an empty shell. */
+  bodyHtml?: string;
 }
 
 const DIST = join(dirname(fileURLToPath(import.meta.url)), '..', 'dist');
@@ -130,13 +135,47 @@ async function emit(
   route: Route,
   settings?: SeoSettingsLike
 ): Promise<void> {
-  const html = stripManagedTags(template).replace(
+  let html = stripManagedTags(template).replace(
     '</head>',
     `${headFor(route, settings)}\n  </head>`
   );
+  // React's createRoot() replaces #root's children on mount rather than hydrating them, so a
+  // JS-executing visitor briefly sees this static markup, then the live app — the same trade-off
+  // every "static shell" SPA-SEO patch makes. A crawler that never runs JS just keeps this.
+  if (route.bodyHtml) {
+    html = html.replace(
+      '<div id="root"></div>',
+      `<div id="root">${route.bodyHtml}</div>`
+    );
+  }
   const dir = route.path === '/' ? DIST : join(DIST, route.path);
   await mkdir(dir, { recursive: true });
   await writeFile(join(dir, 'index.html'), html, 'utf8');
+}
+
+/** A minimal but complete server-rendered article — headline, meta, tags and the real sanitized body — for crawlers that don't execute JS. */
+function blogBodyHtml(post: BlogPostDoc, jsdomDocument: Document): string {
+  const origin = siteOrigin();
+  const dateIso = post.publishedAt || post.createdAt;
+  const date = dateIso ? new Date(dateIso).toISOString().slice(0, 10) : '';
+  const tags = (post.tags ?? [])
+    .map((t) => `<span>#${attr(t)}</span>`)
+    .join(' ');
+  const content = sanitizeRichText(post.content, jsdomDocument, origin);
+  const lang = detectLanguage(`${post.title} ${post.excerpt}`);
+
+  return (
+    `<article lang="${lang}">` +
+    `<p><a href="/blog">Blog</a></p>` +
+    (tags ? `<p>${tags}</p>` : '') +
+    `<h1>${attr(post.title)}</h1>` +
+    `<p>${date}${post.readingTime ? ` · ${post.readingTime} min read` : ''}</p>` +
+    (post.coverImage
+      ? `<img src="${attr(post.coverImage)}" alt="${attr(post.title)}" />`
+      : '') +
+    `<div>${content}</div>` +
+    `</article>`
+  );
 }
 
 async function main(): Promise<void> {
@@ -153,8 +192,10 @@ async function main(): Promise<void> {
       get<{ data: SeoSettingsDoc }>('/seo'),
       get<{ data: ToolDoc[] }>('/tools'),
       get<{ data: ProjectDoc[] }>('/projects'),
-      get<{ data: BlogPostDoc[] }>('/blog?limit=100'),
+      // full=1 includes `content`, which the public listing otherwise omits.
+      get<{ data: BlogPostDoc[] }>('/blog?limit=100&full=1'),
     ]);
+  const jsdomDocument = new JSDOM('').window.document;
 
   // A record with no slug would resolve to its parent's path and silently overwrite that page's HTML.
   const slugged = <T extends { slug?: string }>(rows: T[]): T[] =>
@@ -299,6 +340,7 @@ async function main(): Promise<void> {
         image: p.coverImage || undefined,
         keywords: p.tags ?? [],
         type: 'article',
+        bodyHtml: blogBodyHtml(p, jsdomDocument),
         jsonLd: [
           ...identity,
           breadcrumbSchema([

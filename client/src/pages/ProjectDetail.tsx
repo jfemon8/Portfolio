@@ -67,7 +67,7 @@ export default function ProjectDetail() {
   // Page-shaped placeholder rather than a centred spinner, so the layout the record will fill is already on screen.
   if (isLoading)
     return (
-      <div className="container-x py-8">
+      <div className="container-x py-4">
         <DetailPageSkeleton />
       </div>
     );
@@ -78,7 +78,7 @@ export default function ProjectDetail() {
           message={st.projectNotFound}
           onRetry={() => void refetch()}
         />
-        <Link to="/projects" className="mt-6 inline-block">
+        <Link to="/projects" className="4 inline-block">
           <Button variant="outline">{lab.backToProjects}</Button>
         </Link>
       </div>
@@ -109,19 +109,19 @@ export default function ProjectDetail() {
             <ArrowLeft className="h-4 w-4" /> {lab.btnBack}
           </button>
 
-          <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground/70">
+          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground/70">
             <span className="rounded-full border border-border/60 bg-card/60 px-3 py-1 capitalize text-muted-foreground backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
               {capitalizeFirst(p.category)}
             </span>
             {p.year && (
-              <span className="flex items-center gap-1.5">
+              <span className="flex items-center gap-1">
                 <Calendar className="h-3.5 w-3.5" /> {p.year}
               </span>
             )}
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center gap-1">
               <Eye className="h-3.5 w-3.5" /> {p.views} {lab.unitViews}
             </span>
-            <span className="flex items-center gap-1.5 capitalize text-neon">
+            <span className="flex items-center gap-1 capitalize text-neon">
               <CheckCircle2 className="h-3.5 w-3.5" />{' '}
               {capitalizeFirst(p.status)}
             </span>
@@ -132,7 +132,7 @@ export default function ProjectDetail() {
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">{p.tagline}</p>
 
-          <div className="mt-7 flex flex-wrap gap-3">
+          <div className="mt-4 flex flex-wrap gap-3">
             {p.sourceUrl && (
               <a href={p.sourceUrl} target="_blank" rel="noreferrer">
                 <Button size="lg">
@@ -162,8 +162,8 @@ export default function ProjectDetail() {
         )}
 
         {p.videoUrl && (
-          <Reveal delay={0.06}>
-            <div className="mt-6 overflow-hidden rounded-2xl border border-border/70">
+          <Reveal delay={0.05}>
+            <div className="mt-4 overflow-hidden rounded-2xl border border-border/70">
               <video
                 src={p.videoUrl}
                 poster={p.coverImage || undefined}
@@ -176,12 +176,12 @@ export default function ProjectDetail() {
           </Reveal>
         )}
 
-        <Reveal delay={0.08}>
-          <div className="mt-8 flex flex-wrap gap-2">
+        <Reveal delay={0.05}>
+          <div className="mt-4 flex flex-wrap gap-2">
             {p.techStack.map((t) => (
               <span
                 key={t}
-                className="rounded-md border border-border/60 bg-card/60 px-2.5 py-1 font-mono text-xs text-muted-foreground"
+                className="rounded-md border border-border/60 bg-card/60 px-2 py-1 font-mono text-xs text-muted-foreground"
               >
                 {t}
               </span>
@@ -190,10 +190,10 @@ export default function ProjectDetail() {
         </Reveal>
 
         {p.metrics.length > 0 && (
-          <Reveal delay={0.09}>
-            <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <Reveal delay={0.05}>
+            <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
               {p.metrics.map((m) => (
-                <GlassCard key={m.label} className="p-5 text-center">
+                <GlassCard key={m.label} className="p-4 text-center">
                   <Counter
                     value={m.value}
                     className="block text-2xl font-extrabold text-neon"
@@ -209,7 +209,7 @@ export default function ProjectDetail() {
 
         {p.highlights.length > 0 && (
           <Reveal delay={0.1}>
-            <GlassCard className="mt-8 p-6">
+            <GlassCard className="mt-4 p-4">
               <h2 className="mb-4 font-semibold text-foreground">
                 {lab.headingHighlights}
               </h2>
@@ -245,7 +245,7 @@ export default function ProjectDetail() {
 
           if (sections.length > 0) {
             return (
-              <div className="mt-10 space-y-8 sm:mt-14 sm:space-y-14">
+              <div className="mt-2 space-y-2 md:mt-4 md:space-y-4">
                 {sections.map((k, i) => (
                   <Reveal key={k} delay={0.04}>
                     <section>
@@ -268,7 +268,7 @@ export default function ProjectDetail() {
 
           return p.description ? (
             <Reveal delay={0.12}>
-              <div className="mt-10">
+              <div className="mt-4">
                 <RichText html={p.description} />
               </div>
             </Reveal>
@@ -276,7 +276,7 @@ export default function ProjectDetail() {
         })()}
 
         {p.gallery.length > 0 && (
-          <div className="mt-12 grid gap-5 sm:grid-cols-2">
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
             {p.gallery.map((g, i) => (
               <Reveal key={i} delay={i * 0.06}>
                 <figure>
