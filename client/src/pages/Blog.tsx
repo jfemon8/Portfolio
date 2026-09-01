@@ -123,7 +123,7 @@ export default function Blog() {
                 onChange={(e) => setQ(e.target.value)}
                 placeholder={lab.searchPlaceholder}
                 aria-label={lab.searchAria}
-                className="input w-full pl-9 md:w-56"
+                className="input w-full pl-4 md:w-64 lg:w-80"
               />
             </div>
           }
@@ -134,14 +134,14 @@ export default function Blog() {
             type="button"
             onClick={() => setTag('')}
             aria-label={`Clear filter: ${tag}`}
-            className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:border-primary/60"
+            className="mb-4 inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary/10 px-2 py-1 text-xs font-medium text-primary transition-colors hover:border-primary/60"
           >
             <Tag className="h-3.5 w-3.5" /> #{tag}
             <X className="h-3.5 w-3.5" />
           </button>
         )}
 
-        <div className="grid auto-rows-[1fr] gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid auto-rows-[1fr] gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <Async
             query={blogQuery}
             select={(d) => d.pages.flatMap((page) => page.data)}
@@ -159,7 +159,7 @@ export default function Blog() {
                   >
                     <GlassCard
                       interactive
-                      className="group flex h-full flex-col overflow-hidden"
+                      className="group flex h-full w-0 min-w-full flex-col overflow-hidden"
                     >
                       <div className="relative aspect-video overflow-hidden border-b border-border/60">
                         {post.coverImage ? (
@@ -176,9 +176,9 @@ export default function Blog() {
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-background/70 to-transparent opacity-70" />
                       </div>
-                      <div className="flex flex-1 flex-col p-5">
+                      <div className="flex flex-1 flex-col p-4">
                         {/* nowrap + scroll on mobile (matches the RichTextEditor toolbar), wraps once there's room at sm+ */}
-                        <div className="no-scrollbar mb-2 flex items-center gap-1.5 overflow-x-auto sm:flex-wrap">
+                        <div className="no-scrollbar mb-2 flex items-center gap-1 overflow-x-auto sm:flex-wrap">
                           {post.tags.slice(0, 3).map((t) => (
                             <button
                               key={t}
@@ -188,7 +188,7 @@ export default function Blog() {
                                 e.stopPropagation();
                                 setTag(t);
                               }}
-                              className="shrink-0 rounded-full border border-border/60 bg-card/60 px-2.5 py-0.5 text-2xs text-muted-foreground backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105 transition-colors hover:border-primary/40 hover:text-primary"
+                              className="shrink-0 rounded-full border border-border/60 bg-card/60 px-2 py-0.5 text-2xs text-muted-foreground backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105 transition-colors hover:border-primary/40 hover:text-primary"
                             >
                               #{t}
                             </button>
@@ -203,12 +203,12 @@ export default function Blog() {
                             {post.excerpt}
                           </p>
                         </div>
-                        <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-4 text-xs text-muted-foreground/70">
-                          <span className="flex items-center gap-1.5">
+                        <div className="mt-2 flex items-center justify-between border-t border-border/60 pt-2 text-xs text-muted-foreground/70">
+                          <span className="flex items-center gap-1">
                             <Calendar className="h-3.5 w-3.5" />
                             {formatDate(post.publishedAt || post.createdAt)}
                           </span>
-                          <span className="flex items-center gap-1.5">
+                          <span className="flex items-center gap-1">
                             <Clock className="h-3.5 w-3.5" />{' '}
                             {formatTime(post.updatedAt)}
                             <ArrowUpRight className="ml-1 h-4 w-4 text-neon" />
