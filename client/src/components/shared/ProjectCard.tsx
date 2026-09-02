@@ -31,7 +31,12 @@ export default function ProjectCard({
   });
 
   return (
-    <div className={cn('group relative h-full rounded-2xl', className)}>
+    <div
+      className={cn(
+        'group relative h-full w-0 min-w-full rounded-2xl',
+        className
+      )}
+    >
       <GlassCard interactive className="flex h-full flex-col overflow-hidden">
         {/* Cover */}
         <PrefetchLink
@@ -61,15 +66,15 @@ export default function ProjectCard({
           <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-70" />
 
           {project.featured && (
-            <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-2xs font-semibold text-neon backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
+            <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full border border-border/60 bg-background/70 px-2 py-1 text-2xs font-semibold text-neon backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
               <Star className="h-3 w-3 fill-neon" /> {lab.badgeFeatured}
             </span>
           )}
-          <span className="absolute left-3 top-3 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-2xs font-medium text-muted-foreground backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
+          <span className="absolute left-3 top-3 rounded-full border border-border/60 bg-background/70 px-2 py-1 text-2xs font-medium text-muted-foreground backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
             {capitalizeFirst(project.category)}
           </span>
           {project.videoUrl && (
-            <span className="absolute bottom-3 left-3 flex items-center gap-1 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-2xs font-medium text-neon backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
+            <span className="absolute bottom-3 left-3 flex items-center gap-1 rounded-full border border-border/60 bg-background/70 px-2 py-1 text-2xs font-medium text-neon backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
               <Play className="h-3 w-3 fill-neon" /> {lab.badgeVideo}
             </span>
           )}
@@ -77,7 +82,7 @@ export default function ProjectCard({
 
         {/* Body */}
         <div className="flex flex-1 flex-col p-5">
-          <div className="mb-2 flex items-start justify-between gap-3">
+          <div className="mb-2 flex items-start justify-between gap-2">
             <PrefetchLink
               to={href}
               onClick={onOpen}
@@ -123,8 +128,8 @@ export default function ProjectCard({
             )}
           </div>
 
-          <div className="mt-5 flex items-center gap-4 border-t border-border/60 pt-4 text-sm">
-            <span className="flex items-center gap-1.5 text-xs text-muted-foreground/70">
+          <div className="mt-4 flex items-center gap-4 border-t border-border/60 pt-4 text-sm">
+            <span className="flex items-center gap-1 text-xs text-muted-foreground/70">
               <Eye className="h-3.5 w-3.5" /> {project.views}
             </span>
             {project.sourceUrl && (
@@ -134,7 +139,7 @@ export default function ProjectCard({
                 rel="noreferrer"
                 aria-label={lab.btnSourceCode}
                 title={lab.btnSourceCode}
-                className="-m-2 flex items-center gap-1.5 p-2 text-muted-foreground transition-colors hover:text-neon"
+                className="-m-2 flex items-center gap-1 p-2 text-muted-foreground transition-colors hover:text-neon"
               >
                 <Github className="h-4 w-4" />
               </a>
@@ -146,7 +151,7 @@ export default function ProjectCard({
                 rel="noreferrer"
                 aria-label={lab.btnLiveDemo}
                 title={lab.btnLiveDemo}
-                className="-m-2 flex items-center gap-1.5 p-2 text-muted-foreground transition-colors hover:text-neon"
+                className="-m-2 flex items-center gap-1 p-2 text-muted-foreground transition-colors hover:text-neon"
               >
                 <Globe className="h-4 w-4" />
               </a>

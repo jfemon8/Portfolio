@@ -154,7 +154,10 @@ export default function BlogPostPage() {
               {related.map((r, i) => (
                 <Reveal key={r._id} delay={i * 0.05}>
                   <Link to={`/blog/${r.slug}`} className="block h-full">
-                    <GlassCard interactive className="h-full p-4">
+                    <GlassCard
+                      interactive
+                      className="h-full w-0 min-w-full p-4"
+                    >
                       <h3 className="text-sm font-semibold text-foreground">
                         {r.title}
                       </h3>

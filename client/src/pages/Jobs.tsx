@@ -96,7 +96,7 @@ function JobCard({ job }: { job: JobDoc }) {
     <GlassCard
       interactive={!job.expired}
       className={cn(
-        'flex h-full flex-col p-5 transition-opacity',
+        'flex h-full w-0 min-w-full flex-col p-4 transition-opacity',
         job.expired && 'opacity-70',
         !job.expired &&
           'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary'
@@ -114,7 +114,7 @@ function JobCard({ job }: { job: JobDoc }) {
     >
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-primary/10 px-2.5 py-1 text-2xs font-semibold text-primary">
+          <span className="rounded-full bg-primary/10 px-2 py-1 text-2xs font-semibold text-primary">
             {categoryLabel(job.category)}
           </span>
           {job.attachments && job.attachments.length > 0 && (
@@ -128,14 +128,14 @@ function JobCard({ job }: { job: JobDoc }) {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {job.employmentType && (
-            <span className="rounded-full border border-border/70 px-2.5 py-1 text-2xs text-muted-foreground">
+            <span className="rounded-full border border-border/70 px-2 py-1 text-2xs text-muted-foreground">
               {job.employmentType}
             </span>
           )}
           {urgency && (
             <span
               className={cn(
-                'rounded-full px-2.5 py-1 text-2xs font-semibold',
+                'rounded-full px-2 py-1 text-2xs font-semibold',
                 urgency.className
               )}
             >
@@ -150,7 +150,7 @@ function JobCard({ job }: { job: JobDoc }) {
       </h2>
       <p className="mt-1 text-sm font-medium text-neon">{job.company}</p>
 
-      <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1.5 text-2xs text-muted-foreground">
+      <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-2xs text-muted-foreground">
         <span className="flex items-center gap-1">
           <MapPin className="h-3.5 w-3.5" /> {job.location || 'Bangladesh'}
         </span>
@@ -173,7 +173,7 @@ function JobCard({ job }: { job: JobDoc }) {
       </div>
 
       {!job.expired && job.description && (
-        <p className="mt-4 line-clamp-3 text-sm leading-6 text-muted-foreground">
+        <p className="mt-4 line-clamp-3 text-sm leading-3 text-muted-foreground">
           {job.description}
         </p>
       )}
@@ -184,8 +184,8 @@ function JobCard({ job }: { job: JobDoc }) {
           {extraSources(job) > 0 && ` +${extraSources(job)} more`}
         </p>
         {!job.expired && (
-          <div className="mt-2.5 flex items-center justify-between gap-2">
-            <div className="flex items-center gap-1.5">
+          <div className="mt-2 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
               <AppliedBadge jobId={job._id} />
               <SaveButton jobId={job._id} />
               <HideButton jobId={job._id} />
@@ -196,7 +196,7 @@ function JobCard({ job }: { job: JobDoc }) {
                 target="_blank"
                 rel="noreferrer"
                 onClick={(event) => event.stopPropagation()}
-                className="inline-flex shrink-0 items-center gap-1.5 text-2xs font-semibold text-primary transition-colors hover:text-neon"
+                className="inline-flex shrink-0 items-center gap-1 text-2xs font-semibold text-primary transition-colors hover:text-neon"
               >
                 Apply <ExternalLink className="h-3.5 w-3.5" />
               </a>
@@ -332,7 +332,7 @@ export default function Jobs() {
             <label className="relative min-w-0 flex-1">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
-                className="input pl-9 pr-9"
+                className="input pl-4 pr-4"
                 placeholder="Search title, company, location or type"
                 aria-label="Search jobs"
                 value={search}
@@ -360,7 +360,7 @@ export default function Jobs() {
                   onClick={() => setFilter({ category: item.value })}
                   aria-pressed={category === item.value}
                   className={cn(
-                    'rounded-full border px-3 py-1.5 text-xs transition-colors',
+                    'rounded-full border px-2 py-1 text-xs transition-colors',
                     category === item.value
                       ? 'border-primary/50 bg-primary/10 text-primary'
                       : 'border-border/70 text-muted-foreground hover:text-foreground'
@@ -368,7 +368,7 @@ export default function Jobs() {
                 >
                   {item.label}
                   {count !== undefined && (
-                    <span className="ml-1.5 text-muted-foreground/70">
+                    <span className="ml-1 text-muted-foreground/70">
                       {count}
                     </span>
                   )}

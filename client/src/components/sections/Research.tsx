@@ -19,7 +19,7 @@ function Pipeline({ stages }: { stages: string[] }) {
   return (
     <div
       aria-hidden
-      className="mb-12 flex flex-wrap items-center gap-2 font-mono text-2xs text-muted-foreground"
+      className="mb-4 flex flex-wrap items-center gap-2 font-mono text-2xs text-muted-foreground"
     >
       {stages.map((s, i) => (
         <div key={s} className="flex items-center gap-2">
@@ -64,7 +64,7 @@ export default function Research() {
 
       <Pipeline stages={lab.researchStages} />
 
-      <div className="grid gap-6 lg:grid-cols-2">{children}</div>
+      <div className="grid gap-4 lg:grid-cols-2">{children}</div>
     </Section>
   );
 
@@ -80,9 +80,12 @@ export default function Research() {
       {(pubs) =>
         frame(
           pubs.map((p, i) => (
-            <Reveal key={p._id} delay={i * 0.08}>
-              <GlassCard interactive className="flex h-full flex-col p-6">
-                <div className="mb-3 flex items-center gap-2 font-mono text-xs text-muted-foreground/70">
+            <Reveal key={p._id} delay={i * 0.05}>
+              <GlassCard
+                interactive
+                className="flex h-full w-0 min-w-full flex-col p-4"
+              >
+                <div className="mb-2 flex items-center gap-2 font-mono text-xs text-muted-foreground/70">
                   <FileText className="h-4 w-4 text-neon" />
                   <span>{[p.venue, p.year].filter(Boolean).join(' · ')}</span>
                 </div>

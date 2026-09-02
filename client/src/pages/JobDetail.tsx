@@ -125,15 +125,15 @@ export default function JobDetail() {
       <article className="container-x py-4">
         <button
           onClick={() => navigate(-1)}
-          className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-neon"
+          className="mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-neon"
         >
           <ArrowLeft className="h-4 w-4" /> Back
         </button>
 
-        <GlassCard className="p-5 sm:p-8">
+        <GlassCard className="p-2 sm:p-4">
           <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-primary/10 px-2.5 py-1 text-2xs font-semibold capitalize text-primary">
+              <span className="rounded-full bg-primary/10 px-2 py-1 text-2xs font-semibold capitalize text-primary">
                 {job.category === 'private' ? 'Non-govt.' : job.category}
               </span>
               {job.employmentType && (
@@ -151,12 +151,12 @@ export default function JobDetail() {
           <h1 className="mt-4 break-words text-2xl font-extrabold leading-tight tracking-tight text-foreground sm:text-4xl lg:text-5xl">
             {job.title}
           </h1>
-          <p className="mt-3 break-words text-base font-semibold text-neon sm:text-lg">
+          <p className="mt-2 break-words text-base font-semibold text-neon sm:text-lg">
             {job.company}
           </p>
 
-          <div className="mt-5 flex flex-col gap-2 text-sm text-muted-foreground sm:flex-row sm:flex-wrap sm:gap-x-5">
-            <span className="flex items-start gap-1.5">
+          <div className="mt-4 flex flex-col gap-2 text-sm text-muted-foreground sm:flex-row sm:flex-wrap sm:gap-x-4">
+            <span className="flex items-start gap-1">
               <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
               <span className="min-w-0 break-words">
                 {job.location || 'Bangladesh'}
@@ -165,7 +165,7 @@ export default function JobDetail() {
             {job.deadline && (
               <span
                 className={cn(
-                  'flex items-start gap-1.5',
+                  'flex items-start gap-1',
                   closingSoon && 'font-semibold text-destructive'
                 )}
               >
@@ -177,13 +177,13 @@ export default function JobDetail() {
               </span>
             )}
             {job.salary && (
-              <span className="flex items-start gap-1.5">
+              <span className="flex items-start gap-1">
                 <Wallet className="mt-0.5 h-4 w-4 shrink-0" />
                 <span className="min-w-0 break-words">{job.salary}</span>
               </span>
             )}
             {job.publishedAt && (
-              <span className="flex items-center gap-1.5">
+              <span className="flex items-center gap-1">
                 <Clock className="h-4 w-4 shrink-0" /> Posted{' '}
                 {timeAgo(job.publishedAt)}
               </span>
@@ -195,7 +195,7 @@ export default function JobDetail() {
               href={destination}
               target="_blank"
               rel="noreferrer"
-              className="mt-7 block sm:inline-flex"
+              className="mt-4 block sm:inline-flex"
             >
               <Button size="lg" className="w-full sm:w-auto">
                 Apply now <ExternalLink className="h-4 w-4" />
@@ -203,7 +203,7 @@ export default function JobDetail() {
             </a>
           )}
 
-          <div className="mt-5 flex items-center gap-2 border-t border-border/50 pt-4">
+          <div className="mt-4 flex items-center gap-2 border-t border-border/50 pt-4">
             <AppliedBadge jobId={job._id} />
             <SaveButton jobId={job._id} />
             <span className="text-2xs text-muted-foreground/70">
@@ -215,17 +215,17 @@ export default function JobDetail() {
         <JobTrackerNote jobId={job._id} />
 
         {(job.description.trim() || !hasCircular) && (
-          <section className="mt-8">
+          <section className="mt-4">
             <h2 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
               Job description
             </h2>
             {job.description.trim() ? (
               <RichText
                 html={formatJobDescription(job.description)}
-                className="mt-5"
+                className="mt-4"
               />
             ) : (
-              <p className="mt-5 text-sm text-muted-foreground">
+              <p className="mt-4 text-sm text-muted-foreground">
                 This source does not publish a full description. Use the apply
                 link above to read the original posting.
               </p>
@@ -236,7 +236,7 @@ export default function JobDetail() {
         <JobAttachments attachments={attachments} title={job.title} />
 
         {related.length > 0 && (
-          <section className="mt-12">
+          <section className="mt-4">
             <h2 className="text-xl font-bold tracking-tight text-foreground">
               Similar openings
             </h2>
@@ -247,7 +247,10 @@ export default function JobDetail() {
                   to={`/tools/jobs/${item._id}`}
                   className="block h-full"
                 >
-                  <GlassCard interactive className="h-full p-4">
+                  {/* w-0 + min-w-full (not w-full) — see Blog.tsx's card for why: break-words
+                      alone doesn't stop this grid item from sizing the whole track past the
+                      viewport, since the track sizing issue isn't about word-breaking. */}
+                  <GlassCard interactive className="h-full w-0 min-w-full p-4">
                     <p className="break-words font-semibold leading-snug text-foreground">
                       {item.title}
                     </p>

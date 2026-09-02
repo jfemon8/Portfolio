@@ -139,12 +139,12 @@ export default function Tools() {
           {showJobsCard && (
             <Reveal>
               <PrefetchLink to="/tools/jobs" className="group block h-full">
-                <GlassCard interactive className="flex h-full flex-col p-5">
+                <GlassCard interactive className="flex h-full flex-col p-4">
                   <div className="flex items-center justify-between">
                     <span className="grid h-10 w-10 place-items-center rounded-xl border border-border/60 bg-background/40 text-neon">
                       <BriefcaseBusiness className="h-5 w-5" />
                     </span>
-                    <span className="rounded-full border border-border/60 bg-card/60 px-2.5 py-1 text-2xs text-muted-foreground backdrop-blur-md">
+                    <span className="rounded-full border border-border/60 bg-card/60 px-2 py-1 text-2xs text-muted-foreground backdrop-blur-md">
                       {categoryOptions.find(
                         (c) => c.slug === JOBS_CARD.category
                       )?.name ?? JOBS_CARD.label}

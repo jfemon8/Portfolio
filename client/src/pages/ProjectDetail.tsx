@@ -104,13 +104,13 @@ export default function ProjectDetail() {
         <Reveal>
           <button
             onClick={() => navigate(-1)}
-            className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-neon"
+            className="mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-neon"
           >
             <ArrowLeft className="h-4 w-4" /> {lab.btnBack}
           </button>
 
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground/70">
-            <span className="rounded-full border border-border/60 bg-card/60 px-3 py-1 capitalize text-muted-foreground backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
+            <span className="rounded-full border border-border/60 bg-card/60 px-2 py-1 capitalize text-muted-foreground backdrop-blur-md backdrop-saturate-150 backdrop-brightness-105">
               {capitalizeFirst(p.category)}
             </span>
             {p.year && (
@@ -127,22 +127,24 @@ export default function ProjectDetail() {
             </span>
           </div>
 
-          <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-foreground md:text-5xl">
+          <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-foreground md:text-5xl">
             {p.title}
           </h1>
-          <p className="mt-4 text-lg text-muted-foreground">{p.tagline}</p>
+          <p className="mt-2 text-sm md:text-lg text-muted-foreground">
+            {p.tagline}
+          </p>
 
-          <div className="mt-4 flex flex-wrap gap-3">
+          <div className="mt-2 flex flex-wrap gap-2">
             {p.sourceUrl && (
               <a href={p.sourceUrl} target="_blank" rel="noreferrer">
-                <Button size="lg">
+                <Button size="md">
                   <Github className="h-4 w-4" /> {lab.btnSourceCode}
                 </Button>
               </a>
             )}
             {p.liveUrl && (
               <a href={p.liveUrl} target="_blank" rel="noreferrer">
-                <Button size="lg" variant="outline">
+                <Button size="md" variant="outline">
                   <ExternalLink className="h-4 w-4" /> {lab.btnLiveDemo}
                 </Button>
               </a>
@@ -156,14 +158,14 @@ export default function ProjectDetail() {
               src={p.coverImage}
               alt={p.title}
               priority
-              className="mt-9 aspect-video w-full rounded-2xl border border-border/70 object-cover"
+              className="mt-2 aspect-video w-full rounded-lg border border-border/70 object-cover"
             />
           </Reveal>
         )}
 
         {p.videoUrl && (
           <Reveal delay={0.05}>
-            <div className="mt-4 overflow-hidden rounded-2xl border border-border/70">
+            <div className="mt-2 overflow-hidden rounded-lg border border-border/70">
               <video
                 src={p.videoUrl}
                 poster={p.coverImage || undefined}
@@ -177,7 +179,7 @@ export default function ProjectDetail() {
         )}
 
         <Reveal delay={0.05}>
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-2 flex flex-wrap gap-2">
             {p.techStack.map((t) => (
               <span
                 key={t}
@@ -191,7 +193,7 @@ export default function ProjectDetail() {
 
         {p.metrics.length > 0 && (
           <Reveal delay={0.05}>
-            <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <div className="mt-2 grid grid-cols-2 gap-4 sm:grid-cols-4">
               {p.metrics.map((m) => (
                 <GlassCard key={m.label} className="p-4 text-center">
                   <Counter
@@ -209,15 +211,17 @@ export default function ProjectDetail() {
 
         {p.highlights.length > 0 && (
           <Reveal delay={0.1}>
-            <GlassCard className="mt-4 p-4">
+            <GlassCard className="mt-2 p-4">
               <h2 className="mb-4 font-semibold text-foreground">
                 {lab.headingHighlights}
               </h2>
               <ul className="grid gap-2 sm:grid-cols-2">
                 {p.highlights.map((h, i) => (
+                  // w-0 + min-w-full (not w-full) — see Blog.tsx's card for why: without it, a
+                  // long highlight sentence can size this grid item past the viewport.
                   <li
                     key={i}
-                    className="flex gap-2 text-sm text-muted-foreground"
+                    className="flex w-0 min-w-full gap-2 text-sm text-muted-foreground"
                   >
                     <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-neon" />
                     {h}
@@ -249,7 +253,7 @@ export default function ProjectDetail() {
                 {sections.map((k, i) => (
                   <Reveal key={k} delay={0.04}>
                     <section>
-                      <div className="mb-5 flex items-center gap-3">
+                      <div className="mb-4 flex items-center gap-3">
                         <span className="font-mono text-sm text-neon">
                           {String(i + 1).padStart(2, '0')}.
                         </span>
@@ -267,8 +271,8 @@ export default function ProjectDetail() {
           }
 
           return p.description ? (
-            <Reveal delay={0.12}>
-              <div className="mt-4">
+            <Reveal delay={0.1}>
+              <div className="mt-2">
                 <RichText html={p.description} />
               </div>
             </Reveal>
@@ -276,10 +280,10 @@ export default function ProjectDetail() {
         })()}
 
         {p.gallery.length > 0 && (
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div className="mt-2 grid gap-4 sm:grid-cols-2">
             {p.gallery.map((g, i) => (
-              <Reveal key={i} delay={i * 0.06}>
-                <figure>
+              <Reveal key={i} delay={i * 0.05}>
+                <figure className="w-0 min-w-full">
                   <button
                     type="button"
                     onClick={() => setLb(i)}

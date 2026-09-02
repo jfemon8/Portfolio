@@ -15,13 +15,13 @@ export default function ToolCard({
   const Icon = TOOL_ICONS[tool.icon];
 
   return (
-    <PrefetchLink to={href} className="group block h-full">
-      <GlassCard interactive className="flex h-full flex-col p-5">
+    <PrefetchLink to={href} className="group block h-full w-0 min-w-full">
+      <GlassCard interactive className="flex h-full flex-col p-4">
         <div className="flex items-center justify-between">
           <span className="grid h-10 w-10 place-items-center rounded-xl border border-border/60 bg-background/40 text-neon">
             {Icon && <Icon className="h-5 w-5" />}
           </span>
-          <span className="rounded-full border border-border/60 bg-card/60 px-2.5 py-1 text-2xs text-muted-foreground backdrop-blur-md">
+          <span className="rounded-full border border-border/60 bg-card/60 px-2 py-1 text-2xs text-muted-foreground backdrop-blur-md">
             {categoryLabel ?? tool.category}
           </span>
         </div>

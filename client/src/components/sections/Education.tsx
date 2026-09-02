@@ -22,7 +22,7 @@ export default function Education() {
         title={copy.title}
         subtitle={copy.subtitle}
       />
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Async
           query={educationQuery}
           select={(r) => r.data}
@@ -34,8 +34,8 @@ export default function Education() {
           {(items) =>
             items.map((e, i) => (
               <Reveal key={e._id} delay={i * 0.07}>
-                <div className="group relative h-full rounded-2xl">
-                  <GlassCard interactive className="h-full p-6">
+                <div className="group relative h-full w-0 min-w-full rounded-2xl">
+                  <GlassCard interactive className="h-full p-4">
                     <GraduationCap
                       className="mb-4 h-7 w-7 text-neon"
                       strokeWidth={2.25}
@@ -52,18 +52,18 @@ export default function Education() {
                         {e.startYear} – {e.endYear}
                       </span>
                       {e.grade && (
-                        <span className="rounded-full border border-border/70 bg-card/60 px-2.5 py-1 text-muted-foreground">
+                        <span className="rounded-full border border-border/70 bg-card/60 px-2 py-1 text-muted-foreground">
                           {e.grade}
                         </span>
                       )}
                     </div>
                     {e.location && (
-                      <p className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground/70">
+                      <p className="mt-2 flex items-center gap-1 text-xs text-muted-foreground/70">
                         <MapPin className="h-3.5 w-3.5" /> {e.location}
                       </p>
                     )}
                     {e.description && (
-                      <p className="mt-3 text-xs leading-relaxed text-muted-foreground/70 line-clamp-3">
+                      <p className="mt-2 text-xs leading-relaxed text-muted-foreground/70 line-clamp-3">
                         {e.description}
                       </p>
                     )}

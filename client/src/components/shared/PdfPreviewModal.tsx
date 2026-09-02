@@ -44,7 +44,7 @@ export default function PdfPreviewModal({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.18 }}
+          transition={{ duration: 0.2 }}
           // data-lenis-prevent stops the Lenis smooth-scroll provider from swallowing wheel/touch here, so the PDF container's overflow-auto actually scrolls.
           data-lenis-prevent
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-3 backdrop-blur-[1.875rem] backdrop-saturate-150 backdrop-brightness-105 sm:p-6"
@@ -72,7 +72,7 @@ export default function PdfPreviewModal({
                 href={action.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="glass-thin absolute -left-3 -top-3 z-10 inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-medium text-foreground shadow-lg hover:bg-accent sm:-left-4 sm:-top-4"
+                className="glass-thin absolute left-0 -top-10 z-10 inline-flex items-center gap-1 rounded-full px-3 py-2 text-xs font-medium text-foreground shadow-lg hover:bg-accent sm:-left-4 sm:-top-4"
               >
                 {action.label} <ExternalLink className="h-3.5 w-3.5" />
               </a>

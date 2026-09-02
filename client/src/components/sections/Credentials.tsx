@@ -48,19 +48,19 @@ function Column({
 }) {
   return (
     <Reveal delay={delay}>
-      <GlassCard interactive className="h-full p-6">
-        <h3 className="mb-5 flex items-center gap-2 font-mono text-sm font-semibold uppercase tracking-wider text-neon">
+      <GlassCard interactive className="h-full w-0 min-w-full p-4">
+        <h3 className="mb-4 flex items-center gap-2 font-mono text-sm font-semibold uppercase tracking-wider text-neon">
           <Icon className="h-4 w-4" /> {title}
         </h3>
         <ul className="space-y-4">
           {items.map((it) => {
             // Title priority: media opens the viewer, credential URL opens in a new tab, otherwise plain text.
             const titleClass =
-              'group/title inline-flex items-start gap-1.5 text-left text-sm font-medium text-foreground transition-colors hover:text-neon';
+              'group/title inline-flex items-center gap-1 text-left text-sm font-medium text-foreground transition-colors hover:text-neon';
             const iconClass =
               'mt-0.5 h-3.5 w-3.5 shrink-0 opacity-60 transition-opacity group-hover/title:opacity-100';
             return (
-              <li key={it.id} className="border-l-2 border-border/70 pl-3">
+              <li key={it.id} className="border-l-2 border-border/70 pl-2">
                 {it.mediaUrl ? (
                   <button
                     type="button"
@@ -172,7 +172,7 @@ export default function Credentials() {
         title={copy.title}
         subtitle={copy.subtitle}
       />
-      <div className="grid gap-6 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         <Async
           query={certificationsQuery}
           select={(r) => r.data}
