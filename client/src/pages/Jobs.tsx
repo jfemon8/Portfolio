@@ -173,7 +173,7 @@ function JobCard({ job }: { job: JobDoc }) {
       </div>
 
       {!job.expired && job.description && (
-        <p className="mt-4 line-clamp-3 text-sm leading-3 text-muted-foreground">
+        <p className="mt-4 line-clamp-3 text-sm leading-5 text-muted-foreground">
           {job.description}
         </p>
       )}
