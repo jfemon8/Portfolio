@@ -217,8 +217,7 @@ export default function ProjectDetail() {
               </h2>
               <ul className="grid gap-2 sm:grid-cols-2">
                 {p.highlights.map((h, i) => (
-                  // w-0 + min-w-full (not w-full) — see Blog.tsx's card for why: without it, a
-                  // long highlight sentence can size this grid item past the viewport.
+                  // w-0 + min-w-full — see Blog.tsx's card for why.
                   <li
                     key={i}
                     className="flex w-0 min-w-full gap-2 text-sm text-muted-foreground"

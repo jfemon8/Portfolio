@@ -247,9 +247,7 @@ export default function JobDetail() {
                   to={`/tools/jobs/${item._id}`}
                   className="block h-full"
                 >
-                  {/* w-0 + min-w-full (not w-full) — see Blog.tsx's card for why: break-words
-                      alone doesn't stop this grid item from sizing the whole track past the
-                      viewport, since the track sizing issue isn't about word-breaking. */}
+                  {/* w-0 + min-w-full — see Blog.tsx's card for why; break-words alone doesn't stop it. */}
                   <GlassCard interactive className="h-full w-0 min-w-full p-4">
                     <p className="break-words font-semibold leading-snug text-foreground">
                       {item.title}

@@ -335,7 +335,8 @@ export default function RichTextEditor({
   const applyCommand = (tool: Tool): void => {
     const editable = ref.current;
     if (!editable) return;
-    editable.focus();
+    // preventScroll — plain focus() yanks a long post back to the top on every toolbar click.
+    editable.focus({ preventScroll: true });
     document.execCommand(tool.command, false, tool.value);
     window.requestAnimationFrame(sync);
   };
@@ -345,7 +346,7 @@ export default function RichTextEditor({
     const editable = ref.current;
     const selection = window.getSelection();
     if (!editable || !selection || selection.rangeCount === 0) return;
-    editable.focus();
+    editable.focus({ preventScroll: true });
 
     const tag = command === 'superscript' ? 'sup' : 'sub';
     const anchorElement =
@@ -387,7 +388,7 @@ export default function RichTextEditor({
   const restoreSelection = (): void => {
     const editable = ref.current;
     if (!editable) return;
-    editable.focus();
+    editable.focus({ preventScroll: true });
     const selection = window.getSelection();
     if (selection && savedRangeRef.current) {
       selection.removeAllRanges();
@@ -399,7 +400,7 @@ export default function RichTextEditor({
     const editable = ref.current;
     const selection = window.getSelection();
     if (!editable || !selection || selection.rangeCount === 0) return;
-    editable.focus();
+    editable.focus({ preventScroll: true });
 
     const anchorElement =
       (selection.anchorNode instanceof HTMLElement
@@ -493,7 +494,7 @@ export default function RichTextEditor({
     );
 
   return (
-    // w-0 + min-w-full (not w-full) stops the toolbar's horizontal scroll from forcing this card, and any grid/flex ancestor, wider than the viewport on mobile.
+    // w-0 + min-w-full (not w-full): stops the scrolling toolbar from forcing this card wider than the viewport on mobile.
     <div
       className={cn(
         'w-0 min-w-full rounded-lg border border-border/70 bg-card shadow-sm',
