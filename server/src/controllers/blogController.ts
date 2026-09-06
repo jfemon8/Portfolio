@@ -144,7 +144,11 @@ export const listPublished = asyncHandler(
       });
     }
     const filter: RootFilterQuery<IBlogPost> = { $and: and };
-    if (req.query.tag) filter.tags = String(req.query.tag);
+
+    if (req.query.tag) {
+      const tag = escapeRegex(String(req.query.tag).trim().slice(0, 60));
+      filter.tags = { $regex: `^${tag}$`, $options: 'i' };
+    }
 
     // The prerender script needs full article bodies to embed for non-JS crawlers; the public listing never does.
     const projection = req.query.full ? '' : '-content';
@@ -167,7 +171,6 @@ export const listPublished = asyncHandler(
   }
 );
 
-/** Public — single published post by slug (increments views). Comments are fetched separately (paginated) since a post can carry thousands. */
 export const getPublishedBySlug = asyncHandler(
   async (req: Request, res: Response) => {
     const visitorKey = String(req.query.visitorKey || '').trim();
@@ -178,16 +181,44 @@ export const getPublishedBySlug = asyncHandler(
     );
     if (!post) throw ApiError.notFound('Post not found');
 
+    const ownTags = post.tags.map((tag) => tag.toLowerCase());
+
     const [related, totalComments, reactions, visitorReaction] =
       await Promise.all([
-        BlogPost.find({
-          $and: [publicVisibility()],
-          _id: { $ne: post._id },
-          tags: { $in: post.tags },
-        })
-          .select('title slug excerpt coverImage readingTime publishedAt')
-          .limit(3)
-          .lean(),
+        BlogPost.aggregate([
+          { $match: { ...publicVisibility(), _id: { $ne: post._id } } },
+          {
+            $addFields: {
+              sharedTags: {
+                $size: {
+                  $setIntersection: [
+                    {
+                      $map: {
+                        input: { $ifNull: ['$tags', []] },
+                        as: 'tag',
+                        in: { $toLower: '$$tag' },
+                      },
+                    },
+                    ownTags,
+                  ],
+                },
+              },
+            },
+          },
+          { $match: { sharedTags: { $gt: 0 } } },
+          { $sort: { sharedTags: -1, publishedAt: -1 } },
+          { $limit: 3 },
+          {
+            $project: {
+              title: 1,
+              slug: 1,
+              excerpt: 1,
+              coverImage: 1,
+              readingTime: 1,
+              publishedAt: 1,
+            },
+          },
+        ]),
         BlogComment.countDocuments({ post: post._id }),
         summarizeReactions(String(post._id)),
         visitorKey
@@ -211,7 +242,6 @@ export const getPublishedBySlug = asyncHandler(
   }
 );
 
-/** Public — a page of a post's top-level comments (newest first), each carrying its full reply thread (also newest first) nested inline, Facebook-style. Replies never nest more than one level deep — replying to a reply still attaches to that reply's top-level ancestor. */
 export const getPostComments = asyncHandler(
   async (req: Request, res: Response) => {
     const post = await BlogPost.findOne({

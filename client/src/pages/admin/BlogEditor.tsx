@@ -69,9 +69,10 @@ export default function BlogEditor() {
   const submit = (): void => {
     save.mutate({
       ...f,
+
       tags: tagsText
         .split(',')
-        .map((s) => s.trim())
+        .map((s) => s.trim().toLowerCase())
         .filter(Boolean),
     });
   };
