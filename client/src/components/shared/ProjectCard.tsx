@@ -100,7 +100,6 @@ export default function ProjectCard({
             )}
           </div>
 
-          {/* flex-1 on a wrapper, not the clamped <p> — see Blog.tsx card for why. */}
           <div className="flex-1">
             <p
               className={cn(

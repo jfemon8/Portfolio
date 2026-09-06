@@ -41,22 +41,19 @@ const envSchema = z.object({
   SMTP_PASS: z.string().optional(),
   CONTACT_RECEIVER_EMAIL: z.string().optional(),
 
-  /** JSON array of approved public RSS/JSON job feeds. Never add private endpoints here. */
   JOB_FEEDS: z.string().optional(),
   CRON_SECRET: z.string().min(16).optional(),
-  /** Least-privilege Mongo URI for the ingestion agent — jobs collections only. */
+
   JOBS_AGENT_MONGODB_URI: z.string().optional(),
-  /** Lookback for postings with no stated deadline; a live deadline always wins over this. */
+
   JOB_SYNC_LOOKBACK_DAYS: z.coerce.number().int().min(0).max(90).default(30),
-  /** Default validity in days applied when a posting states no deadline. */
   JOB_DEFAULT_VALIDITY_DAYS: z.coerce
     .number()
     .int()
     .min(1)
     .max(365)
     .default(30),
-  /** Automated listings unseen in any sync for this many days are purged. 0 disables the purge. */
-  JOB_RETENTION_DAYS: z.coerce.number().int().min(0).max(365).default(45),
+  JOB_RETENTION_DAYS: z.coerce.number().int().min(0).max(365).default(30),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -109,7 +106,7 @@ export interface JobFeedConfig {
   /** Which crawler definition handles this source when `format` is `crawl`. */
   crawler?: string;
   company?: string;
-  category?: 'government' | 'private' | 'it' | 'bank' | 'ngo' | 'other';
+  category?: 'government' | 'it' | 'bank' | 'ngo' | 'other';
   /** Keep only postings whose declared location is in Bangladesh. */
   bangladeshOnly?: boolean;
   /** Per-feed fetch budget for unusually large or slow endpoints. */
@@ -163,7 +160,7 @@ const DEFAULT_JOB_FEEDS: JobFeedConfig[] = [
     url: 'https://api.lever.co/v0/postings/aleph?mode=json',
     format: 'lever',
     company: 'Aleph',
-    category: 'private',
+    category: 'other',
     bangladeshOnly: true,
   },
   // SmartRecruiters public board; verified live serving a Dhaka-based listing.
@@ -361,14 +358,9 @@ function parseJobFeeds(raw?: string): JobFeedConfig[] {
             typeof value.company === 'string'
               ? value.company.slice(0, 160)
               : undefined,
-          category: [
-            'government',
-            'private',
-            'it',
-            'bank',
-            'ngo',
-            'other',
-          ].includes(String(value.category))
+          category: ['government', 'it', 'bank', 'ngo', 'other'].includes(
+            String(value.category)
+          )
             ? (value.category as JobFeedConfig['category'])
             : undefined,
           bangladeshOnly: value.bangladeshOnly === true,

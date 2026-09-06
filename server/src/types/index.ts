@@ -493,13 +493,7 @@ export interface ITool {
   order: number;
 }
 
-export type JobCategory =
-  | 'government'
-  | 'private'
-  | 'it'
-  | 'bank'
-  | 'ngo'
-  | 'other';
+export type JobCategory = 'government' | 'it' | 'bank' | 'ngo' | 'other';
 export type JobSource = 'manual' | 'automated';
 
 /** A Bangladesh job posting. `deadline` is intentionally a local calendar date (Asia/Dhaka). */

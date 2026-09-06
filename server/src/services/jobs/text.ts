@@ -246,6 +246,7 @@ const CATEGORY_RULES: Array<{ category: JobCategory; pattern: RegExp }> = [
   },
 ];
 
+// Anything the rules don't match is simply unclassified, and lands in 'other'.
 export const classify = (
   text: string,
   preferred?: JobCategory
@@ -253,8 +254,7 @@ export const classify = (
   if (preferred) return preferred;
   const value = text.toLowerCase();
   return (
-    CATEGORY_RULES.find((rule) => rule.pattern.test(value))?.category ??
-    'private'
+    CATEGORY_RULES.find((rule) => rule.pattern.test(value))?.category ?? 'other'
   );
 };
 

@@ -10,7 +10,6 @@ import type { JobDoc } from '@/types';
 
 const CATEGORIES = [
   { value: 'government', label: 'Govt.' },
-  { value: 'private', label: 'Non-govt.' },
   { value: 'it', label: 'IT' },
   { value: 'bank', label: 'Bank' },
   { value: 'ngo', label: 'NGO' },
@@ -29,7 +28,7 @@ const config: ResourceConfig<JobDoc> = {
     title: '',
     company: '',
     location: 'Bangladesh',
-    category: 'private',
+    category: 'other',
     description: '',
     applyUrl: '',
     sourceUrl: '',

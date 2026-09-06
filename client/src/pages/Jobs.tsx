@@ -37,7 +37,6 @@ type CategoryFilter = 'all' | JobCategory;
 const CATEGORIES: Array<{ value: CategoryFilter; label: string }> = [
   { value: 'all', label: 'All' },
   { value: 'government', label: 'Govt.' },
-  { value: 'private', label: 'Non-govt.' },
   { value: 'it', label: 'IT' },
   { value: 'bank', label: 'Bank' },
   { value: 'ngo', label: 'NGO' },

@@ -23,7 +23,7 @@ const jobSchema = new mongoose.Schema<IJob>(
     },
     category: {
       type: String,
-      enum: ['government', 'private', 'it', 'bank', 'ngo', 'other'],
+      enum: ['government', 'it', 'bank', 'ngo', 'other'],
       default: 'other',
       index: true,
     },

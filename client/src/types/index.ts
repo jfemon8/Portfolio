@@ -232,13 +232,7 @@ export interface Tool {
   order: number;
 }
 
-export type JobCategory =
-  | 'government'
-  | 'private'
-  | 'it'
-  | 'bank'
-  | 'ngo'
-  | 'other';
+export type JobCategory = 'government' | 'it' | 'bank' | 'ngo' | 'other';
 export type JobSource = 'manual' | 'automated';
 
 export interface Job {

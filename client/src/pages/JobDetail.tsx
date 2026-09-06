@@ -133,8 +133,8 @@ export default function JobDetail() {
         <GlassCard className="p-2 sm:p-4">
           <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-primary/10 px-2 py-1 text-2xs font-semibold capitalize text-primary">
-                {job.category === 'private' ? 'Non-govt.' : job.category}
+              <span className="rounded-full bg-primary/10 px-2 py-1 text-2xs font-semibold uppercase text-primary">
+                {job.category}
               </span>
               {job.employmentType && (
                 <span className="inline-flex items-center gap-1 rounded-full border border-border/70 px-2.5 py-1 text-2xs text-muted-foreground">
@@ -247,7 +247,6 @@ export default function JobDetail() {
                   to={`/tools/jobs/${item._id}`}
                   className="block h-full"
                 >
-                  {/* w-0 + min-w-full — see Blog.tsx's card for why; break-words alone doesn't stop it. */}
                   <GlassCard interactive className="h-full w-0 min-w-full p-4">
                     <p className="break-words font-semibold leading-snug text-foreground">
                       {item.title}

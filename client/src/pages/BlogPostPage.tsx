@@ -91,7 +91,6 @@ export default function BlogPostPage() {
             <ArrowLeft className="h-4 w-4" /> {lab.btnBack}
           </button>
 
-          {/* nowrap + scroll on mobile (matches the RichTextEditor toolbar), wraps once there's room at sm+ */}
           <div className="no-scrollbar flex items-center gap-1 overflow-x-auto sm:flex-wrap">
             {post.tags.map((t) => (
               <Link

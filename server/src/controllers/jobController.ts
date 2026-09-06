@@ -21,14 +21,7 @@ import type {
   JobSyncTrigger,
 } from '../types/index.js';
 
-const CATEGORIES: JobCategory[] = [
-  'government',
-  'private',
-  'it',
-  'bank',
-  'ngo',
-  'other',
-];
+const CATEGORIES: JobCategory[] = ['government', 'it', 'bank', 'ngo', 'other'];
 
 const REGIONS: JobRegion[] = ['bangladesh', 'remote', 'international'];
 
@@ -106,12 +99,13 @@ export const listJobs = asyncHandler(async (req: Request, res: Response) => {
         data: [
           ...(categoryFilter ? [{ $match: categoryFilter }] : []),
           // Booleans sort false-first, so live postings always lead the board.
+          // createdAt leads publishedAt, which feeds routinely carry stale; updatedAt/lastSeenAt are rewritten every sync, so neither tracks freshness.
           {
             $sort: {
               expired: 1,
               regionRank: 1,
-              publishedAt: -1,
               createdAt: -1,
+              publishedAt: -1,
             },
           },
           { $skip: (page - 1) * limit },
