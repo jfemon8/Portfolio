@@ -116,9 +116,9 @@ function CpStatsBody({ cp, copy }: { cp: CpStatsDoc; copy: CpCopy }) {
 
   const term = [
     '$ whoami',
-    `${cp.handle} — competitive programmer`,
+    `${cp.handle} - competitive programmer`,
     '$ codeforces --rating',
-    `${cp.rating ?? '—'} (max ${cp.maxRating ?? '—'})${
+    `${cp.rating ?? '-'} (max ${cp.maxRating ?? '-'})${
       cp.rank ? ` · ${cp.rank}` : ''
     }`,
     ...(lc

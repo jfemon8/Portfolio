@@ -61,7 +61,7 @@ export default function Experience() {
                           : 'border-border/70 text-muted-foreground'
                       }`}
                     >
-                      {e.startDate} — {e.endDate}
+                      {e.startDate} - {e.endDate}
                     </span>
                   </div>
                   {e.location && (

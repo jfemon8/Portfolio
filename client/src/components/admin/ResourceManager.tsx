@@ -276,7 +276,7 @@ export default function ResourceManager<T extends WithId>({
       {isLoading && <Spinner />}
       {isError && <ErrorState onRetry={() => void refetch()} />}
       {!isLoading && !isError && items.length === 0 && (
-        <EmptyState message="Nothing here yet — add your first entry." />
+        <EmptyState message="Nothing here yet, add your first entry." />
       )}
       {!isLoading && !isError && items.length > 0 && visible.length === 0 && (
         <EmptyState message="No entries match this filter." />

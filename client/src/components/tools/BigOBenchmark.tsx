@@ -76,14 +76,14 @@ const EXAMPLES: Record<Language, Record<InputGeneratorId, string>> = {
 };
 
 const CLASS_HINT: Record<ComplexityClass, string> = {
-  'O(1)': 'Constant — time barely changes with input size.',
-  'O(log n)': 'Logarithmic — grows very slowly (e.g. binary search).',
-  'O(n)': 'Linear — time grows proportionally with input size.',
-  'O(n log n)': 'Log-linear — typical of efficient sorting (merge/quick sort).',
-  'O(n^2)': 'Quadratic — typical of nested loops (e.g. bubble sort).',
-  'O(n^3)': 'Cubic — typical of triple-nested loops.',
+  'O(1)': 'Constant - time barely changes with input size.',
+  'O(log n)': 'Logarithmic - grows very slowly (e.g. binary search).',
+  'O(n)': 'Linear - time grows proportionally with input size.',
+  'O(n log n)': 'Log-linear - typical of efficient sorting (merge/quick sort).',
+  'O(n^2)': 'Quadratic - typical of nested loops (e.g. bubble sort).',
+  'O(n^3)': 'Cubic - typical of triple-nested loops.',
   'O(2^n)':
-    'Exponential — grows extremely fast (e.g. naive recursive Fibonacci).',
+    'Exponential - grows extremely fast (e.g. naive recursive Fibonacci).',
 };
 
 type RunStatus = 'idle' | 'running' | 'done' | 'error';
@@ -398,7 +398,7 @@ export default function BigOBenchmark() {
           >
             {INPUT_GENERATOR_OPTIONS.map((opt) => (
               <option key={opt.id} value={opt.id}>
-                {opt.label} — {opt.signatureHint}
+                {opt.label} - {opt.signatureHint}
               </option>
             ))}
           </select>
@@ -496,12 +496,12 @@ export default function BigOBenchmark() {
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-400" />
                 </span>
                 <span className="text-2xs font-medium text-amber-400">
-                  Measuring live — estimate refines as more data arrives
+                  Measuring live - estimate refines as more data arrives
                 </span>
               </>
             ) : status === 'error' ? (
               <span className="text-2xs font-medium text-muted-foreground">
-                Stopped early — showing data measured before the error
+                Stopped early - showing data measured before the error
               </span>
             ) : (
               <span className="text-2xs font-medium text-neon">

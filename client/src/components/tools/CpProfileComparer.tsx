@@ -59,7 +59,7 @@ function StatCard({ entry, winner }: { entry: CpEntry; winner: boolean }) {
         {entry.handle}
       </p>
       <p className="mt-1 text-3xl font-extrabold text-neon">
-        {entry.rating != null ? <Counter value={String(entry.rating)} /> : '—'}
+        {entry.rating != null ? <Counter value={String(entry.rating)} /> : '-'}
       </p>
       <p className="text-xs capitalize text-muted-foreground">
         {entry.rank || 'unrated'}
@@ -70,7 +70,7 @@ function StatCard({ entry, winner }: { entry: CpEntry; winner: boolean }) {
             {entry.maxRating != null ? (
               <Counter value={String(entry.maxRating)} />
             ) : (
-              '—'
+              '-'
             )}
           </p>
           <p>Max rating</p>

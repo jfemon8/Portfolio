@@ -101,7 +101,7 @@ const PasteArea = memo(function PasteArea({
       data-lenis-prevent
       rows={10}
       className="input mt-1.5 resize-y overflow-auto overscroll-contain font-mono text-xs"
-      placeholder="Prose, CSV rows, JSON, HTML, mailto: links — addresses are found anywhere in the text."
+      placeholder="Prose, CSV rows, JSON, HTML, mailto: links, addresses are found anywhere in the text."
       value={value}
       onChange={onChange}
     />
@@ -368,7 +368,7 @@ export default function EmailVerifier() {
     };
 
     worker.onerror = () => {
-      toast.error('Verification failed — please try again.');
+      toast.error('Verification failed, please try again.');
       setRunning(false);
       setProgress(null);
       stopWorker();
@@ -450,7 +450,7 @@ export default function EmailVerifier() {
         {text.length > LARGE_INPUT_CHARS ? (
           <div className="input mt-1.5 flex items-center justify-between gap-3 py-3">
             <span className="text-xs text-muted-foreground">
-              {(text.length / 1024 / 1024).toFixed(2)} MB loaded — too large to
+              {(text.length / 1024 / 1024).toFixed(2)} MB loaded. Too large to
               display without slowing the page down.
             </span>
             <Button size="sm" variant="ghost" onClick={() => replaceText('')}>
@@ -669,7 +669,7 @@ export default function EmailVerifier() {
                         {r.reason}
                       </td>
                       <td className="hidden px-3 py-1.5 text-muted-foreground/70 sm:table-cell">
-                        {r.domainInfo?.provider ?? '—'}
+                        {r.domainInfo?.provider ?? '-'}
                       </td>
                     </tr>
                   );
@@ -697,7 +697,7 @@ export default function EmailVerifier() {
           <p className="mt-3 text-2xs text-muted-foreground/70">
             Verdicts come from the domain's real mail configuration (MX records,
             RFC 7505 null-MX, NXDOMAIN) plus disposable, role and typo checks.
-            No tool — paid ones included — can confirm an individual mailbox
+            No tool, paid ones included, can confirm an individual mailbox
             exists without sending mail: providers accept unknown recipients on
             catch-all domains, so treat "valid" as "the domain genuinely accepts
             mail", not a delivery guarantee.

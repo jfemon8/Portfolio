@@ -62,7 +62,7 @@ export default function Tools() {
     index: '~/tools',
     title: 'Free Tools',
     subtitle:
-      'Small utilities I built and use myself — free, no signup, come back whenever you need one.',
+      'Small utilities I built and use myself. Free, no signup, come back whenever you need one.',
   });
   const st = useSiteCopy('states', {
     toolsFilterEmpty: 'No Tools In This Category Yet.',

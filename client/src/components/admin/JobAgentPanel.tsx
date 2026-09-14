@@ -159,7 +159,7 @@ export default function JobAgentPanel() {
       const failure = error as { status?: number; message?: string };
       if (failure.status === undefined) {
         // The server does not stop when the browser gives up, so the run is still finishing.
-        toast('Still running on the server — refreshing shortly.', {
+        toast('Still running on the server, refreshing shortly.', {
           icon: '⏳',
         });
         window.setTimeout(() => void refresh(), 30_000);

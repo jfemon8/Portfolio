@@ -45,11 +45,11 @@ export default function Education() {
                     </h3>
                     <p className="mt-1 text-sm font-medium text-neon">
                       {e.degree}
-                      {e.field ? ` — ${e.field}` : ''}
+                      {e.field ? ` - ${e.field}` : ''}
                     </p>
                     <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground/70">
                       <span>
-                        {e.startYear} – {e.endYear}
+                        {e.startYear} - {e.endYear}
                       </span>
                       {e.grade && (
                         <span className="rounded-full border border-border/70 bg-card/60 px-2 py-1 text-muted-foreground">

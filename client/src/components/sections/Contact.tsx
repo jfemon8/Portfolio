@@ -67,8 +67,7 @@ export default function Contact() {
     send: 'Send message',
     sending: 'Sending…',
     sentTitle: 'Message sent',
-    sentBody:
-      "Thanks for reaching out — I'll get back to you as soon as I can.",
+    sentBody: "Thanks for reaching out. I'll get back to you as soon as I can.",
     sendAnother: 'Send another',
     sentToast: 'Message sent!',
     failToast: 'Failed to send. Please try again.',
