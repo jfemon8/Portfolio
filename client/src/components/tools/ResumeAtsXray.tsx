@@ -133,7 +133,7 @@ export default function ResumeAtsXray() {
             <p className="mt-1 text-2xs text-muted-foreground/70">
               {resume.fullText.trim().length.toLocaleString()} characters across{' '}
               {resume.pageCount} page
-              {resume.pageCount === 1 ? '' : 's'} — in the same order a real
+              {resume.pageCount === 1 ? '' : 's'}, in the same order a real
               parser would read them.
             </p>
             <pre
@@ -179,7 +179,7 @@ export default function ResumeAtsXray() {
             <label className="label" htmlFor="ats-jd">
               Paste a job description{' '}
               <span className="normal-case text-muted-foreground/60">
-                (optional — checks which keywords your resume actually contains)
+                (optional, checks which keywords your resume actually contains)
               </span>
             </label>
             <AutoTextarea
@@ -213,7 +213,7 @@ export default function ResumeAtsXray() {
 
           <p className="flex items-start gap-1.5 text-2xs text-muted-foreground/70">
             <FileText className="h-3 w-3 shrink-0 translate-y-0.5" />
-            This is a simple keyword/layout check, not a real ATS — different
+            This is a simple keyword/layout check, not a real ATS; different
             systems parse differently, and this can't tell you how a human
             recruiter will react. Treat it as a sanity check, not a verdict.
           </p>

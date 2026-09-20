@@ -13,7 +13,7 @@ const OPEN: RobotsRules = EMPTY;
 
 const cache = new Map<string, Promise<RobotsRules>>();
 
-/** Takes the union of the `*` group and any group naming this bot — the stricter reading. */
+/** Takes the union of the `*` group and any group naming this bot, the stricter reading. */
 export function parseRobots(text: string, agent: string): RobotsRules {
   const rules: RobotsRules = { allow: [], disallow: [], crawlDelayMs: 0 };
   const wanted = new Set(['*', agent.toLowerCase()]);

@@ -17,7 +17,7 @@ const SAMPLE_JSON = JSON.stringify(
   2
 );
 
-// V8 sometimes already embeds "(line X column Y)" (recent Node/Chrome); older builds only give "at position N", which this derives line/column from — Firefox/Safari's differently-worded messages just pass through as-is.
+// V8 sometimes embeds "(line X column Y)" while older builds only give "at position N", which this derives line/column from, leaving differently-worded messages to pass through as-is.
 function describeJsonError(message: string, raw: string): string {
   if (/\(line \d+ column \d+\)/.test(message)) return message;
   const posMatch = message.match(/at position (\d+)/);

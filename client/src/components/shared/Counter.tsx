@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { animate, useInView, useReducedMotion } from 'motion/react';
 
 interface CounterProps {
-  /** e.g. "1000+", "100+", "3★", "Pupil" — leading number animates, rest stays */
+  /** e.g. "1000+", "100+", "3★", "Pupil": leading number animates, rest stays */
   value: string;
   className?: string;
   duration?: number;

@@ -1,4 +1,4 @@
-// Codeforces integration — uses two public, unauthenticated endpoints (user.info for rating/rank, user.rating for contest count), normalised into the cache model's shape.
+// Codeforces integration: uses two public, unauthenticated endpoints (user.info for rating/rank, user.rating for contest count), normalised into the cache model's shape.
 const CF_API = 'https://codeforces.com/api';
 
 interface CfUserInfo {
@@ -101,8 +101,7 @@ export interface StandingsEntry {
   rank: number;
 }
 
-// Codeforces rejects any extra query param (count/from/showUnofficial) on this endpoint for anonymous callers — confirmed live: it 400s with "available only via anonymous GET requests with no extra parameters" the moment one is added. So the full field always comes back in one response (a large round can be 10k+ rows); callers that need to bound it (see ratingPredictor.ts's sampleStandings) do so themselves, since naively truncating here would silently bias every caller.
-/** Rated contestants (excludes practice/virtual/out-of-competition rows) for a contest, ranked, full field. */
+// Rated contestants for a contest, ranked, arriving as one unpaginated response since Codeforces 400s any extra query param for anonymous callers.
 export async function fetchContestStandings(
   contestId: number
 ): Promise<StandingsEntry[]> {
@@ -118,7 +117,7 @@ export async function fetchContestStandings(
     .filter((r) => r.handle);
 }
 
-// Confirmed live: Codeforces 400s a `;`-joined handles param past ~5-10k URL chars (a ~1000-handle request fails, 500 succeeds) — chunked well under that so a large contest's full field doesn't break the request.
+// Chunked well under the ~5-10k URL-char limit where Codeforces 400s a `;`-joined handles param.
 const RATING_BATCH_SIZE = 400;
 
 const chunk = <T>(items: T[], size: number): T[][] =>
@@ -133,7 +132,7 @@ async function fetchUserInfoBatch(handles: string[]): Promise<CfUserInfo[]> {
   ).catch(() => null);
   if (res && res.status === 'OK' && res.result) return res.result;
 
-  // Codeforces fails the WHOLE batch if even one handle is invalid (renamed/deleted account) — confirmed live: "handles: User with handle X not found" with no partial results. Bisect to isolate and drop just the bad handle(s) instead of losing the entire batch's ratings.
+  // Codeforces fails the whole batch if any handle is invalid, so bisect to drop just the bad handles instead of losing every rating.
   if (handles.length === 1) return [];
   const mid = Math.ceil(handles.length / 2);
   const [left, right] = await Promise.all([
@@ -143,7 +142,7 @@ async function fetchUserInfoBatch(handles: string[]): Promise<CfUserInfo[]> {
   return [...left, ...right];
 }
 
-/** Bulk current ratings for a set of handles via Codeforces' `;`-separated handles param, batched to stay under its URL-length limit. Unrated (or unresolvable) handles are simply absent from the result. */
+/** Bulk current ratings via Codeforces' `;`-separated handles param, batched under its URL-length limit, with unrated handles simply absent. */
 export async function fetchRatingsBulk(
   handles: string[]
 ): Promise<Map<string, number>> {
@@ -161,7 +160,7 @@ export async function fetchRatingsBulk(
   return map;
 }
 
-// LeetCode integration via the public GraphQL endpoint (no auth); best-effort — failures return null so it never breaks the Codeforces section it's nested under.
+// LeetCode integration via the public GraphQL endpoint (no auth); best-effort, failures return null so it never breaks the Codeforces section it's nested under.
 export interface LeetCodeSnapshot {
   handle: string;
   totalSolved: number;
@@ -243,7 +242,7 @@ export async function fetchLeetCode(
   }
 }
 
-// CodeChef has no official API — scrapes the public profile page and regex-extracts the rating (stars derived from it); best-effort, failures return null.
+// CodeChef has no official API: scrapes the public profile page and regex-extracts the rating (stars derived from it); best-effort, failures return null.
 export interface CodeChefSnapshot {
   handle: string;
   rating: number | null;

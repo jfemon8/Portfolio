@@ -1,7 +1,7 @@
 import mongoose, { type Model } from 'mongoose';
 import type { IVisit } from '../types/index.js';
 
-/** Lightweight, privacy-friendly analytics event — no cookies, no personal identifiers; just a path, event type and a day bucket. */
+/** Lightweight, privacy-friendly analytics event: no cookies, no personal identifiers; just a path, event type and a day bucket. */
 const visitSchema = new mongoose.Schema<IVisit>(
   {
     type: {

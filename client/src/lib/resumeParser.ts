@@ -1,4 +1,4 @@
-// Works only on text really present in the uploaded file — nothing here is inferred or model-generated.
+// Works only on text really present in the uploaded file; nothing here is inferred or model-generated.
 import { pdfjsLib } from './pdfjsSetup';
 
 export interface TextPosition {
@@ -145,7 +145,7 @@ export function detectHazards(resume: ParsedResume): AtsHazard[] {
   if (pagesWithMultiColumn.size > 0) {
     hazards.push({
       severity: 'high',
-      message: `Multi-column layout detected on page${pagesWithMultiColumn.size > 1 ? 's' : ''} ${[...pagesWithMultiColumn].join(', ')} — many ATS parsers read straight across the page, silently interleaving your two columns into scrambled, nonsensical text.`,
+      message: `Multi-column layout detected on page${pagesWithMultiColumn.size > 1 ? 's' : ''} ${[...pagesWithMultiColumn].join(', ')}. Many ATS parsers read straight across the page, silently interleaving your two columns into scrambled, nonsensical text.`,
     });
   }
 
@@ -154,7 +154,7 @@ export function detectHazards(resume: ParsedResume): AtsHazard[] {
     hazards.push({
       severity: 'high',
       message:
-        'Very little text could be extracted for the document length — content may be trapped in images, text boxes, or graphics that a real ATS parser cannot read at all.',
+        'Very little text could be extracted for the document length; content may be trapped in images, text boxes, or graphics that a real ATS parser cannot read at all.',
     });
   }
 
@@ -162,7 +162,7 @@ export function detectHazards(resume: ParsedResume): AtsHazard[] {
     hazards.push({
       severity: 'high',
       message:
-        "No email address was found in the extracted text — if it's in a header/footer or a text box, many ATS parsers will miss it entirely.",
+        "No email address was found in the extracted text. If it's in a header/footer or a text box, many ATS parsers will miss it entirely.",
     });
   }
   if (!PHONE_PATTERN.test(trimmed)) {
@@ -175,7 +175,7 @@ export function detectHazards(resume: ParsedResume): AtsHazard[] {
     hazards.push({
       severity: 'medium',
       message:
-        'No standard section heading (Experience, Education, Skills, etc.) was found — if your headings are stylized as images or unusual fonts, an ATS may not recognize them as section breaks.',
+        'No standard section heading (Experience, Education, Skills, etc.) was found. If your headings are stylized as images or unusual fonts, an ATS may not recognize them as section breaks.',
     });
   }
 
@@ -243,7 +243,7 @@ const STOPWORDS = new Set([
   'level',
   'house',
   'block',
-  // Section labels — the content under them is what matters, not the label itself.
+  // Section labels: the content under them is what matters, not the label itself.
   'objective',
   'summary',
   'profile',
@@ -438,7 +438,7 @@ const STOPWORDS = new Set([
   'please',
 ]);
 
-// The major facts. Unlisted terms are demoted, never dropped, since no list is exhaustive.
+// The major facts, with unlisted terms demoted rather than dropped since no list is exhaustive.
 const SKILL_TERMS = new Set([
   'c',
   'c++',
@@ -711,7 +711,7 @@ function extractKeywords(text: string): Set<string> {
     .filter(
       (w) =>
         w.length >= 2 &&
-        // Letterless tokens are dates, salaries, or licence numbers — never matchable keywords.
+        // Letterless tokens are dates, salaries, or licence numbers, never matchable keywords.
         /[a-z]/.test(w) &&
         !STOPWORDS.has(w)
     );
@@ -743,7 +743,7 @@ function toRankedHits(terms: string[]): KeywordHit[] {
     );
 }
 
-// Compares substantive content only — contact fields, PII fragments, and page boilerplate are stripped first.
+// Compares substantive content only: contact fields, PII fragments, and page boilerplate are stripped first.
 export function compareKeywords(
   resumeText: string,
   jobDescription: string
@@ -757,7 +757,7 @@ export function compareKeywords(
     (resumeWords.has(word) ? matched : missing).push(word);
   }
 
-  // Scored on skill terms alone — counting boilerplate words would inflate the number without meaning anything.
+  // Scored on skill terms alone; counting boilerplate words would inflate the number without meaning anything.
   const matchedSkillCount = matched.filter((t) => SKILL_TERMS.has(t)).length;
   const totalSkillCount =
     matchedSkillCount + missing.filter((t) => SKILL_TERMS.has(t)).length;

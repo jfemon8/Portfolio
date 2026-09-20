@@ -82,7 +82,7 @@ async function queryDoh(
   }
 }
 
-// Cloudflare first, Google on SERVFAIL too — one resolver failing where the other answers is common.
+// Cloudflare first, Google on SERVFAIL too; one resolver failing where the other answers is common.
 async function resolve(domain: string, type: 'MX' | 'A'): Promise<DohResponse> {
   try {
     const first = await queryDoh(domain, type, false);
@@ -99,7 +99,7 @@ export async function lookupDomain(domain: string): Promise<DomainInfo> {
     if (mx.Status === 3) {
       return { status: 'nxdomain', mxHosts: [], provider: null };
     }
-    // SERVFAIL/REFUSED means the lookup failed, which is not evidence the domain lacks mail — never call it invalid.
+    // SERVFAIL/REFUSED means the lookup failed, which is not evidence the domain lacks mail; never call it invalid.
     if (mx.Status !== 0) {
       return { status: 'lookup-failed', mxHosts: [], provider: null };
     }

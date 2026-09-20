@@ -33,9 +33,9 @@ import type {
 
 const get = async <T>(url: string): Promise<T> => (await api.get<T>(url)).data;
 
-// Portfolio content is admin-managed and rarely changes, so a 5-min staleTime cuts refetches; admin managers keep the global 60s default for fresher data.
+// Portfolio content is admin-managed and rarely changes, so a 5-min staleTime cuts refetches while admin managers keep the global 60s default.
 const CONTENT = 5 * 60 * 1000;
-// Kept well above staleTime so a page revisited within 30min still paints instantly from cache (then silently revalidates in the background) instead of blocking on a refetch.
+// Kept well above staleTime so a page revisited within 30 minutes paints instantly from cache and revalidates in the background.
 const CONTENT_GC = 30 * 60 * 1000;
 
 export const useProfile = () =>
@@ -93,7 +93,7 @@ const projectQueryOptions = (slug: string) => ({
 export const useProject = (slug?: string) =>
   useQuery({ ...projectQueryOptions(slug ?? ''), enabled: !!slug });
 
-/** Warms the project-detail query cache — pairs with prefetchRoute on hover/focus. */
+/** Warms the project-detail query cache; pairs with prefetchRoute on hover/focus. */
 export const prefetchProject = (slug: string): void => {
   void queryClient.prefetchQuery(projectQueryOptions(slug));
 };
@@ -175,7 +175,7 @@ const jobSearchParams = (query: JobQuery): string => {
   return search ? `?${search}` : '';
 };
 
-/** Paged board query — page 1 also carries the facet counts, and `keepPreviousData` keeps the current results on screen while a new filter loads. */
+/** Paged board query: page 1 also carries the facet counts, and `keepPreviousData` keeps the current results on screen while a new filter loads. */
 export const useJobsInfinite = (query: JobQuery = {}) => {
   const base = jobSearchParams(query);
   return useInfiniteQuery({

@@ -1,4 +1,4 @@
-// Shared between the UI (dropdown labels) and the worker (actual generation) — single source of truth so the two can never drift out of sync.
+// Shared between the UI (dropdown labels) and the worker (actual generation): single source of truth so the two can never drift out of sync.
 
 export type InputGeneratorId =
   | 'number'
@@ -65,7 +65,7 @@ function extractFirstParamName(
   return match?.[1]?.toLowerCase() ?? '';
 }
 
-// Best-effort guess at which input shape a pasted function expects, from conventional parameter naming first and surface syntax second — used only to suggest (never force) a matching selection, since a mismatched input type is the single most common cause of an immediate run error. Never returns 'sortedArray': sortedness can't be inferred from syntax and doesn't affect crash risk either way — see isSameInputShape.
+// Best-effort guess at the input shape a pasted function expects, used only to suggest a selection and never returning 'sortedArray', which syntax can't reveal.
 export function detectInputGenerator(
   source: string,
   language: 'javascript' | 'python'
@@ -79,7 +79,7 @@ export function detectInputGenerator(
   return 'number';
 }
 
-// All three array variants produce a number[] and are interchangeable for crash-avoidance purposes (sortedness only affects whether the *measured complexity* is meaningful for sort-dependent code, e.g. binary search — never whether the call throws) — so they should never trigger a mismatch warning against each other.
+// All three array variants produce a number[] and are interchangeable for crash-avoidance purposes (sortedness only affects whether the *measured complexity* is meaningful for sort-dependent code, e.g. binary search, never whether the call throws), so they should never trigger a mismatch warning against each other.
 export function isSameInputShape(
   a: InputGeneratorId,
   b: InputGeneratorId
@@ -94,7 +94,7 @@ export function isSameInputShape(
 
 const ALPHABET = 'abcdefghijklmnopqrstuvwxyz';
 
-/** Produces one fresh input of size `n`. Called once per benchmark call (never reused across calls in a timed batch — see the worker's mutation-safety handling). */
+/** Produces one fresh input of size `n` per benchmark call, never reused across calls in a timed batch. */
 export function generateInput(
   id: InputGeneratorId,
   n: number
@@ -114,7 +114,7 @@ export function generateInput(
       const arr = Array.from({ length: n }, () =>
         Math.floor(Math.random() * n * 10)
       ).sort((a, b) => a - b);
-      // ~5% of positions swapped with a *nearby* partner (within a few slots), not anywhere in the array — a handful of long-range swaps would each displace an element by up to n positions, creating just as many inversions as fully random data. Bounding the swap distance is what actually keeps this adaptive-algorithm-friendly: each element needs only a small, constant number of shifts to reach its sorted position.
+      // Swaps ~5% of positions with a nearby partner rather than anywhere in the array, so each element stays a small constant number of shifts from its sorted position.
       const swaps = Math.max(1, Math.round(n * 0.05));
       const maxOffset = Math.max(1, Math.min(5, n - 1));
       for (let i = 0; i < swaps; i++) {

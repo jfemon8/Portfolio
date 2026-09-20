@@ -1,4 +1,4 @@
-/** Asia/Dhaka calendar-day helpers — job deadlines are local dates, never UTC instants. */
+/** Asia/Dhaka calendar-day helpers; job deadlines are local dates, never UTC instants. */
 const DHAKA_PARTS = new Intl.DateTimeFormat('en-CA', {
   timeZone: 'Asia/Dhaka',
   year: 'numeric',

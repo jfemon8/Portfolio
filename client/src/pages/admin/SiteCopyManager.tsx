@@ -27,7 +27,7 @@ import { Button } from '@/components/ui/button';
 import { getByPath, setByPath } from '@/lib/object';
 import type { ApiError, ContentSection } from '@/types';
 
-/** Collapsible glass section — native <details>, zero-dep & accessible. */
+/** Collapsible glass section: native <details>, zero-dep & accessible. */
 function Panel({
   icon: Icon,
   title,
@@ -86,15 +86,15 @@ const HERO_FIELDS: FieldSchema[] = [
   { name: 'hero.availableBadge', label: '"Available" badge', type: 'text' },
   { name: 'hero.unavailableBadge', label: '"Building" badge', type: 'text' },
   { name: 'hero.greeting', label: 'Greeting (before name)', type: 'text' },
-  { name: 'hero.ctaProjects', label: 'CTA — projects', type: 'text' },
-  { name: 'hero.ctaResume', label: 'CTA — resume', type: 'text' },
-  { name: 'hero.ctaContact', label: 'CTA — contact', type: 'text' },
+  { name: 'hero.ctaProjects', label: 'CTA: projects', type: 'text' },
+  { name: 'hero.ctaResume', label: 'CTA: resume', type: 'text' },
+  { name: 'hero.ctaContact', label: 'CTA: contact', type: 'text' },
   { name: 'hero.scrollLabel', label: 'Scroll-down aria-label', type: 'text' },
   { name: 'hero.terminalTitle', label: 'Terminal title bar', type: 'text' },
-  { name: 'hero.whoamiCmd', label: 'Terminal — whoami command', type: 'text' },
-  { name: 'hero.stackCmd', label: 'Terminal — stack command', type: 'text' },
-  { name: 'hero.goalsCmd', label: 'Terminal — goals command', type: 'text' },
-  { name: 'hero.goalsText', label: 'Terminal — goals text', type: 'text' },
+  { name: 'hero.whoamiCmd', label: 'Terminal: whoami command', type: 'text' },
+  { name: 'hero.stackCmd', label: 'Terminal: stack command', type: 'text' },
+  { name: 'hero.goalsCmd', label: 'Terminal: goals command', type: 'text' },
+  { name: 'hero.goalsText', label: 'Terminal: goals text', type: 'text' },
   {
     name: 'hero.stack',
     label: 'Terminal stack.json (key → value)',
@@ -122,9 +122,9 @@ const ABOUT_FIELDS: FieldSchema[] = [
 
 const FOOTER_FIELDS: FieldSchema[] = [
   { name: 'footer.wordmark', label: 'Wordmark', type: 'text' },
-  { name: 'footer.linkProjects', label: 'Link — Projects', type: 'text' },
-  { name: 'footer.linkBlog', label: 'Link — Blog', type: 'text' },
-  { name: 'footer.linkAdmin', label: 'Link — Admin', type: 'text' },
+  { name: 'footer.linkProjects', label: 'Link: Projects', type: 'text' },
+  { name: 'footer.linkBlog', label: 'Link: Blog', type: 'text' },
+  { name: 'footer.linkAdmin', label: 'Link: Admin', type: 'text' },
 ];
 
 const STATES_FIELDS: FieldSchema[] = [
@@ -132,51 +132,51 @@ const STATES_FIELDS: FieldSchema[] = [
   { name: 'states.error', label: 'Error text', type: 'text' },
   { name: 'states.retry', label: 'Retry button', type: 'text' },
   { name: 'states.empty', label: 'Empty text', type: 'text' },
-  { name: 'states.notFoundError', label: '404 — error line', type: 'text' },
-  { name: 'states.notFoundHome', label: '404 — home button', type: 'text' },
-  { name: 'states.homeLoading', label: 'Home — loading', type: 'text' },
-  { name: 'states.homeError', label: 'Home — API error', type: 'text' },
-  { name: 'states.projectsEmpty', label: 'Featured — empty', type: 'text' },
+  { name: 'states.notFoundError', label: '404: error line', type: 'text' },
+  { name: 'states.notFoundHome', label: '404: home button', type: 'text' },
+  { name: 'states.homeLoading', label: 'Home: loading', type: 'text' },
+  { name: 'states.homeError', label: 'Home: API error', type: 'text' },
+  { name: 'states.projectsEmpty', label: 'Featured: empty', type: 'text' },
   {
     name: 'states.projectsFilterEmpty',
-    label: 'Projects — filter empty',
+    label: 'Projects: filter empty',
     type: 'text',
   },
-  { name: 'states.postsEmpty', label: 'Blog — empty', type: 'text' },
+  { name: 'states.postsEmpty', label: 'Blog: empty', type: 'text' },
   {
     name: 'states.projectNotFound',
-    label: 'Project — not found',
+    label: 'Project: not found',
     type: 'text',
   },
-  { name: 'states.postNotFound', label: 'Post — not found', type: 'text' },
+  { name: 'states.postNotFound', label: 'Post: not found', type: 'text' },
 ];
 
 const AUTH_FIELDS: FieldSchema[] = [
   { name: 'auth.panelTitle', label: 'Panel title', type: 'text' },
   { name: 'auth.panelSubtitle', label: 'Panel subtitle', type: 'text' },
-  { name: 'auth.emailLabel', label: 'Email — label', type: 'text' },
+  { name: 'auth.emailLabel', label: 'Email: label', type: 'text' },
   {
     name: 'auth.emailPlaceholder',
-    label: 'Email — placeholder',
+    label: 'Email: placeholder',
     type: 'text',
   },
-  { name: 'auth.emailRequired', label: 'Email — required', type: 'text' },
-  { name: 'auth.passwordLabel', label: 'Password — label', type: 'text' },
+  { name: 'auth.emailRequired', label: 'Email: required', type: 'text' },
+  { name: 'auth.passwordLabel', label: 'Password: label', type: 'text' },
   {
     name: 'auth.passwordPlaceholder',
-    label: 'Password — placeholder',
+    label: 'Password: placeholder',
     type: 'text',
   },
   {
     name: 'auth.passwordRequired',
-    label: 'Password — required',
+    label: 'Password: required',
     type: 'text',
   },
   { name: 'auth.signIn', label: 'Sign-in button', type: 'text' },
   { name: 'auth.signingIn', label: 'Sign-in button (busy)', type: 'text' },
   { name: 'auth.footer', label: 'Footer note', type: 'text' },
-  { name: 'auth.welcomeToast', label: 'Toast — welcome', type: 'text' },
-  { name: 'auth.failToast', label: 'Toast — failed', type: 'text' },
+  { name: 'auth.welcomeToast', label: 'Toast: welcome', type: 'text' },
+  { name: 'auth.failToast', label: 'Toast: failed', type: 'text' },
 ];
 
 const LABELS_FIELDS: FieldSchema[] = [
@@ -323,60 +323,60 @@ const EMAIL_FIELDS: FieldSchema[] = [
 ];
 
 const FORMS_FIELDS: FieldSchema[] = [
-  { name: 'forms.nameLabel', label: 'Name — label', type: 'text' },
-  { name: 'forms.namePlaceholder', label: 'Name — placeholder', type: 'text' },
-  { name: 'forms.nameRequired', label: 'Name — required error', type: 'text' },
-  { name: 'forms.emailLabel', label: 'Email — label', type: 'text' },
+  { name: 'forms.nameLabel', label: 'Name: label', type: 'text' },
+  { name: 'forms.namePlaceholder', label: 'Name: placeholder', type: 'text' },
+  { name: 'forms.nameRequired', label: 'Name: required error', type: 'text' },
+  { name: 'forms.emailLabel', label: 'Email: label', type: 'text' },
   {
     name: 'forms.emailPlaceholder',
-    label: 'Email — placeholder',
+    label: 'Email: placeholder',
     type: 'text',
   },
   {
     name: 'forms.emailRequired',
-    label: 'Email — required error',
+    label: 'Email: required error',
     type: 'text',
   },
-  { name: 'forms.emailInvalid', label: 'Email — invalid error', type: 'text' },
-  { name: 'forms.subjectLabel', label: 'Subject — label', type: 'text' },
+  { name: 'forms.emailInvalid', label: 'Email: invalid error', type: 'text' },
+  { name: 'forms.subjectLabel', label: 'Subject: label', type: 'text' },
   {
     name: 'forms.subjectPlaceholder',
-    label: 'Subject — placeholder',
+    label: 'Subject: placeholder',
     type: 'text',
   },
-  { name: 'forms.messageLabel', label: 'Message — label', type: 'text' },
+  { name: 'forms.messageLabel', label: 'Message: label', type: 'text' },
   {
     name: 'forms.messagePlaceholder',
-    label: 'Message — placeholder',
+    label: 'Message: placeholder',
     type: 'text',
   },
   {
     name: 'forms.messageRequired',
-    label: 'Message — required error',
+    label: 'Message: required error',
     type: 'text',
   },
   {
     name: 'forms.messageMin',
-    label: 'Message — min-length error',
+    label: 'Message: min-length error',
     type: 'text',
   },
   { name: 'forms.send', label: 'Submit button', type: 'text' },
   { name: 'forms.sending', label: 'Submit button (sending)', type: 'text' },
-  { name: 'forms.sentTitle', label: 'Success — title', type: 'text' },
+  { name: 'forms.sentTitle', label: 'Success: title', type: 'text' },
   {
     name: 'forms.sentBody',
-    label: 'Success — body',
+    label: 'Success: body',
     type: 'textarea',
     editor: 'richtext',
     full: true,
     rows: 2,
   },
-  { name: 'forms.sendAnother', label: 'Success — reset button', type: 'text' },
-  { name: 'forms.sentToast', label: 'Toast — sent', type: 'text' },
-  { name: 'forms.failToast', label: 'Toast — failed', type: 'text' },
-  { name: 'forms.infoEmail', label: 'Info — Email label', type: 'text' },
-  { name: 'forms.infoPhone', label: 'Info — Phone label', type: 'text' },
-  { name: 'forms.infoLocation', label: 'Info — Location label', type: 'text' },
+  { name: 'forms.sendAnother', label: 'Success: reset button', type: 'text' },
+  { name: 'forms.sentToast', label: 'Toast: sent', type: 'text' },
+  { name: 'forms.failToast', label: 'Toast: failed', type: 'text' },
+  { name: 'forms.infoEmail', label: 'Info: Email label', type: 'text' },
+  { name: 'forms.infoPhone', label: 'Info: Phone label', type: 'text' },
+  { name: 'forms.infoLocation', label: 'Info: Location label', type: 'text' },
 ];
 
 export default function SiteCopyManager() {
@@ -493,7 +493,7 @@ export default function SiteCopyManager() {
         <div className="grid gap-4">
           <Panel
             icon={LayoutList}
-            title='Section headings — the title, sub-title and tiny "index" tag above each public section'
+            title='Section headings: the title, sub-title and tiny "index" tag above each public section'
             defaultOpen
           >
             <div className="space-y-2 md:space-y-4">
@@ -544,28 +544,28 @@ export default function SiteCopyManager() {
 
           <Panel
             icon={Terminal}
-            title="Hero — top of homepage (badges, greeting, CTA buttons, scroll label, terminal card)"
+            title="Hero: top of homepage (badges, greeting, CTA buttons, scroll label, terminal card)"
           >
             {fieldGrid(HERO_FIELDS)}
           </Panel>
 
           <Panel
             icon={Sparkles}
-            title='About — the "What I bring" heading + bullet list under the About section'
+            title='About: the "What I bring" heading + bullet list under the About section'
           >
             {fieldGrid(ABOUT_FIELDS)}
           </Panel>
 
           <Panel
             icon={PanelBottom}
-            title="Footer — wordmark and links shown at the bottom of every public page"
+            title="Footer: wordmark and links shown at the bottom of every public page"
           >
             {fieldGrid(FOOTER_FIELDS)}
           </Panel>
 
           <Panel
             icon={Compass}
-            title="Navigation — labels shown on the floating dock at the bottom of every public page"
+            title="Navigation: labels shown on the floating dock at the bottom of every public page"
           >
             <div className="grid gap-4 sm:grid-cols-2">
               {NAV_TARGETS.map(({ key, label }) => (
@@ -587,35 +587,35 @@ export default function SiteCopyManager() {
 
           <Panel
             icon={Inbox}
-            title="States & 404 — loading / empty / error messages and the Not-Found page"
+            title="States & 404: loading / empty / error messages and the Not-Found page"
           >
             {fieldGrid(STATES_FIELDS)}
           </Panel>
 
           <Panel
             icon={MessageSquare}
-            title="Contact form — input labels, placeholders, validation errors and submit-button text"
+            title="Contact form: input labels, placeholders, validation errors and submit-button text"
           >
             {fieldGrid(FORMS_FIELDS)}
           </Panel>
 
           <Panel
             icon={KeyRound}
-            title="Admin login page — the /admin/login screen labels, errors and toast messages"
+            title="Admin login page: the /admin/login screen labels, errors and toast messages"
           >
             {fieldGrid(AUTH_FIELDS)}
           </Panel>
 
           <Panel
             icon={Tags}
-            title="Labels & chrome — small UI text across the site (buttons, badges, filters, units, headings)"
+            title="Labels & chrome: small UI text across the site (buttons, badges, filters, units, headings)"
           >
             {fieldGrid(LABELS_FIELDS)}
           </Panel>
 
           <Panel
             icon={Mail}
-            title="Contact emails — subject + body of mail sent when a visitor submits the contact form (yours + the auto-reply)"
+            title="Contact emails: subject + body of mail sent when a visitor submits the contact form (yours + the auto-reply)"
           >
             {fieldGrid(EMAIL_FIELDS)}
           </Panel>

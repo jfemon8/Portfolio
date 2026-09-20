@@ -1,7 +1,7 @@
-# 💻 Developer Portfolio — Md Jannatul Ferdhous Emon
+# 💻 Developer Portfolio by Md Jannatul Ferdhous Emon
 
 A **premium, fully-dynamic personal portfolio ecosystem** with a cinematic
-_Dark Developer / Neon_ design — motion-driven, interactive, and built
+_Dark Developer / Neon_ design: motion-driven, interactive, and built
 end-to-end with the **MERN stack** and **TypeScript**.
 
 ### 🔗 Live: **https://jfemon.vercel.app**
@@ -11,7 +11,7 @@ end-to-end with the **MERN stack** and **TypeScript**.
 ## Overview
 
 A fast, responsive, content-driven portfolio that showcases projects,
-experience, skills and writing — wrapped in a smooth, cinematic interface.
+experience, skills and writing, wrapped in a smooth, cinematic interface.
 Every section is data-driven and managed through a secure dashboard, so the
 site stays up to date without any code changes.
 
@@ -43,7 +43,7 @@ role-based access control
 
 ## 👤 Author
 
-**Md Jannatul Ferdhous Emon** — Front-End Developer / Software Engineer
+**Md Jannatul Ferdhous Emon**, Front-End Developer / Software Engineer
 
 🌐 Portfolio: [jfemon.vercel.app](https://jfemon.vercel.app)
 

@@ -10,7 +10,7 @@ export const PAGE_SEO = {
   projects: {
     title: 'Projects',
     description:
-      'Full-Stack Platforms, Front-Ends And Experiments — From MERN Products To .NET E-Commerce.',
+      'Full-Stack Platforms, Front-Ends And Experiments: From MERN Products To .NET E-Commerce.',
   },
   blog: {
     title: 'Blog',
@@ -18,7 +18,7 @@ export const PAGE_SEO = {
   },
   tools: {
     // The hub competes for the generic "free online tools" searches; the detail pages take the specific ones.
-    title: 'Free Online Tools — No Sign-Up, Nothing Uploaded',
+    title: 'Free Online Tools: No Sign-Up, Nothing Uploaded',
     description:
       'A set of free browser tools: PDF editing, OCR for English and Bangla, JSON and JWT utilities, regex testing, vocal removal and more. No account, no upload.',
     exactTitle: true,
@@ -26,7 +26,7 @@ export const PAGE_SEO = {
   jobs: {
     title: 'Job Circular Finder',
     description:
-      'Open jobs in Bangladesh plus remote and international roles — government circulars, company career pages and worldwide job APIs, collected nightly.',
+      'Open jobs in Bangladesh plus remote and international roles: government circulars, company career pages and worldwide job APIs, collected nightly.',
   },
 } satisfies Record<string, PageSeo>;
 

@@ -74,7 +74,7 @@ export default function HeroPremium({
         <Particles count={28} />
 
         <div className="container-x relative z-10 grid items-center gap-6 py-4 md:gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14">
-          {/* Left — identity */}
+          {/* Left: identity */}
           <div className="min-w-0">
             {/* <motion.span
               {...rise(0)}
@@ -166,7 +166,7 @@ export default function HeroPremium({
             </motion.div>
           </div>
 
-          {/* Right — terminal glass card */}
+          {/* Right: terminal glass card */}
           <motion.div
             initial={reduce ? false : { opacity: 0, scale: 0.94, y: 28 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}

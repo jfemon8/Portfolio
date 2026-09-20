@@ -4,9 +4,9 @@ import type { ICategory } from '../types/index.js';
 const categorySchema = new mongoose.Schema<ICategory>(
   {
     name: { type: String, required: true, trim: true },
-    /** Stable slug used as ISkill.category (scope 'skill') or ITool.category (scope 'tool'). Lower-kebab, unique within its scope. */
+    /** Stable lower-kebab slug used as ISkill.category or ITool.category, unique within its scope. */
     slug: { type: String, required: true, trim: true, lowercase: true },
-    /** Which resource's category picker this entry belongs to — keeps skill and tool categories from sharing one flat, mismatched namespace. */
+    /** Which resource's category picker this entry belongs to; keeps skill and tool categories from sharing one flat, mismatched namespace. */
     scope: { type: String, enum: ['skill', 'tool'], default: 'skill' },
     order: { type: Number, default: 0 },
   },

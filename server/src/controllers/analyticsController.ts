@@ -11,7 +11,7 @@ const deviceFromUA = (ua = ''): string => {
   return 'desktop';
 };
 
-/** Coarse browser family from UA — privacy-friendly, no fingerprinting. */
+/** Coarse browser family from UA: privacy-friendly, no fingerprinting. */
 const browserFromUA = (ua = ''): string => {
   if (/Edg\//.test(ua)) return 'Edge';
   if (/OPR\/|Opera/.test(ua)) return 'Opera';
@@ -22,7 +22,7 @@ const browserFromUA = (ua = ''): string => {
   return 'unknown';
 };
 
-// Country code from Vercel's geo header — stores only the 2-letter code, never the IP, so it stays privacy-friendly with no GeoIP dependency; empty outside Vercel.
+// Country code from Vercel's geo header, storing only the 2-letter code and never the IP, and empty outside Vercel.
 const countryFromReq = (req: Request): string => {
   const h = req.headers['x-vercel-ip-country'];
   const raw = Array.isArray(h) ? h[0] : h;
@@ -34,7 +34,7 @@ const clampDepth = (v: unknown): number => {
   return Number.isFinite(n) ? Math.min(100, Math.max(0, n)) : 0;
 };
 
-/** Public — record a lightweight, cookie-less analytics event. */
+/** Public: record a lightweight, cookie-less analytics event. */
 export const track = asyncHandler(async (req: Request, res: Response) => {
   const { type, path, ref, sid, depth } = (req.body ?? {}) as {
     type?: string;
@@ -57,9 +57,9 @@ export const track = asyncHandler(async (req: Request, res: Response) => {
   res.json({ success: true });
 });
 
-/** Admin — aggregated dashboard summary. */
+/** Admin: aggregated dashboard summary. */
 export const summary = asyncHandler(async (req: Request, res: Response) => {
-  // Clamp both bounds — a negative ?days would otherwise push `since` into the future and zero out every aggregation.
+  // Clamp both bounds: a negative ?days would otherwise push `since` into the future and zero out every aggregation.
   const days = Math.min(
     90,
     Math.max(1, parseInt(String(req.query.days)) || 30)
@@ -93,7 +93,7 @@ export const summary = asyncHandler(async (req: Request, res: Response) => {
       { $sort: { _id: 1 } },
     ]),
     Visit.aggregate([
-      // scroll_depth has its own funnel — keep the events list meaningful
+      // scroll_depth has its own funnel; keep the events list meaningful
       { $match: { type: { $ne: 'scroll_depth' }, createdAt: { $gte: since } } },
       { $group: { _id: '$type', count: { $sum: 1 } } },
     ]),

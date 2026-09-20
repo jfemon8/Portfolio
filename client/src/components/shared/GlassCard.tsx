@@ -6,7 +6,7 @@ interface GlassCardProps extends HTMLAttributes<HTMLDivElement> {
   interactive?: boolean;
 }
 
-/** The single glass surface primitive — Liquid Glass material, token-driven, theme-aware. */
+/** The single glass surface primitive: Liquid Glass material, token-driven, theme-aware. */
 const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
   ({ className, interactive = false, ...props }, ref) => (
     <div

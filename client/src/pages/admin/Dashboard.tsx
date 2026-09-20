@@ -42,25 +42,25 @@ export default function Dashboard() {
   }[] = [
     {
       label: 'Page views (30d)',
-      value: a?.pageviews.range ?? '—',
+      value: a?.pageviews.range ?? '…',
       icon: Eye,
       to: '/admin/analytics',
     },
     {
       label: 'Projects',
-      value: a?.counts.projects ?? '—',
+      value: a?.counts.projects ?? '…',
       icon: FolderGit2,
       to: '/admin/projects',
     },
     {
       label: 'Published posts',
-      value: a?.counts.posts ?? '—',
+      value: a?.counts.posts ?? '…',
       icon: Newspaper,
       to: '/admin/blog',
     },
     {
       label: 'Unread messages',
-      value: a?.counts.unread ?? '—',
+      value: a?.counts.unread ?? '…',
       icon: Inbox,
       to: '/admin/messages',
       highlight: (a?.counts.unread ?? 0) > 0,

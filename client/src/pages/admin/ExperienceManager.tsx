@@ -56,7 +56,7 @@ const config: ResourceConfig<ExperienceDoc> = {
         {i.role} <span className="text-neon">@ {i.company}</span>
       </p>
       <p className="text-xs text-muted-foreground">
-        {i.startDate} — {i.endDate} · {i.location}
+        {i.startDate} – {i.endDate} · {i.location}
       </p>
     </>
   ),

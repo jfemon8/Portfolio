@@ -112,7 +112,7 @@ function SyncSummary({ result }: { result: JobSyncResult }) {
   );
 }
 
-/** Diagnosis surface for the ingestion agent — which sources ran, which broke, what it wrote. */
+/** Diagnosis surface for the ingestion agent: which sources ran, which broke, what it wrote. */
 export default function JobAgentPanel() {
   const [syncing, setSyncing] = useState(false);
   const [result, setResult] = useState<JobSyncResult | null>(null);
@@ -152,7 +152,7 @@ export default function JobAgentPanel() {
       );
       if (body.data.failures.length) {
         toast.error(
-          `${body.data.failures.length} source${body.data.failures.length === 1 ? '' : 's'} failed — see the panel.`
+          `${body.data.failures.length} source${body.data.failures.length === 1 ? '' : 's'} failed; see the panel.`
         );
       }
     } catch (error) {

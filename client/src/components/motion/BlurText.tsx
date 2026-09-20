@@ -22,7 +22,7 @@ interface BlurTextProps {
   onAnimationComplete?: () => void;
   /** Duration of each keyframe step, in seconds. */
   stepDuration?: number;
-  /** Tag to render — defaults to `<p>`. Use `<span>` for inline. */
+  /** Tag to render, defaulting to `<p>`, with `<span>` for inline. */
   as?: 'p' | 'span' | 'h1' | 'h2' | 'h3' | 'div';
 }
 
@@ -44,7 +44,7 @@ const buildKeyframes = (
   return keyframes;
 };
 
-// Per-word/letter blur-in reveal; reduced-motion shows the final state instantly. Use over Reveal for hero/heading moments that want more than a fade.
+// Per-word/letter blur-in reveal for hero and heading moments, showing the final state instantly under reduced motion.
 export default function BlurText({
   text = '',
   delay = 200,

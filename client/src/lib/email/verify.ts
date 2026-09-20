@@ -45,7 +45,7 @@ function decide(
   }
   if (flags.disposable) {
     // Typo-squat domains are often on the disposable list too; the suggestion is the more actionable half.
-    const hint = flags.suggestion ? ` — did you mean ${flags.suggestion}?` : '';
+    const hint = flags.suggestion ? `. Did you mean ${flags.suggestion}?` : '';
     return {
       verdict: 'risky',
       reason: `Disposable / temporary address${hint}`,
@@ -54,7 +54,7 @@ function decide(
   if (flags.suggestion) {
     return {
       verdict: 'risky',
-      reason: `Likely typo — did you mean ${flags.suggestion}?`,
+      reason: `Likely typo. Did you mean ${flags.suggestion}?`,
     };
   }
   if (flags.role) {
@@ -65,7 +65,7 @@ function decide(
   }
   // After the address-level signals: a known disposable/typo domain is worth reporting even when DNS was inconclusive.
   if (info.status === 'lookup-failed') {
-    return { verdict: 'unknown', reason: 'DNS lookup failed — try again' };
+    return { verdict: 'unknown', reason: 'DNS lookup failed, try again' };
   }
   if (info.status === 'a-record-only') {
     return {
@@ -100,11 +100,11 @@ export interface VerifyOptions {
   concurrency?: number;
   onProgress?: (progress: VerifyProgress) => void;
   shouldStop?: () => boolean;
-  /** Known domain lookups from an earlier run. This deliberately lives in memory in the UI, never in persistent storage, and contains domains only. */
+  /** Known domain lookups from an earlier run, kept in memory only and holding domains rather than addresses. */
   domainCache?: ReadonlyMap<string, DomainInfo>;
 }
 
-// Verification is per-domain, not per-address — deduplicating here removes ~98% of the network work on real lists.
+// Verification is per-domain, not per-address; deduplicating here removes ~98% of the network work on real lists.
 export async function verifyEmails(
   emails: string[],
   options: VerifyOptions = {}

@@ -36,7 +36,7 @@ router.post(
 router.get('/assets', protect, adminOnly, listAssetsHandler);
 router.delete('/asset', protect, adminOnly, deleteAssetHandler);
 
-// Public; proxies Cloudinary raw assets with the correct Content-Type for preview/download. SSRF-guarded to our own Cloudinary cloud.
+// Public Cloudinary raw-asset proxy with the correct Content-Type, SSRF-guarded to our own cloud.
 router.get('/proxy', proxyFileHandler);
 
 export default router;

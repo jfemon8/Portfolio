@@ -1,4 +1,4 @@
-// Remembers layout shape only — item counts and section order, never the payload — so a returning visitor's skeleton matches what replaces it.
+// Remembers layout shape only (item counts and section order, never the payload) so a returning visitor's skeleton matches what replaces it.
 
 const KEY = 'portfolio:layout-hints';
 
@@ -36,7 +36,7 @@ const flush = (): void => {
   try {
     localStorage.setItem(KEY, JSON.stringify(state()));
   } catch {
-    // Private browsing / quota — hints are an optimisation, never a requirement.
+    // Private browsing / quota: hints are an optimisation, never a requirement.
   }
 };
 

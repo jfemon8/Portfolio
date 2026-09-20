@@ -103,7 +103,7 @@ function ExpiryBadge({ exp }: { exp: unknown }) {
       ) : (
         <CheckCircle2 className="h-3.5 w-3.5" />
       )}
-      {expired ? `Expired ${diff} ago` : `Valid — expires in ${diff}`}
+      {expired ? `Expired ${diff} ago` : `Valid, expires in ${diff}`}
     </span>
   );
 }

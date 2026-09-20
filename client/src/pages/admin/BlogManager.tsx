@@ -57,7 +57,7 @@ export default function BlogManager() {
       {isLoading && <Spinner />}
       {isError && <ErrorState onRetry={() => void refetch()} />}
       {!isLoading && posts.length === 0 && (
-        <EmptyState message="No posts yet — write your first article!" />
+        <EmptyState message="No posts yet. Write your first article!" />
       )}
 
       <div className="space-y-2">

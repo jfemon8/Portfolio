@@ -23,7 +23,7 @@ export interface SourceJob {
   sourceName?: string;
 }
 
-/** Every source — feed or crawler — reduces to this one call. */
+/** Every source (feed or crawler) reduces to this one call. */
 export type SourceAdapter = (
   config: JobFeedConfig,
   fetchText: FetchText

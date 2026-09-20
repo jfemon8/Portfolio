@@ -241,7 +241,7 @@ const escapeHtml = (value: string): string =>
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;');
 
-// A bare "example.com" is treated as a hostname (https:// prepended); anything with an explicit scheme, or a site-relative /path or #anchor, passes through untouched.
+// A bare "example.com" gets https:// prepended, while an explicit scheme, site-relative /path or #anchor passes through untouched.
 const normalizeUrl = (input: string): string => {
   const trimmed = input.trim();
   if (!trimmed) return '';
@@ -335,7 +335,7 @@ export default function RichTextEditor({
   const applyCommand = (tool: Tool): void => {
     const editable = ref.current;
     if (!editable) return;
-    // preventScroll — plain focus() yanks a long post back to the top on every toolbar click.
+    // preventScroll: plain focus() yanks a long post back to the top on every toolbar click.
     editable.focus({ preventScroll: true });
     document.execCommand(tool.command, false, tool.value);
     window.requestAnimationFrame(sync);

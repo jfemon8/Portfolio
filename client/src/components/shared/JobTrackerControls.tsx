@@ -139,7 +139,7 @@ export function JobTrackerNote({ jobId }: { jobId: string }) {
           {stats.applied} Applied · {stats.saved} Saved
         </span>
       </div>
-      {/* Kept only on this device (and synced to its own code) — never shown to anyone else. */}
+      {/* Kept only on this device (and synced to its own code), never shown to anyone else. */}
       <textarea
         value={note}
         onChange={(e) => setNote(jobId, e.target.value)}

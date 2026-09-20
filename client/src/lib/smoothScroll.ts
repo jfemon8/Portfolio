@@ -7,12 +7,12 @@ export const setLenis = (instance: Lenis | null): void => {
   lenis = instance;
 };
 
-/** Scroll to an element id (used by the floating dock). `immediate` skips the ease, for a final corrective snap. */
+/** Scrolls to an element id for the floating dock, where `immediate` skips the ease for a final corrective snap. */
 export function scrollToId(id: string, immediate = false): void {
   const el = document.getElementById(id);
   if (!el) return;
   if (lenis) {
-    // Force a sync recalc — Lenis's own ResizeObserver update is async and would clamp a just-mounted taller page.
+    // Force a sync recalc; Lenis's own ResizeObserver update is async and would clamp a just-mounted taller page.
     lenis.resize();
     lenis.scrollTo(el, { offset: -8, immediate });
   } else {
@@ -20,13 +20,13 @@ export function scrollToId(id: string, immediate = false): void {
   }
 }
 
-/** Jump to top instantly — goes through Lenis so its internal state stays in sync. */
+/** Jump to top instantly; goes through Lenis so its internal state stays in sync. */
 export function resetScroll(): void {
   if (lenis) lenis.scrollTo(0, { immediate: true });
   else window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
-/** Jump to an arbitrary Y instantly — used to restore a remembered scroll position on back/forward nav. */
+/** Jump to an arbitrary Y instantly, used to restore a remembered scroll position on back/forward nav. */
 export function scrollToY(y: number): void {
   if (lenis) {
     // Same sync recalc `scrollToId` needs: Lenis's ResizeObserver is async and would clamp against the outgoing page's height.

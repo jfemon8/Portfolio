@@ -2,7 +2,7 @@
   "name": "portfolio-monorepo",
   "version": "1.0.0",
   "private": true,
-  "description": "Premium MERN portfolio ecosystem — Express API (server/) + React app (client/)",
+  "description": "Premium MERN portfolio ecosystem: Express API (server/) + React app (client/)",
   "scripts": {
     "dev": "concurrently -k -n server,client -c cyan,magenta \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
     "dev:server": "npm --prefix server run dev",

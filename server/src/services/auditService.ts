@@ -2,7 +2,7 @@ import type { Request } from 'express';
 import { AuditLog } from '../models/AuditLog.js';
 import type { AuditAction, IAuditLog, UserRole } from '../types/index.js';
 
-/** Coarse client info — best-effort, never throws. */
+/** Coarse client info: best-effort, never throws. */
 export function clientInfo(req: Request): { ip: string; userAgent: string } {
   const fwd = req.headers['x-forwarded-for'];
   const ip =

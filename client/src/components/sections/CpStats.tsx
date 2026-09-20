@@ -35,7 +35,7 @@ export default function CpStats() {
     index: '~/cp',
     title: 'Competitive programming',
     subtitle:
-      'Live Codeforces & LeetCode standing — problem-solving under time pressure.',
+      'Live Codeforces & LeetCode standing: problem-solving under time pressure.',
   });
 
   return (
@@ -83,12 +83,12 @@ function CpStatsBody({ cp, copy }: { cp: CpStatsDoc; copy: CpCopy }) {
   const cards = [
     {
       label: lab.cpCurrentRating,
-      value: cp.rating != null ? String(cp.rating) : '—',
+      value: cp.rating != null ? String(cp.rating) : 'N/A',
       icon: TrendingUp,
     },
     {
       label: lab.cpMaxRating,
-      value: cp.maxRating != null ? String(cp.maxRating) : '—',
+      value: cp.maxRating != null ? String(cp.maxRating) : 'N/A',
       icon: Award,
     },
     { label: lab.cpContests, value: String(cp.contests), icon: Trophy },
@@ -289,13 +289,13 @@ function CpStatsBody({ cp, copy }: { cp: CpStatsDoc; copy: CpCopy }) {
               </span>
               <div>
                 <p className="font-semibold text-foreground">
-                  {lab.cpCodechef} · {cp.codechef.rating ?? '—'}
+                  {lab.cpCodechef} · {cp.codechef.rating ?? 'N/A'}
                   <span className="ml-2 text-neon">
                     {'★'.repeat(cp.codechef.stars)}
                   </span>
                 </p>
                 <p className="text-xs text-muted-foreground/70">
-                  {lab.cpHighest} {cp.codechef.highestRating ?? '—'}
+                  {lab.cpHighest} {cp.codechef.highestRating ?? 'N/A'}
                 </p>
               </div>
             </div>

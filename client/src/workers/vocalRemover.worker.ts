@@ -193,7 +193,7 @@ async function runChunk(
     const l = leftFrames[t]!;
     const r = rightFrames[t]!;
     for (let f = 0; f < DIM_F; f++) {
-      // Model's lowest 3 frequency bins are zeroed on input — it was never trained to see energy there.
+      // Model's lowest 3 frequency bins are zeroed on input; it was never trained to see energy there.
       const zeroed = f < 3;
       inputData[0 * DIM_F * DIM_T + f * DIM_T + t] = zeroed ? 0 : l.re[f]!;
       inputData[1 * DIM_F * DIM_T + f * DIM_T + t] = zeroed ? 0 : l.im[f]!;
@@ -227,7 +227,7 @@ async function runChunk(
       rRe[f] = outputData[2 * DIM_F * DIM_T + f * DIM_T + t]! * COMPENSATE;
       rIm[f] = outputData[3 * DIM_F * DIM_T + f * DIM_T + t]! * COMPENSATE;
     }
-    // Bins above dim_f stay zero — the model never predicts them, so all that treble belongs to the instrumental.
+    // Bins above dim_f stay zero; the model never predicts them, so all that treble belongs to the instrumental.
     leftOutFrames.push(interleave(lRe, lIm));
     rightOutFrames.push(interleave(rRe, rIm));
   }

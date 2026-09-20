@@ -25,7 +25,7 @@ const router = Router();
 
 // Public
 router.get('/', cacheControl(60), listPublished);
-router.get('/slug/:slug', getPublishedBySlug); // increments views — never cache
+router.get('/slug/:slug', getPublishedBySlug); // increments views, never cache
 router.get('/slug/:slug/comments', getPostComments);
 router.post(
   '/slug/:slug/reactions',

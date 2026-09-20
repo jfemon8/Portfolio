@@ -17,9 +17,9 @@ import {
   type Contestant,
 } from '../services/ratingPredictor.js';
 
-const TTL_MS = 6 * 60 * 60 * 1000; // 6h — respects CF rate limits, serverless-safe
+const TTL_MS = 6 * 60 * 60 * 1000; // 6h; respects CF rate limits, serverless-safe
 
-// Public CP stats — handle is admin-managed (no redeploy to change); serves the cached snapshot, refetching only when stale, and falls back to the last good cache on a Codeforces outage.
+// Public CP stats: handle is admin-managed (no redeploy to change); serves the cached snapshot, refetching only when stale, and falls back to the last good cache on a Codeforces outage.
 export const getCpStats = asyncHandler(async (_req: Request, res: Response) => {
   const profile = await Profile.findOne()
     .select('codeforcesHandle leetcodeHandle codechefHandle')
@@ -48,7 +48,7 @@ export const getCpStats = asyncHandler(async (_req: Request, res: Response) => {
     ]);
     const doc = await CpStats.findOneAndUpdate(
       { handle },
-      // Pin the stored handle to the admin-configured value — Codeforces returns a canonically-cased handle (e.g. 'tourist' for 'Tourist'), and persisting that would make the case-sensitive findOne({ handle }) miss forever and collide on the unique index.
+      // Pin the stored handle to the admin-configured value: Codeforces returns a canonically-cased handle (e.g. 'tourist' for 'Tourist'), and persisting that would make the case-sensitive findOne({ handle }) miss forever and collide on the unique index.
       { ...snap, handle, leetcode, codechef, fetchedAt: new Date() },
       { new: true, upsert: true, setDefaultsOnInsert: true }
     );
@@ -81,7 +81,7 @@ const resolveCompare = (
             : 'Could not fetch this handle',
       };
 
-// Public — live side-by-side Codeforces comparison for two arbitrary visitor-entered handles (not the owner's own stats, so no DB caching; rides cpToolLimiter instead).
+// Public: live side-by-side Codeforces comparison for two arbitrary visitor-entered handles (not the owner's own stats, so no DB caching; rides cpToolLimiter instead).
 export const compareCp = asyncHandler(async (req: Request, res: Response) => {
   const a = String(req.query.a || '').trim();
   const b = String(req.query.b || '').trim();
@@ -98,7 +98,7 @@ export const compareCp = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-// Public tool — unofficial predicted rating delta for one handle in a contest, computed from live standings (see services/ratingPredictor.ts for the algorithm and its caveats). Not cacheable — standings shift every request during a running contest; rides cpToolLimiter.
+// Unofficial predicted rating delta from live standings, uncacheable because standings shift every request during a running contest.
 export const predictRating = asyncHandler(
   async (req: Request, res: Response) => {
     const contestId = Number(req.query.contestId);
@@ -114,11 +114,11 @@ export const predictRating = asyncHandler(
     );
     if (!entry) {
       throw ApiError.notFound(
-        `"${handle}" isn't in this contest's rated standings — check the handle and contest id, or they may not have competed as a rated contestant.`
+        `"${handle}" isn't in this contest's rated standings. Check the handle and contest id, or they may not have competed as a rated contestant.`
       );
     }
 
-    // Codeforces won't paginate anonymous standings requests, so a big round's full field arrives in one shot — sampleStandings bounds it for the O(n^2) prediction math while keeping the sample representative (see ratingPredictor.ts).
+    // Codeforces won't paginate anonymous standings requests, so a big round's full field arrives in one shot; sampleStandings bounds it for the O(n^2) prediction math while keeping the sample representative (see ratingPredictor.ts).
     const sample = sampleStandings(standings, entry.handle);
     const ratings = await fetchRatingsBulk(sample.map((s) => s.handle));
     const contestants: Contestant[] = sample
@@ -131,7 +131,7 @@ export const predictRating = asyncHandler(
 
     if (!ratings.has(entry.handle)) {
       throw ApiError.badRequest(
-        `"${handle}" has no rating yet — the predictor only works for already-rated handles.`
+        `"${handle}" has no rating yet; the predictor only works for already-rated handles.`
       );
     }
 

@@ -10,7 +10,7 @@ export interface AsyncQuery<TData> {
   refetch: () => Promise<unknown>;
 }
 
-/** Pending until every query resolves — only for a value genuinely derived from several, never to make independent slots wait on each other. */
+/** Pending until every query resolves; only for a value genuinely derived from several, never to make independent slots wait on each other. */
 export const allOf = (
   ...queries: AsyncQuery<unknown>[]
 ): AsyncQuery<true> => ({
@@ -32,9 +32,9 @@ interface AsyncProps<TData, TValue> {
   fallbackCount?: number;
   empty?: ReactNode;
   errorMessage?: string;
-  /** For sections that may not exist at all: renders nothing until a hint proves they do, rather than reserving space that then collapses. Implies `hideOnError`. */
+  /** For sections that may not exist at all, rendering nothing until a hint proves they do (implies `hideOnError`). */
   selfHiding?: boolean;
-  /** Fails silently — for a secondary slot whose primary already reports the same failure. */
+  /** Fails silently: for a secondary slot whose primary already reports the same failure. */
   hideOnError?: boolean;
   /** Applied to the error/empty state only, e.g. `col-span-full` inside a grid. */
   stateClass?: string;

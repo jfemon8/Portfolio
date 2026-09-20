@@ -47,7 +47,7 @@ export default function CfRatingPredictor() {
       });
       setResult(res.data.data);
     } catch (e) {
-      // api.ts's response interceptor already normalizes every rejection to ApiError ({status, message, details}) — not a raw AxiosError, so the message is read directly, not via .response.data.message.
+      // api.ts's interceptor already normalizes every rejection to ApiError, so the message is read directly rather than via .response.data.message.
       setError(
         (e as ApiError)?.message ??
           'Could not predict a delta for this contest/handle.'

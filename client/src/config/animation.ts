@@ -1,13 +1,13 @@
 // Single source of truth for motion tokens shared by Motion.dev and React Spring, so transitions feel like one physics system.
 import type { Transition, Variants } from 'motion/react';
 
-/** Signature easings (cubic-bezier) — premium, natural, never linear. */
+/** Signature easings (cubic-bezier): premium, natural, never linear. */
 export const ease = {
-  /** smooth deceleration — default for reveals */
+  /** smooth deceleration, default for reveals */
   out: [0.22, 1, 0.36, 1],
-  /** expressive in-out — section/page transitions */
+  /** expressive in-out, section/page transitions */
   inOut: [0.83, 0, 0.17, 1],
-  /** snappy — hover/press micro-interactions */
+  /** snappy, hover/press micro-interactions */
   snappy: [0.34, 1.56, 0.64, 1],
 } as const;
 

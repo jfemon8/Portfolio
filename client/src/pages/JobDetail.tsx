@@ -30,7 +30,7 @@ import { formatJobDescription } from '@/lib/jobText';
 import { cn } from '@/lib/cn';
 import type { JobDoc } from '@/types';
 
-/** schema.org JobPosting — the markup Google Jobs actually reads. */
+/** schema.org JobPosting: the markup Google Jobs actually reads. */
 const jobPostingSchema = (job: JobDoc): Record<string, unknown> => ({
   '@context': 'https://schema.org',
   '@type': 'JobPosting',

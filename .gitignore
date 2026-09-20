@@ -48,7 +48,7 @@ Thumbs.db
 # ===== Local docs (not tracked) =====
 docs/
 
-# ===== Markdown (local/agent notes) — only README.md is tracked =====
+# ===== Markdown (local/agent notes); only README.md is tracked =====
 *.md
 !README.md
 

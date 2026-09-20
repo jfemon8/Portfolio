@@ -6,7 +6,7 @@ export interface SectionCopy {
   subtitle: string;
 }
 
-// Resolves section heading copy from the admin SiteContent singleton, falling back to hardcoded defaults — clearing a field in admin restores the original.
+// Resolves section heading copy from the admin SiteContent singleton, falling back to hardcoded defaults; clearing a field in admin restores the original.
 export function useSectionCopy(
   key: string,
   defaults: SectionCopy

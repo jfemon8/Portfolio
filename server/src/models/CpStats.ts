@@ -1,7 +1,7 @@
 import mongoose, { type Model } from 'mongoose';
 import type { ICpStats } from '../types/index.js';
 
-// Cached CP snapshot (one doc per handle); Codeforces rate-limits and Vercel is stateless, so refetch only when stale. Mongoose ESM-safe pattern, don't regress to named imports.
+// Cached CP snapshot per handle, refetched only when stale, using the ESM-safe Mongoose import pattern.
 const leetcodeSchema = new mongoose.Schema(
   {
     handle: String,

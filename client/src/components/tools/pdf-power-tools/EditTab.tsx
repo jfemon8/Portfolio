@@ -477,7 +477,7 @@ export default function EditTab() {
       setWatermark((w) => ({ ...w, enabled: false }));
       setAppliedRounds((n) => n + 1);
       await openFile(baked, true);
-      toast.success('Changes applied — keep editing or download');
+      toast.success('Changes applied. Keep editing or download');
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Could not apply.');
     } finally {
@@ -514,7 +514,7 @@ export default function EditTab() {
         ocr: {
           onProgress: (p) =>
             setOcrStatus(
-              `Reading page ${p.page}/${p.totalPages} — ${p.status} ${Math.round(p.progress * 100)}%`
+              `Reading page ${p.page}/${p.totalPages}: ${p.status} ${Math.round(p.progress * 100)}%`
             ),
         },
       });

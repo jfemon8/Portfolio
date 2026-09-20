@@ -107,7 +107,7 @@ export default function MusicRemover() {
 
       if (audioBuffer.duration > MAX_DURATION_SECONDS) {
         throw new Error(
-          `This track is ${Math.round(audioBuffer.duration / 60)} minutes long — please use one under ${MAX_DURATION_SECONDS / 60} minutes so processing stays reasonable.`
+          `This track is ${Math.round(audioBuffer.duration / 60)} minutes long. Please use one under ${MAX_DURATION_SECONDS / 60} minutes so processing stays reasonable.`
         );
       }
 
@@ -150,13 +150,13 @@ export default function MusicRemover() {
       );
       setStage('error');
     } finally {
-      // Closed on every path — leaking contexts eventually trips the browser's hard limit and breaks valid files too.
+      // Closed on every path; leaking contexts eventually trips the browser's hard limit and breaks valid files too.
       await audioCtx?.close().catch(() => undefined);
     }
   };
 
   const stopWorker = (): void => {
-    // Always terminated, never just dropped — an orphaned worker keeps a multi-hundred-MB session alive unreachably.
+    // Always terminated, never just dropped; an orphaned worker keeps a multi-hundred-MB session alive unreachably.
     workerRef.current?.terminate();
     workerRef.current = null;
   };
@@ -194,7 +194,7 @@ export default function MusicRemover() {
         setModelProgress({ loaded: msg.loaded, total: msg.total });
       } else if (msg.type === 'model-retry') {
         setRetryNote(
-          `Download stalled — retrying (attempt ${msg.attempt + 1} of ${msg.attempts})…`
+          `Download stalled, retrying (attempt ${msg.attempt + 1} of ${msg.attempts})…`
         );
       } else if (msg.type === 'processing-progress') {
         setStage('processing');
@@ -291,11 +291,11 @@ export default function MusicRemover() {
       {quickPreviewUrl && (stage === 'ready' || busy) && (
         <div className="mt-4">
           <p className="label">
-            Instant preview (rough — not real vocal isolation)
+            Instant preview (rough, not real vocal isolation)
           </p>
           <audio controls src={quickPreviewUrl} className="mt-1.5 w-full" />
           <p className="mt-1 text-2xs text-muted-foreground/70">
-            Cancels whatever's identical in both channels — usually most of the
+            Cancels whatever's identical in both channels, usually most of the
             vocal, but also centered bass/drums. Free and instant while the real
             model works below.
           </p>
@@ -312,9 +312,9 @@ export default function MusicRemover() {
               className="mt-0.5 accent-primary"
             />
             <span>
-              Extra noise reduction — runs the model a second time on an
-              inverted signal to cancel artefacts it adds either way. Noticeably
-              cleaner, but roughly doubles the processing time.
+              Extra noise reduction: runs the model a second time on an inverted
+              signal to cancel artefacts it adds either way. Noticeably cleaner,
+              but roughly doubles the processing time.
             </span>
           </label>
           <Button onClick={handleSeparate} className="w-full sm:w-auto">
@@ -329,7 +329,7 @@ export default function MusicRemover() {
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
             {modelProgress
-              ? `Downloading separation model — ${formatBytes(modelProgress.loaded)} / ${formatBytes(modelProgress.total)}`
+              ? `Downloading separation model: ${formatBytes(modelProgress.loaded)} / ${formatBytes(modelProgress.total)}`
               : 'Starting up the separation model…'}
           </p>
           {modelProgress && modelProgress.total > 0 && (
@@ -361,7 +361,7 @@ export default function MusicRemover() {
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
             {chunkProgress
-              ? `Separating — segment ${chunkProgress.chunk} of ${chunkProgress.total}`
+              ? `Separating: segment ${chunkProgress.chunk} of ${chunkProgress.total}`
               : 'Separating…'}
           </p>
           {chunkProgress && (

@@ -137,7 +137,7 @@ export default function MessagesManager() {
 
   const emptyMessage =
     filter === 'unread'
-      ? 'Nothing unread — you are all caught up.'
+      ? 'Nothing unread. You are all caught up.'
       : filter === 'starred'
         ? 'No starred messages yet.'
         : filter === 'archived'
@@ -284,7 +284,7 @@ export default function MessagesManager() {
                   className={cn(iconBtn, active.read && 'text-neon')}
                   title={active.read ? 'Mark as unread' : 'Mark as read'}
                 >
-                  {/* Open envelope means read, closed means unread — the reverse of this read as "nothing happened" on click. */}
+                  {/* Open envelope means read, closed means unread; the reverse of this read as "nothing happened" on click. */}
                   {active.read ? (
                     <MailOpen className="h-4 w-4" />
                   ) : (

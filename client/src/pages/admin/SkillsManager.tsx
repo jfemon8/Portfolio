@@ -44,7 +44,7 @@ export default function SkillsManager() {
             : [{ value: 'other', label: 'Other' }],
           help: categories.length
             ? undefined
-            : 'No categories yet — add one from the Categories tab.',
+            : 'No categories yet. Add one from the Categories tab.',
         },
         { name: 'level', label: 'Proficiency %', type: 'number' },
         { name: 'order', label: 'Order', type: 'number' },
@@ -94,7 +94,7 @@ export default function SkillsManager() {
 
   return (
     <div>
-      {/* Tab strip — active indicator style borrowed from the public Skills section. */}
+      {/* Tab strip: active indicator style borrowed from the public Skills section. */}
       <div role="tablist" className="mb-4 flex gap-2">
         {(['skills', 'categories'] as const).map((key) => {
           const on = tab === key;

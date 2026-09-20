@@ -3,9 +3,7 @@ import GlassCard from '@/components/shared/GlassCard';
 import { Skeleton } from '@/components/ui/States';
 import { cn } from '@/lib/cn';
 
-// Each skeleton reuses the real card's shell rather than hardcoded heights, so a card redesign carries into its placeholder.
-
-/** Fragment of N placeholders — sits directly inside the caller's grid, beside any static cards. */
+// Fragment of N placeholders that reuses the real card's shell, sitting directly inside the caller's grid beside any static cards.
 function Repeat({
   count,
   children,
@@ -146,7 +144,7 @@ export function SkillCardSkeleton({ count = 10 }: { count?: number }) {
   );
 }
 
-/** Filter/category pill row — resolves from its own query, so it fills in independently of the grid below it. */
+/** Filter/category pill row; resolves from its own query, so it fills in independently of the grid below it. */
 export function FilterTabsSkeleton({ count = 4 }: { count?: number }) {
   return (
     <Repeat count={count}>
@@ -159,7 +157,7 @@ export function FilterTabsSkeleton({ count = 4 }: { count?: number }) {
   );
 }
 
-/** Timeline entries — the dot sits at the real one's offset, so the gradient rail stays aligned. */
+/** Timeline entries; the dot sits at the real one's offset, so the gradient rail stays aligned. */
 export function TimelineItemSkeleton({ count = 3 }: { count?: number }) {
   return (
     <Repeat count={count}>
@@ -284,7 +282,7 @@ export function JobCardSkeleton({ count = 6 }: { count?: number }) {
   );
 }
 
-/** Terminal block, stat cards and profile bar — the CP section's real layout. */
+/** Terminal block, stat cards and profile bar: the CP section's real layout. */
 export function CpStatsSkeleton() {
   return (
     <>
@@ -406,7 +404,7 @@ export function SectionHeadingSkeleton() {
   );
 }
 
-/** Long-form body — blog posts and project case studies share this rhythm. */
+/** Long-form body: blog posts and project case studies share this rhythm. */
 export function ArticleSkeleton() {
   return (
     <div className="space-y-4">
@@ -425,7 +423,7 @@ export function ArticleSkeleton() {
   );
 }
 
-/** Detail-page shell: title block, cover, body — shared by the project, blog and job pages while their record loads. */
+/** Detail-page shell: title block, cover, body; shared by the project, blog and job pages while their record loads. */
 export function DetailPageSkeleton({ cover = true }: { cover?: boolean }) {
   return (
     <div className="space-y-6">

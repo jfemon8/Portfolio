@@ -111,7 +111,7 @@ export default function About() {
           >
             {(profile) => (
               <div className="space-y-4 sm:space-y-6">
-                {/* Avatar, identity and resume affordance — the glass card that anchors the right column. */}
+                {/* Avatar, identity and resume affordance: the glass card that anchors the right column. */}
                 <GlassCard className="p-6 text-center">
                   <div className="relative mx-auto h-44 w-44 sm:h-48 sm:w-48">
                     <div

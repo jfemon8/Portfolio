@@ -17,7 +17,7 @@ export const verifyAccessToken = (token: string): JwtPayload => {
   return decoded;
 };
 
-/** Back-compat aliases (existing imports keep working — rule 8). */
+/** Back-compat aliases (existing imports keep working, rule 8). */
 export const signToken = signAccessToken;
 export const verifyToken = verifyAccessToken;
 

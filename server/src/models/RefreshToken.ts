@@ -1,7 +1,7 @@
 import mongoose, { type Model } from 'mongoose';
 import type { IRefreshToken } from '../types/index.js';
 
-// Refresh tokens stored hashed; each rotation revokes the presented token and reissues in the same family — replaying a revoked token revokes the whole family (see authService).
+// Refresh tokens are stored hashed and rotated within a family, where replaying a revoked token revokes the whole family.
 const refreshTokenSchema = new mongoose.Schema<IRefreshToken>(
   {
     user: {

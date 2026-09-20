@@ -21,7 +21,7 @@ import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore — Vite handles the ?url suffix at build time
+// @ts-ignore: Vite handles the ?url suffix at build time
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker;
 
@@ -112,7 +112,7 @@ export default function PdfViewer({
   useEffect(() => {
     scaleRef.current = scale;
   }, [scale]);
-  // Live-preview zoom/pan via CSS transform on contentRef during the gesture, commit to real setScale + scroll only on release — calling setScale() per pinch tick raced react-pdf's async re-rasterization against scrollLeft/scrollTop writes, which is what broke post-pinch scrolling.
+  // Zoom/pan previews as a CSS transform and commits to setScale only on release, because a per-tick setScale raced react-pdf's async re-rasterization and broke post-pinch scrolling.
   interface PinchMemo {
     startScale: number;
     originX: number;
@@ -154,7 +154,7 @@ export default function PdfViewer({
       content.style.transform = `translate(${m.panX}px, ${m.panY}px) scale(${liveFactor})`;
 
       if (last) {
-        // Clear before setScale — the real re-render is async, so a brief un-zoomed flash beats double-scaling.
+        // Clear before setScale: the real re-render is async, so a brief un-zoomed flash beats double-scaling.
         content.style.transform = 'none';
         content.style.transformOrigin = '';
         el.scrollLeft -= m.panX;
@@ -376,7 +376,7 @@ export default function PdfViewer({
                     of {numPages}
                   </>
                 ) : (
-                  '—'
+                  '…'
                 )}
               </button>
               <button
@@ -487,7 +487,7 @@ export default function PdfViewer({
             </a>
           </div>
         ) : (
-          // Live pinch transform target — kept separate from containerRef so it never fights the container's own scroll/overflow.
+          // Live pinch transform target, kept separate from containerRef so it never fights the container's own scroll/overflow.
           <div ref={contentRef}>
             <Document
               file={viewUrl}

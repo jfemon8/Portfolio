@@ -6,7 +6,7 @@ import type { CategoryScope } from '../types/index.js';
 
 type DefaultCategory = { name: string; slug: string; order: number };
 
-/** The legacy enum values that pre-existing Skill rows reference. Seeded once on first read so the public Skills section keeps rendering the same category tabs out of the box. Admins can rename / reorder / add / delete them freely after that. */
+/** Legacy enum values that pre-existing Skill rows reference, seeded once on first read and freely renamable afterwards. */
 const DEFAULT_SKILL_CATEGORIES: DefaultCategory[] = [
   { name: 'Languages', slug: 'language', order: 0 },
   { name: 'Frameworks', slug: 'framework', order: 1 },
@@ -17,7 +17,7 @@ const DEFAULT_SKILL_CATEGORIES: DefaultCategory[] = [
   { name: 'Other', slug: 'other', order: 6 },
 ];
 
-/** Matches the categories the Tools seed script assigns — seeded once on first read of the tool scope, same idea as DEFAULT_SKILL_CATEGORIES. */
+/** Matches the categories the Tools seed script assigns; seeded once on first read of the tool scope, same idea as DEFAULT_SKILL_CATEGORIES. */
 const DEFAULT_TOOL_CATEGORIES: DefaultCategory[] = [
   { name: 'Developer Utilities', slug: 'developer-utilities', order: 0 },
   {
@@ -90,7 +90,7 @@ export const updateCategory = asyncHandler(
       const next = slugify(req.body.slug);
       if (!next) throw ApiError.badRequest('Invalid slug');
       if (next !== doc.slug) {
-        // Scoped to the category's own (immutable) scope, not a caller-supplied one — a rename can't accidentally jump namespaces.
+        // Scoped to the category's own (immutable) scope, not a caller-supplied one; a rename can't accidentally jump namespaces.
         const conflict = await Category.findOne({
           slug: next,
           scope: doc.scope,

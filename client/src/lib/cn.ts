@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
-// Merges conditional class names and de-dupes conflicting Tailwind utilities — the single class-composition helper used everywhere.
+// The single class-composition helper, merging conditional class names and de-duping conflicting Tailwind utilities.
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs));
 }

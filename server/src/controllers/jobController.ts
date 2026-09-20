@@ -98,8 +98,7 @@ export const listJobs = asyncHandler(async (req: Request, res: Response) => {
       $facet: {
         data: [
           ...(categoryFilter ? [{ $match: categoryFilter }] : []),
-          // Booleans sort false-first, so live postings always lead the board.
-          // createdAt leads publishedAt, which feeds routinely carry stale; updatedAt/lastSeenAt are rewritten every sync, so neither tracks freshness.
+          // Booleans sort false-first so live postings lead, and createdAt leads publishedAt because feeds routinely carry stale dates.
           {
             $sort: {
               expired: 1,

@@ -16,7 +16,7 @@ const Jobs = lazy(() => import('@/pages/Jobs'));
 const JobDetail = lazy(() => import('@/pages/JobDetail'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
-// Admin (code-split — never loaded by public visitors)
+// Admin (code-split, never loaded by public visitors)
 const AdminLogin = lazy(() => import('@/pages/admin/Login'));
 const AdminLayout = lazy(() => import('@/pages/admin/AdminLayout'));
 const Dashboard = lazy(() => import('@/pages/admin/Dashboard'));

@@ -28,7 +28,7 @@ interface FloatingTechIconsProps {
   className?: string;
 }
 
-// Deterministic layout avoids hydration shift; GPU-only float, pointer/screen-reader transparent, hidden under reduced-motion, muted token adapts to every theme.
+// Deterministic layout avoids hydration shift, with a GPU-only float that is pointer- and screen-reader-transparent and hidden under reduced motion.
 export default function FloatingTechIcons({
   className,
 }: FloatingTechIconsProps) {

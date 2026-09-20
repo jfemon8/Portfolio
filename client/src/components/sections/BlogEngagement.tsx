@@ -151,7 +151,7 @@ export default function BlogEngagement({
           name,
           email: email.trim() || undefined,
           content,
-          // Replying to a reply still attaches to ITS top-level ancestor — threads never nest more than one level, Facebook-style.
+          // Replying to a reply still attaches to ITS top-level ancestor; threads never nest more than one level, Facebook-style.
           parentCommentId: replyTo && (replyTo.parentComment ?? replyTo._id),
         })
       ).data,

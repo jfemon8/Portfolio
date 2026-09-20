@@ -34,7 +34,7 @@ blogSchema.pre('validate', function prep(next) {
   if (this.isModified('content')) {
     const words = (this.content || '').trim().split(/\s+/).length;
     this.readingTime = Math.max(1, Math.round(words / 200));
-    // The excerpt is always derived from content — there's no separate admin input for it.
+    // The excerpt is always derived from content; there's no separate admin input for it.
     this.excerpt = excerptFromHtml(this.content || '');
   }
   if (

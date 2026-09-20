@@ -43,7 +43,7 @@ export default function Blog() {
       'Thoughts on development, the MERN stack, .NET and competitive programming.',
   });
   const st = useSiteCopy('states', {
-    postsEmpty: 'No posts published yet — check back soon!',
+    postsEmpty: 'No posts published yet. Check back soon!',
     postsSearchEmpty: 'No posts match your search.',
   });
   const lab = useSiteCopy('labels', {
@@ -85,7 +85,7 @@ export default function Blog() {
   return (
     <>
       <Seo
-        title={tag ? `#${tag} — ${PAGE_SEO.blog.title}` : PAGE_SEO.blog.title}
+        title={tag ? `#${tag} | ${PAGE_SEO.blog.title}` : PAGE_SEO.blog.title}
         path={tag ? `/blog?tag=${encodeURIComponent(tag)}` : '/blog'}
         description={
           tag
@@ -197,7 +197,7 @@ export default function Blog() {
                         <h2 className="text-lg font-bold text-foreground transition-colors group-hover:text-neon">
                           {post.title}
                         </h2>
-                        {/* flex-1 on this wrapper, not the clamped <p> — flex-grow on the clamped element itself defeats line-clamp. */}
+                        {/* flex-1 on this wrapper, not the clamped <p>; flex-grow on the clamped element itself defeats line-clamp. */}
                         <div className="mt-2 flex-1">
                           <p className="text-sm leading-relaxed text-muted-foreground line-clamp-3">
                             {post.excerpt}

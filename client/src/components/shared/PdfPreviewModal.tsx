@@ -17,7 +17,7 @@ export interface PdfPreviewAction {
   label: string;
 }
 
-// Ported from RDSWA; fully controlled by `target` — pass `null` to close.
+// Ported from RDSWA and fully controlled by `target`, which is `null` when closed.
 export default function PdfPreviewModal({
   target,
   action,

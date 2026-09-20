@@ -29,7 +29,7 @@ export function formatDate(value?: string): string {
   return value;
 }
 
-// Time-of-day only, with seconds — e.g. blog card/post metadata showing the exact create/update moment.
+// Time-of-day only, with seconds; e.g. blog card/post metadata showing the exact create/update moment.
 export function formatTime(value?: string): string {
   if (!value) return '';
   const dt = new Date(value);

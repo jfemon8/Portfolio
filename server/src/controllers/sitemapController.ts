@@ -8,7 +8,7 @@ import { SeoSettings } from '../models/SeoSettings.js';
 import { publicVisibility } from './blogController.js';
 import { canonicalOrigin } from '../utils/canonicalOrigin.js';
 
-// Dynamic XML sitemap, generated per-request (Vercel has no cron) — reuses the blog API's public-visibility filter so URLs never outpace what's reachable; exposed via a vercel.json rewrite.
+// Dynamic XML sitemap generated per-request, reusing the blog API's public-visibility filter so URLs never outpace what's reachable.
 
 const XML_ENTITIES: Record<string, string> = {
   '&': '&amp;',

@@ -18,7 +18,7 @@ self.onmessage = (event: MessageEvent<RegexRequest>) => {
   if (type !== 'match') return;
 
   try {
-    // matchAll needs 'g'; per-group offsets need 'd' — both added transparently regardless of what the user typed.
+    // matchAll needs 'g' and per-group offsets need 'd', both added transparently regardless of what the user typed.
     let f = flags;
     if (!f.includes('g')) f += 'g';
     if (!f.includes('d')) f += 'd';

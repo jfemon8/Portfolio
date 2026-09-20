@@ -122,7 +122,7 @@ export const formatJobDescription = (description: string): string => {
     .replace(/[^\S\n]+/g, ' ')
     .replace(/\r\n?/g, '\n');
 
-  // A single-line description means the source flattened it — rebuild the breaks.
+  // A single-line description means the source flattened it; rebuild the breaks.
   const withBreaks = normalized.includes('\n')
     ? normalized
     : normalized

@@ -35,7 +35,7 @@ export function encodeWav(
     for (let ch = 0; ch < numChannels; ch++) {
       const raw = channels[ch]?.[i] ?? 0;
       const sample = Number.isNaN(raw) ? 0 : Math.max(-1, Math.min(1, raw));
-      // Rounded rather than truncated — truncation toward zero adds roughly 6 dB of quantization noise.
+      // Rounded rather than truncated; truncation toward zero adds roughly 6 dB of quantization noise.
       view.setInt16(
         offset,
         Math.round(sample < 0 ? sample * 0x8000 : sample * 0x7fff),

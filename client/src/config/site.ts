@@ -1,4 +1,4 @@
-// SEO identity in one place; the canonical origin is resolved at runtime from the admin's SeoSettings.siteUrl so a domain change needs no code edit, with VITE_SITE_URL and the literal below as fallbacks until it loads.
+// SEO identity in one place, with the canonical origin resolved at runtime from the admin's SeoSettings.siteUrl so a domain change needs no code edit.
 const envSiteUrl: string | undefined =
   (import.meta.env as { VITE_SITE_URL?: string } | undefined)?.VITE_SITE_URL ??
   (typeof process !== 'undefined' ? process.env.VITE_SITE_URL : undefined);
@@ -24,7 +24,7 @@ export const AUTHOR_NAME = 'Md Jannatul Ferdhous Emon';
 
 export const AUTHOR_JOB_TITLE = 'Assistant Front-End Developer';
 
-// Name variants people search for — Person.alternateName and the default keywords read this one list; search is case-insensitive, so only distinct token patterns belong here, not casing variants.
+// Name variants people search for, read by Person.alternateName and the default keywords, so only distinct token patterns belong here rather than casing variants.
 export const AUTHOR_ALTERNATE_NAMES = [
   'Jannatul Ferdhous Emon',
   'Md Jannatul Ferdhous',
@@ -50,7 +50,7 @@ export const AUTHOR_ALMA_MATER = 'University of Barishal';
 export const AUTHOR_NATIONALITY = 'Bangladesh';
 export const AUTHOR_CITY = 'Dhaka';
 
-// Fallback Person.sameAs profiles when the DB has none — Google uses these to build the knowledge-panel entity, so this must never be empty.
+// Fallback Person.sameAs profiles when the DB has none; Google uses these to build the knowledge-panel entity, so this must never be empty.
 export const AUTHOR_SAME_AS = [
   'https://github.com/jfemon8',
   'https://www.linkedin.com/in/jfemon/',
@@ -59,7 +59,7 @@ export const AUTHOR_SAME_AS = [
   'https://www.codechef.com/users/jfemon',
 ] as const;
 
-/** Topics for `Person.knowsAbout` — strengthens the entity's subject graph. */
+/** Topics for `Person.knowsAbout`; strengthens the entity's subject graph. */
 export const AUTHOR_KNOWS_ABOUT = [
   'React',
   'Next.js',
@@ -92,7 +92,7 @@ export const AUTHOR_KNOWS_ABOUT = [
   'Software Engineering',
 ] as const;
 
-export const SITE_TITLE = `${AUTHOR_NAME} — Developer Portfolio`;
+export const SITE_TITLE = `${AUTHOR_NAME} | Developer Portfolio`;
 
 export const DEFAULT_DESCRIPTION =
   'Assistant Front-End Developer Building Responsive, Dynamic MERN Applications.';
@@ -138,7 +138,7 @@ export const DEFAULT_KEYWORDS = [
   'Developer Portfolio',
 ] as const;
 
-// Static raster (not generated) because social scrapers don't execute JS; owner-supplied at client/public/og.png (1200×630), same pattern as avatar/resume placeholders.
+// Static raster at client/public/og.png (1200x630) because social scrapers don't execute JS.
 export const defaultOgImage = (): string => `${siteOrigin()}/og.png`;
 
 /** Resolve a route path or an already-absolute URL against the current canonical origin. */

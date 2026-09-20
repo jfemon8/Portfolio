@@ -34,9 +34,7 @@ export default function Home() {
 
   const profile = data?.data;
 
-  // Hash-scroll for `/#section` is handled centrally by PublicLayout.
-
-  // HOME_SECTIONS remains the source of truth.
+  // Hash-scroll for `/#section` is handled centrally by PublicLayout, and HOME_SECTIONS remains the source of truth.
   const sectionEl: Record<string, ReactNode> = {
     about: <About />,
     skills: <Skills />,

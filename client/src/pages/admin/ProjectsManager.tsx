@@ -52,7 +52,7 @@ const config: ResourceConfig<ProjectDoc> = {
     },
     {
       name: 'description',
-      label: 'Overview / Fallback (Rich Text) — Shown If No Case Study Below',
+      label: 'Overview / Fallback (Rich Text), Shown If No Case Study Below',
       type: 'textarea',
       editor: 'richtext',
       full: true,

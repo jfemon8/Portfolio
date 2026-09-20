@@ -1,4 +1,4 @@
-// Single source of truth for section keys/labels/order: Home maps keys to components, SettingsManager uses labels for the reorder UI, server stores only overrides; Hero is excluded (fixed, always first).
+// Single source of truth for section keys, labels and order, read by Home, SettingsManager and the server's overrides, with Hero excluded as fixed and always first.
 export interface HomeSectionMeta {
   key: string;
   label: string;

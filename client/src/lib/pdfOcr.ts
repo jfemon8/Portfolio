@@ -60,7 +60,7 @@ const supportsSimd = (): boolean =>
     ])
   );
 
-/** Names the core file explicitly, which skips tesseract.js's own auto-selection. Its relaxed-SIMD build imports DotProductSSE, a symbol none of the v7.0.0 wasm binaries define, so recognition aborts on any browser that reports relaxed SIMD. */
+/** Names the core file explicitly to skip tesseract.js's auto-selection, whose relaxed-SIMD build imports a DotProductSSE symbol no v7.0.0 wasm binary defines. */
 const corePath = (): string =>
   `${CORE_CDN}/tesseract-core${supportsSimd() ? '-simd' : ''}-lstm.wasm.js`;
 

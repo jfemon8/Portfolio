@@ -1,7 +1,7 @@
 import mongoose, { type Model } from 'mongoose';
 import type { ISiteContent } from '../types/index.js';
 
-// Singleton site copy; every string has a component fallback so an empty/missing doc renders identically (zero-risk dynamic copy). Mongoose ESM-safe pattern, don't regress to named imports.
+// Singleton site copy where every string has a component fallback, using the ESM-safe Mongoose import pattern.
 const heroSchema = new mongoose.Schema(
   {
     availableBadge: { type: String, default: '' },

@@ -63,7 +63,7 @@ const metaContent = (html: string, name: string): string => {
   return oneLine(pattern.exec(html)?.[1] ?? reversed.exec(html)?.[1] ?? '');
 };
 
-/** JSON-LD JobPosting is the ideal case — a standard schema rather than a guessed layout. */
+/** JSON-LD JobPosting is the ideal case: a standard schema rather than a guessed layout. */
 const fromJsonLd = (html: string): Partial<SourceJob> | null => {
   const blocks =
     html.match(
@@ -157,7 +157,7 @@ const absolute = (href: string, base: string): string | null => {
   }
 };
 
-/** bdjobstoday.com — server-rendered, robots-permitted, and the main public source of BD government vacancies. */
+/** bdjobstoday.com: server-rendered, robots-permitted, and the main public source of BD government vacancies. */
 const bdjobstoday: CrawlerDefinition = {
   listUrls: (config) => [
     { url: config.url },
@@ -183,7 +183,7 @@ const bdjobstoday: CrawlerDefinition = {
     const title =
       structured?.title ||
       labelled(lines, LABELS.position) ||
-      // og:title carries "Role Job, Employer | site" — only the role is wanted.
+      // og:title carries "Role Job, Employer | site"; only the role is wanted.
       oneLine(
         (metaContent(html, 'og:title').split('|')[0] ?? '')
           .split(/\s+Job,\s+/i)[0]
@@ -295,7 +295,7 @@ const duranta: CrawlerDefinition = {
             pdf || `${config.key}:${company}:${designation}`.slice(0, 300),
           sourceUrl: apply || pdf || config.url,
           applyUrl: apply || pdf || config.url,
-          description: `${company} — ${designation}`,
+          description: `${company}: ${designation}`,
           deadline,
           company,
           location: 'Bangladesh',
@@ -470,7 +470,7 @@ export async function crawlSource(
     if (!direct.length)
       throw new Error(
         blocked > 0
-          ? `Listing blocked — ${blocked} path(s) disallowed by robots.txt`
+          ? `Listing blocked: ${blocked} path(s) disallowed by robots.txt`
           : 'No rows parsed from the listing page'
       );
     return direct.map((job) => ({
@@ -484,7 +484,7 @@ export async function crawlSource(
   if (!discovered.size) {
     throw new Error(
       blocked > 0
-        ? `No crawlable job links — ${blocked} path(s) disallowed by robots.txt`
+        ? `No crawlable job links: ${blocked} path(s) disallowed by robots.txt`
         : 'No job links found on listing pages'
     );
   }
@@ -518,7 +518,7 @@ export async function crawlSource(
     if (index + DETAIL_CONCURRENCY < targets.length) await sleep(pause);
   }
 
-  // Zero parsed pages from a live listing means the layout changed — surface it as a failure.
+  // Zero parsed pages from a live listing means the layout changed; surface it as a failure.
   if (!jobs.length)
     throw new Error(`Parsed 0 of ${targets.length} detail pages`);
   return jobs;

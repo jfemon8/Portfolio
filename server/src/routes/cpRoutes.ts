@@ -9,13 +9,13 @@ import {
 
 const router = Router();
 
-// Public — cached competitive-programming stats (Codeforces).
+// Public: cached competitive-programming stats (Codeforces).
 router.get('/', cacheControl(300), getCpStats);
 
-// Public tool — live per-request comparison, not cacheable (arbitrary visitor-entered handles).
+// Public tool: live per-request comparison, not cacheable (arbitrary visitor-entered handles).
 router.get('/compare', cpToolLimiter, compareCp);
 
-// Public tool — live per-request rating prediction, not cacheable (standings shift during a running contest).
+// Public tool: live per-request rating prediction, not cacheable (standings shift during a running contest).
 router.get('/predict', cpToolLimiter, predictRating);
 
 export default router;

@@ -54,7 +54,7 @@ export default function ImageUpload({
     }
   };
 
-  // Variant geometry. Centered for avatar/compact-when-square.
+  // Variant geometry, centered for avatar and compact when square.
   const variantClass =
     variant === 'avatar'
       ? 'mx-auto h-36 w-36 rounded-full'

@@ -25,7 +25,7 @@ const offset = (dir: Direction, d: number) => {
   }
 };
 
-/** Scroll-triggered reveal. Skips the animation for content already in the viewport at mount (i.e. just-loaded, not scrolled-to) — only genuine scroll-ins animate. */
+/** Scroll-triggered reveal that animates only genuine scroll-ins, skipping content already in the viewport at mount. */
 export default function Reveal({
   children,
   delay = 0,

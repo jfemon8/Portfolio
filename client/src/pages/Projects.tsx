@@ -27,7 +27,7 @@ export default function Projects() {
     index: '~/projects',
     title: "Things I've Built",
     subtitle:
-      'Full-Stack Platforms, Front-Ends And Experiments — From MERN Products To .NET E-Commerce.',
+      'Full-Stack Platforms, Front-Ends And Experiments: From MERN Products To .NET E-Commerce.',
   });
   const st = useSiteCopy('states', {
     projectsFilterEmpty: 'No Projects In This Category Yet.',

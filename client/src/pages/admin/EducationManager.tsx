@@ -41,8 +41,8 @@ const config: ResourceConfig<EducationDoc> = {
     <>
       <p className="font-semibold text-foreground">{i.institution}</p>
       <p className="text-xs text-muted-foreground">
-        {i.degree} {i.field && `— ${i.field}`} · {i.startYear}–{i.endYear} ·{' '}
-        {i.grade}
+        {i.degree}
+        {i.field && `, ${i.field}`} · {i.startYear}–{i.endYear} · {i.grade}
       </p>
     </>
   ),

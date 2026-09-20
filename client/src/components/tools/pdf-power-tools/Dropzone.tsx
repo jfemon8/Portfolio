@@ -31,7 +31,7 @@ export default function Dropzone({
     if (files.length < list.length) {
       const skipped = list.length - files.length;
       toast.error(
-        `Skipped ${skipped} file${skipped === 1 ? '' : 's'} — only PDFs can be used here.`
+        `Skipped ${skipped} file${skipped === 1 ? '' : 's'}. Only PDFs can be used here.`
       );
     }
     if (files.length) onFiles(files);

@@ -259,7 +259,7 @@ import {
 import { VscVscode } from 'react-icons/vsc';
 import { GiTortoise } from 'react-icons/gi';
 
-// Widened (not react-icons' own IconType) so lucide-react icons (Binary, OopIcon) can share this map — both libs accept `className`, which is all callers pass.
+// Widened (not react-icons' own IconType) so lucide-react icons (Binary, OopIcon) can share this map; both libs accept `className`, which is all callers pass.
 type IconComponent = ComponentType<{ className?: string }>;
 
 // Keys are normalised skill names (lowercased, alphanumerics only) with aliases (e.g. "node"/"nodejs") for wider matches; unmatched skills fall back to FaCode via the caller.
@@ -344,7 +344,7 @@ const ICON_MAP: Record<string, IconComponent> = {
   sqlmysql: SiMysql,
   sqlserver: DiMsqlServer,
 
-  // Cloud / DevOps — AWS uses the FA glyph because react-icons v5 dropped the Si brand entry for it.
+  // Cloud / DevOps: AWS uses the FA glyph because react-icons v5 dropped the Si brand entry for it.
   aws: FaAws,
   amazonwebservices: FaAws,
   gcp: SiGooglecloud,
@@ -443,7 +443,7 @@ const ICON_MAP: Record<string, IconComponent> = {
   backbonejs: SiBackbonedotjs,
   preact: SiPreact,
   lit: SiLit,
-  reactnative: SiReact, // no dedicated Simple Icons brand — React Native shares the React atom logo
+  reactnative: SiReact, // no dedicated Simple Icons brand; React Native shares the React atom logo
   reactrouter: SiReactrouter,
 
   // UI kits
@@ -612,7 +612,7 @@ const ICON_MAP: Record<string, IconComponent> = {
   neovim: SiNeovim,
   homebrew: SiHomebrew,
 
-  // CS concepts — no brand exists, so these use a representative lucide glyph instead of a react-icons logo.
+  // CS concepts: no brand exists, so these use a representative lucide glyph instead of a react-icons logo.
   dsa: Binary,
   datastructuresalgorithms: Binary,
   oop: OopIcon,
@@ -626,7 +626,7 @@ const normalise = (input: string): string =>
     .replace(/#/g, 'sharp')
     .replace(/[^a-z0-9]+/g, '');
 
-/** Returns a react-icons component for a skill name, or null if no brand match — callers should render a fallback themselves. */
+/** Returns a react-icons component for a skill name, or null if no brand match; callers should render a fallback themselves. */
 export function getSkillIcon(name: string): IconComponent | null {
   if (!name) return null;
   const key = normalise(name);

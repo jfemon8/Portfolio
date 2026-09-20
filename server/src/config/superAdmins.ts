@@ -1,4 +1,4 @@
-// Hardcoded, immutable super admins — can never be deleted/disabled/demoted via any API/UI; re-asserted as { role: 'superAdmin', status: 'active', isImmutableSuperAdmin: true } on save/seed. Source of truth for the User model guard, userService and seed.
+// Hardcoded, immutable super admins that can never be deleted, disabled or demoted through any API, re-asserted on save and seed.
 export const IMMUTABLE_SUPER_ADMINS: readonly string[] = [
   'jfemon8@gmail.com',
   'emon.cse6.bu@gmail.com',

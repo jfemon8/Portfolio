@@ -157,7 +157,7 @@ export default function SettingsManager() {
       });
       reset();
       // Password changes invalidate all sessions.
-      toast.success('Password updated — please log in again.');
+      toast.success('Password updated. Please log in again.');
       logout();
     } catch (err) {
       toast.error((err as ApiError).message || 'Failed to update password');
@@ -315,7 +315,7 @@ export default function SettingsManager() {
                   <p className="mt-1 text-2xs text-muted-foreground/70">
                     The canonical origin for canonical links, og:url, sitemap
                     and structured data. Changing it here is all a domain move
-                    needs — no redeploy.
+                    needs. No redeploy.
                   </p>
                 </div>
               </div>
@@ -365,7 +365,7 @@ export default function SettingsManager() {
                 </div>
               </div>
               <ImageUpload
-                label="Default social (OG) image — 1200×630"
+                label="Default social (OG) image, 1200×630"
                 value={seo.ogImage}
                 publicId={seo.ogImagePublicId}
                 folder="portfolio/seo"

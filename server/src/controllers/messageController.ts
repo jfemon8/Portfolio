@@ -5,7 +5,7 @@ import { Message } from '../models/Message.js';
 import { Visit } from '../models/Visit.js';
 import { sendContactEmail, sendReplyEmail } from '../config/mailer.js';
 
-/** Public — submit the contact form. Stores in DB + emails owner & sender. */
+/** Public contact-form submission, stored in the DB and emailed to both owner and sender. */
 export const submitMessage = asyncHandler(
   async (req: Request, res: Response) => {
     const { name, email, subject, message } = req.body as {
@@ -39,7 +39,7 @@ export const submitMessage = asyncHandler(
 
     res.status(201).json({
       success: true,
-      message: "Thanks! Your message has been sent — I'll reply soon.",
+      message: "Thanks! Your message has been sent. I'll reply soon.",
       emailDelivered: mail.sent,
       id: doc._id,
     });
@@ -109,7 +109,7 @@ export const replyToMessage = asyncHandler(
       throw new ApiError(
         502,
         result.reason === 'smtp_not_configured'
-          ? 'Email is not configured on the server — reply not sent.'
+          ? 'Email is not configured on the server; reply not sent.'
           : `Reply could not be sent: ${result.reason}`
       );
     }

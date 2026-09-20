@@ -44,10 +44,10 @@ const tooltipStyle = {
   color: 'hsl(var(--foreground))',
 } as const;
 
-// Beyond the worker's own ~12s cooperative budget — only fires for a genuine infinite loop, which the worker can never catch itself since it never regains control.
+// Beyond the worker's own ~12s budget, so it only fires for a genuine infinite loop the worker can never catch itself.
 const WATCHDOG_MS = 20_000;
 
-// One matching, illustrative example per input type (not just per language) — each showcases a different complexity class, so switching "Input your function receives" always has working, relevant code behind it rather than one function that only ever fit a single input shape.
+// One illustrative example per input type, each showcasing a different complexity class so every input selection has working code behind it.
 const EXAMPLES: Record<Language, Record<InputGeneratorId, string>> = {
   javascript: {
     number:
@@ -185,10 +185,10 @@ export default function BigOBenchmark() {
   } | null>(null);
   const [pyodideLoading, setPyodideLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Accumulates live, one point per progress message — the chart and complexity estimate below are reactive to this the whole run, not just once a final result arrives, so the actual empirical curve visibly builds in real time.
+  // Accumulates one point per progress message so the chart and estimate below refine live instead of only at the end.
   const [measurements, setMeasurements] = useState<Measurement[]>([]);
 
-  // Best-effort suggestion only, never auto-applied — a mismatched input type is the most common cause of an immediate run error, so surface it before the user hits Run rather than only after a crash.
+  // Best-effort suggestion only, surfaced before Run because a mismatched input type is the most common cause of an immediate error.
   const suggestedInputGenerator = useMemo(
     () => detectInputGenerator(source, language),
     [source, language]
@@ -199,7 +199,7 @@ export default function BigOBenchmark() {
   )
     ? INPUT_GENERATOR_OPTIONS.find((o) => o.id === suggestedInputGenerator)
     : null;
-  // Whether the editor still holds one of the stock examples (untouched) — used to decide whether switching input type may safely swap in the matching example, versus a custom snippet the user is actively editing.
+  // Whether the editor still holds an untouched stock example, which decides if switching input type may safely swap in a new one.
   const isUnmodifiedExample = Object.values(EXAMPLES[language]).includes(
     source
   );
@@ -235,13 +235,13 @@ export default function BigOBenchmark() {
   };
   const onLanguageChange = (next: Language): void => {
     setLanguage(next);
-    // Guarded like the input-type switch — one stray click on the other language used to wipe pasted code.
+    // Guarded like the input-type switch: one stray click on the other language used to wipe pasted code.
     if (isUnmodifiedExample) setSource(EXAMPLES[next][inputGenerator]);
     resetRunState();
   };
   const onInputGeneratorChange = (next: InputGeneratorId): void => {
     setInputGenerator(next);
-    // Only swap the code when the editor still holds an unmodified example — never overwrite a snippet the user is actively writing.
+    // Only swap the code when the editor still holds an unmodified example; never overwrite a snippet the user is actively writing.
     if (isUnmodifiedExample) setSource(EXAMPLES[language][next]);
   };
 
@@ -284,9 +284,9 @@ export default function BigOBenchmark() {
     clearWatchdog();
     watchdogRef.current = setTimeout(() => {
       worker.terminate();
-      workerRef.current = null; // this worker is gone — next run spins up a fresh one
+      workerRef.current = null; // this worker is gone; next run spins up a fresh one
       setError(
-        'This is taking far longer than expected (possible infinite loop) — stopped.'
+        'This is taking far longer than expected (possible infinite loop). Stopped.'
       );
       setStatus('error');
     }, WATCHDOG_MS);
@@ -301,7 +301,7 @@ export default function BigOBenchmark() {
     worker.postMessage(req);
   };
 
-  // Recomputed on every new point, live — cheap closed-form regression, so re-fitting on each of the ~10-20 progress messages in a run is not a performance concern, and it's what makes the estimate below visibly refine itself in real time.
+  // Recomputed live on every new point, since the closed-form regression is cheap enough to re-fit on each progress message.
   const result: ComplexityResult | null = useMemo(() => {
     if (measurements.length < 4) return null;
     try {
@@ -326,7 +326,7 @@ export default function BigOBenchmark() {
       return { n, fit: result.winner.predict(n) };
     });
   }, [result, measurements]);
-  // Explicit ticks at the actual measured N values, rather than Recharts' auto-generated log-scale ticks — those can round two nearby "nice" values to the same displayed label on a wide range, producing a duplicate-key warning. Thinned to a readable count for runs with many points; always unique since N strictly increases every step.
+  // Explicit ticks at the measured N values, thinned to a readable count, since Recharts' auto log-scale ticks can round two nearby values to the same label.
   const xTicks = useMemo(() => {
     if (measurements.length === 0) return undefined;
     const ns = measurements.map((m) => m.n);

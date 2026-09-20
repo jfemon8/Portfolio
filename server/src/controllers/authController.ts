@@ -31,7 +31,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   res.json({ success: true, token: accessToken, user });
 });
 
-/** POST /auth/refresh — rotates the refresh cookie, returns a new access token. */
+/** POST /auth/refresh: rotates the refresh cookie, returns a new access token. */
 export const refresh = asyncHandler(async (req: Request, res: Response) => {
   const { user, accessToken, refreshToken } = await authService.rotateRefresh(
     readRefreshCookie(req),
@@ -45,7 +45,7 @@ export const refresh = asyncHandler(async (req: Request, res: Response) => {
   res.json({ success: true, token: accessToken, user });
 });
 
-/** POST /auth/logout — revokes the refresh token + clears the cookie. */
+/** POST /auth/logout: revokes the refresh token + clears the cookie. */
 export const logout = asyncHandler(async (req: Request, res: Response) => {
   await authService.logout(readRefreshCookie(req), req);
   res.clearCookie(authConfig.refreshCookieName, clearRefreshCookieOptions());

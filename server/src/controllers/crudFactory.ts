@@ -76,7 +76,7 @@ export const crudFactory = <T>(Model: Model<T>, opts: CrudOptions = {}) => {
     const items = req.body.items as ReorderItem[] | undefined;
     if (!Array.isArray(items)) throw ApiError.badRequest('items[] required');
     if (items.length > 500) throw ApiError.badRequest('Too many items');
-    // Validate the whole payload up front — the old parallel findByIdAndUpdate could commit some writes before rejecting a malformed id/order, leaving the list half-reordered.
+    // Validate the whole payload up front: the old parallel findByIdAndUpdate could commit some writes before rejecting a malformed id/order, leaving the list half-reordered.
     for (const i of items) {
       if (
         !mongoose.isValidObjectId(i.id) ||

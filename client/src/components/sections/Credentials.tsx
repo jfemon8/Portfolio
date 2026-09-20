@@ -123,7 +123,7 @@ export default function Credentials() {
   const [pdfTarget, setPdfTarget] = useState<PdfPreviewTarget | null>(null);
   // Credential URL of the open item, surfaced as a "Verify" action in the modal.
   const [verifyUrl, setVerifyUrl] = useState<string | null>(null);
-  // Element that opened the viewer — focus returns here on close (WCAG 2.4.3).
+  // Element that opened the viewer; focus returns here on close (WCAG 2.4.3).
   const triggerRef = useRef<HTMLElement | null>(null);
 
   const openMedia = (item: ColumnItem, trigger: HTMLElement): void => {

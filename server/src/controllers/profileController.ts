@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { Profile } from '../models/Profile.js';
 
-/** Public — returns the single profile document (creates an empty one if absent). */
+/** Public: returns the single profile document (creates an empty one if absent). */
 export const getProfile = asyncHandler(async (_req: Request, res: Response) => {
   // Atomic get-or-create avoids a find-then-create race that could insert duplicate "singleton" profiles on concurrent first hits.
   const profile = await Profile.findOneAndUpdate(
@@ -13,7 +13,7 @@ export const getProfile = asyncHandler(async (_req: Request, res: Response) => {
   res.json({ success: true, data: profile });
 });
 
-/** Admin — upsert the single profile document. */
+/** Admin: upsert the single profile document. */
 export const updateProfile = asyncHandler(
   async (req: Request, res: Response) => {
     const profile = await Profile.findOneAndUpdate({}, req.body, {

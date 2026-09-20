@@ -12,7 +12,7 @@ export interface IUser {
   password: string;
   role: UserRole;
   status: UserStatus;
-  /** true for the hardcoded super admins — role/status/deletion locked */
+  /** true for the hardcoded super admins: role/status/deletion locked */
   isImmutableSuperAdmin: boolean;
   avatar: string;
   lastLogin?: Date;
@@ -24,7 +24,7 @@ export interface IUser {
 export interface IRefreshToken {
   user: ID;
   tokenHash: string;
-  /** rotation family — a reused token revokes the whole family */
+  /** rotation family; a reused token revokes the whole family */
   family: string;
   expiresAt: Date;
   revokedAt?: Date;
@@ -138,7 +138,7 @@ export interface ISeoSettings {
   ogImage: string;
   ogImagePublicId: string;
   twitterHandle: string;
-  /** Site identity — overrides the config/site fallbacks at runtime. */
+  /** Site identity; overrides the config/site fallbacks at runtime. */
   siteName: string;
   authorName: string;
   siteUrl: string;
@@ -450,7 +450,7 @@ export interface IEducation {
   order: number;
 }
 
-/** Ties a Tool doc to its implementation — the client resolves this to a lazy-loaded component; there is no code for a key that isn't in this list. */
+/** Ties a Tool doc to its implementation: the client resolves this to a lazy-loaded component; there is no code for a key that isn't in this list. */
 export type ToolKey =
   | 'jwt-decoder'
   | 'json-formatter'
@@ -496,7 +496,7 @@ export interface ITool {
 export type JobCategory = 'government' | 'it' | 'bank' | 'ngo' | 'other';
 export type JobSource = 'manual' | 'automated';
 
-/** A Bangladesh job posting. `deadline` is intentionally a local calendar date (Asia/Dhaka). */
+/** A Bangladesh job posting, where `deadline` is intentionally a local Asia/Dhaka calendar date. */
 export interface IJob {
   title: string;
   company: string;
@@ -686,11 +686,11 @@ export interface IVisit {
   ref: string;
   referrer: string;
   device: string;
-  /** UA-derived browser family (privacy-friendly — no fingerprinting). */
+  /** UA-derived browser family (privacy-friendly, no fingerprinting). */
   browser: string;
   /** Vercel-native 2-letter country code; '' when unavailable (local/dev). */
   country: string;
-  /** Opaque cookie-less session id (ephemeral, sessionStorage — not a cookie). */
+  /** Opaque cookie-less session id (ephemeral, sessionStorage, not a cookie). */
   sid: string;
   /** Max scroll-depth percentage for `scroll_depth` events (0–100). */
   depth: number;
@@ -710,7 +710,7 @@ export interface JwtPayload {
   email: string;
   /** distinguishes access vs (future) typed tokens */
   type: 'access';
-  /** issued-at (seconds) — added by jwt.sign, used to reject stale tokens */
+  /** issued-at (seconds); added by jwt.sign, used to reject stale tokens */
   iat?: number;
   exp?: number;
 }

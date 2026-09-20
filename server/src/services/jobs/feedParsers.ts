@@ -304,7 +304,7 @@ export function parseGreenhouse(
       ? (value as { jobs: unknown[] }).jobs
       : [];
 
-  // Newest first, then capped — these boards run to thousands of postings.
+  // Newest first, then capped; these boards run to thousands of postings.
   const ordered = jobs
     .filter((entry): entry is Record<string, unknown> =>
       Boolean(entry && typeof entry === 'object')

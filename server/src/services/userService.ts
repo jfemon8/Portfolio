@@ -5,7 +5,7 @@ import { isImmutableSuperAdminEmail } from '../config/superAdmins.js';
 import { recordAudit } from './auditService.js';
 import { toPublicUser, type PublicUser } from './authService.js';
 
-/** Roles assignable via the API. `superAdmin` is reserved for the hardcoded immutable accounts only — it can never be granted through user management. */
+/** Roles assignable via the API, excluding `superAdmin`, which is reserved for the hardcoded immutable accounts. */
 export type AssignableRole = 'admin' | 'visitor';
 
 export async function listUsers(): Promise<PublicUser[]> {

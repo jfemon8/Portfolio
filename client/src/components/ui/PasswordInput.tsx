@@ -2,7 +2,7 @@ import { forwardRef, useState, type InputHTMLAttributes } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/cn';
 
-// Drop-in for <input> (forwards ref, spreads props) but owns `type` itself — any `type` passed in is ignored.
+// Drop-in for <input> (forwards ref, spreads props) but owns `type` itself; any `type` passed in is ignored.
 const PasswordInput = forwardRef<
   HTMLInputElement,
   InputHTMLAttributes<HTMLInputElement>

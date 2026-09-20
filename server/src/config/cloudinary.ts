@@ -1,7 +1,7 @@
 import { v2 as cloudinary } from 'cloudinary';
 import { env } from './env.js';
 
-// Runs once at module load (not lazily) so every consumer — including proxyFileHandler, which never called the old lazy initializer — gets a configured SDK.
+// Runs once at module load (not lazily) so every consumer (including proxyFileHandler, which never called the old lazy initializer) gets a configured SDK.
 if (env.cloudinary.configured) {
   cloudinary.config({
     cloud_name: env.cloudinary.cloudName,
@@ -11,7 +11,7 @@ if (env.cloudinary.configured) {
   });
 } else {
   console.warn(
-    '⚠️  Cloudinary is not configured — image uploads will be disabled. ' +
+    '⚠️  Cloudinary is not configured; image uploads will be disabled. ' +
       'See docs/02-CLOUDINARY-SETUP.md'
   );
 }
@@ -70,7 +70,7 @@ export async function destroyAsset(
 ): Promise<void> {
   if (!publicId) return;
   if (!env.cloudinary.configured) return;
-  // The SDK defaults resource_type to 'image', which never matches a raw asset — PDFs would never be deleted, so honour an explicit type or infer 'raw' from the .pdf suffix.
+  // The SDK defaults resource_type to 'image', which never matches a raw asset: PDFs would never be deleted, so honour an explicit type or infer 'raw' from the .pdf suffix.
   const type: CloudinaryResourceType =
     resourceType ?? (/\.pdf$/i.test(publicId) ? 'raw' : 'image');
   try {

@@ -39,12 +39,12 @@ module.exports = {
     },
     {
       // ShadCN/UI vendored primitives intentionally co-export `*Variants`
-      // (cva) with the component — standard ShadCN convention.
+      // (cva) with the component; standard ShadCN convention.
       files: ['src/components/ui/**/*.{ts,tsx}'],
       rules: { 'react-refresh/only-export-components': 'off' },
     },
     {
-      // Web Worker scope — no `window`/DOM, has `self`/`postMessage` instead.
+      // Web Worker scope: no `window`/DOM, has `self`/`postMessage` instead.
       files: ['src/workers/**/*.ts'],
       env: { worker: true, browser: false },
     },
@@ -60,7 +60,7 @@ module.exports = {
                 name: '@/components/ui/States',
                 importNames: ['Spinner'],
                 message:
-                  'Use <Async> with a skeleton from components/ui/Skeletons instead — a public surface should never block on a spinner.',
+                  'Use <Async> with a skeleton from components/ui/Skeletons instead; a public surface should never block on a spinner.',
               },
             ],
           },

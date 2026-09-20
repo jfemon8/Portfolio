@@ -16,7 +16,7 @@ const isChunkLoadError = (error: unknown): boolean =>
     error instanceof Error ? error.message : String(error)
   );
 
-// A stale tab after a redeploy gets one silent auto-reload per tab session (flag is never cleared programmatically — clearing it on mount raced the async chunk failure and caused a reload loop); any other render error falls back to this hook-free screen instead of a blank page.
+// A stale tab after a redeploy gets one silent auto-reload per tab session, and any other render error falls back to this hook-free screen instead of a blank page.
 export class ErrorBoundary extends Component<Props, State> {
   state: State = { hasError: false };
 

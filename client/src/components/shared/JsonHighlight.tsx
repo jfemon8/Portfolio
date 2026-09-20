@@ -6,7 +6,7 @@ interface Token {
   type: TokenType;
 }
 
-// Named groups so the same matched "..." text can be told apart as an object key (lookahead for a trailing ':') vs a plain string value — both alternatives match identical text otherwise.
+// Named groups tell an object key (lookahead for a trailing ':') apart from a plain string value, which otherwise match identical text.
 const TOKEN_RE =
   /(?<key>"(?:\\.|[^"\\])*"(?=\s*:))|(?<str>"(?:\\.|[^"\\])*")|(?<num>-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)|(?<bool>true|false)|(?<nul>null)/g;
 
@@ -49,7 +49,7 @@ const COLOR: Record<TokenType, string> = {
 // Past this, per-token spans stop being worth it: a 5 MB document tokenizes into ~1.7M DOM nodes and locks the tab.
 const MAX_HIGHLIGHT_CHARS = 200_000;
 
-// Tokenizes already-valid JSON text into typed spans — no dangerouslySetInnerHTML, so there's nothing to escape/sanitize.
+// Tokenizes already-valid JSON text into typed spans; no dangerouslySetInnerHTML, so there's nothing to escape/sanitize.
 export default function JsonHighlight({
   code,
   className,

@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, type TextareaHTMLAttributes } from 'react';
 import { cn } from '@/lib/cn';
 
-// Grows/shrinks to fit content via scrollHeight instead of a fixed `rows` — pass a min-h-* class for the floor; CSS min-height clamps the computed height even when scrollHeight would be smaller, so no JS-side floor logic is needed.
+// Grows and shrinks to fit content via scrollHeight instead of a fixed `rows`, so a min-h-* class is all the floor it needs.
 export default function AutoTextarea({
   className,
   value,

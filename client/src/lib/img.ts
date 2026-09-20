@@ -1,4 +1,4 @@
-// Cloudinary delivery optimizer — rewrites upload URLs with f_auto,q_auto,c_limit,w_* to cut bytes with no visual change; other URLs pass through untouched.
+// Cloudinary delivery optimizer: rewrites upload URLs with f_auto,q_auto,c_limit,w_* to cut bytes with no visual change; other URLs pass through untouched.
 export function cldUrl(src: string, width = 1600): string {
   if (
     !src ||

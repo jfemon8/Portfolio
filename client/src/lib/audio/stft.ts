@@ -15,7 +15,7 @@ function padCenter(signal: Float32Array, padAmount: number): Float32Array {
   return out;
 }
 
-// Each frame is n_fft/2+1 complex bins, interleaved [re0,im0,re1,im1,...] — kissfft-js's real-FFT packed format.
+// Each frame is n_fft/2+1 complex bins, interleaved [re0,im0,re1,im1,...]: kissfft-js's real-FFT packed format.
 export function stft(
   signal: Float32Array,
   nFft: number,

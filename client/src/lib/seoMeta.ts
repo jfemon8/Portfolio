@@ -62,7 +62,7 @@ export function resolveSeo(
     fullTitle: input.title
       ? input.exactTitle
         ? input.title
-        : `${input.title} — ${author}`
+        : `${input.title} | ${author}`
       : settings?.metaTitle || siteName,
     description:
       input.description || settings?.metaDescription || DEFAULT_DESCRIPTION,

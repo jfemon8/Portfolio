@@ -13,7 +13,7 @@ export default defineConfig({
   server: {
     port: 5173,
     open: true,
-    // Dev-only proxies — production uses `vercel.json` rewrites for the same paths.
+    // Dev-only proxies; production uses `vercel.json` rewrites for the same paths.
     proxy: {
       '/api': {
         target: 'http://localhost:5000',

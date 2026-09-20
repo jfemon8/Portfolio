@@ -20,8 +20,7 @@ import type { Profile, ProjectDoc, BlogPostDoc } from '@/types';
 
 type Json = Record<string, unknown>;
 
-// Shared node ids so the Person/WebSite/ProfilePage graphs (and the static copies in index.html) merge into ONE entity — the mechanism knowledge panels are built from.
-// Functions, not constants: they must track the same origin as the canonical link, which is only known once SeoSettings has loaded.
+// Shared node ids that merge the Person/WebSite/ProfilePage graphs into the ONE entity knowledge panels are built from, exposed as functions so they track the canonical origin once SeoSettings loads.
 export const personId = (): string => `${siteOrigin()}/#person`;
 export const websiteId = (): string => `${siteOrigin()}/#website`;
 
@@ -160,7 +159,7 @@ export const articleSchema = (
   },
   ...(post.tags?.length ? { keywords: post.tags.join(', ') } : {}),
   publisher: personRef(),
-  // This blog mixes Bengali and English posts — the site-wide "en" default is wrong often enough to detect per post.
+  // This blog mixes Bengali and English posts; the site-wide "en" default is wrong often enough to detect per post.
   inLanguage: detectLanguage(`${post.title} ${post.excerpt}`),
   isPartOf: { '@id': websiteId() },
   mainEntityOfPage: absoluteUrl(`/blog/${post.slug}`),

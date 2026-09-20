@@ -11,9 +11,9 @@ export interface ToolSeo {
 
 export const TOOL_SEO: Partial<Record<ToolKey, ToolSeo>> = {
   'jwt-decoder': {
-    title: 'JWT Decoder Online — Decode JSON Web Tokens Free',
+    title: 'JWT Decoder Online: Decode JSON Web Tokens Free',
     description:
-      'Decode a JWT online and read its header, payload and claims instantly. Shows expiry in plain English. Runs in your browser — your token is never uploaded.',
+      'Decode a JWT online and read its header, payload and claims instantly. Shows expiry in plain English. Runs in your browser; your token is never uploaded.',
     keywords: [
       'jwt decoder',
       'decode jwt online',
@@ -28,12 +28,12 @@ export const TOOL_SEO: Partial<Record<ToolKey, ToolSeo>> = {
       'Translates exp, iat and nbf claims into readable dates',
       'Shows at a glance whether the token has expired',
       'Syntax-highlighted JSON output with one-click copy',
-      'Works offline — the token never leaves your browser',
+      'Works offline: the token never leaves your browser',
     ],
   },
 
   'json-formatter': {
-    title: 'JSON Formatter & Validator Online — Free Beautifier',
+    title: 'JSON Formatter & Validator Online: Free Beautifier',
     description:
       'Format, beautify, validate and minify JSON online. Pinpoints syntax errors by line and column. Free, no sign-up, and your data never leaves the browser.',
     keywords: [
@@ -55,7 +55,7 @@ export const TOOL_SEO: Partial<Record<ToolKey, ToolSeo>> = {
   },
 
   'regex-tester': {
-    title: 'Regex Tester Online — Test & Debug Regular Expressions',
+    title: 'Regex Tester Online: Test & Debug Regular Expressions',
     description:
       'Test regular expressions live with highlighted matches and colour-coded capture groups. Catches catastrophic backtracking instead of freezing your tab.',
     keywords: [
@@ -77,7 +77,7 @@ export const TOOL_SEO: Partial<Record<ToolKey, ToolSeo>> = {
   },
 
   'password-crack-time': {
-    title: 'Password Strength Checker — How Long To Crack My Password',
+    title: 'Password Strength Checker: How Long To Crack My Password',
     description:
       'Find out how long your password would take to crack, benchmarked on your own device. Checks against common-password lists. Nothing is transmitted or stored.',
     keywords: [
@@ -93,14 +93,14 @@ export const TOOL_SEO: Partial<Record<ToolKey, ToolSeo>> = {
       'Benchmarks your actual device to ground the numbers in real hashing speed',
       'Flags dictionary words, names, dates, keyboard walks and leetspeak',
       'Explains what is weak about the password rather than only scoring it',
-      'The password is never sent anywhere — not even hashed',
+      'The password is never sent anywhere, not even hashed',
     ],
   },
 
   'pdf-power-tools': {
-    title: 'Free PDF Tools Online — Merge, Split, Compress, Sign & Edit',
+    title: 'Free PDF Tools Online: Merge, Split, Compress, Sign & Edit',
     description:
-      'Merge, split, compress, edit and sign PDF files free in your browser. No upload, no watermark, no sign-up — your documents never leave your device.',
+      'Merge, split, compress, edit and sign PDF files free in your browser. No upload, no watermark, no sign-up; your documents never leave your device.',
     keywords: [
       'pdf tools online free',
       'merge pdf',
@@ -123,9 +123,9 @@ export const TOOL_SEO: Partial<Record<ToolKey, ToolSeo>> = {
   },
 
   'image-to-text': {
-    title: 'Image to Text Converter — Free OCR for English & Bangla',
+    title: 'Image to Text Converter: Free OCR for English & Bangla',
     description:
-      'Extract text from images free with OCR that reads both English and Bengali. Download as .txt or an editable .docx. Runs in your browser — images never uploaded.',
+      'Extract text from images free with OCR that reads both English and Bengali. Download as .txt or an editable .docx. Runs in your browser; images never uploaded.',
     keywords: [
       'image to text',
       'ocr online free',
@@ -146,7 +146,7 @@ export const TOOL_SEO: Partial<Record<ToolKey, ToolSeo>> = {
   },
 
   'email-verifier': {
-    title: 'Email Extractor & Verifier — Find and Validate Emails Free',
+    title: 'Email Extractor & Verifier: Find and Validate Emails Free',
     description:
       'Pull every email address out of any text and check which are deliverable. Syntax, domain, MX and disposable-address checks, then export to CSV. Free.',
     keywords: [
@@ -168,7 +168,7 @@ export const TOOL_SEO: Partial<Record<ToolKey, ToolSeo>> = {
   },
 
   'music-remover': {
-    title: 'Vocal Remover & Music Separator — Free Karaoke Maker',
+    title: 'Vocal Remover & Music Separator: Free Karaoke Maker',
     description:
       'Split any song into vocals and instrumental free in your browser. Make karaoke tracks or acapellas with no upload, no sign-up and no processing queue.',
     keywords: [
@@ -182,7 +182,7 @@ export const TOOL_SEO: Partial<Record<ToolKey, ToolSeo>> = {
     ],
     features: [
       'Separates a track into a vocal stem and an instrumental stem',
-      'Runs entirely on your device — no upload and no queue',
+      'Runs entirely on your device: no upload and no queue',
       'Preview both stems before downloading',
       'Downloads as standard WAV files',
       'No account, no watermark and no track limit',
@@ -190,7 +190,7 @@ export const TOOL_SEO: Partial<Record<ToolKey, ToolSeo>> = {
   },
 
   'resume-ats-xray': {
-    title: 'Free ATS Resume Checker — Scan Your CV For Applicant Tracking',
+    title: 'Free ATS Resume Checker: Scan Your CV For Applicant Tracking',
     description:
       'See your resume the way an applicant tracking system does. Checks parsing, keyword match against the job description, formatting traps and contact details.',
     keywords: [
@@ -211,7 +211,7 @@ export const TOOL_SEO: Partial<Record<ToolKey, ToolSeo>> = {
   },
 
   'bigo-benchmark': {
-    title: 'Big-O Complexity Analyser — Benchmark Your Code Online',
+    title: 'Big-O Complexity Analyser: Benchmark Your Code Online',
     description:
       'Measure how your JavaScript or Python function actually scales. Runs it across growing inputs, fits the curve and names the complexity, with a live chart.',
     keywords: [
@@ -232,7 +232,7 @@ export const TOOL_SEO: Partial<Record<ToolKey, ToolSeo>> = {
   },
 
   'cf-rating-predictor': {
-    title: 'Codeforces Rating Predictor — Estimate Your Rating Change',
+    title: 'Codeforces Rating Predictor: Estimate Your Rating Change',
     description:
       'Predict your Codeforces rating change from a contest rank. Uses the Elo-based system Codeforces itself applies, so you know before the ratings roll out.',
     keywords: [
@@ -251,7 +251,7 @@ export const TOOL_SEO: Partial<Record<ToolKey, ToolSeo>> = {
   },
 
   'cp-profile-comparer': {
-    title: 'Competitive Programming Profile Comparer — Codeforces & More',
+    title: 'Competitive Programming Profile Comparer: Codeforces & More',
     description:
       'Compare two competitive programming profiles side by side: ratings, solved counts, problem difficulty spread, contest history and activity over time.',
     keywords: [
@@ -275,7 +275,7 @@ export const fallbackToolSeo = (tool: {
   name: string;
   description: string;
 }): ToolSeo => ({
-  title: `${tool.name} — Free Online Tool`,
+  title: `${tool.name} | Free Online Tool`,
   description: tool.description,
   keywords: [
     tool.name.toLowerCase(),

@@ -42,7 +42,7 @@ export default function Skills() {
   const copy = useSectionCopy('skills', {
     index: '02.',
     title: 'Skills & tech',
-    subtitle: 'The stack I build with — explore by category.',
+    subtitle: 'The stack I build with. Explore by category.',
   });
 
   return (
@@ -152,7 +152,7 @@ export default function Skills() {
                       </div>
                     </div>
                     <div className="relative mt-3 h-1.5 overflow-hidden rounded-full bg-border/40">
-                      {/* scaleX, not width — width triggers layout on every tick. */}
+                      {/* scaleX, not width; width triggers layout on every tick. */}
                       <motion.span
                         initial={
                           reduce ? { scaleX: s.level / 100 } : { scaleX: 0 }

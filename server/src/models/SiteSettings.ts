@@ -1,7 +1,7 @@
 import mongoose, { type Model } from 'mongoose';
 import type { ISiteSettings } from '../types/index.js';
 
-// Singleton homepage layout; canonical section catalogue lives on the client, this only stores order/visibility overrides + hero image. Mongoose ESM-safe pattern, don't regress to named imports.
+// Singleton homepage layout storing only order, visibility and hero-image overrides, using the ESM-safe Mongoose import pattern.
 const siteSettingsSchema = new mongoose.Schema<ISiteSettings>(
   {
     heroBackground: { type: String, default: '' },

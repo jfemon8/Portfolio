@@ -8,7 +8,7 @@ function post(message: EmailExtractWorkerMessage): void {
   (self as unknown as Worker).postMessage(message);
 }
 
-// Extraction can involve megabytes of pasted CSV/HTML. Keep regex scanning out of React's event loop so typing, scrolling and cancelling always stay smooth.
+// Keeps regex scanning over megabytes of pasted CSV/HTML out of React's event loop so typing and scrolling stay smooth.
 self.onmessage = (event: MessageEvent<EmailExtractRequest>) => {
   const request = event.data;
   if (request.type !== 'extract') return;

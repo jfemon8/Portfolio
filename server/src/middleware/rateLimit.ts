@@ -33,7 +33,7 @@ export const blogEngagementLimiter = rateLimit({
   },
 });
 
-/** Looser than strictLimiter — analytics beacons are bursty but bounded. */
+/** Looser than strictLimiter; analytics beacons are bursty but bounded. */
 export const trackingLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
   max: 120,

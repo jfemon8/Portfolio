@@ -48,7 +48,7 @@ export default function FloatingDock() {
     items: [] as { key: string; label: string }[],
   });
 
-  // rAF-throttled scroll listener — IntersectionObserver missed late-mounting sections.
+  // rAF-throttled scroll listener; IntersectionObserver missed late-mounting sections.
   useEffect(() => {
     if (pathname !== '/') {
       // Drop stale activeSection so the next visit to Home starts fresh.

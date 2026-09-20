@@ -306,7 +306,7 @@ export async function syncConfiguredJobFeeds(
   const perFeed = outcomes.map(([outcome]) => outcome);
   const collected = outcomes.flatMap(([, jobs]) => jobs);
 
-  // Dedupe across all sources at once — the only place one vacancy from two boards is recognisable as one.
+  // Dedupe across all sources at once; the only place one vacancy from two boards is recognisable as one.
   const merged = mergeDuplicates(collected);
   const { eligible, skipped } = selectEligible(merged, options) as {
     eligible: MergedJob[];

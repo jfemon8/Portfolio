@@ -3,8 +3,8 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { SeoSettings } from '../models/SeoSettings.js';
 import { canonicalOrigin } from '../utils/canonicalOrigin.js';
 
-// Dynamic robots.txt, generated per-request (Vercel has no cron) — name comes from the SeoSettings singleton, exposed at the canonical origin via vercel.json rewrites.
-const FALLBACK_NAME = 'Md Jannatul Ferdhous Emon — Developer Portfolio';
+// Dynamic robots.txt, generated per-request (Vercel has no cron); name comes from the SeoSettings singleton, exposed at the canonical origin via vercel.json rewrites.
+const FALLBACK_NAME = 'Md Jannatul Ferdhous Emon | Developer Portfolio';
 
 export const getRobots = asyncHandler(async (_req: Request, res: Response) => {
   const seo = await SeoSettings.findOne()

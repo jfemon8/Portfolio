@@ -36,7 +36,7 @@ export default function ToolDetail() {
     backToTools: 'Back To Tools',
   });
 
-  // The tool component is keyed by `tool.key`, which the slug does not encode — but the frame and back link need not wait for the record.
+  // The tool component is keyed by `tool.key`, which the slug does not encode, but the frame and back link need not wait for the record.
   if (isLoading)
     return (
       <Section id="tool-detail-page" className="mt-4 pt-4">

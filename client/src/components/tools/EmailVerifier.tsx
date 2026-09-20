@@ -32,7 +32,7 @@ import type {
 } from '@/workers/emailExtract.types';
 
 const EXTRACT_DEBOUNCE_MS = 200;
-// Past this, rendering the raw text costs seconds of browser layout for no benefit — a summary is shown instead.
+// Past this, rendering the raw text costs seconds of browser layout for no benefit; a summary is shown instead.
 const LARGE_INPUT_CHARS = 300_000;
 const EMPTY_EXTRACTION: ExtractionResult = {
   emails: [],
@@ -41,7 +41,7 @@ const EMPTY_EXTRACTION: ExtractionResult = {
   uniqueDomains: 0,
 };
 
-// Safety ceiling only — the real cost is unique domains, so this sits far above any realistic list.
+// Safety ceiling only: the real cost is unique domains, so this sits far above any realistic list.
 const MAX_EMAILS = 250000;
 const DOMAIN_CACHE_MAX = 3000;
 const DOMAIN_CACHE_MS = 10 * 60 * 1000;
@@ -123,7 +123,7 @@ function toCsv(rows: VerifiedEmail[]): string {
     'free_provider',
     'suggested_domain',
   ];
-  // Excel treats cells beginning with these characters as formulas, even when quoted. Keep exports safe when an untrusted list is opened in a spreadsheet.
+  // Excel treats cells beginning with these characters as formulas even when quoted, so exports stay safe when an untrusted list is opened in a spreadsheet.
   const esc = (v: string | number) => {
     const value = String(v);
     const safeValue = /^[=+\-@]/.test(value) ? `'${value}` : value;
@@ -262,7 +262,7 @@ export default function EmailVerifier() {
   }, [results, filter, query]);
 
   const replaceText = useCallback((next: string): void => {
-    // Input and results always belong to the same batch. Invalidate any work immediately so an old worker can never overwrite a newly pasted list.
+    // Invalidates in-flight work immediately so an old worker can never overwrite a newly pasted list.
     scanIdRef.current++;
     scanWorkerRef.current?.terminate();
     scanWorkerRef.current = null;
@@ -688,7 +688,7 @@ export default function EmailVerifier() {
             </table>
             {visible.length > 500 && (
               <p className="border-t border-border/40 px-3 py-2 text-2xs text-muted-foreground/70">
-                Showing the first 500 of {visible.length.toLocaleString()} —
+                Showing the first 500 of {visible.length.toLocaleString()};
                 export the CSV for the full list.
               </p>
             )}

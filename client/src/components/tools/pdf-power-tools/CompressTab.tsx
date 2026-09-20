@@ -117,7 +117,7 @@ export default function CompressTab() {
             <ModeCard
               active={mode === 'safe'}
               title="Safe"
-              description="Lossless structural cleanup. Never touches page content — savings depend on how the PDF was originally built."
+              description="Lossless structural cleanup. Never touches page content; savings depend on how the PDF was originally built."
               onClick={() => setMode('safe')}
             />
             <ModeCard
@@ -155,7 +155,7 @@ export default function CompressTab() {
               </div>
               <div>
                 <label className="label" htmlFor="jpeg-quality">
-                  JPEG quality — {Math.round(quality * 100)}%
+                  JPEG quality: {Math.round(quality * 100)}%
                 </label>
                 <input
                   id="jpeg-quality"

@@ -27,7 +27,7 @@ export const listProjects = asyncHandler(
   }
 );
 
-/** Public detail by slug — increments a view counter. */
+/** Public detail by slug; increments a view counter. */
 export const getProjectBySlug = asyncHandler(
   async (req: Request, res: Response) => {
     const project = await Project.findOneAndUpdate(

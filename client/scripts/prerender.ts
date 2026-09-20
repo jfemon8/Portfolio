@@ -1,7 +1,4 @@
-// Post-build step: writes one static HTML file per public route with that route's real title, meta and JSON-LD.
-// The SPA still hydrates normally — this only fixes the *initial* HTML, which is all a non-JS crawler (Bing,
-// Facebook, LinkedIn, Slack) ever sees, and what lets Google index a deep page without waiting to render it.
-// Fails open: any error leaves the plain SPA build in place rather than breaking the deploy.
+// Post-build step that writes one static HTML file per public route with its real title, meta and JSON-LD, failing open so any error leaves the plain SPA build in place.
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -59,7 +56,7 @@ const XML_ENTITIES: Record<string, string> = {
 const attr = (v: string): string =>
   v.replace(/[&<>"]/g, (c) => XML_ENTITIES[c] ?? c);
 
-/** Never rejects — a missing endpoint just means that route group is skipped. */
+/** Never rejects: a missing endpoint just means that route group is skipped. */
 async function get<T>(path: string): Promise<T | null> {
   try {
     const res = await fetch(`${API}${path}`, {
@@ -139,9 +136,7 @@ async function emit(
     '</head>',
     `${headFor(route, settings)}\n  </head>`
   );
-  // React's createRoot() replaces #root's children on mount rather than hydrating them, so a
-  // JS-executing visitor briefly sees this static markup, then the live app — the same trade-off
-  // every "static shell" SPA-SEO patch makes. A crawler that never runs JS just keeps this.
+  // React's createRoot() replaces #root's children rather than hydrating them, so a JS-executing visitor briefly sees this static markup while a crawler keeps it.
   if (route.bodyHtml) {
     html = html.replace(
       '<div id="root"></div>',
@@ -153,7 +148,7 @@ async function emit(
   await writeFile(join(dir, 'index.html'), html, 'utf8');
 }
 
-/** A minimal but complete server-rendered article — headline, meta, tags and the real sanitized body — for crawlers that don't execute JS. */
+/** A minimal but complete server-rendered article (headline, meta, tags and the real sanitized body) for crawlers that don't execute JS. */
 function blogBodyHtml(post: BlogPostDoc, jsdomDocument: Document): string {
   const origin = siteOrigin();
   const dateIso = post.publishedAt || post.createdAt;
@@ -180,7 +175,7 @@ function blogBodyHtml(post: BlogPostDoc, jsdomDocument: Document): string {
 
 async function main(): Promise<void> {
   if (!API) {
-    console.warn('[prerender] VITE_API_URL is unset — skipping.');
+    console.warn('[prerender] VITE_API_URL is unset, skipping.');
     return;
   }
 

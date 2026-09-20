@@ -24,7 +24,7 @@ interface MongooseLikeError extends Error {
   errors?: Record<string, { path?: string; message: string }>;
 }
 
-/** Central error handler — last middleware in the chain. */
+/** Central error handler, last middleware in the chain. */
 export const errorHandler: ErrorRequestHandler = (
   err: MongooseLikeError,
   _req: Request,

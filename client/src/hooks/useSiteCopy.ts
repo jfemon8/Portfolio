@@ -15,7 +15,7 @@ const isEmpty = (v: unknown): boolean =>
   (typeof v === 'string' && v.trim() === '') ||
   (Array.isArray(v) && v.length === 0);
 
-// Resolves an admin-managed SiteContent group over hardcoded defaults — empty/missing fields fall back to the default, so clearing a field restores the original; same contract as useSectionCopy.
+// Resolves an admin-managed SiteContent group over hardcoded defaults, so clearing a field restores the original, same contract as useSectionCopy.
 export function useSiteCopy<T extends Record<string, unknown>>(
   group: CopyGroup,
   defaults: T

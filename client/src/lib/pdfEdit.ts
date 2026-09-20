@@ -116,7 +116,7 @@ export interface TextElement {
   yPct: number;
   text: string;
   fontKey: EditFontKey;
-  /** Points — the PDF's own unit, so the size survives export unchanged. */
+  /** Points: the PDF's own unit, so the size survives export unchanged. */
   fontSize: number;
   color: string;
   opacity: number;
@@ -225,7 +225,7 @@ export function collectEditText(options: PdfEditOptions): string {
   ].join('');
 }
 
-/** Applies placed elements first, then the repeating bands, then metadata — one pass, one save. */
+/** Applies placed elements first, then the repeating bands, then metadata: one pass, one save. */
 export async function applyPdfEdits(
   file: File,
   options: PdfEditOptions

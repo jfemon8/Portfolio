@@ -75,7 +75,7 @@ const iconMap: Record<string, IconComponent> = {
   code: Code2,
 };
 
-// "x" is deliberately excluded from `iconMap` — as a bare one-letter key it would false-positive as a substring of almost any URL/label. It's only reachable through the explicit x.com check below.
+// "x" is excluded from `iconMap` because a bare one-letter key would match almost any URL, so it is only reachable through the explicit x.com check below.
 const UNSCANNED_ICONS: Record<string, IconComponent> = { x: SiX };
 const ALL_ICONS: Record<string, IconComponent> = {
   ...iconMap,

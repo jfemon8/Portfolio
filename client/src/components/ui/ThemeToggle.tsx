@@ -4,7 +4,7 @@ import { Sun, Moon } from 'lucide-react';
 import { useThemeStore } from '@/stores/theme';
 import { cn } from '@/lib/cn';
 
-// Single canonical theme toggle (project rule #3) — driven by the Zustand theme engine; don't duplicate this UI elsewhere.
+// Single canonical theme toggle (project rule #3), driven by the Zustand theme engine; don't duplicate this UI elsewhere.
 export default function ThemeToggle({ className }: { className?: string }) {
   const resolved = useThemeStore((s) => s.resolved);
   const toggle = useThemeStore((s) => s.toggle);

@@ -31,7 +31,7 @@ export function useBodyScrollLock(locked: boolean): void {
       body.style.left = original.left;
       body.style.right = original.right;
       body.style.width = original.width;
-      // Only restore scroll position if still on the same page — otherwise a stale scrollY would apply the OLD page's offset to the NEW page.
+      // Only restore scroll position if still on the same page; otherwise a stale scrollY would apply the OLD page's offset to the NEW page.
       if (window.location.pathname === lockedOnPath) {
         window.scrollTo(0, scrollY);
       }

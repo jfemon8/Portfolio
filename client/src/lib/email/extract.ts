@@ -46,7 +46,7 @@ export function splitAddress(
   return { local: address.slice(0, at), domain: address.slice(at + 1) };
 }
 
-// Pulls addresses out of anything pasted — prose, CSV, JSON, HTML, mailto: links, semicolon lists.
+// Pulls addresses out of anything pasted: prose, CSV, JSON, HTML, mailto: links, semicolon lists.
 export function extractEmails(text: string): ExtractionResult {
   const seen = new Map<string, ExtractedEmail>();
   const domains = new Set<string>();

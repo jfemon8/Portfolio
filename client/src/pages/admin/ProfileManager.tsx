@@ -67,7 +67,7 @@ export default function ProfileManager() {
   const set = <K extends keyof ProfileForm>(k: K, v: ProfileForm[K]): void =>
     setF((p) => (p ? { ...p, [k]: v } : p));
 
-  /** Stats / languages — flat `{ label, value }` / `{ name, level }` rows. */
+  /** Stats / languages: flat `{ label, value }` / `{ name, level }` rows. */
   const setArr = (
     key: FlatArrayKey,
     idx: number,
@@ -96,7 +96,7 @@ export default function ProfileManager() {
     }));
   };
 
-  /** Socials get their own setters — they carry image-upload fields too, so the generic `Record<string,string>` setArr doesn't fit cleanly. */
+  /** Socials get their own setters: they carry image-upload fields too, so the generic `Record<string,string>` setArr doesn't fit cleanly. */
   const setSocial = <K extends keyof Social>(
     idx: number,
     field: K,
@@ -221,7 +221,7 @@ export default function ProfileManager() {
             />
           </div>
 
-          {/* Stats (Hero Terminal) — inline within Basics, immediately under
+          {/* Stats (Hero Terminal), inline within Basics, immediately under
               Hero roles. Custom layout (not the shared ArrayEditor) so it
               renders as a flat sub-section instead of a nested GlassCard. */}
           <div className="border-t border-border/60 pt-4">
@@ -275,7 +275,7 @@ export default function ProfileManager() {
             </div>
           </div>
 
-          {/* Languages — inline within Basics, immediately under Stats. */}
+          {/* Languages: inline within Basics, immediately under Stats. */}
           <div className="border-t border-border/60 pt-4">
             <div className="mb-2 flex items-center justify-between">
               <label className="label mb-0">Languages</label>
@@ -470,7 +470,7 @@ export default function ProfileManager() {
         </div>
       </div>
 
-      {/* Resume preview — react-pdf-backed viewer in an animated overlay.
+      {/* Resume preview: react-pdf-backed viewer in an animated overlay.
           Lazy-loaded, so the ~600 KB pdfjs worker only ships when an admin
           actually clicks "View Resume". Replaces the prior native iframe
           which lacked zoom, pagination, fullscreen, and pinch-to-zoom. */}
@@ -483,7 +483,7 @@ export default function ProfileManager() {
         onClose={() => setResumeViewerOpen(false)}
       />
 
-      {/* Sticky-bottom Save bar — replaces the previous PageHeader-action
+      {/* Sticky-bottom Save bar: replaces the previous PageHeader-action
           button so the save affordance is always within thumb-reach as the
           admin scrolls through the long Profile form. */}
       <div className="sticky bottom-4 z-10 mt-4 flex justify-end">

@@ -184,7 +184,7 @@ export default function ResourceManager<T extends WithId>({
       if (field.type !== 'list' && field.type !== 'tags') continue;
       const current = getByPath(payload, field.name);
       if (!Array.isArray(current)) continue;
-      // setByPath is immutable — assign its return value or the cleanup is a no-op.
+      // setByPath is immutable; assign its return value or the cleanup is a no-op.
       payload = setByPath(
         payload,
         field.name,

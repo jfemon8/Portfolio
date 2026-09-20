@@ -139,7 +139,7 @@ export const calendarDay = (
   return `${year}-${pad(month)}-${pad(day)}`;
 };
 
-/** Parses the date formats Bangladeshi job feeds actually use — including `D/M/YYYY`. */
+/** Parses the date formats Bangladeshi job feeds actually use, including `D/M/YYYY`. */
 export const parseLooseDate = (input: string): string | undefined => {
   const value = input.trim();
 
@@ -189,7 +189,7 @@ export const asTimestampDate = (value: unknown): Date | undefined => {
   return Number.isNaN(date.getTime()) ? undefined : date;
 };
 
-/** A wildly future timestamp is bad feed data — drop it rather than pin the item to the top forever. */
+/** A wildly future timestamp is bad feed data; drop it rather than pin the item to the top forever. */
 export const sanePublishedAt = (date?: Date): Date | undefined =>
   date && date.getTime() <= Date.now() + DAY_MS ? date : undefined;
 

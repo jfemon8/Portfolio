@@ -1,4 +1,4 @@
-// Per-pathname scroll memory for back/forward navigation. In-memory only (not sessionStorage) — resets on hard reload, which matches native browser back/forward feel without stepping on the top-on-forward-nav behavior.
+// Per-pathname scroll memory for back/forward navigation, held in memory only so a hard reload resets it like a native browser would.
 const positions = new Map<string, number>();
 
 export function saveScroll(key: string, y: number): void {

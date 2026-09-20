@@ -187,7 +187,7 @@ export default function AdminLayout() {
           )}
         >
           <div className="flex h-full flex-col">
-            {/* Only this region scrolls when the nav list outgrows the viewport — the profile card below stays put. */}
+            {/* Only this region scrolls when the nav list outgrows the viewport; the profile card below stays put. */}
             <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
               {visibleNav.map((n) => (
                 <NavLink

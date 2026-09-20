@@ -52,7 +52,7 @@ export default function ToolsManager() {
           label: 'Implementation',
           type: 'select',
           options: KEY_OPTIONS,
-          help: 'Which built-in tool this entry renders — the actual logic lives in code.',
+          help: 'Which built-in tool this entry renders; the actual logic lives in code.',
         },
         {
           name: 'category',
@@ -63,7 +63,7 @@ export default function ToolsManager() {
             : [{ value: 'developer-utilities', label: 'Developer Utilities' }],
           help: categories.length
             ? undefined
-            : 'No categories yet — add one from the Categories tab.',
+            : 'No categories yet. Add one from the Categories tab.',
         },
         {
           name: 'icon',

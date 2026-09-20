@@ -1,13 +1,4 @@
-/**
- * Database seeder — populates the portfolio with data extracted from
- * Md Jannatul Ferdhous Emon's CV, and creates the initial admin account.
- *
- *   npm run seed          upsert content + ensure admin
- *   npm run seed:fresh    wipe content collections, then seed
- *   npm run create:admin  admin account only
- *
- * Messages & analytics are NEVER wiped.
- */
+/** Database seeder that upserts portfolio content from the CV and ensures the admin account, where --fresh wipes content collections first and --admin-only skips content, never touching messages or analytics. */
 import type { Model } from 'mongoose';
 import slugify from 'slugify';
 import { connectDB } from '../src/config/db.js';
@@ -414,7 +405,7 @@ const publications: Partial<IPublication>[] = [
   },
 ];
 
-// upsertMany() goes through findOneAndUpdate, which — unlike Model.create() — never fires the Tool schema's slug-derive pre('validate') hook, so slugs are computed here instead of left blank (blank would collide on the unique index after the 2nd upsert).
+// upsertMany() goes through findOneAndUpdate, which (unlike Model.create()) never fires the Tool schema's slug-derive pre('validate') hook, so slugs are computed here instead of left blank (blank would collide on the unique index after the 2nd upsert).
 const toolsRaw: Omit<ITool, 'slug'>[] = [
   {
     name: 'JWT Decoder',
@@ -445,7 +436,7 @@ const toolsRaw: Omit<ITool, 'slug'>[] = [
   {
     name: 'CP Profile Comparer',
     description:
-      'Compare two Codeforces handles side by side — rating, max rating, rank, and contest count.',
+      'Compare two Codeforces handles side by side: rating, max rating, rank, and contest count.',
     category: 'competitive-programming',
     icon: 'GitCompare',
     key: 'cp-profile-comparer',
@@ -463,7 +454,7 @@ const toolsRaw: Omit<ITool, 'slug'>[] = [
   {
     name: 'Big-O Benchmark',
     description:
-      'Paste a JavaScript or Python function and get its actual Big-O — measured by real execution, not AI guesswork.',
+      'Paste a JavaScript or Python function and get its actual Big-O, measured by real execution, not AI guesswork.',
     category: 'competitive-programming',
     icon: 'Gauge',
     key: 'bigo-benchmark',
@@ -507,7 +498,7 @@ const toolsRaw: Omit<ITool, 'slug'>[] = [
   {
     name: 'Email Extractor & Verifier',
     description:
-      'Pull every email out of any text, then check each one against its real mail configuration — no signup, no limit.',
+      'Pull every email out of any text, then check each one against its real mail configuration. No signup, no limit.',
     category: 'everyday-tools',
     icon: 'MailCheck',
     key: 'email-verifier',
@@ -522,9 +513,9 @@ const tools: ITool[] = toolsRaw.map((t) => ({
 
 const sampleBlog: Partial<IBlogPost> = {
   title: 'Welcome to My Developer Journey',
-  // No excerpt field — BlogPost's pre-save hook derives it from content.
+  // No excerpt field; BlogPost's pre-save hook derives it from content.
   content:
-    "# Welcome 👋\n\nI'm **Md Jannatul Ferdhous Emon**, an Assistant Front-End Developer who loves turning ideas into fast, accessible, and delightful web apps.\n\nThis blog is where I'll share:\n\n- Notes from building **MERN** + **.NET** applications\n- **Competitive programming** writeups (1000+ problems and counting!)\n- Lessons learned shipping real products\n\nThanks for stopping by — more soon!",
+    "# Welcome 👋\n\nI'm **Md Jannatul Ferdhous Emon**, an Assistant Front-End Developer who loves turning ideas into fast, accessible, and delightful web apps.\n\nThis blog is where I'll share:\n\n- Notes from building **MERN** + **.NET** applications\n- **Competitive programming** writeups (1000+ problems and counting!)\n- Lessons learned shipping real products\n\nThanks for stopping by. More soon!",
   tags: ['intro', 'mern', 'career'],
   category: 'General',
   status: 'published',
@@ -532,12 +523,7 @@ const sampleBlog: Partial<IBlogPost> = {
 
 /* ------------------------------------------------------------- RUNNER */
 
-/**
- * Idempotently ensure BOTH hardcoded immutable super admins exist and are
- * locked to { role: 'superAdmin', status: 'active', isImmutableSuperAdmin }.
- * Existing accounts (e.g. the live `jfemon8@gmail.com`) are upgraded in place
- * WITHOUT touching their password.
- */
+/** Idempotently ensures both hardcoded immutable super admins exist and are locked to superAdmin/active, upgrading existing accounts in place without touching their password. */
 async function ensureSuperAdmins(): Promise<void> {
   for (const email of IMMUTABLE_SUPER_ADMINS) {
     const lock = {
@@ -553,7 +539,7 @@ async function ensureSuperAdmins(): Promise<void> {
       const name = email === env.admin.email ? env.admin.name : 'Super Admin';
       await User.create({ name, email, password: env.admin.password, ...lock });
       console.log(
-        `👑 Super admin created: ${email} (bootstrap password = ADMIN_PASSWORD — change it after first login)`
+        `👑 Super admin created: ${email} (bootstrap password = ADMIN_PASSWORD; change it after first login)`
       );
     }
   }
@@ -590,7 +576,7 @@ async function seedContent(): Promise<void> {
 
   if (await Profile.findOne({})) {
     console.log(
-      '⏭️  Profile already exists — skipping (use --fresh to reset to defaults)'
+      '⏭️  Profile already exists, skipping (use --fresh to reset to defaults)'
     );
   } else {
     await Profile.create(profile);

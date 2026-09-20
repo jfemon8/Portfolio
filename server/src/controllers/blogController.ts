@@ -102,7 +102,7 @@ const summarizeCommentReactions = async (
   return map;
 };
 
-/** A post is public if published, or scheduled with its time due — the model only auto-promotes on save, and this query covers the rest since Vercel serverless has no cron. */
+/** A post is public if published, or scheduled with its time due; the model only auto-promotes on save, and this query covers the rest since Vercel serverless has no cron. */
 export const publicVisibility = (): RootFilterQuery<IBlogPost> => ({
   $or: [
     { status: 'published' },
@@ -110,11 +110,11 @@ export const publicVisibility = (): RootFilterQuery<IBlogPost> => ({
   ],
 });
 
-/** Escape regex metacharacters so a search term is matched literally — prevents invalid-regex 500s (e.g. "C++") and closes the regex-injection / ReDoS surface on this public endpoint. */
+/** Escapes regex metacharacters so a search term matches literally, preventing invalid-regex 500s and closing the ReDoS surface on this public endpoint. */
 const escapeRegex = (s: string): string =>
   s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-/** Public — visible posts only, paginated, with ?tag & ?q search. */
+/** Public: visible posts only, paginated, with ?tag & ?q search. */
 export const listPublished = asyncHandler(
   async (req: Request, res: Response) => {
     // Self-heal: promote due scheduled posts here since Vercel serverless has no cron and the model otherwise only promotes on .save().
@@ -316,7 +316,7 @@ export const getPostComments = asyncHandler(
   }
 );
 
-/** Public — submit a reaction for a blog post. */
+/** Public: submit a reaction for a blog post. */
 export const reactToPost = asyncHandler(async (req: Request, res: Response) => {
   const { reaction, visitorKey } = req.body as {
     reaction: (typeof BLOG_REACTIONS)[number];
@@ -344,7 +344,7 @@ export const reactToPost = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-/** Public — react to a specific blog comment. */
+/** Public: react to a specific blog comment. */
 export const reactToComment = asyncHandler(
   async (req: Request, res: Response) => {
     const { reaction, visitorKey } = req.body as {
@@ -395,7 +395,7 @@ export const reactToComment = asyncHandler(
   }
 );
 
-/** Public — add a comment or reply to a blog post. */
+/** Public: add a comment or reply to a blog post. */
 export const commentOnPost = asyncHandler(
   async (req: Request, res: Response) => {
     const { name, email, content, parentCommentId } = req.body as {
@@ -435,7 +435,7 @@ export const commentOnPost = asyncHandler(
   }
 );
 
-/** Admin — update any blog comment or reply. */
+/** Admin: update any blog comment or reply. */
 export const updateComment = asyncHandler(
   async (req: Request, res: Response) => {
     const comment = await BlogComment.findById(req.params.id);
@@ -456,7 +456,7 @@ export const updateComment = asyncHandler(
   }
 );
 
-/** Admin — delete a blog comment/reply and all nested descendants. */
+/** Admin: delete a blog comment/reply and all nested descendants. */
 export const removeComment = asyncHandler(
   async (req: Request, res: Response) => {
     const comment = await BlogComment.findById(req.params.id);

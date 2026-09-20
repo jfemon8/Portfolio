@@ -44,7 +44,7 @@ export default function MergeTab() {
         })
         .catch(() => {
           setItems((prev) => prev.filter((i) => i.id !== item.id));
-          toast.error(`Couldn't read "${item.file.name}" — skipped.`);
+          toast.error(`Couldn't read "${item.file.name}". Skipped.`);
         });
     }
   };
@@ -73,7 +73,7 @@ export default function MergeTab() {
       const bytes = await mergePdfs(items.map((i) => i.file));
       downloadBytes(bytes, 'merged.pdf');
       toast.success(
-        `Merged ${items.length} PDFs — ${formatBytes(bytes.length)}`
+        `Merged ${items.length} PDFs: ${formatBytes(bytes.length)}`
       );
     } catch (err) {
       toast.error(

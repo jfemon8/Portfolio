@@ -1,4 +1,4 @@
-// zxcvbn-ts is a sizeable dictionary-backed library (dozens of KB gzipped) — dynamically imported here rather than at the top level, so its cost is only ever paid by a visitor who actually opens the password tool, not bundled into every page.
+// zxcvbn-ts is a sizeable dictionary-backed library (dozens of KB gzipped), dynamically imported here rather than at the top level, so its cost is only ever paid by a visitor who actually opens the password tool, not bundled into every page.
 import type { ZxcvbnFactory as ZxcvbnFactoryType } from '@zxcvbn-ts/core';
 
 export interface PasswordAnalysis {
@@ -6,7 +6,7 @@ export interface PasswordAnalysis {
   guesses: number;
   warning: string;
   suggestions: string[];
-  // zxcvbn's own standard reference scenarios — well-established rate assumptions, not something this tool invented.
+  // zxcvbn's own standard reference scenarios: well-established rate assumptions, not something this tool invented.
   crackTimes: {
     onlineThrottled: string;
     onlineUnthrottled: string;

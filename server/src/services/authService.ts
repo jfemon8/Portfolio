@@ -25,7 +25,7 @@ export interface PublicUser {
 export interface AuthResult {
   user: PublicUser;
   accessToken: string;
-  /** raw refresh token — controller puts this in the HttpOnly cookie */
+  /** raw refresh token; controller puts this in the HttpOnly cookie */
   refreshToken: string;
 }
 

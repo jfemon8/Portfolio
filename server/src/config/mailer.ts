@@ -45,7 +45,7 @@ export async function sendContactEmail({
   const tx = getTransporter();
   if (!tx) {
     console.warn(
-      '⚠️  SMTP not configured — skipping email, message stored in DB only.'
+      '⚠️  SMTP not configured; skipping email, message stored in DB only.'
     );
     return { sent: false, reason: 'smtp_not_configured' };
   }
@@ -122,7 +122,7 @@ export async function sendContactEmail({
           )}</p>
           <p style="color:#9ca3af">${html(
             ec.ackSignoff,
-            '— Md Jannatul Ferdhous Emon'
+            'Best regards,<br />Md Jannatul Ferdhous Emon'
           )}</p>
         </div>
       </div>`,
@@ -145,7 +145,7 @@ export interface ReplyEmailInput {
   original: { name: string; message: string; createdAt?: Date };
 }
 
-// Sends an admin-composed reply, quoting the original message; never throws — the caller must surface failure so the admin knows it didn't go out.
+// Sends an admin-composed reply quoting the original message and never throws, so the caller must surface failure itself.
 export async function sendReplyEmail({
   to,
   subject,

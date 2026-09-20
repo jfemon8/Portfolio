@@ -11,7 +11,7 @@ import Async from '@/components/ui/Async';
 import { PublicationCardSkeleton } from '@/components/ui/Skeletons';
 import { usePublications } from '@/hooks/usePortfolio';
 
-/** Generic research/ML pipeline motif — decorative, theme-token driven. */
+/** Generic research/ML pipeline motif: decorative, theme-token driven. */
 const STAGES = ['Dataset', 'Resampling', 'Ensemble', 'Detection'];
 
 function Pipeline({ stages }: { stages: string[] }) {

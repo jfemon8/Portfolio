@@ -39,7 +39,7 @@ export default {
         ],
       },
       colors: {
-        // ---- Dark Developer / Neon palette (existing — unchanged) ----
+        // ---- Dark Developer / Neon palette (existing, unchanged) ----
         bg: {
           DEFAULT: '#0a0a0f',
           soft: '#0f0f17',
@@ -51,7 +51,7 @@ export default {
         // for a darker teal (`--neon` var defined in index.css) so every
         // `text-neon`/`bg-neon`/`border-neon` reads cleanly on the light bg
         // instead of washing out. The accent variants (dim/violet/pink/blue)
-        // stay fixed — they're brand accents used sparingly.
+        // stay fixed; they're brand accents used sparingly.
         neon: {
           DEFAULT: 'hsl(var(--neon) / <alpha-value>)',
           dim: '#0bbfa3',

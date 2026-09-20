@@ -54,7 +54,7 @@ export const dedupeKeyOf = (job: {
   return `${company || 'unknown'}::${title || job.title.toLowerCase().trim()}`;
 };
 
-/** How complete a posting is — decides which source wins a merge. */
+/** How complete a posting is; decides which source wins a merge. */
 export const qualityOf = (job: SourceJob): number => {
   let score = 0;
   if (job.description)
@@ -127,7 +127,7 @@ export function mergeDuplicates(jobs: SourceJob[]): MergedJob[] {
     };
 
     for (const candidate of ranked) {
-      // Gap-filling only — never let a weaker source overwrite the winner's field.
+      // Gap-filling only: never let a weaker source overwrite the winner's field.
       if (!merged.deadline && candidate.deadline)
         merged.deadline = candidate.deadline;
       if (!merged.salary && candidate.salary) merged.salary = candidate.salary;

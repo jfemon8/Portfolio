@@ -28,7 +28,7 @@ export default function PublicLayout() {
 
   useEffect(() => initThemeSync(), []);
 
-  // Read by the restore effect instead of sitting in its deps: a list page syncs its filters with `setSearchParams(replace)`, and re-running the effect on that REPLACE would tear down an in-flight restore and send the visitor to the top.
+  // Read by the restore effect instead of sitting in its deps, so a list page's `setSearchParams(replace)` can't tear down an in-flight restore.
   const navType = useRef(navigationType);
   const instantRef = useRef(instant);
 
@@ -65,7 +65,7 @@ export default function PublicLayout() {
         resetScroll();
         return;
       }
-      // Re-applies until the offset holds: a restored list paints over several frames as its queries land, and one jump would leave the visitor short of where they were.
+      // Re-applies until the offset holds, since a restored list paints over several frames as its queries land.
       let rafId = 0;
       let stable = 0;
       const deadline = performance.now() + 2000;
@@ -121,7 +121,7 @@ export default function PublicLayout() {
         once: true,
       });
 
-      // Lets the eased scroll finish, then chases: re-snaps whenever the target moves (siblings still fetching reflow the page) until queries settle and it holds still.
+      // Lets the eased scroll finish, then re-snaps whenever the target moves until queries settle.
       startTimer = setTimeout(
         () => {
           if (cancelled) return;

@@ -10,7 +10,7 @@ interface SparkAreaProps {
   ariaLabel?: string;
 }
 
-/** Hand-rolled SVG chart, no library, to keep the public bundle lean — recharts stays admin-only/lazy. */
+/** Hand-rolled SVG chart, no library, to keep the public bundle lean; recharts stays admin-only/lazy. */
 export default function SparkArea({
   data,
   className,

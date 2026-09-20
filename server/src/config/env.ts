@@ -113,7 +113,7 @@ export interface JobFeedConfig {
   timeoutMs?: number;
   /** Keep only postings whose title matches (regex source). */
   include?: string;
-  /** Drop postings whose title matches (regex source) — results, admit cards, notices. */
+  /** Drop postings whose title matches (regex source): results, admit cards, notices. */
   exclude?: string;
   /** Source publishes Bengali circular headlines, so the employer is read out of the title. */
   circularTitles?: boolean;
@@ -311,13 +311,13 @@ function parseJobFeeds(raw?: string): JobFeedConfig[] {
   } catch {
     // Falling back to the vetted defaults beats going silently dark on a typo.
     console.warn(
-      '⚠️  JOB_FEEDS is not valid JSON — using the built-in default feeds instead.'
+      '⚠️  JOB_FEEDS is not valid JSON; using the built-in default feeds instead.'
     );
     return DEFAULT_JOB_FEEDS;
   }
   if (!Array.isArray(candidate)) {
     console.warn(
-      '⚠️  JOB_FEEDS must be a JSON array — using the built-in default feeds instead.'
+      '⚠️  JOB_FEEDS must be a JSON array; using the built-in default feeds instead.'
     );
     return DEFAULT_JOB_FEEDS;
   }

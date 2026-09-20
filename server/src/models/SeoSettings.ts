@@ -1,7 +1,7 @@
 import mongoose, { type Model } from 'mongoose';
 import type { ISeoSettings } from '../types/index.js';
 
-// Singleton SEO defaults (like Profile); public Seo component falls back to config/site constants. Mongoose ESM-safe pattern, don't regress to named imports.
+// Singleton SEO defaults backed by config/site fallbacks, using the ESM-safe Mongoose import pattern.
 const seoSettingsSchema = new mongoose.Schema<ISeoSettings>(
   {
     metaTitle: { type: String, default: '' },

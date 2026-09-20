@@ -13,7 +13,7 @@ export async function loadPdf(bytes: ArrayBuffer): Promise<PDFDocument> {
   } catch (err) {
     if (err instanceof EncryptedPDFError) {
       throw new Error(
-        'This PDF is password-protected — remove the password before using it here.'
+        'This PDF is password-protected. Remove the password before using it here.'
       );
     }
     throw new Error(
@@ -132,7 +132,7 @@ export interface RasterCompressOptions {
   quality: number;
 }
 
-// Rasterizes every page to a JPEG and rebuilds the PDF from those images — trades text-selectability for size.
+// Rasterizes every page to a JPEG and rebuilds the PDF from those images; trades text-selectability for size.
 export async function compressRaster(
   file: File,
   opts: RasterCompressOptions,
@@ -295,7 +295,7 @@ export function parsePageRanges(input: string, pageCount: number): number[] {
     const to = match[2] ? parseInt(match[2], 10) : from;
     if (from < 1 || to > pageCount || from > to) {
       throw new Error(
-        `"${chunk}" is out of range — this PDF has ${pageCount} page${pageCount === 1 ? '' : 's'}.`
+        `"${chunk}" is out of range; this PDF has ${pageCount} page${pageCount === 1 ? '' : 's'}.`
       );
     }
     for (let p = from; p <= to; p++) indices.add(p - 1);

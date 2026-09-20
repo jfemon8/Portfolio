@@ -16,7 +16,7 @@ const jobSourceHealthSchema = new mongoose.Schema<IJobSourceHealth>(
     lastOkAt: { type: Date },
     lastError: { type: String, default: '', maxlength: 500 },
     consecutiveFailures: { type: Number, default: 0, min: 0 },
-    /** Runs in a row that succeeded but returned nothing — a silent-breakage signal. */
+    /** Runs in a row that succeeded but returned nothing: a silent-breakage signal. */
     consecutiveEmpty: { type: Number, default: 0, min: 0 },
     lastScanned: { type: Number, default: 0, min: 0 },
     lastAdded: { type: Number, default: 0, min: 0 },

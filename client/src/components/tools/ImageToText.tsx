@@ -70,7 +70,7 @@ export default function ImageToText() {
     try {
       const out = await ocrImages(files, language, (p) =>
         setStatus(
-          `Image ${p.page}/${p.totalPages} — ${p.status} ${Math.round(p.progress * 100)}%`
+          `Image ${p.page}/${p.totalPages}: ${p.status} ${Math.round(p.progress * 100)}%`
         )
       );
       setResults(out);
@@ -78,12 +78,14 @@ export default function ImageToText() {
       const mean =
         out.reduce((sum, r) => sum + r.confidence, 0) / (out.length || 1);
       if (out.some((r) => r.mode === 'handwriting-unavailable'))
-        toast.error('Bengali handwriting cannot be read yet — printed only.');
+        toast.error(
+          'Bengali handwriting cannot be read yet. Printed text only.'
+        );
       else if (out.some((r) => r.mode === 'handwriting'))
         toast.success(`Read ${words} words as handwriting`);
       else if (mean < OCR_USABLE_CONFIDENCE)
         toast.error(
-          'Barely readable — try a sharper, flatter, better-lit shot.'
+          'Barely readable. Try a sharper, flatter, better-lit shot.'
         );
       else toast.success(`Read ${words} words from ${out.length} image(s)`);
     } catch (err) {
@@ -197,7 +199,7 @@ export default function ImageToText() {
           PNG, JPG, WebP, BMP or GIF · several at once is fine
         </span>
         <span className="text-2xs text-muted-foreground/60">
-          Handwriting is read too — English only.
+          Handwriting is read too, English only.
         </span>
       </div>
       <input
@@ -285,14 +287,14 @@ export default function ImageToText() {
               )}
             >
               {handwritten
-                ? 'Read as handwriting — check it against the image before using it.'
+                ? 'Read as handwriting. Check it against the image before using it.'
                 : noBengaliModel
                   ? 'This looks like Bengali handwriting, which no available model can read yet. Printed Bengali works fine.'
                   : `Average confidence ${averageConfidence}%${
                       unusable
-                        ? ' — this looks unreadable. Try a sharper, flatter, better-lit shot.'
+                        ? '. This looks unreadable. Try a sharper, flatter, better-lit shot.'
                         : averageConfidence < 75
-                          ? ' — try a sharper, flatter, better-lit photo'
+                          ? '. Try a sharper, flatter, better-lit photo'
                           : ''
                     }`}
             </span>

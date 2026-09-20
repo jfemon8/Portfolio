@@ -41,6 +41,6 @@ router.use(
   '/publications',
   resourceRouter(Publication, { imageFields: ['mediaPublicId'] })
 );
-router.use('/tools', resourceRouter(Tool)); // icon is a fixed select, not an upload — no imageFields
+router.use('/tools', resourceRouter(Tool)); // icon is a fixed select, not an upload; no imageFields
 
 export default router;

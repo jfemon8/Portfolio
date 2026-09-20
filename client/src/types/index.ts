@@ -1,4 +1,4 @@
-// Frontend DTOs mirror the backend domain models — one consistent shape; ids/dates are serialized to strings.
+// Frontend DTOs mirror the backend domain models: one consistent shape; ids/dates are serialized to strings.
 
 export interface Timestamps {
   createdAt: string;
@@ -17,7 +17,7 @@ export interface Social {
   url: string;
   /** Legacy built-in icon key ('github'|'linkedin'|'mail'|'code'); new entries can leave empty and let display logic auto-derive from `label`. */
   icon: string;
-  /** Optional Cloudinary URL — when set, overrides the auto-derived icon. */
+  /** Optional Cloudinary URL; when set, overrides the auto-derived icon. */
   iconImage?: string;
   iconImagePublicId?: string;
 }
@@ -162,7 +162,7 @@ export interface Skill {
   level: number;
   /** Legacy free-text icon hint, retained for older rows; new skills should use `iconImage` and let the public renderer fall back to a react-icons logo. */
   icon: string;
-  /** Cloudinary-uploaded icon URL. Empty → react-icons fallback by name. */
+  /** Cloudinary-uploaded icon URL, falling back to a react-icons match by name when empty. */
   iconImage: string;
   iconImagePublicId: string;
   order: number;
@@ -404,7 +404,7 @@ export interface BlogComment {
   reactions?: BlogCommentReactionSummary[];
   totalReactions?: number;
   visitorReaction?: BlogReactionType | null;
-  /** Only populated on top-level comments — the API nests each thread's replies (already newest-first) inline. */
+  /** Only populated on top-level comments; the API nests each thread's replies (already newest-first) inline. */
   replies?: BlogCommentDoc[];
 }
 
@@ -799,7 +799,7 @@ export interface AnalyticsSummary {
   byDevice: { _id: string; count: number }[];
   byBrowser: { _id: string; count: number }[];
   byCountry: { _id: string; count: number }[];
-  /** scroll-depth funnel — _id is the 25/50/75/100 bucket */
+  /** scroll-depth funnel; _id is the 25/50/75/100 bucket */
   scrollDepth: { _id: number; count: number }[];
   topProjects: Pick<ProjectDoc, '_id' | 'title' | 'slug' | 'views'>[];
   topPosts: Pick<BlogPostDoc, '_id' | 'title' | 'slug' | 'views'>[];

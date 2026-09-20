@@ -16,7 +16,7 @@ interface RichTextImageModalProps {
 
 type Tab = 'upload' | 'url';
 
-/** Custom replacement for window.prompt() when inserting an image in RichTextEditor — upload to Cloudinary or paste a URL. */
+/** Custom replacement for window.prompt() when inserting an image in RichTextEditor: upload to Cloudinary or paste a URL. */
 export default function RichTextImageModal({
   open,
   folder,

@@ -49,7 +49,7 @@ const PUBLIC_ROUTE_IMPORTERS: ChunkImporter[] = [
   importers.toolDetail,
 ];
 
-// Mirrors the admin lazy() list in App.tsx — only ever runs once an admin has already reached AdminLayout, so visitors never trigger it.
+// Mirrors the admin lazy() list in App.tsx; only ever runs once an admin has already reached AdminLayout, so visitors never trigger it.
 const ADMIN_ROUTE_IMPORTERS: ChunkImporter[] = [
   () => import('@/pages/admin/Dashboard'),
   () => import('@/pages/admin/ProfileManager'),
@@ -95,7 +95,7 @@ function idlePrefetchAll(chunks: ChunkImporter[]): void {
 }
 
 let publicRoutesWarmed = false;
-/** Idle-warms every public route chunk once — call on mount from the public shell. */
+/** Idle-warms every public route chunk once; call on mount from the public shell. */
 export function prefetchPublicRoutes(): void {
   if (publicRoutesWarmed) return;
   publicRoutesWarmed = true;
@@ -103,7 +103,7 @@ export function prefetchPublicRoutes(): void {
 }
 
 let adminRoutesWarmed = false;
-/** Idle-warms every admin route chunk once — call on mount from AdminLayout (post-auth only). */
+/** Idle-warms every admin route chunk once; call on mount from AdminLayout (post-auth only). */
 export function prefetchAdminRoutes(): void {
   if (adminRoutesWarmed) return;
   adminRoutesWarmed = true;

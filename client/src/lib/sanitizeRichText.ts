@@ -1,6 +1,4 @@
-// Shared by <RichText> (browser `document`) and the prerender script (a jsdom `Document`), so the
-// sanitizer that decides what a reader — and a non-JS crawler reading the prerendered HTML — sees
-// is defined exactly once.
+// Shared by <RichText> and the prerender script so the sanitizer deciding what a reader and a non-JS crawler see is defined exactly once.
 
 const ALLOWED_TAGS = new Set([
   'p',
@@ -92,7 +90,7 @@ const safeHref = (href: string, origin: string): string | null => {
   return null;
 };
 
-// No data: URIs — images go through the editor's upload button, which always returns an http(s) Cloudinary URL.
+// No data: URIs; images go through the editor's upload button, which always returns an http(s) Cloudinary URL.
 const safeImageSrc = (src: string, origin: string): string | null => {
   const trimmed = src.trim();
   if (!trimmed) return null;
@@ -117,8 +115,7 @@ const safeTextAlign = (element: HTMLElement, tag: string): string => {
   return value ? ` style="text-align:${value.toLowerCase()}"` : '';
 };
 
-// Node.TEXT_NODE/ELEMENT_NODE are browser globals (unavailable under plain Node.js, unlike jsdom's
-// DOM objects themselves), so these use the DOM spec's own stable numeric values instead.
+// Node.TEXT_NODE/ELEMENT_NODE are browser globals unavailable under plain Node.js, so these use the DOM spec's stable numeric values instead.
 const TEXT_NODE = 3;
 const ELEMENT_NODE = 1;
 

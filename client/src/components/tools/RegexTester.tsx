@@ -75,7 +75,7 @@ const PRESETS = [
   },
 ];
 
-// Splits each match into runs owned by whichever capturing group covers them (innermost/highest-numbered wins on overlap), so `(\d{4})-(\d{2})` highlights each group in a distinct color instead of one flat block — needs the 'd' flag for per-group character offsets.
+// Splits each match into runs owned by the innermost capturing group so each highlights in its own color, which needs the 'd' flag for per-group offsets.
 function buildSegments(text: string, matches: RegexMatch[]): Segment[] {
   const segments: Segment[] = [];
   let cursor = 0;
@@ -132,7 +132,7 @@ export default function RegexTester() {
     setText(p.sample);
   };
 
-  // Debounced into a watchdogged worker — a backtracking pattern like `(a+)+$` used to freeze this tab for minutes.
+  // Debounced into a watchdogged worker; a backtracking pattern like `(a+)+$` used to freeze this tab for minutes.
   useEffect(() => {
     if (!pattern) {
       setMatchState(null);
@@ -155,7 +155,7 @@ export default function RegexTester() {
           matches: [],
           truncated: false,
           error:
-            'This pattern is taking too long on this input — it is probably backtracking catastrophically. Try making it less ambiguous (for example replace nested quantifiers like (a+)+ with a+).',
+            'This pattern is taking too long on this input; it is probably backtracking catastrophically. Try making it less ambiguous (for example replace nested quantifiers like (a+)+ with a+).',
         });
       }, WATCHDOG_MS);
 
@@ -212,7 +212,7 @@ export default function RegexTester() {
     };
   }, [matchState, text]);
 
-  // Reduced rather than spread — spreading 200k matches into Math.max throws a RangeError that escapes render and takes down the whole app.
+  // Reduced rather than spread: spreading 200k matches into Math.max throws a RangeError that escapes render and takes down the whole app.
   const groupCount = (result?.matches ?? []).reduce(
     (max, m) => Math.max(max, m.groupCount),
     0
@@ -354,7 +354,7 @@ export default function RegexTester() {
           <span className="label">Matches</span>
           {matchState?.truncated && (
             <p className="text-2xs text-amber-400">
-              Showing the first {MAX_MATCHES.toLocaleString()} matches — the
+              Showing the first {MAX_MATCHES.toLocaleString()} matches; the
               pattern matched more than that.
             </p>
           )}
@@ -366,8 +366,7 @@ export default function RegexTester() {
               <span className="text-foreground">Match {i + 1}:</span> "{m.text}"
               {m.groupCount > 0 && (
                 <span>
-                  {' '}
-                  — groups:{' '}
+                  , groups:{' '}
                   {m.indices
                     .slice(1)
                     .map(

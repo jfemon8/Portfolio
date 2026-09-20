@@ -79,7 +79,7 @@ export default function PasswordCrackTime() {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const requestIdRef = useRef(0);
 
-  // Benchmarks this device once, up front — it doesn't depend on anything the visitor types, so there's no reason to wait for a password before finding out how fast this browser can hash.
+  // Benchmarks this device once up front, since the hash rate doesn't depend on anything the visitor types.
   useEffect(() => {
     const worker = new Worker(
       new URL('../../workers/passwordBenchmark.worker.ts', import.meta.url),
@@ -106,7 +106,7 @@ export default function PasswordCrackTime() {
     debounceRef.current = setTimeout(() => {
       void analyzePassword(password)
         .then((result) => {
-          // A later keystroke's analysis may resolve before an earlier one if the dictionary was still loading on the first call — only the most recent request is allowed to land.
+          // Only the most recent request is allowed to land, since a later keystroke can resolve before an earlier one while the dictionary is still loading.
           if (requestId === requestIdRef.current) {
             setAnalysis(result);
             setAnalyzing(false);
@@ -117,7 +117,7 @@ export default function PasswordCrackTime() {
           if (requestId === requestIdRef.current) {
             setAnalyzing(false);
             setLoadError(
-              "Couldn't load the password dictionary — check your connection and type again."
+              "Couldn't load the password dictionary. Check your connection and type again."
             );
           }
         });
@@ -134,7 +134,7 @@ export default function PasswordCrackTime() {
       <div className="flex items-start gap-2.5 rounded-xl border border-border/60 bg-bg-elevated/40 p-3.5 text-xs text-muted-foreground">
         <ShieldCheck className="h-4 w-4 shrink-0 translate-y-0.5 text-neon" />
         <p>
-          Your password is never sent anywhere, logged, or stored — not even to
+          Your password is never sent anywhere, logged, or stored, not even to
           check it.
         </p>
       </div>
@@ -252,13 +252,13 @@ export default function PasswordCrackTime() {
                 />
               </div>
               <p className="mt-3 text-2xs text-muted-foreground/70">
-                Your device's measured rate is a browser tab doing plain SHA-256
-                — a real attacker with dedicated GPU/ASIC hardware typically
-                reaches far higher throughput than one tab can, so treat the
-                fast-hash scenario above as a conservative floor on real-world
-                risk, not a ceiling. This is exactly why slow, purpose-built
-                hashes like bcrypt matter for how a service stores your password
-                in the first place.
+                Your device's measured rate is a browser tab doing plain
+                SHA-256; a real attacker with dedicated GPU/ASIC hardware
+                typically reaches far higher throughput than one tab can, so
+                treat the fast-hash scenario above as a conservative floor on
+                real-world risk, not a ceiling. This is exactly why slow,
+                purpose-built hashes like bcrypt matter for how a service stores
+                your password in the first place.
               </p>
             </>
           )}

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { env } from './env.js';
 
-// Connection cache for serverless (Vercel) — each warm invocation reuses the existing connection instead of opening a new pool.
+// Connection cache for serverless (Vercel): each warm invocation reuses the existing connection instead of opening a new pool.
 interface MongooseCache {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
