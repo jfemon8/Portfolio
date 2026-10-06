@@ -13,7 +13,11 @@ import {
   FileX,
   RotateCw,
   FileText,
+  Check,
+  Link2,
+  Share2,
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 import { proxyFileUrl } from '@/lib/fileProxy';
 
@@ -28,6 +32,11 @@ pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker;
 interface PdfViewerProps {
   url: string;
   fileName?: string;
+  displayName?: string;
+  shareTitle?: string;
+  showDocumentName?: boolean;
+  showDownload?: boolean;
+  className?: string;
   allowFullscreen?: boolean;
 }
 
@@ -35,6 +44,11 @@ interface PdfViewerProps {
 export default function PdfViewer({
   url,
   fileName,
+  displayName: displayNameOverride,
+  shareTitle,
+  showDocumentName = true,
+  showDownload = true,
+  className,
   allowFullscreen = true,
 }: PdfViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -49,11 +63,15 @@ export default function PdfViewer({
   const [fullscreen, setFullscreen] = useState(false);
   const [showPageInput, setShowPageInput] = useState(false);
   const [pageInput, setPageInput] = useState('');
+  const [copied, setCopied] = useState(false);
   const pageInputRef = useRef<HTMLInputElement>(null);
 
   // Proxied because Cloudinary raw assets serve `application/octet-stream`, breaking inline preview and filename-keeping downloads.
   const displayName =
-    fileName || url.split('/').pop()?.split('?')[0] || 'document.pdf';
+    displayNameOverride ||
+    fileName ||
+    url.split('/').pop()?.split('?')[0] ||
+    'document.pdf';
 
   // Downloads need an extension for the OS to identify the file type, so keep displayName's if present, else fall back to the URL's (or `.pdf`).
   const urlExtMatch = url.match(/\.([a-z0-9]{1,8})(?:$|\?)/i);
@@ -61,6 +79,24 @@ export default function PdfViewer({
   const downloadName = /\.[a-z0-9]{1,8}$/i.test(displayName)
     ? displayName
     : `${displayName}${urlExt}`;
+
+  const copyLink = async (): Promise<void> => {
+    await navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    toast.success('Link copied');
+    window.setTimeout(() => setCopied(false), 1800);
+  };
+
+  const share = async (): Promise<void> => {
+    if (navigator.share) {
+      await navigator.share({
+        title: shareTitle || displayName,
+        url: window.location.href,
+      });
+      return;
+    }
+    await copyLink();
+  };
 
   const viewUrl = useMemo(
     () => proxyFileUrl(url, downloadName, true),
@@ -304,20 +340,24 @@ export default function PdfViewer({
       tabIndex={-1}
       // `flex-1 min-h-0` lets the pane shrink below its content size, which nested `overflow-auto` needs to actually scroll.
       className={`flex h-full select-none flex-col overflow-hidden rounded-xl border border-border bg-card outline-none ${
-        fullscreen ? 'fixed inset-0 z-[100] rounded-none border-0' : ''
-      }`}
+        className || ''
+      } ${fullscreen ? 'fixed inset-0 z-[100] rounded-none border-0' : ''}`}
     >
       {/* ── Toolbar ── */}
       <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border bg-muted/40 px-3 py-2 sm:px-4">
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-          <FileText className="hidden h-4 w-4 shrink-0 text-red-500 sm:block" />
-          <span
-            className="hidden max-w-[7.5rem] truncate text-xs font-medium text-foreground sm:block sm:max-w-[12.5rem] sm:text-sm lg:max-w-[18.75rem]"
-            title={displayName}
-          >
-            {displayName}
-          </span>
-          <div className="hidden h-4 w-px bg-border sm:block" />
+          {showDocumentName && (
+            <>
+              <FileText className="hidden h-4 w-4 shrink-0 text-red-500 sm:block" />
+              <span
+                className="hidden max-w-[7.5rem] truncate text-xs font-medium text-foreground sm:block sm:max-w-[12.5rem] sm:text-sm lg:max-w-[18.75rem]"
+                title={displayName}
+              >
+                {displayName}
+              </span>
+              <div className="hidden h-4 w-px bg-border sm:block" />
+            </>
+          )}
 
           {showPageInput ? (
             <form
@@ -422,6 +462,32 @@ export default function PdfViewer({
         </div>
 
         <div className="flex items-center gap-1">
+          {shareTitle && (
+            <>
+              <button
+                type="button"
+                onClick={() => void copyLink()}
+                className="rounded-lg p-1.5 text-foreground hover:bg-accent sm:p-2"
+                aria-label="Copy link"
+                title={copied ? 'Copied' : 'Copy link'}
+              >
+                {copied ? (
+                  <Check className="h-4 w-4" />
+                ) : (
+                  <Link2 className="h-4 w-4" />
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => void share()}
+                className="rounded-lg p-1.5 text-foreground hover:bg-accent sm:p-2"
+                aria-label={`Share ${shareTitle}`}
+                title={`Share ${shareTitle}`}
+              >
+                <Share2 className="h-4 w-4" />
+              </button>
+            </>
+          )}
           {scale !== 1 && (
             <button
               type="button"
@@ -448,15 +514,17 @@ export default function PdfViewer({
               )}
             </button>
           )}
-          <a
-            href={downloadHref}
-            download={downloadName}
-            className="rounded-lg p-1.5 text-foreground hover:bg-accent sm:p-2"
-            aria-label="Download PDF"
-            title="Download"
-          >
-            <Download className="h-4 w-4" />
-          </a>
+          {showDownload && (
+            <a
+              href={downloadHref}
+              download={downloadName}
+              className="rounded-lg p-1.5 text-foreground hover:bg-accent sm:p-2"
+              aria-label="Download PDF"
+              title="Download"
+            >
+              <Download className="h-4 w-4" />
+            </a>
+          )}
         </div>
       </div>
 

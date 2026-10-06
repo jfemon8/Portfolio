@@ -34,6 +34,7 @@ export default function ProfileManager() {
   const [f, setF] = useState<ProfileForm | null>(null);
   const [rolesText, setRolesText] = useState('');
   const [resumeBusy, setResumeBusy] = useState(false);
+  const [cvBusy, setCvBusy] = useState(false);
   const [resumeViewerOpen, setResumeViewerOpen] = useState(false);
   const [arrKeys, setArrKeys] = useState<Record<FlatArrayKey, string[]>>({
     stats: [],
@@ -157,6 +158,32 @@ export default function ProfileManager() {
       toast.error((err as ApiError).message || 'Resume upload failed');
     } finally {
       setResumeBusy(false);
+    }
+  };
+
+  const uploadCv = async (file?: File): Promise<void> => {
+    if (!file) return;
+    setCvBusy(true);
+    try {
+      const fd = new FormData();
+      fd.append('cv', file);
+      const { data: res } = await api.post<{
+        url: string;
+        publicId: string;
+        fileName: string;
+        mimeType: string;
+      }>('/upload/cv', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      set('cvUrl', res.url);
+      set('cvPublicId', res.publicId);
+      set('cvFileName', res.fileName);
+      set('cvMimeType', res.mimeType);
+      toast.success('CV uploaded');
+    } catch (err) {
+      toast.error((err as ApiError).message || 'CV upload failed');
+    } finally {
+      setCvBusy(false);
     }
   };
 
@@ -389,6 +416,32 @@ export default function ProfileManager() {
                   accept="application/pdf"
                   className="hidden"
                   onChange={(e) => uploadResume(e.target.files?.[0])}
+                />
+              </label>
+            </div>
+          </GlassCard>
+
+          <GlassCard className="space-y-4 p-6">
+            <h3 className="font-semibold text-neon">CV</h3>
+            <div className="space-y-2">
+              <label className="label">CV (PDF, DOC or DOCX)</label>
+              {f.cvFileName && (
+                <p className="truncate text-xs text-muted-foreground">
+                  Current file: {f.cvFileName}
+                </p>
+              )}
+              <label className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-border bg-muted/40 px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:border-primary/50 hover:bg-muted/60 hover:text-primary">
+                {cvBusy ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <FileUp className="h-4 w-4" />
+                )}
+                {f.cvUrl ? 'Replace CV file' : 'Upload CV file'}
+                <input
+                  type="file"
+                  accept="application/pdf,.doc,.docx"
+                  className="hidden"
+                  onChange={(e) => uploadCv(e.target.files?.[0])}
                 />
               </label>
             </div>

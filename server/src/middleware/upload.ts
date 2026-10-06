@@ -32,6 +32,22 @@ export const uploadDoc = multer({
   },
 });
 
+export const uploadCv = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (
+      [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      ].includes(file.mimetype)
+    )
+      return cb(null, true);
+    cb(ApiError.badRequest('Only PDF, DOC or DOCX files are allowed.'));
+  },
+});
+
 // Accepts an image or a PDF, used by the generic media uploader (credential certificates, publication papers, etc.).
 export const uploadMedia = multer({
   storage,

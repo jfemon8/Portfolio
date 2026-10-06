@@ -14,6 +14,8 @@ const Tools = lazy(() => import('@/pages/Tools'));
 const ToolDetail = lazy(() => import('@/pages/ToolDetail'));
 const Jobs = lazy(() => import('@/pages/Jobs'));
 const JobDetail = lazy(() => import('@/pages/JobDetail'));
+const Cv = lazy(() => import('@/pages/Cv'));
+const Resume = lazy(() => import('@/pages/Resume'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
 // Admin (code-split, never loaded by public visitors)
@@ -57,6 +59,8 @@ export default function App() {
           <Route path="/tools/jobs" element={<Jobs />} />
           <Route path="/tools/jobs/:id" element={<JobDetail />} />
           <Route path="/tools/:slug" element={<ToolDetail />} />
+          <Route path="/cv" element={<Cv />} />
+          <Route path="/resume" element={<Resume />} />
           <Route path="*" element={<NotFound />} />
         </Route>
 

@@ -24,6 +24,7 @@ site stays up to date without any code changes.
 - 💼 Cinematic experience timeline, interactive skill cloud, education, research & credentials
 - 📈 Live competitive-programming stats (Codeforces, LeetCode & CodeChef) with rating history
 - 📬 Working contact form with email notifications
+- 📄 Public CV viewer at `/cv` with PDF/DOC/DOCX upload, sharing and download
 - 🌗 Animated dark / light theme, SEO-optimized, fully responsive
 - 🔐 Secure role-based admin dashboard for fully dynamic content
 - 📊 Privacy-friendly, cookie-less visitor analytics

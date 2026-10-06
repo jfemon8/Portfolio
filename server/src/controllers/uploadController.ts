@@ -38,6 +38,32 @@ export const uploadResumeHandler = asyncHandler(
   }
 );
 
+export const uploadCvHandler = asyncHandler(
+  async (req: Request, res: Response) => {
+    if (!req.file) throw ApiError.badRequest('No CV file provided.');
+    const extension = (req.file.originalname.split('.').pop() || 'pdf')
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '');
+    const base = (req.file.originalname || 'cv')
+      .replace(/\.[^.]+$/, '')
+      .replace(/[^a-zA-Z0-9-_]/g, '_')
+      .toLowerCase()
+      .slice(0, 40);
+    const publicId = `${base || 'cv'}-${Date.now()}.${extension}`;
+    const result = await uploadBuffer(req.file.buffer, {
+      folder: 'portfolio/cv',
+      publicId,
+      resourceType: 'raw',
+    });
+    res.status(201).json({
+      success: true,
+      fileName: req.file.originalname,
+      mimeType: req.file.mimetype,
+      ...result,
+    });
+  }
+);
+
 // Admin: upload an image or a PDF; PDFs get a .pdf-suffixed public_id (same trick as the resume upload) so the CDN URL ends in .pdf and the proxy can serve it inline.
 export const uploadMediaHandler = asyncHandler(
   async (req: Request, res: Response) => {

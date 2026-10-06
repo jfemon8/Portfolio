@@ -1,9 +1,15 @@
 import { Router } from 'express';
 import { protect, adminOnly } from '../middleware/auth.js';
-import { uploadImage, uploadDoc, uploadMedia } from '../middleware/upload.js';
+import {
+  uploadImage,
+  uploadDoc,
+  uploadCv,
+  uploadMedia,
+} from '../middleware/upload.js';
 import {
   uploadImageHandler,
   uploadResumeHandler,
+  uploadCvHandler,
   uploadMediaHandler,
   deleteAssetHandler,
   listAssetsHandler,
@@ -26,6 +32,7 @@ router.post(
   uploadDoc.single('resume'),
   uploadResumeHandler
 );
+router.post('/cv', protect, adminOnly, uploadCv.single('cv'), uploadCvHandler);
 router.post(
   '/media',
   protect,

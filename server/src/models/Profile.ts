@@ -26,6 +26,10 @@ const profileSchema = new mongoose.Schema<IProfile>(
     avatarPublicId: { type: String, default: '' },
     resumeUrl: { type: String, default: '' },
     resumePublicId: { type: String, default: '' },
+    cvUrl: { type: String, default: '' },
+    cvPublicId: { type: String, default: '' },
+    cvFileName: { type: String, default: '' },
+    cvMimeType: { type: String, default: '' },
     socials: { type: [socialSchema], default: [] },
     stats: {
       type: [{ label: String, value: String }],

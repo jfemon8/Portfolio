@@ -49,6 +49,10 @@ export interface Profile {
   avatarPublicId: string;
   resumeUrl: string;
   resumePublicId: string;
+  cvUrl: string;
+  cvPublicId: string;
+  cvFileName: string;
+  cvMimeType: string;
   socials: Social[];
   stats: Stat[];
   languages: LanguageProficiency[];
